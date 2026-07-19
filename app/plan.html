@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '2.0';
+window.APP_VERSION = '2.01';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2102,21 +2102,29 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      (900) and modals (1000) since a step can legitimately point at
      something inside either.
      ========================================================================== */
-  /* Blocking by default (pointer-events:auto) — a plain descriptive step
-     ("tap a course to see its details") must NOT let that tap fall through
-     to the real page, or the real course modal opens underneath while the
-     tutorial stays stuck pointing at now-stale coordinates. Only while the
-     CURRENT step is interactive does .interactive-step switch this to
-     pointer-events:none, letting a real press-and-hold gesture reach the
-     real element it's spotlighting. The tooltip card always stays
-     interactive itself, for its own Next/Skip buttons. */
-  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;pointer-events:auto;}
+  /* pointer-events:none on the whole layer — every step's spotlighted
+     element is genuinely tappable, not just the one flagged interactive:
+     true, because a step's own text ("tap a course to see its details")
+     is an instruction to actually do that right now, not a description of
+     a feature to try later. If that tap opens a REAL modal underneath
+     (course details, etc.), JS detects it and hides this layer for as
+     long as that modal stays open (see pauseForRealModal/resumeFromPause)
+     rather than leaving a dark overlay + stale spotlight fighting a dialog
+     that just opened on top of it. The tooltip card stays interactive
+     itself regardless, for its own Next/Skip buttons. */
+  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;pointer-events:none;}
   .tut-layer.open{display:block;}
-  .tut-layer.interactive-step{pointer-events:none;}
+  .tut-layer.paused{visibility:hidden;}
   .tut-spotlight{
     position:fixed;
     border-radius:10px;
-    box-shadow:0 0 0 9999px rgba(4,7,18,.78);
+    /* Lighter than a typical spotlight overlay on purpose — the "hole" this
+       box-shadow trick cuts is a fixed rectangle sized to the target at
+       render time, but several steps invite an interaction that reveals
+       content OUTSIDE that rectangle (a modal opening, a search dropdown,
+       an accordion expanding). A lighter backdrop still reads as "focus
+       here" without making that revealed content unreadable. */
+    box-shadow:0 0 0 9999px rgba(4,7,18,.45);
     outline:2px solid var(--accent);
     outline-offset:4px;
     pointer-events:none;
@@ -10319,9 +10327,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 1); },
         title: 'GPA',
         text: 'Enter grades for a course from its info popup on the Study Plan page — your GPA updates here automatically.' },
-      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 2); },
+      { target: function(){ return document.querySelector('#dashboard .dash-quicklink[onclick*="AAUP_ACHIEVEMENTS"]'); },
         title: 'Achievements',
-        text: 'Small goals that unlock as you go — tap the card to see all of them for this major.' },
+        text: 'Small goals that unlock as you go — tap here to see all of them for this major. Go ahead, try it.' },
       { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 3); },
         title: 'What Can I Take Next',
         text: 'Courses whose prerequisites you’ve already checked off — a quick answer to "what am I actually allowed to register for."' },
@@ -10342,7 +10350,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         interactive: true },
       { target: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-box'); },
         title: 'Search a course',
-        text: 'Find any course on this page by name or course number instead of hunting through every semester.' }
+        text: 'Find any course on this page by name or course number instead of hunting through every semester. Try typing one now.',
+        noDim: true } // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
     ]
   };
 
@@ -10394,8 +10403,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         spot.style.left = Math.max(0, r.left - pad) + 'px';
         spot.style.width = (r.width + pad * 2) + 'px';
         spot.style.height = (r.height + pad * 2) + 'px';
-        spot.classList.toggle('no-dim', !!step.interactive);
-        document.getElementById('tutLayer').classList.toggle('interactive-step', !!step.interactive);
+        spot.classList.toggle('no-dim', !!(step.interactive || step.noDim));
 
         document.getElementById('tutTitle').textContent = step.title;
         document.getElementById('tutText').textContent = step.text;
@@ -10441,13 +10449,69 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(!active) return;
     stopWatchingInteractive();
     markDone(active.id);
-    document.getElementById('tutLayer').classList.remove('open');
+    document.getElementById('tutLayer').classList.remove('open', 'paused');
     window.removeEventListener('resize', reflow);
     window.removeEventListener('scroll', reflow, true);
+    paused = false;
     active = null;
   }
 
+  // Every step's spotlighted element is genuinely tappable (see the
+  // pointer-events comment on .tut-layer in the stylesheet) — a step's own
+  // text ("tap a course to see its details") is telling the student to do
+  // that right now. When that tap opens a REAL modal (course details,
+  // achievements, etc.) underneath this layer, fighting it with a dark
+  // overlay and a spotlight pointing at now-covered coordinates is worse
+  // than just getting out of the way: hide the tour layer for as long as
+  // that modal stays open, then treat closing it as "step done" and move
+  // on, same reward-the-interaction logic the hold-to-trace step already
+  // uses.
+  var paused = false;
+  function anyOtherModalOpen(){
+    return !!document.querySelector('.modal-overlay.open:not(#tutLayer)');
+  }
+  function checkRealModalState(){
+    if(!active) return;
+    var blocked = anyOtherModalOpen();
+    if(blocked && !paused){
+      paused = true;
+      document.getElementById('tutLayer').classList.add('paused');
+    } else if(!blocked && paused){
+      paused = false;
+      document.getElementById('tutLayer').classList.remove('paused');
+      advance();
+    }
+  }
+  // Coalesced to at most one check per animation frame — the interactive
+  // trace step alone can fire dozens of class-attribute mutations in a
+  // single burst (every related SVG path + course node), and this only
+  // ever needs to notice a modal-overlay open/close, not react to each one.
+  var modalCheckScheduled = false;
+  function scheduleModalCheck(){
+    if(modalCheckScheduled) return;
+    modalCheckScheduled = true;
+    requestAnimationFrame(function(){ modalCheckScheduled = false; checkRealModalState(); });
+  }
+  var modalWatcher = new MutationObserver(function(){ scheduleModalCheck(); });
+  modalWatcher.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+
   function start(id){
+    // A tour step's target can be genuinely tapped now (see the
+    // pointer-events comment above), and some of those taps navigate to a
+    // whole different page instead of opening a modal — "My Study Plan" on
+    // the last dashboard step, for one. That page transition itself calls
+    // startWhenClear() for the NEXT tour in the very same synchronous tick,
+    // before the modalWatcher below ever gets a chance to fire and finish()
+    // the old one — so without this check, a still-"active" dashboard tour
+    // would permanently block the study-plan tour from ever starting.
+    // Detect it here instead: if the previous tour's own current-step
+    // target is no longer on screen, its page is gone — treat that exactly
+    // like the student finished it themselves.
+    if(active && active.id !== id){
+      var staleStep = active.steps[active.index];
+      var staleEl = staleStep && resolve(staleStep);
+      if(!staleEl || staleEl.offsetParent === null){ finish(); }
+    }
     if(active || done(id)) return;
     var steps = TOURS[id];
     if(!steps || !steps.length) return;
