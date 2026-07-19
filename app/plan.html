@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '2.11';
+window.APP_VERSION = '2.5';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -9465,7 +9465,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<div class="header-actions">' +
         '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">🏠</span><span class="home-lbl">Home</span></button>' +
         (canEdit ? (editing
-          ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
+          ? '<button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
           : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">✏️ Edit Mode</button>') : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">📚 Course Library</button>' : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">📤 Export Plan</button>' : '') +
@@ -9558,7 +9558,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var page = document.getElementById('page-' + planId);
     if(!page) return;
     page.classList.toggle('editing');
-    render(planId);
+    var enteringEdit = page.classList.contains('editing');
+    render(planId); // rebuilds the DOM the tour's step targets look for — must happen before starting it
+    if(enteringEdit && window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('planEditor'); }
   }
 
   function toggleLang(planId){
@@ -10353,6 +10355,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
   function nth(list, i){ return list && list[i] ? list[i] : null; }
 
+  // The custom/imported plan editor always renders into this one fixed
+  // host regardless of which plan is open — unlike visiblePlanRoot()'s
+  // built-in majors, there's only ever one candidate, so this just needs
+  // to confirm it's actually the thing on screen right now.
+  function importedEditRoot(){
+    var host = document.getElementById('importedPlanView');
+    return (host && host.offsetParent !== null) ? host : document;
+  }
+
   // A course guaranteed to have at least one prerequisite connection —
   // needed for the interactive hold-to-trace step, since holding a course
   // with zero connections draws nothing and the step would never complete.
@@ -10420,6 +10431,60 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         noDim: true, // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
         avoidBelow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown.open'); },
         watchReflow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown'); } }
+    ],
+    // Edit Mode on a student's OWN custom/imported plan — no developer
+    // password involved, since only its own creator can ever reach it (see
+    // the "canEdit = true" comment in AAUP_IMPORTED.render). Steps that open
+    // one of the shared devModalOverlay dialogs (Add Course, Course
+    // Library, Edit Course) need no special handling here at all: the same
+    // pause-while-a-real-modal-is-open / resume-and-advance-on-close
+    // machinery below (see anyOtherModalOpen) already covers any
+    // .modal-overlay, automatically. Move/Add Year/Remove are left
+    // descriptive rather than gated on a specific gesture — forcing an
+    // exact drag destination is fragile, and forcing a real delete on
+    // someone's own data is actively bad UX; the layer being pass-through
+    // means they're all genuinely tappable/draggable live regardless.
+    planEditor: [
+      { target: function(){ return importedEditRoot().querySelector('.imp-exit-edit-btn'); },
+        title: 'Edit Mode',
+        text: 'This is YOUR plan — nothing here is shared with anyone until you choose to Export or Contribute it. Add, remove, and rearrange courses freely; everything saves automatically as you go, no separate Save button.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-add-course-card'); },
+        title: 'Add a course',
+        text: 'Tap + in any semester to add a course by hand — name, credit hours, category, even its prerequisites. Try it now.' },
+      { target: function(){ return importedEditRoot().querySelector('.home-btn[onclick*="openLibrary"]'); },
+        title: 'Course Library',
+        text: 'Or skip the typing — copy a course straight from an official plan (or someone else’s) instead of entering it by hand. Go ahead, try it.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-edit-course-btn'); },
+        title: 'Edit a course',
+        text: 'Tap the pencil on any course to fix its name, credit hours, or category later — nothing here is permanent.' },
+      { target: function(){ return importedEditRoot().querySelector('.course[id]'); },
+        title: 'Move a course',
+        text: 'Press and hold a course, then drag it to a different semester — the app checks prerequisites for you and warns if the new order would break something. Give it a try.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-structure-actions .home-btn'); },
+        title: 'Add a Year',
+        text: 'Need more than what’s here? Add another year any time — each year can also get a Summer semester from its own header, and both can be removed again just as easily.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-remove-course-btn'); },
+        title: 'Remove a course',
+        text: 'The ✕ on a course removes it — you’ll always get an “are you sure” first, and this can’t be undone once confirmed.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-exit-edit-btn'); },
+        title: 'All done?',
+        text: 'Tap here whenever you’re finished editing. There’s nothing left to save — it already has been, the whole time.' }
+    ],
+    // Developer Edit Mode on an OFFICIAL major (robotics/cybersecurity/
+    // medical/cs) — deliberately much smaller than planEditor above: no
+    // add/remove/course-editing exists here on purpose (see AAUP_PLAN_EDITOR
+    // — only drag-to-reorder), since this changes what every student using
+    // that shared plan sees, not just the person editing it.
+    devEdit: [
+      { target: function(){ return visiblePlanRoot().querySelector('.emb-exit'); },
+        title: 'Developer Edit Mode',
+        text: 'This edits the OFFICIAL shared plan every student sees — changes here affect everyone, not just you. There’s no add or remove here on purpose, only reordering, so the course list itself always stays exactly what the university publishes.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.course[id]'); },
+        title: 'Move a course',
+        text: 'Press and hold, then drag any course to a different semester. Prerequisites are checked automatically — moving something before what it needs, or after what needs it, gets rejected. A same-semester conflict (a retake case) asks to confirm instead.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.emb-exit'); },
+        title: 'Exit',
+        text: 'Tap here when you’re done — every move is already saved as you make it.' }
     ]
   };
 
@@ -10573,30 +10638,46 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   function anyOtherModalOpen(){
     return !!document.querySelector('.modal-overlay.open:not(#tutLayer)');
   }
-  function checkRealModalState(){
+  // Runs on every real DOM class-change while a tour is active — modal
+  // open/close is the common case, but it's also the one place broad
+  // enough to catch a step's target disappearing for some OTHER reason
+  // with nothing to pause for, e.g. a step whose whole point is "tap this
+  // real button" and that real button's own action (Exit Edit Mode) is
+  // exactly what removes it from the page. render() already has the "my
+  // target is gone, skip it" self-heal (needed for the tour-to-tour case
+  // in start() above) — it just needs a trigger beyond the tour's own
+  // scroll/resize/step-change calls to notice something changed for a
+  // reason that had nothing to do with this tour at all.
+  function checkTutorialHealth(){
     if(!active) return;
     var blocked = anyOtherModalOpen();
     if(blocked && !paused){
       paused = true;
       document.getElementById('tutLayer').classList.add('paused');
-    } else if(!blocked && paused){
+      return;
+    }
+    if(!blocked && paused){
       paused = false;
       document.getElementById('tutLayer').classList.remove('paused');
       advance();
+      return;
     }
+    var step = active.steps[active.index];
+    var el = step && resolve(step);
+    if(!el || el.offsetParent === null){ advance(); }
   }
   // Coalesced to at most one check per animation frame — the interactive
   // trace step alone can fire dozens of class-attribute mutations in a
   // single burst (every related SVG path + course node), and this only
-  // ever needs to notice a modal-overlay open/close, not react to each one.
-  var modalCheckScheduled = false;
-  function scheduleModalCheck(){
-    if(modalCheckScheduled) return;
-    modalCheckScheduled = true;
-    requestAnimationFrame(function(){ modalCheckScheduled = false; checkRealModalState(); });
+  // ever needs to notice things settling, not react to each one.
+  var healthCheckScheduled = false;
+  function scheduleHealthCheck(){
+    if(healthCheckScheduled) return;
+    healthCheckScheduled = true;
+    requestAnimationFrame(function(){ healthCheckScheduled = false; checkTutorialHealth(); });
   }
-  var modalWatcher = new MutationObserver(function(){ scheduleModalCheck(); });
-  modalWatcher.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+  var tutorialWatcher = new MutationObserver(function(){ scheduleHealthCheck(); });
+  tutorialWatcher.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 
   function start(id){
     // A tour step's target can be genuinely tapped now (see the
@@ -10604,7 +10685,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // whole different page instead of opening a modal — "My Study Plan" on
     // the last dashboard step, for one. That page transition itself calls
     // startWhenClear() for the NEXT tour in the very same synchronous tick,
-    // before the modalWatcher below ever gets a chance to fire and finish()
+    // before the tutorialWatcher below ever gets a chance to fire and finish()
     // the old one — so without this check, a still-"active" dashboard tour
     // would permanently block the study-plan tour from ever starting.
     // Detect it here instead: if the previous tour's own current-step
@@ -11018,6 +11099,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(window.showPage){ window.showPage(prefix); }
     var page = document.getElementById('page-' + prefix);
     if(page){ page.classList.add('editing'); }
+    if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('devEdit'); }
   }
   function exitEditMode(prefix){
     var page = document.getElementById('page-' + prefix);
@@ -11481,6 +11563,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var others = accounts.filter(function(a){ return a !== current; });
     var selectedPlan = window.AAUP_DASHBOARD ? window.AAUP_DASHBOARD.getSelected() : null;
     var isRtlNow = selectedPlan && window.__isRtl ? window.__isRtl(selectedPlan) : false;
+    var isImportedSelected = !!(selectedPlan && window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[selectedPlan]);
+    // Developer Mode's own unlock state is deliberately kept in memory only
+    // (see AAUP_DEV's `authenticated` var) — re-locking on every reload is
+    // the point. The dev-edit buttons it reveals are the one visible trace
+    // of "unlocked this session" already on the page, so reuse that instead
+    // of tracking a second flag just for gating this tour's replay button.
+    var devEditBtn = document.querySelector('[data-dev-edit-btn]');
+    var devUnlocked = !!(devEditBtn && devEditBtn.style.display !== 'none');
 
     body.innerHTML =
       '<h2 style="margin-top:0;">⚙️ Settings</h2>' +
@@ -11505,6 +11595,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 Home tour</button>' +
       (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 Dashboard tour</button>' : '') +
       (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 Study Plan tour</button>' : '') +
+      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 Plan Editor tour</button>' : '') +
+      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 Developer Edit tour</button>' : '') +
       '</div>' +
       '<h3 style="margin-bottom:6px;">👤 Accounts</h3>' +
       '<p class="form-note" style="margin-top:0;">Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.</p>' +
@@ -11567,6 +11659,26 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         document.getElementById('devModalOverlay').classList.remove('open');
         if(window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.openStudyPlan(selectedPlan); }
         if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('studyplan'); }
+      });
+    }
+    if(document.getElementById('setTourEditBtn')){
+      document.getElementById('setTourEditBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        if(window.AAUP_IMPORTED){
+          window.AAUP_IMPORTED.open(selectedPlan);
+          var page = document.getElementById('page-' + selectedPlan);
+          if(page && !page.classList.contains('editing')){ window.AAUP_IMPORTED.toggleEdit(selectedPlan); }
+        }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('planEditor'); }
+      });
+    }
+    if(document.getElementById('setTourDevEditBtn')){
+      document.getElementById('setTourDevEditBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        var builtins = ['robotics', 'cybersecurity', 'medical', 'cs'];
+        var prefix = builtins.indexOf(selectedPlan) !== -1 ? selectedPlan : 'robotics';
+        if(window.AAUP_PLAN_EDITOR){ window.AAUP_PLAN_EDITOR.enterEditMode(prefix); }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('devEdit'); }
       });
     }
 
