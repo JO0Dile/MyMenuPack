@@ -2047,6 +2047,54 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     display:flex;justify-content:space-between;font-size:12.5px;
     background:rgba(255,255,255,.03);border-radius:6px;padding:6px 10px;
   }
+
+  /* ==========================================================================
+     18. ONBOARDING TOUR — first-time spotlight walkthroughs (Home, Dashboard,
+     Study Plan page). One <div> darkens the whole screen via a 9999px spread
+     box-shadow with a transparent "hole" cut exactly over the current
+     target's own bounding box, so the target reads as lit up without ever
+     touching its actual styles; a small card near it carries the step's
+     text, an i/N counter, and Skip/Next controls. Above the sidebar
+     (900) and modals (1000) since a step can legitimately point at
+     something inside either.
+     ========================================================================== */
+  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;}
+  .tut-layer.open{display:block;}
+  .tut-spotlight{
+    position:fixed;
+    border-radius:10px;
+    box-shadow:0 0 0 9999px rgba(4,7,18,.78);
+    outline:2px solid var(--accent);
+    outline-offset:4px;
+    pointer-events:none;
+    transition:top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+  }
+  .tut-tooltip{
+    position:fixed;
+    max-width:300px;
+    background:var(--panel);
+    border:1px solid var(--accent);
+    border-radius:12px;
+    padding:16px 18px;
+    box-shadow:0 20px 55px rgba(0,0,0,.55);
+    transition:top .25s ease, left .25s ease;
+  }
+  .tut-tooltip h4{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--text);}
+  .tut-tooltip p{margin:0 0 12px;font-size:12.5px;line-height:1.55;color:var(--text-dim);}
+  .tut-tooltip .tut-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .tut-tooltip .tut-progress{font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:.03em;white-space:nowrap;}
+  .tut-tooltip .tut-actions{display:flex;align-items:center;gap:14px;}
+  .tut-skip{background:none;border:none;color:var(--text-dim);font-size:12px;font-family:inherit;cursor:pointer;padding:0;}
+  .tut-skip:hover{color:var(--text);}
+  .tut-next{
+    background:var(--accent);border:none;color:var(--navy-900);
+    font-size:12.5px;font-weight:800;font-family:inherit;
+    padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
+  }
+  .tut-next:hover{filter:brightness(1.08);}
+  @media (prefers-reduced-motion: reduce){
+    .tut-spotlight, .tut-tooltip{transition:none;}
+  }
 </style>
 </head>
 <style>
@@ -2234,6 +2282,21 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 </div>
 
 <div class="toast-msg" id="globalToast"></div>
+
+<div class="tut-layer" id="tutLayer">
+  <div class="tut-spotlight" id="tutSpotlight"></div>
+  <div class="tut-tooltip" id="tutTooltip">
+    <h4 id="tutTitle"></h4>
+    <p id="tutText"></p>
+    <div class="tut-foot">
+      <span class="tut-progress" id="tutProgress"></span>
+      <div class="tut-actions">
+        <button type="button" class="tut-skip" id="tutSkip">Skip</button>
+        <button type="button" class="tut-next" id="tutNext">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="auditModalOverlay">
   <div class="modal-card audit-modal-card">
@@ -9819,6 +9882,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     renderUniversities();
     renderBreadcrumb();
     showStep('universities');
+    if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('home'); }
   }
 
   function showColleges(uniId){
@@ -9992,7 +10056,183 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   else { window.addEventListener('load', init); }
 })();
 
+// ==========================
+// ONBOARDING TOUR — first-time spotlight walkthroughs
+// ==========================
+// Three short, independent tours (Home, Dashboard, Study Plan page), each
+// auto-played exactly once per browser (localStorage-gated) the first time
+// its screen is reached, and replayable anytime from Settings. Intentionally
+// several short tours triggered where each screen actually appears, rather
+// than one long forced tour up front — a student who never opens a Study
+// Plan page yet shouldn't have to click through a step explaining one.
+(function(){
+  var KEY_PREFIX = 'aaup_tut_';
+  var active = null; // { id, steps, index }
 
+  function done(id){
+    try{ return localStorage.getItem(KEY_PREFIX + id) === '1'; }catch(e){ return true; }
+  }
+  function markDone(id){
+    try{ localStorage.setItem(KEY_PREFIX + id, '1'); }catch(e){}
+  }
+  function clearDone(id){
+    try{ localStorage.removeItem(KEY_PREFIX + id); }catch(e){}
+  }
+
+  // The one element every plan page (built-in or imported) currently on
+  // screen — used to scope step targets so a hidden major elsewhere in the
+  // DOM never gets matched instead of the one actually visible.
+  function visiblePlanRoot(){
+    var candidates = document.querySelectorAll('.plan-page, #importedPlanView');
+    for(var i = 0; i < candidates.length; i++){
+      if(candidates[i].offsetParent !== null) return candidates[i];
+    }
+    return document;
+  }
+  function nth(list, i){ return list && list[i] ? list[i] : null; }
+
+  var TOURS = {
+    home: [
+      { target: '#homeSearchBox',
+        title: 'Already know your major?',
+        text: 'Search for it by name — this jumps straight to its plan, skipping the university/college steps below.' },
+      { target: function(){ return document.querySelector('#homeUniversityGrid .plan-card'); },
+        title: 'University → College → Plan',
+        text: 'Pick your university, then your college, then your major — same three taps every time, for every school this app ever covers.' },
+      { target: '[onclick*="openSettings"]',
+        title: 'Settings',
+        text: 'Export a backup of your progress, switch theme, or manage multiple profiles on this device — all here.' }
+    ],
+    dashboard: [
+      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 0); },
+        title: 'Progress',
+        text: 'Completed credit hours out of everything required for your degree.' },
+      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 1); },
+        title: 'GPA',
+        text: 'Enter grades for a course from its info popup on the Study Plan page — your GPA updates here automatically.' },
+      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 2); },
+        title: 'Achievements',
+        text: 'Small goals that unlock as you go — tap the card to see all of them for this major.' },
+      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 3); },
+        title: 'What Can I Take Next',
+        text: 'Courses whose prerequisites you’ve already checked off — a quick answer to "what am I actually allowed to register for."' },
+      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-actions .home-btn'), 1); },
+        title: 'My Study Plan',
+        text: 'The full four-year course map — prerequisites, electives, and where every course you’ve completed slots in.' }
+    ],
+    studyplan: [
+      { target: function(){ return visiblePlanRoot().querySelector('.legend-toggle'); },
+        title: 'Legend',
+        text: 'Every color on this page means something — university requirement, elective, core course, etc. Tap to see what’s what.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.course'); },
+        title: 'Courses',
+        text: 'Tap a course to see its details and prerequisites, or check the box once you’ve completed it — that’s what feeds Progress and GPA on your Dashboard.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-box'); },
+        title: 'Search a course',
+        text: 'Find any course on this page by name or course number instead of hunting through every semester.' }
+    ]
+  };
+
+  function resolve(step){
+    return typeof step.target === 'function' ? step.target() : document.querySelector(step.target);
+  }
+
+  function render(){
+    if(!active) return;
+    var step = active.steps[active.index];
+    var el = step && resolve(step);
+    if(!el || el.offsetParent === null){ advance(); return; } // not on screen right now — skip it, don't get stuck
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        var r = el.getBoundingClientRect();
+        var pad = 6;
+        var spot = document.getElementById('tutSpotlight');
+        spot.style.top = Math.max(0, r.top - pad) + 'px';
+        spot.style.left = Math.max(0, r.left - pad) + 'px';
+        spot.style.width = (r.width + pad * 2) + 'px';
+        spot.style.height = (r.height + pad * 2) + 'px';
+
+        document.getElementById('tutTitle').textContent = step.title;
+        document.getElementById('tutText').textContent = step.text;
+        document.getElementById('tutProgress').textContent = (active.index + 1) + ' / ' + active.steps.length;
+        document.getElementById('tutNext').textContent = (active.index === active.steps.length - 1) ? 'Got it!' : 'Next';
+
+        var tip = document.getElementById('tutTooltip');
+        tip.style.left = '';
+        var tipWidth = 300;
+        var left = r.left + r.width / 2 - tipWidth / 2;
+        left = Math.max(12, Math.min(left, window.innerWidth - tipWidth - 12));
+        tip.style.left = left + 'px';
+        var spaceBelow = window.innerHeight - r.bottom;
+        if(spaceBelow > 180 || r.top < 180){
+          tip.style.top = (r.bottom + pad + 12) + 'px';
+        } else {
+          tip.style.top = Math.max(12, r.top - pad - 12 - tip.offsetHeight) + 'px';
+        }
+      });
+    });
+  }
+
+  function reflow(){ if(active) render(); }
+
+  function advance(){
+    if(!active) return;
+    active.index++;
+    if(active.index >= active.steps.length){ finish(); return; }
+    render();
+  }
+
+  function finish(){
+    if(!active) return;
+    markDone(active.id);
+    document.getElementById('tutLayer').classList.remove('open');
+    window.removeEventListener('resize', reflow);
+    window.removeEventListener('scroll', reflow, true);
+    active = null;
+  }
+
+  function start(id){
+    if(active || done(id)) return;
+    var steps = TOURS[id];
+    if(!steps || !steps.length) return;
+    active = { id: id, steps: steps, index: 0 };
+    document.getElementById('tutLayer').classList.add('open');
+    window.addEventListener('resize', reflow);
+    window.addEventListener('scroll', reflow, true);
+    render();
+  }
+
+  // A tour shouldn't start behind, or on top of, the welcome dialog or any
+  // other modal — wait until nothing's blocking, then go.
+  function startWhenClear(id){
+    if(done(id)) return;
+    var tries = 0;
+    (function attempt(){
+      tries++;
+      var blocked = document.querySelector('.modal-overlay.open, #studentInfoOverlay.open');
+      if(blocked && tries < 20){ setTimeout(attempt, 400); return; }
+      start(id);
+    })();
+  }
+
+  function replay(id){
+    finish();
+    clearDone(id);
+    setTimeout(function(){ start(id); }, 50);
+  }
+
+  function bind(){
+    var next = document.getElementById('tutNext');
+    var skip = document.getElementById('tutSkip');
+    if(next) next.addEventListener('click', advance);
+    if(skip) skip.addEventListener('click', finish);
+  }
+  if(document.readyState === 'complete'){ bind(); }
+  else { window.addEventListener('load', bind); }
+
+  window.AAUP_TUTORIAL = { start: start, startWhenClear: startWhenClear, replay: replay, hasSeen: done };
+})();
 
 // ==========================
 // PLAN EDITOR (developer-only: drag-and-drop semester reordering,
@@ -10560,6 +10800,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     render(prefix);
     if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'dashboard'); }
     window.scrollTo(0, 0);
+    if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('dashboard'); }
   }
 
   function openStudyPlan(prefix){
@@ -10567,6 +10808,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(isImportedPlan(prefix)){ window.AAUP_IMPORTED.open(prefix); }
     else if(window.showPage){ window.showPage(prefix); }
     if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'studyplan'); }
+    if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('studyplan'); }
   }
 
   // Explicitly shows the major-picker regardless of any previously
@@ -10835,6 +11077,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         '</div>' +
         '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
       ) : '') +
+      '<h3 style="margin-bottom:6px;">❓ Tours</h3>' +
+      '<p class="form-note" style="margin-top:0;">Replay the spotlight walkthrough for any screen.</p>' +
+      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
+      '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 Home tour</button>' +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 Dashboard tour</button>' : '') +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 Study Plan tour</button>' : '') +
+      '</div>' +
       '<h3 style="margin-bottom:6px;">👤 Accounts</h3>' +
       '<p class="form-note" style="margin-top:0;">Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.</p>' +
       '<p style="font-size:12.5px;">Current account: <b>' + current + '</b></p>' +
@@ -10875,6 +11124,27 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         window.AAUP_SYNC.checkForUpdates(true).then(function(){
           renderSettingsBody(body);
         });
+      });
+    }
+    if(document.getElementById('setTourHomeBtn')){
+      document.getElementById('setTourHomeBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        if(selectedPlan && window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.choosePlan(); }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('home'); }
+      });
+    }
+    if(document.getElementById('setTourDashBtn')){
+      document.getElementById('setTourDashBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        if(window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.open(selectedPlan); }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('dashboard'); }
+      });
+    }
+    if(document.getElementById('setTourPlanBtn')){
+      document.getElementById('setTourPlanBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        if(window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.openStudyPlan(selectedPlan); }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('studyplan'); }
       });
     }
 
