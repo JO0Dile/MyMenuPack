@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '2.01';
+window.APP_VERSION = '2.1';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -894,7 +894,6 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 
   @media (max-width:640px){
-    .float-popup{left:12px;right:12px;width:auto;top:auto;bottom:14px;}
     .course-search-wrap{margin-left:16px;margin-right:16px;}
   }
 
@@ -1611,18 +1610,36 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     border-bottom:1px solid var(--line);
     cursor:grab;
     user-select:none;
+    /* Without this, a touch-drag on mobile races the browser's own "is this
+       a page scroll?" gesture detection — it sometimes wins and cancels the
+       pointer sequence mid-drag, making the popup feel stuck or jumpy. */
+    touch-action:none;
   }
 
   .float-popup-head:active{cursor:grabbing;}
 
-  .float-popup-title{font-size:13px;font-weight:800;color:var(--text);}
+  .float-popup-title{font-size:13px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-  .float-popup-close{
+  .float-popup-head-actions{display:flex;align-items:center;gap:2px;flex:0 0 auto;}
+
+  .float-popup-min, .float-popup-close{
     background:none;border:none;color:var(--text-dim);
-    font-size:20px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:6px;
+    font-size:13px;line-height:1;cursor:pointer;padding:6px 8px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
   }
 
-  .float-popup-close:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .float-popup-close{font-size:20px;}
+
+  .float-popup-min:hover, .float-popup-close:hover{color:#fff;background:rgba(255,255,255,.08);}
+
+  .float-popup-min .fp-min-arrow{display:inline-block;transition:transform .2s ease;}
+
+  /* Collapsed to just the head bar — lets the page underneath be read or
+     tapped without fully closing (and losing) the popup's own state. The
+     arrow flips to point the opposite way it did before the tap, same
+     affordance as the legend's own expand/collapse arrow. */
+  .float-popup.minimized .float-popup-min .fp-min-arrow{transform:rotate(180deg);}
+  .float-popup.minimized .float-popup-body{display:none;}
 
   .float-popup-body{
     padding:14px 16px 16px;
@@ -1665,6 +1682,18 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .float-popup[dir="rtl"] .float-popup-body ul{padding-left:0;padding-right:18px;}
 
   .float-popup[dir="rtl"] .float-popup-head{cursor:grab;}
+
+  /* Placed AFTER the base .float-popup rule above on purpose — same
+     specificity, so source order decides, and a mobile override declared
+     BEFORE the rule it's meant to override silently loses regardless of
+     the media query (this bit the course grid earlier; same fix here). */
+  @media (max-width:640px){
+    .float-popup{left:12px;right:12px;width:auto;top:auto;bottom:14px;}
+    /* 60vh (the desktop default) combined with a near-full-width popup
+       reads as "covering the whole screen" on a phone — capped lower so
+       the page underneath stays visibly reachable even before minimizing. */
+    .float-popup-body{max-height:42vh;}
+  }
   /* ================= COURSE MODAL: STATUS + GRADE EXTRAS ================= */
 
   .modal-extras{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;}
@@ -5474,7 +5503,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 <div class="float-popup" id="floatPopup" style="display:none;" role="dialog" aria-label="Course details">
   <div class="float-popup-head" id="floatPopupHead">
     <span class="float-popup-title" id="floatPopupTitle">Course</span>
-    <button type="button" class="float-popup-close" id="floatPopupClose" aria-label="Close">&times;</button>
+    <div class="float-popup-head-actions">
+      <button type="button" class="float-popup-min" id="floatPopupMin" aria-label="Minimize"><span class="fp-min-arrow">&#9650;</span></button>
+      <button type="button" class="float-popup-close" id="floatPopupClose" aria-label="Close">&times;</button>
+    </div>
   </div>
   <div class="float-popup-body" id="floatPopupBody"></div>
 </div>
@@ -5883,6 +5915,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       popupEl.style.left = lastPopupPos.left;
       popupEl.style.top = lastPopupPos.top;
       popupEl.style.right = 'auto';
+      // Mobile's default placement pins the popup with `bottom` (see the
+      // max-width:640px rule); once it's been dragged even once, top/left
+      // drive its position instead, and leaving the old `bottom` in place
+      // too would fight them for the box's height.
+      popupEl.style.bottom = 'auto';
     }
   }
 
@@ -5890,6 +5927,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(!popupEl) return;
     positionPopup();
     refreshPopupContent(prefix, slug);
+    popupEl.classList.remove('minimized');
     popupEl.style.display = 'block';
     popupEl.dataset.prefix = prefix;
     popupEl.dataset.slug = slug;
@@ -5908,18 +5946,25 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     popupTitle = document.getElementById('floatPopupTitle');
     popupBody = document.getElementById('floatPopupBody');
     popupCloseBtn = document.getElementById('floatPopupClose');
+    var popupMinBtn = document.getElementById('floatPopupMin');
     if(!popupEl) return;
 
     popupCloseBtn.addEventListener('click', closeFloatingPopup);
+    if(popupMinBtn){
+      popupMinBtn.addEventListener('click', function(){
+        popupEl.classList.toggle('minimized');
+      });
+    }
 
     var dragging = false, startX, startY, startLeft, startTop;
     popupHead.addEventListener('pointerdown', function(e){
-      if(e.target === popupCloseBtn) return;
+      if(e.target.closest('.float-popup-close, .float-popup-min')) return;
       dragging = true;
       var rect = popupEl.getBoundingClientRect();
       startX = e.clientX; startY = e.clientY;
       startLeft = rect.left; startTop = rect.top;
       popupEl.style.right = 'auto';
+      popupEl.style.bottom = 'auto';
       popupEl.style.left = startLeft + 'px';
       popupEl.style.top = startTop + 'px';
       try{ popupHead.setPointerCapture(e.pointerId); }catch(err){}
@@ -10338,20 +10383,32 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         text: 'The full four-year course map — prerequisites, electives, and where every course you’ve completed slots in.' }
     ],
     studyplan: [
-      { target: function(){ return visiblePlanRoot().querySelector('.legend-toggle'); },
+      { target: function(){
+          var legend = visiblePlanRoot().querySelector('.legend');
+          // Once expanded, spotlight the whole panel (not just the header)
+          // so the newly-revealed color key is actually inside the lit-up
+          // area instead of sitting in the dimmed backdrop underneath it.
+          return (legend && legend.classList.contains('expanded')) ? legend : visiblePlanRoot().querySelector('.legend-toggle');
+        },
         title: 'Legend',
-        text: 'Every color on this page means something — university requirement, elective, core course, etc. Tap to see what’s what.' },
+        text: 'Every color on this page means something — university requirement, elective, core course, etc. Tap it to see what’s what.',
+        interactive: true,
+        watchTarget: function(){ return visiblePlanRoot().querySelector('.legend'); },
+        interactionClass: 'expanded',
+        reflowDelay: 320 }, // matches .legend-items' own max-height transition, so the panel has finished growing before it's measured
       { target: function(){ return visiblePlanRoot().querySelector('.course'); },
         title: 'Courses',
         text: 'Tap a course to see its details and prerequisites, or check the box once you’ve completed it — that’s what feeds Progress and GPA on your Dashboard.' },
       { target: aConnectedCourse,
         title: 'Trace prerequisites',
-        text: 'Press and hold this course (or hover it on a computer) — the lines connecting it to what it needs, and what it unlocks, light up. Go ahead, try it now.',
+        text: 'Press and hold this course (or hover it on a computer) — the lines connecting it to what it needs, and what it unlocks, light up. Go ahead, try it — Next will be waiting whenever you are.',
         interactive: true },
       { target: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-box'); },
         title: 'Search a course',
         text: 'Find any course on this page by name or course number instead of hunting through every semester. Try typing one now.',
-        noDim: true } // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
+        noDim: true, // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
+        avoidBelow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown.open'); },
+        watchReflow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown'); } }
     ]
   };
 
@@ -10360,32 +10417,52 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   // For steps marked interactive: true — rather than just describing the
-  // gesture, wait for the user to actually perform it (detected via the
-  // 'node-active' class the real trace logic already adds to a course once
-  // its connections light up) and auto-advance, instead of taking their
-  // word for it via a Next click. Next is relabeled "Skip" during this wait
-  // rather than disabled — the step should never be able to soft-lock the
-  // tour for someone whose device/input doesn't cooperate.
+  // gesture, wait for the user to actually perform it (detected via a class
+  // the real feature already adds — 'node-active' for the hold-to-trace
+  // course, 'expanded' for the legend panel) and switch Next from "Skip" to
+  // its normal label once it happens. Deliberately does NOT auto-advance —
+  // an earlier version did, on a fixed timer, and that took the decision of
+  // "I'm done looking" away from the student. Skip stays tappable the whole
+  // time regardless, so the step can never soft-lock the tour for someone
+  // whose device/input doesn't cooperate.
   var interactiveObserver = null;
   function stopWatchingInteractive(){
     if(interactiveObserver){ interactiveObserver.disconnect(); interactiveObserver = null; }
   }
-  function watchInteractive(el){
+  function watchInteractive(step, el){
     stopWatchingInteractive();
+    var watchEl = (step.watchTarget && step.watchTarget()) || el;
+    if(!watchEl) return;
+    var cls = step.interactionClass || 'node-active';
     interactiveObserver = new MutationObserver(function(){
-      if(el.classList.contains('node-active')){
+      if(watchEl.classList.contains(cls)){
         stopWatchingInteractive();
-        // node-active fires the instant the FIRST related line starts its
-        // staggered reveal (startTrace's own STEP_MS-per-edge animation),
-        // not once every related line has finished drawing — advancing
-        // right away would cut that reveal off practically before it
-        // started. 3.2s comfortably covers a handful of staggered edges
-        // (~650ms each) plus their own draw-in transition, so there's
-        // something to actually look at before the tour moves on.
-        setTimeout(advance, 3200);
+        if(!active) return;
+        active._interactionDone = true;
+        // Some interactions (the legend panel expanding) change size over a
+        // CSS transition rather than instantly — reflowDelay lets that
+        // finish before the spotlight/tooltip are re-measured, so they land
+        // on the settled size instead of the mid-animation one.
+        setTimeout(function(){ if(active) render(); }, step.reflowDelay || 0);
       }
     });
-    interactiveObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
+    interactiveObserver.observe(watchEl, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  // For steps whose target reveals more content without necessarily
+  // "completing" anything (the search dropdown appearing as you type) —
+  // just reposition the tooltip when that content's own open/closed state
+  // changes, no Skip/Next relabeling involved.
+  var reflowObserver = null;
+  function stopWatchingReflow(){
+    if(reflowObserver){ reflowObserver.disconnect(); reflowObserver = null; }
+  }
+  function watchReflow(getEl){
+    stopWatchingReflow();
+    var el = getEl();
+    if(!el) return;
+    reflowObserver = new MutationObserver(function(){ if(active) render(); });
+    reflowObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
   }
 
   function render(){
@@ -10408,16 +10485,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         document.getElementById('tutTitle').textContent = step.title;
         document.getElementById('tutText').textContent = step.text;
         document.getElementById('tutProgress').textContent = (active.index + 1) + ' / ' + active.steps.length;
-        document.getElementById('tutNext').textContent = step.interactive ? 'Skip' : ((active.index === active.steps.length - 1) ? 'Got it!' : 'Next');
+        var waitingOnInteraction = !!(step.interactive && !active._interactionDone);
+        document.getElementById('tutNext').textContent = waitingOnInteraction ? 'Skip' : ((active.index === active.steps.length - 1) ? 'Got it!' : 'Next');
 
         if(step.interactive){
           if(active._watchedIndex !== active.index){
             active._watchedIndex = active.index;
-            watchInteractive(el);
+            active._interactionDone = false;
+            watchInteractive(step, el);
           }
         } else {
           stopWatchingInteractive();
         }
+        if(step.watchReflow){ watchReflow(step.watchReflow); } else { stopWatchingReflow(); }
 
         var tip = document.getElementById('tutTooltip');
         tip.style.left = '';
@@ -10425,9 +10505,20 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         var left = r.left + r.width / 2 - tipWidth / 2;
         left = Math.max(12, Math.min(left, window.innerWidth - tipWidth - 12));
         tip.style.left = left + 'px';
-        var spaceBelow = window.innerHeight - r.bottom;
+        // Some steps invite an interaction that reveals content BELOW the
+        // spotlighted element itself (a search dropdown) — avoidBelow, when
+        // it returns that now-open content, extends the "clear zone" the
+        // tooltip must sit under so it doesn't land on top of it.
+        var belowEdge = r.bottom;
+        if(step.avoidBelow){
+          var extra = step.avoidBelow();
+          if(extra && extra.offsetParent !== null){
+            belowEdge = Math.max(belowEdge, extra.getBoundingClientRect().bottom);
+          }
+        }
+        var spaceBelow = window.innerHeight - belowEdge;
         if(spaceBelow > 180 || r.top < 180){
-          tip.style.top = (r.bottom + pad + 12) + 'px';
+          tip.style.top = (belowEdge + pad + 12) + 'px';
         } else {
           tip.style.top = Math.max(12, r.top - pad - 12 - tip.offsetHeight) + 'px';
         }
@@ -10448,6 +10539,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   function finish(){
     if(!active) return;
     stopWatchingInteractive();
+    stopWatchingReflow();
     markDone(active.id);
     document.getElementById('tutLayer').classList.remove('open', 'paused');
     window.removeEventListener('resize', reflow);
