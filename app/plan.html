@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '2.11';
+window.APP_VERSION = '2.51';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2569,7 +2569,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               </div>
               <div class="course math" id="robotics-c-calc-1"><div class="name" data-ar="التفاضل والتكامل (1)">Calculus I</div></div>
               <div class="course math" id="robotics-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete math</div></div>
-              <div class="course eng" id="robotics-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+              <div class="pair-group independent-grades">
+                <div class="course eng" id="robotics-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course eng" id="robotics-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+              </div>
             </div>
           </div>
           <div class="divider"></div>
@@ -2582,7 +2585,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               </div>
               <div class="course math" id="robotics-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="robotics-c-prob-stats"><div class="name" data-ar="مبادئ الاحتمالات والإحصاء">Elementary probability &amp; statistics</div></div>
-              <div class="course eng" id="robotics-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+              <div class="pair-group independent-grades">
+                <div class="course eng" id="robotics-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course eng" id="robotics-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+              </div>
               <div class="course uni" id="robotics-c-uni-elective-2"><div class="name" data-ar="مادة اختيارية جامعية (2)">University elective (2)</div></div>
             </div>
           </div>
@@ -2903,7 +2909,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               </div>
               <div class="course math" id="cybersecurity-c-calc-1"><div class="name" data-ar="التفاضل والتكامل (1)">Calculus I</div></div>
               <div class="course math" id="cybersecurity-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete math</div></div>
-              <div class="course eng" id="cybersecurity-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+              <div class="pair-group independent-grades">
+                <div class="course eng" id="cybersecurity-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course eng" id="cybersecurity-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+              </div>
             </div>
           </div>
           <div class="divider"></div>
@@ -2916,7 +2925,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               </div>
               <div class="course math" id="cybersecurity-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="cybersecurity-c-prob-stats"><div class="name" data-ar="مبادئ الاحتمالات والإحصاء">Elementary probability &amp; statistics</div></div>
-              <div class="course eng" id="cybersecurity-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+              <div class="pair-group independent-grades">
+                <div class="course eng" id="cybersecurity-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course eng" id="cybersecurity-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+              </div>
               <div class="course uni" id="cybersecurity-c-uni-elective-2"><div class="name" data-ar="مادة اختيارية جامعية (2)">University elective (2)</div></div>
             </div>
           </div>
@@ -3250,7 +3262,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               </div>
               <div class="course math" id="medical-c-calc-1"><div class="name" data-ar="التفاضل والتكامل (1)">Calculus I</div></div>
               <div class="course math" id="medical-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete math</div></div>
-              <div class="course eng" id="medical-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+              <div class="pair-group independent-grades">
+                <div class="course eng" id="medical-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course eng" id="medical-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+              </div>
             </div>
           </div>
           <div class="divider"></div>
@@ -3271,7 +3286,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               </div>
               <div class="course math" id="medical-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="medical-c-prob-stats"><div class="name" data-ar="مبادئ الاحتمالات والإحصاء">Elementary probability &amp; statistics</div></div>
-              <div class="course eng" id="medical-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+              <div class="pair-group independent-grades">
+                <div class="course eng" id="medical-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course eng" id="medical-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+              </div>
             </div>
           </div>
         </div>
@@ -3611,7 +3629,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
           <div class="sem">
             <div class="sem-label" data-ar="الفصل الثاني">Second semester</div>
             <div class="course-row" id="cs-y1-s2">
-              <div class="pair-group">
+              <div class="pair-group independent-grades">
                 <div class="course eng" id="cs-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
                 <div class="course eng" id="cs-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
               </div>
@@ -3634,7 +3652,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
           <div class="sem">
             <div class="sem-label" data-ar="الفصل الأول">First semester</div>
             <div class="course-row" id="cs-y2-s1">
-              <div class="pair-group">
+              <div class="pair-group independent-grades">
                 <div class="course eng" id="cs-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
                 <div class="course eng" id="cs-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
               </div>
@@ -3984,6 +4002,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['calc-2','linear-algebra'],
     ['linear-algebra','diff-eq'],
     ['intermediate-english','advanced-english'],
+    ['intermediate-english-lab','advanced-english'],
+    ['intermediate-english','advanced-english-lab'],
+    ['intermediate-english-lab','advanced-english-lab'],
     ['progfund','dsa'],
     ['progfund','fund-ai'],
     ['progfund','comp-arch'],
@@ -4026,7 +4047,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // pattern used elsewhere in this file (e.g. advanced-english needing
     // both Intermediate English and its lab).
     ['machine-learning','nlp'],
-    ['advanced-english','research-methods']
+    ['advanced-english','research-methods'],
+    ['advanced-english-lab','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -4072,11 +4094,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'elective-sensors-perception': {num:'290313170', name:'Sensors and Perception in Robotics', th:'2', pr:'2', cr:'3', prereq:'Robotics Foundation (290313110) & Computer Vision (290313210)', ar:'الحساسات والإدراك في الروبوتات'},
     'elective-reinforcement-learning': {num:'290313180', name:'Reinforcement Learning', th:'2', pr:'2', cr:'3', prereq:'Machine Learning (290312230)', ar:'التعلم المعزز'},
     'elective-cognitive-systems': {num:'290313190', name:'Cognitive Systems', th:'2', pr:'2', cr:'3', prereq:'Machine Learning (290312230)', ar:'النظم الإدراكية'},
-    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'3', pr:'-', cr:'2', prereq:'Beginning English (010610014)', ar:'اللغة الإنجليزية المتوسطة'},
-    'advanced-english': {num:'010610035', name:'Advanced English', th:'3', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
+    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة الإنجليزية المتوسطة'},
+    'intermediate-english-lab': {num:'010610026', name:'Intermediate English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتوسطة'},
+    'advanced-english': {num:'010610035', name:'Advanced English', th:'2', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
+    'advanced-english-lab': {num:'010610036', name:'Advanced English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتقدمة'},
     'arabic-language': {num:'040111001', name:'Arabic Language', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة العربية'},
     'palestinian-studies': {num:'040511011', name:'Palestinian Studies', th:'2', pr:'-', cr:'2', prereq:'-', ar:'دراسات فلسطينية'},
-    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035)', ar:'أساسيات مناهج البحث'},
+    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035) &amp; Advanced English Lab (010610036)', ar:'أساسيات مناهج البحث'},
     'computer-skills': {num:'240111000', name:'Computer Skills', th:'2', pr:'-', cr:'2', prereq:'-', ar:'مهارات حاسوبية'},
     'uni-elective-1': {num:'-', name:'University Elective', th:'-', pr:'-', cr:'2', prereq:'-', ar:'اختياري جامعي'},
     'uni-elective-2': {num:'-', name:'University Elective', th:'-', pr:'-', cr:'2', prereq:'-', ar:'اختياري جامعي'},
@@ -4360,6 +4384,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['calc-2','linear-algebra'],
     ['linear-algebra','machine-learning'],
     ['intermediate-english','advanced-english'],
+    ['intermediate-english-lab','advanced-english'],
+    ['intermediate-english','advanced-english-lab'],
+    ['intermediate-english-lab','advanced-english-lab'],
     ['progfund','dsa'],
     ['progfund','fund-ai'],
     ['progfund','comp-arch'],
@@ -4389,7 +4416,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['ethical-hacking','elective-advanced-ethical-hacking'],
     // Matches prereq text already on research-methods itself, which had no
     // corresponding arrow.
-    ['advanced-english','research-methods']
+    ['advanced-english','research-methods'],
+    ['advanced-english-lab','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -4441,11 +4469,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'elective-advanced-ethical-hacking': {num:'290373160', name:'Advanced Ethical Hacking', th:'3', pr:'-', cr:'3', prereq:'Ethical Hacking and Penetration Testing (290373230)', ar:'الاختراق الأخلاقي المتقدم'},
     'elective-wireless-networks': {num:'290373170', name:'Wireless Networks Management and Security', th:'3', pr:'-', cr:'3', prereq:'Computer Networks (290372220)', ar:'إدارة وأمن الشبكات اللاسلكية'},
 
-    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'3', pr:'-', cr:'2', prereq:'Beginning English (010610014)', ar:'اللغة الإنجليزية المتوسطة'},
-    'advanced-english': {num:'010610035', name:'Advanced English', th:'3', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
+    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة الإنجليزية المتوسطة'},
+    'intermediate-english-lab': {num:'010610026', name:'Intermediate English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتوسطة'},
+    'advanced-english': {num:'010610035', name:'Advanced English', th:'2', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
+    'advanced-english-lab': {num:'010610036', name:'Advanced English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتقدمة'},
     'arabic-language': {num:'040111001', name:'Arabic Language', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة العربية'},
     'palestinian-studies': {num:'040511011', name:'Palestinian Studies', th:'2', pr:'-', cr:'2', prereq:'-', ar:'دراسات فلسطينية'},
-    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035)', ar:'أساسيات مناهج البحث'},
+    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035) &amp; Advanced English Lab (010610036)', ar:'أساسيات مناهج البحث'},
     'computer-skills': {num:'240111000', name:'Computer Skills', th:'2', pr:'-', cr:'2', prereq:'-', ar:'مهارات حاسوبية'},
     'dept-elective-1': {num:'-', name:'Department Elective', th:'-', pr:'-', cr:'3', prereq:'-', ar:'اختياري تخصصي'},
     'dept-elective-2': {num:'-', name:'Department Elective', th:'-', pr:'-', cr:'3', prereq:'-', ar:'اختياري تخصصي'},
@@ -4732,6 +4762,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['calc-2','linear-algebra'],
     ['linear-algebra','diff-eq'],
     ['intermediate-english','advanced-english'],
+    ['intermediate-english-lab','advanced-english'],
+    ['intermediate-english','advanced-english-lab'],
+    ['intermediate-english-lab','advanced-english-lab'],
     ['progfund','dsa'],
     ['progfund','fund-ai'],
     ['progfund','comp-arch'],
@@ -4777,7 +4810,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['bio-medsci-lab','anatomy-physio'],
     ['fund-ai','ethics-ai'],
     ['machine-learning','nlp'],
-    ['advanced-english','research-methods']
+    ['advanced-english','research-methods'],
+    ['advanced-english-lab','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -4811,11 +4845,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'db-fund-lab': {num:'290312110', name:'Fundamentals of Databases', th:'2', pr:'2', cr:'3', prereq:'-', ar:'مختبر أساسيات قواعد البيانات'},
     'capstone-research': {num:'290314130', name:'Capstone Project Research', th:'1', pr:'-', cr:'1', prereq:'-', ar:'مشروع التخرج: البحث'},
     'capstone-cognitive': {num:'290314210', name:'Capstone Project: Cognitive Robotics', th:'2', pr:'2', cr:'3', prereq:'Capstone Project Research (290314130)', ar:'مشروع التخرج: الحوسبة الإدراكية'},
-    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'3', pr:'-', cr:'2', prereq:'Beginning English (010610014)', ar:'اللغة الإنجليزية المتوسطة'},
-    'advanced-english': {num:'010610035', name:'Advanced English', th:'3', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
+    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة الإنجليزية المتوسطة'},
+    'intermediate-english-lab': {num:'010610026', name:'Intermediate English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتوسطة'},
+    'advanced-english': {num:'010610035', name:'Advanced English', th:'2', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
+    'advanced-english-lab': {num:'010610036', name:'Advanced English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتقدمة'},
     'arabic-language': {num:'040111001', name:'Arabic Language', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة العربية'},
     'palestinian-studies': {num:'040511011', name:'Palestinian Studies', th:'2', pr:'-', cr:'2', prereq:'-', ar:'دراسات فلسطينية'},
-    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035)', ar:'أساسيات مناهج البحث'},
+    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035) &amp; Advanced English Lab (010610036)', ar:'أساسيات مناهج البحث'},
     'computer-skills': {num:'240111000', name:'Computer Skills', th:'2', pr:'-', cr:'2', prereq:'-', ar:'مهارات حاسوبية'},
 
     'medical-terminology': {num:'060511030', name:'Medical Terminology', th:'2', pr:'-', cr:'2', prereq:'-', ar:'المصطلحات الطبية'},
@@ -5178,7 +5214,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // progfund2-lab, research-methods below) that had no corresponding arrow.
     ['progfund1','progfund1-lab'],
     ['progfund2','progfund2-lab'],
-    ['advanced-english','research-methods']
+    ['advanced-english','research-methods'],
+    ['advanced-english-lab','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -5204,7 +5241,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'digital-logic': {num:'110411100', name:'Digital Logic Design', th:'3', pr:'-', cr:'3', prereq:'-', ar:'تصميم المنطق الرقمي'},
     'advanced-english': {num:'010610035', name:'Advanced English', th:'2', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
     'advanced-english-lab': {num:'010610036', name:'Advanced English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتقدمة'},
-    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035)', ar:'أساسيات مناهج البحث'},
+    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035) &amp; Advanced English Lab (010610036)', ar:'أساسيات مناهج البحث'},
     'math-it': {num:'100412040', name:'Mathematics for Information Technology', th:'3', pr:'-', cr:'3', prereq:'Calculus II (100411020)', ar:'الرياضيات لتكنولوجيا المعلومات'},
     'progfund2-lab': {num:'110412120', name:'Programming Fundamentals II Lab', th:'-', pr:'2', cr:'1', prereq:'Programming Fundamentals II (240112003)', ar:'مختبر أساسيات البرمجة (2)'},
     'progfund2': {num:'240112003', name:'Programming Fundamentals II', th:'3', pr:'-', cr:'3', prereq:'Programming Fundamentals (C++) (240111011)', ar:'أساسيات البرمجة (2)'},
@@ -6444,11 +6481,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   // A lecture course and its lab sit together inside a shared ".pair-group"
-  // wrapper (see the "Connected — e.g. a course and its lab" legend entry).
-  // Returns the other .course[id] in that wrapper, if any.
+  // wrapper (see the "Connected — e.g. a course and its lab" legend entry),
+  // but that wrapper covers two different real relationships. Most pairs
+  // (Programming Fundamentals + its lab, Introduction to CS + its lab) are
+  // literally one registration/one catalog number split across two display
+  // rows, so completing one correctly completes both. English lecture/lab
+  // pairs are genuinely separate courses with their own catalog numbers —
+  // a student can pass one without the other yet, and each carries its own
+  // grade — so ".pair-group.independent-grades" opts a wrapper out of the
+  // auto-complete-together behavior entirely, without touching how any
+  // other existing pair already works.
   function getPairSibling(el){
     var group = el.closest ? el.closest('.pair-group') : null;
-    if(!group) return null;
+    if(!group || group.classList.contains('independent-grades')) return null;
     var courses = group.querySelectorAll('.course[id]');
     for(var i = 0; i < courses.length; i++){
       if(courses[i] !== el) return courses[i];
@@ -9465,7 +9510,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<div class="header-actions">' +
         '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">🏠</span><span class="home-lbl">Home</span></button>' +
         (canEdit ? (editing
-          ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
+          ? '<button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
           : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">✏️ Edit Mode</button>') : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">📚 Course Library</button>' : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">📤 Export Plan</button>' : '') +
@@ -9558,7 +9603,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var page = document.getElementById('page-' + planId);
     if(!page) return;
     page.classList.toggle('editing');
-    render(planId);
+    var enteringEdit = page.classList.contains('editing');
+    render(planId); // rebuilds the DOM the tour's step targets look for — must happen before starting it
+    if(enteringEdit && window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('planEditor'); }
   }
 
   function toggleLang(planId){
@@ -10353,6 +10400,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
   function nth(list, i){ return list && list[i] ? list[i] : null; }
 
+  // The custom/imported plan editor always renders into this one fixed
+  // host regardless of which plan is open — unlike visiblePlanRoot()'s
+  // built-in majors, there's only ever one candidate, so this just needs
+  // to confirm it's actually the thing on screen right now.
+  function importedEditRoot(){
+    var host = document.getElementById('importedPlanView');
+    return (host && host.offsetParent !== null) ? host : document;
+  }
+
   // A course guaranteed to have at least one prerequisite connection —
   // needed for the interactive hold-to-trace step, since holding a course
   // with zero connections draws nothing and the step would never complete.
@@ -10420,6 +10476,60 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         noDim: true, // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
         avoidBelow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown.open'); },
         watchReflow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown'); } }
+    ],
+    // Edit Mode on a student's OWN custom/imported plan — no developer
+    // password involved, since only its own creator can ever reach it (see
+    // the "canEdit = true" comment in AAUP_IMPORTED.render). Steps that open
+    // one of the shared devModalOverlay dialogs (Add Course, Course
+    // Library, Edit Course) need no special handling here at all: the same
+    // pause-while-a-real-modal-is-open / resume-and-advance-on-close
+    // machinery below (see anyOtherModalOpen) already covers any
+    // .modal-overlay, automatically. Move/Add Year/Remove are left
+    // descriptive rather than gated on a specific gesture — forcing an
+    // exact drag destination is fragile, and forcing a real delete on
+    // someone's own data is actively bad UX; the layer being pass-through
+    // means they're all genuinely tappable/draggable live regardless.
+    planEditor: [
+      { target: function(){ return importedEditRoot().querySelector('.imp-exit-edit-btn'); },
+        title: 'Edit Mode',
+        text: 'This is YOUR plan — nothing here is shared with anyone until you choose to Export or Contribute it. Add, remove, and rearrange courses freely; everything saves automatically as you go, no separate Save button.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-add-course-card'); },
+        title: 'Add a course',
+        text: 'Tap + in any semester to add a course by hand — name, credit hours, category, even its prerequisites. Try it now.' },
+      { target: function(){ return importedEditRoot().querySelector('.home-btn[onclick*="openLibrary"]'); },
+        title: 'Course Library',
+        text: 'Or skip the typing — copy a course straight from an official plan (or someone else’s) instead of entering it by hand. Go ahead, try it.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-edit-course-btn'); },
+        title: 'Edit a course',
+        text: 'Tap the pencil on any course to fix its name, credit hours, or category later — nothing here is permanent.' },
+      { target: function(){ return importedEditRoot().querySelector('.course[id]'); },
+        title: 'Move a course',
+        text: 'Press and hold a course, then drag it to a different semester — the app checks prerequisites for you and warns if the new order would break something. Give it a try.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-structure-actions .home-btn'); },
+        title: 'Add a Year',
+        text: 'Need more than what’s here? Add another year any time — each year can also get a Summer semester from its own header, and both can be removed again just as easily.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-remove-course-btn'); },
+        title: 'Remove a course',
+        text: 'The ✕ on a course removes it — you’ll always get an “are you sure” first, and this can’t be undone once confirmed.' },
+      { target: function(){ return importedEditRoot().querySelector('.imp-exit-edit-btn'); },
+        title: 'All done?',
+        text: 'Tap here whenever you’re finished editing. There’s nothing left to save — it already has been, the whole time.' }
+    ],
+    // Developer Edit Mode on an OFFICIAL major (robotics/cybersecurity/
+    // medical/cs) — deliberately much smaller than planEditor above: no
+    // add/remove/course-editing exists here on purpose (see AAUP_PLAN_EDITOR
+    // — only drag-to-reorder), since this changes what every student using
+    // that shared plan sees, not just the person editing it.
+    devEdit: [
+      { target: function(){ return visiblePlanRoot().querySelector('.emb-exit'); },
+        title: 'Developer Edit Mode',
+        text: 'This edits the OFFICIAL shared plan every student sees — changes here affect everyone, not just you. There’s no add or remove here on purpose, only reordering, so the course list itself always stays exactly what the university publishes.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.course[id]'); },
+        title: 'Move a course',
+        text: 'Press and hold, then drag any course to a different semester. Prerequisites are checked automatically — moving something before what it needs, or after what needs it, gets rejected. A same-semester conflict (a retake case) asks to confirm instead.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.emb-exit'); },
+        title: 'Exit',
+        text: 'Tap here when you’re done — every move is already saved as you make it.' }
     ]
   };
 
@@ -10573,30 +10683,46 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   function anyOtherModalOpen(){
     return !!document.querySelector('.modal-overlay.open:not(#tutLayer)');
   }
-  function checkRealModalState(){
+  // Runs on every real DOM class-change while a tour is active — modal
+  // open/close is the common case, but it's also the one place broad
+  // enough to catch a step's target disappearing for some OTHER reason
+  // with nothing to pause for, e.g. a step whose whole point is "tap this
+  // real button" and that real button's own action (Exit Edit Mode) is
+  // exactly what removes it from the page. render() already has the "my
+  // target is gone, skip it" self-heal (needed for the tour-to-tour case
+  // in start() above) — it just needs a trigger beyond the tour's own
+  // scroll/resize/step-change calls to notice something changed for a
+  // reason that had nothing to do with this tour at all.
+  function checkTutorialHealth(){
     if(!active) return;
     var blocked = anyOtherModalOpen();
     if(blocked && !paused){
       paused = true;
       document.getElementById('tutLayer').classList.add('paused');
-    } else if(!blocked && paused){
+      return;
+    }
+    if(!blocked && paused){
       paused = false;
       document.getElementById('tutLayer').classList.remove('paused');
       advance();
+      return;
     }
+    var step = active.steps[active.index];
+    var el = step && resolve(step);
+    if(!el || el.offsetParent === null){ advance(); }
   }
   // Coalesced to at most one check per animation frame — the interactive
   // trace step alone can fire dozens of class-attribute mutations in a
   // single burst (every related SVG path + course node), and this only
-  // ever needs to notice a modal-overlay open/close, not react to each one.
-  var modalCheckScheduled = false;
-  function scheduleModalCheck(){
-    if(modalCheckScheduled) return;
-    modalCheckScheduled = true;
-    requestAnimationFrame(function(){ modalCheckScheduled = false; checkRealModalState(); });
+  // ever needs to notice things settling, not react to each one.
+  var healthCheckScheduled = false;
+  function scheduleHealthCheck(){
+    if(healthCheckScheduled) return;
+    healthCheckScheduled = true;
+    requestAnimationFrame(function(){ healthCheckScheduled = false; checkTutorialHealth(); });
   }
-  var modalWatcher = new MutationObserver(function(){ scheduleModalCheck(); });
-  modalWatcher.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+  var tutorialWatcher = new MutationObserver(function(){ scheduleHealthCheck(); });
+  tutorialWatcher.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 
   function start(id){
     // A tour step's target can be genuinely tapped now (see the
@@ -10604,7 +10730,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // whole different page instead of opening a modal — "My Study Plan" on
     // the last dashboard step, for one. That page transition itself calls
     // startWhenClear() for the NEXT tour in the very same synchronous tick,
-    // before the modalWatcher below ever gets a chance to fire and finish()
+    // before the tutorialWatcher below ever gets a chance to fire and finish()
     // the old one — so without this check, a still-"active" dashboard tour
     // would permanently block the study-plan tour from ever starting.
     // Detect it here instead: if the previous tour's own current-step
@@ -11018,6 +11144,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(window.showPage){ window.showPage(prefix); }
     var page = document.getElementById('page-' + prefix);
     if(page){ page.classList.add('editing'); }
+    if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('devEdit'); }
   }
   function exitEditMode(prefix){
     var page = document.getElementById('page-' + prefix);
@@ -11481,6 +11608,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var others = accounts.filter(function(a){ return a !== current; });
     var selectedPlan = window.AAUP_DASHBOARD ? window.AAUP_DASHBOARD.getSelected() : null;
     var isRtlNow = selectedPlan && window.__isRtl ? window.__isRtl(selectedPlan) : false;
+    var isImportedSelected = !!(selectedPlan && window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[selectedPlan]);
+    // Developer Mode's own unlock state is deliberately kept in memory only
+    // (see AAUP_DEV's `authenticated` var) — re-locking on every reload is
+    // the point. The dev-edit buttons it reveals are the one visible trace
+    // of "unlocked this session" already on the page, so reuse that instead
+    // of tracking a second flag just for gating this tour's replay button.
+    var devEditBtn = document.querySelector('[data-dev-edit-btn]');
+    var devUnlocked = !!(devEditBtn && devEditBtn.style.display !== 'none');
 
     body.innerHTML =
       '<h2 style="margin-top:0;">⚙️ Settings</h2>' +
@@ -11505,6 +11640,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 Home tour</button>' +
       (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 Dashboard tour</button>' : '') +
       (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 Study Plan tour</button>' : '') +
+      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 Plan Editor tour</button>' : '') +
+      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 Developer Edit tour</button>' : '') +
       '</div>' +
       '<h3 style="margin-bottom:6px;">👤 Accounts</h3>' +
       '<p class="form-note" style="margin-top:0;">Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.</p>' +
@@ -11567,6 +11704,26 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         document.getElementById('devModalOverlay').classList.remove('open');
         if(window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.openStudyPlan(selectedPlan); }
         if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('studyplan'); }
+      });
+    }
+    if(document.getElementById('setTourEditBtn')){
+      document.getElementById('setTourEditBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        if(window.AAUP_IMPORTED){
+          window.AAUP_IMPORTED.open(selectedPlan);
+          var page = document.getElementById('page-' + selectedPlan);
+          if(page && !page.classList.contains('editing')){ window.AAUP_IMPORTED.toggleEdit(selectedPlan); }
+        }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('planEditor'); }
+      });
+    }
+    if(document.getElementById('setTourDevEditBtn')){
+      document.getElementById('setTourDevEditBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        var builtins = ['robotics', 'cybersecurity', 'medical', 'cs'];
+        var prefix = builtins.indexOf(selectedPlan) !== -1 ? selectedPlan : 'robotics';
+        if(window.AAUP_PLAN_EDITOR){ window.AAUP_PLAN_EDITOR.enterEditMode(prefix); }
+        if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.replay('devEdit'); }
       });
     }
 
