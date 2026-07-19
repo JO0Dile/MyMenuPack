@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '2.1';
+window.APP_VERSION = '2.11';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -984,6 +984,17 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     border:1px solid rgba(255,255,255,.08);
     transition:transform .12s ease, box-shadow .12s ease;
     cursor:pointer;
+    /* The hold-to-trace gesture is a text-length press on a text-filled
+       card, which is exactly what a phone's own "select this text" long-
+       press callout is also listening for — without this it wins the race
+       and pops a Copy/Share bubble mid-hold. Course names aren't meant to
+       be copied out of the app anyway, so selection is off entirely here
+       (touch-action is deliberately left at its default, unlike the
+       .editing drag state below, so scrolling that starts on a course card
+       still works normally). */
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
   }
 
   .course:hover{transform:translateY(-2px);}
