@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '2.51';
+window.APP_VERSION = '3.0';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -456,6 +456,35 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   }
 
   .home-intro strong{color:var(--text);}
+
+  /* "Continue where you left off" card — only shown on the top-level
+     university step when there's a previously-opened plan to resume. */
+  .home-resume{
+    display:flex;align-items:center;gap:14px;
+    background:linear-gradient(180deg, rgba(93,184,255,.14), rgba(93,184,255,.05));
+    border:1px solid var(--accent);
+    border-radius:14px;
+    padding:14px 16px;
+    margin:0 4px 18px;
+    cursor:pointer;
+    transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .home-resume:hover, .home-resume:focus-visible{
+    box-shadow:0 0 20px rgba(93,184,255,.18);
+    transform:translateY(-1px);
+    outline:none;
+  }
+  .home-resume .hr-icon{
+    font-size:26px;flex:0 0 auto;width:46px;height:46px;border-radius:11px;
+    background:rgba(93,184,255,.14);display:flex;align-items:center;justify-content:center;
+  }
+  .home-resume .hr-body{flex:1 1 auto;min-width:0;}
+  .home-resume .hr-kicker{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);}
+  .home-resume .hr-name{font-size:15px;font-weight:800;color:var(--text);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .home-resume .hr-sub{font-size:11.5px;color:var(--text-dim);margin-top:3px;}
+  .home-resume .hr-go{flex:0 0 auto;font-size:20px;color:var(--accent);}
+  .home-resume .hr-progress{margin-top:6px;height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;}
+  .home-resume .hr-progress > span{display:block;height:100%;background:var(--accent);border-radius:3px;}
 
 
   .plan-grid{
@@ -1169,6 +1198,99 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
+  /* ---------- collapse finished years ---------- */
+  .collapse-toggle{
+    display:none;align-items:center;gap:8px;
+    margin:14px 32px 0;padding:9px 14px;
+    background:var(--search-bg);border:1px solid var(--line);border-radius:10px;
+    color:var(--text-dim);font-size:12.5px;font-weight:700;font-family:inherit;
+    cursor:pointer;width:calc(100% - 64px);text-align:left;
+  }
+  .collapse-toggle.available{display:flex;}
+  .collapse-toggle:hover{border-color:var(--accent);color:var(--text);}
+  .collapse-toggle .ct-state{margin-left:auto;color:var(--accent);font-weight:800;}
+  .plan-page.rtl-mode .collapse-toggle, .sheet.rtl-mode .collapse-toggle{text-align:right;}
+  .plan-page.rtl-mode .collapse-toggle .ct-state, .sheet.rtl-mode .collapse-toggle .ct-state{margin-left:0;margin-right:auto;}
+  @media (max-width:640px){
+    .collapse-toggle{margin-left:16px;margin-right:16px;width:calc(100% - 32px);}
+  }
+
+  /* A finished year in collapse mode: its semesters are hidden and a single
+     compact "all done — tap to expand" strip stands in for them. */
+  .year-row.year-collapsed .semesters,
+  .imp-year-block.year-collapsed .imp-semester-block{display:none;}
+  .collapse-hint{
+    display:flex;align-items:center;gap:8px;cursor:pointer;
+    padding:12px 16px;margin:6px 0;border-radius:10px;
+    background:linear-gradient(180deg, rgba(74,222,128,.12), rgba(74,222,128,.04));
+    border:1px dashed var(--unlock);color:var(--text);font-size:12.5px;font-weight:700;
+  }
+  .collapse-hint .ch-expand{margin-left:auto;color:var(--unlock);font-weight:800;}
+  .plan-page.rtl-mode .collapse-hint .ch-expand, .sheet.rtl-mode .collapse-hint .ch-expand{margin-left:0;margin-right:auto;}
+  /* Prerequisite connectors are absolutely positioned over the full grid;
+     collapsing years reflows it, so hide the layer while collapse mode is on
+     to avoid lines pointing at now-hidden courses. It's a navigation view,
+     not a tracing one — the layer (and tracing) return when it's toggled off. */
+  .plan-page.finished-collapsed .connector-layer,
+  .sheet.finished-collapsed .connector-layer{display:none;}
+
+  /* ---------- per-semester workload roll-up ---------- */
+  .sem-workload{
+    display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:10px;vertical-align:middle;
+  }
+  .plan-page.rtl-mode .sem-workload, .sheet.rtl-mode .sem-workload{margin-left:0;margin-right:10px;}
+  .sem-workload .swl{
+    font-size:10px;font-weight:800;letter-spacing:.02em;
+    padding:2px 7px;border-radius:999px;line-height:1.4;white-space:nowrap;
+  }
+  .sem-workload .swl-hard{background:rgba(224,50,47,.16);color:#ff9a97;}
+  .sem-workload .swl-medium{background:rgba(93,184,255,.16);color:var(--accent);}
+  .sem-workload .swl-easy{background:rgba(74,222,128,.16);color:#8ff0b0;}
+
+  /* ---------- plan overview & print ---------- */
+  .po-card{max-width:900px;width:100%;}
+  .po-actions{display:flex;justify-content:flex-end;margin-bottom:14px;}
+  .po-header{border-bottom:2px solid var(--line);padding-bottom:14px;margin-bottom:16px;}
+  .po-title{display:flex;align-items:center;gap:12px;}
+  .po-title .po-icon{font-size:30px;}
+  .po-title .po-name{font-size:20px;font-weight:800;color:var(--text);}
+  .po-title .po-uni{font-size:12px;color:var(--text-dim);margin-top:2px;}
+  .po-meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:12.5px;color:var(--text-dim);}
+  .po-meta span{font-weight:600;}
+  .po-years{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  @media (max-width:640px){ .po-years{grid-template-columns:1fr;} }
+  .po-year{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel);}
+  .po-year-label{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:8px;text-transform:capitalize;}
+  .po-sem{margin-bottom:10px;}
+  .po-sem-label{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+  .po-courses{list-style:none;margin:0;padding:0;}
+  .po-courses li{display:flex;align-items:baseline;gap:6px;font-size:12px;padding:2px 0;color:var(--text);}
+  .po-courses li .po-mark{color:var(--text-dim);flex:0 0 auto;font-weight:800;}
+  .po-courses li.po-done{color:var(--text);}
+  .po-courses li.po-done .po-mark{color:var(--unlock);}
+  .po-courses li .po-cname{flex:1 1 auto;}
+  .po-courses li .po-cr{font-size:10px;color:var(--text-dim);flex:0 0 auto;}
+  .po-courses li .po-grade{font-size:10px;font-weight:800;color:var(--accent);flex:0 0 auto;}
+  .po-foot{font-size:10.5px;color:var(--text-dim);text-align:center;margin-top:16px;font-style:italic;}
+
+  /* Print: strip all app chrome and show only the overview, in a plain
+     high-contrast form that survives a black-and-white printer. */
+  @media print{
+    body{background:#fff !important;}
+    body > *{display:none !important;}
+    #planOverviewOverlay{display:block !important;position:static !important;background:#fff !important;padding:0 !important;}
+    #planOverviewOverlay .modal-card{box-shadow:none !important;border:none !important;max-width:100% !important;background:#fff !important;color:#000 !important;padding:0 !important;}
+    #planOverviewOverlay .po-actions, #planOverviewOverlay .modal-close{display:none !important;}
+    #planOverviewPrintRoot{color:#000 !important;}
+    #planOverviewPrintRoot .po-name, #planOverviewPrintRoot .po-year-label, #planOverviewPrintRoot .po-courses li, #planOverviewPrintRoot .po-courses li.po-done{color:#000 !important;}
+    #planOverviewPrintRoot .po-uni, #planOverviewPrintRoot .po-meta, #planOverviewPrintRoot .po-sem-label, #planOverviewPrintRoot .po-cr, #planOverviewPrintRoot .po-foot{color:#333 !important;}
+    #planOverviewPrintRoot .po-year{border:1px solid #999 !important;background:#fff !important;break-inside:avoid;}
+    #planOverviewPrintRoot .po-grade{color:#000 !important;}
+    #planOverviewPrintRoot .po-mark{color:#000 !important;}
+    #planOverviewPrintRoot .po-header{border-color:#000 !important;}
+    @page{margin:1.2cm;}
+  }
+
   .course-drag-ghost{
     position:fixed; pointer-events:none; z-index:2000;
     opacity:.92; transform:rotate(-2deg) scale(1.04);
@@ -1802,6 +1924,25 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .achievement-badge .ab-tag{font-size:9px;font-weight:700;margin-top:6px;color:#f2b93d;}
 
   .achievement-badge.na .ab-tag{color:var(--text-dim);}
+
+  .achievement-badge .ab-progress{margin-top:8px;width:100%;}
+  .achievement-badge .ab-progress-track{
+    height:5px;border-radius:3px;background:rgba(255,255,255,.09);overflow:hidden;
+  }
+  .achievement-badge .ab-progress-track > span{
+    display:block;height:100%;border-radius:3px;background:var(--accent);
+    transition:width .4s ease;
+  }
+  .achievement-badge .ab-progress-text{
+    font-size:9px;font-weight:700;color:var(--accent);margin-top:4px;
+  }
+
+  .achievement-badge .ab-share{
+    margin-top:8px;background:rgba(93,184,255,.14);border:1px solid var(--accent);
+    color:var(--accent);font-family:inherit;font-size:10px;font-weight:800;
+    border-radius:999px;padding:4px 12px;cursor:pointer;
+  }
+  .achievement-badge .ab-share:hover{background:var(--accent);color:var(--navy-900);}
   /* ================= AI STUDY ADVISOR ================= */
 
   .advisor-summary{
@@ -2031,6 +2172,25 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   }
 
   .toast-msg.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+  /* Like .toast-msg but interactive — carries an inline action button
+     (e.g. "Undo" after a drag move). Separate element so it never fights
+     the plain, pointer-events:none status toast. */
+  .toast-action{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    background:var(--panel);border:1px solid var(--accent);color:var(--text);
+    padding:8px 8px 8px 18px;border-radius:999px;font-size:12.5px;font-weight:600;
+    box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:1201;
+    display:flex;align-items:center;gap:12px;
+    opacity:0;transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast-action.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+  .toast-action .ta-btn{
+    background:var(--accent);color:#04121f;border:none;border-radius:999px;
+    padding:6px 16px;font-size:12.5px;font-weight:800;font-family:inherit;cursor:pointer;
+    white-space:nowrap;
+  }
+  .toast-action .ta-btn:hover{filter:brightness(1.08);}
 
   /* Respect the OS-level "reduce motion" accessibility setting. */
   @media (prefers-reduced-motion: reduce){
@@ -2263,6 +2423,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
   </div>
 
+  <div class="home-resume" id="homeResumeCard" style="display:none;" role="button" tabindex="0"></div>
+
   <p class="home-intro" id="homeIntroText"><strong>Choose your university</strong>, then your college, then your study plan. <span style="opacity:.75;">Unofficial student project — always confirm with your academic advisor.</span></p>
 
   <div class="search-wrap" id="homeSearchWrap">
@@ -2406,6 +2568,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 </div>
 
 <div class="toast-msg" id="globalToast"></div>
+<div class="toast-action" id="globalActionToast" style="display:none;">
+  <span class="ta-text" id="globalActionToastText"></span>
+  <button type="button" class="ta-btn" id="globalActionToastBtn"></button>
+</div>
 
 <div class="tut-layer" id="tutLayer">
   <div class="tut-spotlight" id="tutSpotlight"></div>
@@ -3897,6 +4063,85 @@ window.__escapeHtml = function(s){
     return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch];
   });
 };
+// Exact inverse of __escapeHtml's five entities — nothing more. Exists so
+// __cleanText below can be IDEMPOTENT: text that's already been escaped
+// once (a plan exported from this app, then re-imported) gets unescaped
+// back to its raw form before being escaped again, instead of turning
+// "&" into "&amp;amp;" a little more on every export→import round trip.
+window.__unescapeHtml = function(s){
+  return String(s == null ? '' : s)
+    .replace(/&#39;/g, "'").replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+};
+window.__cleanText = function(s){
+  return window.__escapeHtml(window.__unescapeHtml(s));
+};
+// The same escape-and-reslugify treatment AAUP_SYNC applies to plans that
+// arrive over the network, for plans that arrive any OTHER way: pasted
+// into the Developer Panel, restored from a "progress backup" file, or
+// originally created by typing into the Add Course / New Plan forms.
+// Those paths used to be trusted on the reasoning that a file the user
+// personally opened is their own problem ("self-XSS at worst") — but the
+// Export and Contribute buttons exist precisely so students SEND each
+// other these files, which makes an imported plan attacker-controlled in
+// practice, and its strings feed the same innerHTML render paths as
+// everything else. Idempotent (see __cleanText), so already-clean plans
+// pass through byte-identical and re-sanitizing is always safe.
+window.__sanitizeImportedPlan = function(p){
+  if(!p || typeof p !== 'object') return p;
+  var clean = window.__cleanText;
+  function safeId(s, fallback){
+    var str = String(s == null ? '' : s);
+    // Already-safe ids pass through VERBATIM — collapsing hyphen runs
+    // would silently rename e.g. the "calc-1--retake" ids the retake
+    // scheduler creates, orphaning the progress and grades keyed on them.
+    if(/^[a-z0-9-]+$/.test(str)) return str;
+    var out = str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return out || fallback || ('x-' + Math.random().toString(36).slice(2, 8));
+  }
+  function cleanName(n){
+    if(n == null) return n;
+    if(typeof n === 'object') return { big: clean(n.big || ''), small: clean(n.small || '') };
+    return clean(n);
+  }
+  var CATS = ['skills','core','math','dept','eng','uni','free'];
+  if(p.majorName){
+    p.majorName = { en: cleanName(p.majorName.en), ar: cleanName(p.majorName.ar) };
+  }
+  if(p.icon != null){ p.icon = String(p.icon).slice(0, 8); }
+  if(p.bio && typeof p.bio === 'object'){ p.bio = { en: clean(p.bio.en || ''), ar: clean(p.bio.ar || '') }; }
+  if(p.college && typeof p.college === 'object'){ p.college = { en: clean(p.college.en || ''), ar: clean(p.college.ar || '') }; }
+  if(p.university != null && !(window.APP_UNIVERSITIES && window.APP_UNIVERSITIES[p.university])){ p.university = 'aaup'; }
+  if(p.structure && Array.isArray(p.structure.years)){
+    p.structure.years = p.structure.years.map(function(y){
+      return { id: safeId(y && y.id, 'y1'), hasSummer: !!(y && y.hasSummer) };
+    });
+  }
+  if(Array.isArray(p.courses)){
+    p.courses = p.courses.slice(0, 400).map(function(c){
+      if(!c || typeof c !== 'object') return null;
+      var out = {
+        id: safeId(c.id),
+        name: clean(c.name || c.id || ''),
+        ar: clean(c.ar || ''),
+        creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
+        category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
+        semester: ['s1','s2','s3','summer'].indexOf(c.semester) !== -1 ? c.semester : 's1'
+      };
+      if(c.yearId != null){ out.yearId = safeId(c.yearId, 'y1'); }
+      if(c.courseNumber != null){ out.courseNumber = clean(c.courseNumber).slice(0, 30); }
+      if(c.num != null){ out.num = clean(c.num).slice(0, 30); }
+      if(c.isRetake){ out.isRetake = true; }
+      return out;
+    }).filter(function(c){ return !!c; });
+  }
+  if(Array.isArray(p.prerequisites)){
+    p.prerequisites = p.prerequisites.slice(0, 800).map(function(pair){
+      return Array.isArray(pair) ? [safeId(pair[0]), safeId(pair[1])] : null;
+    }).filter(function(pair){ return pair && pair[0] && pair[1]; });
+  }
+  return p;
+};
 
 function showPage(id){
   document.getElementById('home').style.display = (id === 'home') ? 'block' : 'none';
@@ -3907,6 +4152,11 @@ function showPage(id){
   if(id !== 'home' && window.__redraw && window.__redraw[id]){
     window.__redraw[id]();
   }
+  if(id !== 'home' && window.__refreshCollapse){ window.__refreshCollapse(id); }
+  if(id !== 'home' && window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
+  // Seed the semester-completion celebration set for this plan so opening it
+  // never fires confetti for semesters that were already finished.
+  if(id !== 'home' && window.__celebrateCheck){ window.__celebrateCheck(id); }
   window.scrollTo(0, 0);
 }
 window.showPage = showPage;
@@ -6217,6 +6467,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // Checking off a course can unlock an achievement — check right away
     // rather than waiting for the student to open the Achievements modal.
     if(window.AAUP_ACHIEVEMENTS){ window.AAUP_ACHIEVEMENTS.refreshUnlocks(prefix); }
+
+    // Completion just changed, so which years count as "finished" may have
+    // too — keep the collapse toggle and any collapsed years in sync.
+    if(window.__refreshCollapse){ window.__refreshCollapse(prefix); }
+    // A whole semester may have just been finished — celebrate it.
+    if(window.__celebrateCheck){ window.__celebrateCheck(prefix); }
   }
 
   // Per-plan copy so cybersecurity's still-unconfirmed elective-hour total
@@ -6747,6 +7003,42 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(hideTimer) clearTimeout(hideTimer);
     hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 3200);
   }
+
+  // A toast that carries one tappable action (used for "Moved — Undo").
+  // Stays up a little longer than the plain toast to give a real chance to
+  // hit the button, and is dismissed either by tapping the action or when
+  // it times out. onAction runs at most once.
+  var actionHideTimer = null;
+  function showActionToast(msg, actionLabel, onAction){
+    var el = document.getElementById('globalActionToast');
+    var textEl = document.getElementById('globalActionToastText');
+    var btn = document.getElementById('globalActionToastBtn');
+    if(!el || !textEl || !btn){ showToast(msg); return; }
+    textEl.textContent = msg;
+    btn.textContent = actionLabel;
+    el.style.display = 'flex';
+    // force reflow so the .show transition runs even if the element was
+    // just flipped from display:none
+    void el.offsetWidth;
+    el.classList.add('show');
+    if(actionHideTimer) clearTimeout(actionHideTimer);
+    var done = false;
+    function dismiss(){
+      el.classList.remove('show');
+      setTimeout(function(){ if(!el.classList.contains('show')) el.style.display = 'none'; }, 300);
+    }
+    var newBtn = btn.cloneNode(true); // drop any handler from a previous toast
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', function(){
+      if(done) return;
+      done = true;
+      if(actionHideTimer) clearTimeout(actionHideTimer);
+      dismiss();
+      try{ onAction(); }catch(e){}
+    });
+    actionHideTimer = setTimeout(dismiss, 6000);
+  }
+  window.__showActionToast = showActionToast;
   function anyVisiblePageIsRtl(){
     var pages = document.querySelectorAll('.plan-page');
     for(var i = 0; i < pages.length; i++){
@@ -6904,8 +7196,53 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         if(window.__showToast) window.__showToast('That file does not look like an AAUP Planner export.');
         return;
       }
+      // Only this app's own keys — a backup file is just JSON anyone could
+      // have edited (or built), and without this check it could write ANY
+      // localStorage key on this origin, not just planner data.
+      var progressKey = window.__PROGRESS_STORAGE_KEY;
+      function isOwnKey(k){
+        return k === progressKey || k.indexOf('aaup_') === 0 || k.indexOf('aaup-imported-progress-') === 0;
+      }
+      // The plans inside a backup get the same treatment as any other
+      // imported plan (see __sanitizeImportedPlan) — a "here, take my
+      // progress backup" file from another student is exactly as
+      // attacker-controlled as a shared plan file. Community feedback is
+      // rebuilt against its own whitelist for the same reason.
+      if(data.aaup_importedPlans && typeof data.aaup_importedPlans === 'object' && window.__sanitizeImportedPlan){
+        Object.keys(data.aaup_importedPlans).forEach(function(pid){
+          data.aaup_importedPlans[pid] = window.__sanitizeImportedPlan(data.aaup_importedPlans[pid]);
+        });
+      }
+      if(data['aaup_community_feedback'] && typeof data['aaup_community_feedback'] === 'object'){
+        var WORKLOADS = ['Easy','Medium','Hard'];
+        Object.keys(data['aaup_community_feedback']).forEach(function(cid){
+          var entry = data['aaup_community_feedback'][cid] || {};
+          var counts = {};
+          WORKLOADS.forEach(function(w){
+            if(entry.workloadCounts && typeof entry.workloadCounts[w] === 'number'){ counts[w] = entry.workloadCounts[w]; }
+          });
+          data['aaup_community_feedback'][cid] = {
+            totalDifficulty: Number(entry.totalDifficulty) || 0,
+            difficultyVotes: Number(entry.difficultyVotes) || 0,
+            workloadCounts: counts,
+            sampleNotes: (Array.isArray(entry.sampleNotes) ? entry.sampleNotes.slice(0, 5) : []).map(function(n){
+              return window.__cleanText(String(n).slice(0, 200));
+            })
+          };
+        });
+      }
+      if(data.aaup_ratings && typeof data.aaup_ratings === 'object'){
+        Object.keys(data.aaup_ratings).forEach(function(rid){
+          var r = data.aaup_ratings[rid] || {};
+          data.aaup_ratings[rid] = {
+            workload: ['Easy','Medium','Hard'].indexOf(r.workload) !== -1 ? r.workload : undefined,
+            difficulty: (typeof r.difficulty === 'number' && r.difficulty >= 1 && r.difficulty <= 5) ? r.difficulty : undefined
+          };
+        });
+      }
       var count = 0;
       Object.keys(data).forEach(function(k){
+        if(!isOwnKey(k)) return;
         try{ localStorage.setItem(k, JSON.stringify(data[k])); count++; }
         catch(e){ /* skip a key that fails to write */ }
       });
@@ -7465,6 +7802,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         }
       }
     });
+    // The per-semester "2 hard · 1 easy" roll-up is derived from exactly the
+    // rating this card just changed, so keep it in sync from here too.
+    if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(prefix); }
   }
 
   function refreshAllCards(){
@@ -7872,37 +8212,77 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     return info && info.gender;
   }
 
+  // ---------- progress helpers (for the "N more to go" hint under locked
+  // achievements) — each returns { done, total } counted the same way its
+  // check() decides done-ness, or null when a numeric hint doesn't apply. ----------
+  function countYearCourses(prefix, yearNum){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return null;
+    var progress = window.__getProgress();
+    var els = Array.prototype.slice.call(page.querySelectorAll('.course[id]'))
+      .filter(function(el){ return yearOf(el) === String(yearNum); });
+    if(!els.length) return null;
+    var done = els.filter(function(el){ return !!progress[el.id]; }).length;
+    return { done: done, total: els.length };
+  }
+  function countCategory(prefix, cat){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return null;
+    var progress = window.__getProgress();
+    var els = Array.prototype.slice.call(page.querySelectorAll('.course.' + cat + '[id]'));
+    if(!els.length) return null;
+    var done = els.filter(function(el){ return !!progress[el.id]; }).length;
+    return { done: done, total: els.length };
+  }
+  function countSlugs(prefix, slugs){
+    var progress = window.__getProgress();
+    var done = 0;
+    slugs.forEach(function(s){ if(progress[prefix + '-c-' + s]) done++; });
+    return { done: done, total: slugs.length };
+  }
+  function creditProgressToward(prefix, targetPct){
+    var s = window.__computeStats(prefix);
+    if(!s || !s.totalCredits) return null;
+    var target = Math.round(s.totalCredits * (targetPct / 100));
+    return { done: Math.min(s.doneCredits, target), total: target, unit: 'credit hours' };
+  }
+
   var ACHIEVEMENTS = [
     {
       id: 'year1', icon: '🥇',
       title: { en: 'Finished Year 1', ar: 'أنهيت السنة الأولى' },
       desc: { en: 'Complete every course in Year 1.', ar: 'أكمل جميع مساقات السنة الأولى.' },
-      check: function(prefix){ return allYearCompleted(prefix, 1); }
+      check: function(prefix){ return allYearCompleted(prefix, 1); },
+      prog: function(prefix){ return countYearCourses(prefix, 1); }
     },
     {
       id: 'allmath', icon: '📐',
       title: { en: 'Completed all Math', ar: 'أتقنت الرياضيات' },
       desc: { en: 'Finish every math & statistics course.', ar: 'أكمل جميع مساقات الرياضيات والإحصاء.' },
-      check: function(prefix){ return allCategoryCompleted(prefix, 'math'); }
+      check: function(prefix){ return allCategoryCompleted(prefix, 'math'); },
+      prog: function(prefix){ return countCategory(prefix, 'math'); }
     },
     {
       id: 'progpath', icon: '💻',
       title: { en: 'Finished Programming Path', ar: 'أتممت مسار البرمجة' },
       desc: { en: 'Complete the intro programming sequence.', ar: 'أكمل تسلسل مساقات البرمجة التأسيسية.' },
       appliesTo: progPathApplies,
-      check: progPathDone
+      check: progPathDone,
+      prog: function(prefix){ var seq = findProgSequence(prefix); return seq ? countSlugs(prefix, seq) : null; }
     },
     {
       id: 'halfway', icon: '🎯',
       title: { en: 'Halfway to Graduation', ar: 'في منتصف الطريق للتخرج' },
       desc: { en: 'Complete 50% of required credit hours.', ar: 'أكمل 50٪ من الساعات المعتمدة المطلوبة.' },
-      check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 50; }
+      check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 50; },
+      prog: function(prefix){ return creditProgressToward(prefix, 50); }
     },
     {
       id: 'gradready', icon: '🎓',
       title: { en: 'Graduation Ready', ar: 'جاهز للتخرج' },
       desc: { en: 'Meet 100% of the graduation requirements.', ar: 'أكمل 100٪ من متطلبات التخرج.' },
-      check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.doneCredits >= s.totalCredits; }
+      check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.doneCredits >= s.totalCredits; },
+      prog: function(prefix){ return creditProgressToward(prefix, 100); }
     },
     {
       id: 'goodstudent', icon: '🌟',
@@ -7912,38 +8292,65 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         return { en: 'Great Student', ar: 'طالب مجتهد' };
       },
       desc: { en: 'Complete 10 courses with no failing grade.', ar: 'أكمل 10 مساقات دون أي علامة راسب.' },
-      check: tenNoFails
+      check: tenNoFails,
+      prog: function(prefix){
+        // Distinct completed courses (deduped by catalog number, same as the
+        // check) capped at the goal of 10.
+        var page = document.getElementById('page-' + prefix);
+        if(!page) return null;
+        var progress = window.__getProgress();
+        var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
+        var seen = {}, done = 0;
+        page.querySelectorAll('.course[id]').forEach(function(el){
+          var parts = window.__splitCourseId(el.id);
+          if(!parts) return;
+          var meta = info[parts.slug];
+          var key = (meta && meta.num && meta.num !== '-') ? meta.num : parts.slug;
+          if(seen[key] || !progress[el.id]) return;
+          seen[key] = true; done++;
+        });
+        return { done: Math.min(done, 10), total: 10 };
+      }
     },
     {
       id: 'arabiclegend', icon: '🕌', global: true,
       title: { en: 'Arabic Legend', ar: 'أسطورة اللغة العربية' },
       desc: { en: 'Browse in Arabic for 5+ total minutes.', ar: 'تصفّح الموقع بالعربية لأكثر من 5 دقائق إجمالًا.' },
-      check: arabicLegendDone
+      check: arabicLegendDone,
+      prog: function(){
+        var doneMin = Math.floor(getArabicMs() / 60000);
+        var totalMin = Math.floor(ARABIC_TARGET_MS / 60000);
+        return { done: Math.min(doneMin, totalMin), total: totalMin, unit: 'minutes' };
+      }
     },
     {
       id: 'highskilled', icon: '🖥️',
       title: { en: 'High Skilled Student', ar: 'طالب عالي المهارة' },
       desc: { en: 'Complete Computer Skills & Research Methods.', ar: 'أكمل مهارات حاسوبية وأساسيات مناهج البحث.' },
-      check: highSkilledDone
+      check: highSkilledDone,
+      prog: function(prefix){ return countSlugs(prefix, ['computer-skills', 'research-methods']); }
     },
     {
       id: 'englishmaster', icon: '🇬🇧',
       title: { en: 'English Master', ar: 'أستاذ اللغة الإنجليزية' },
       desc: { en: 'Complete every English course.', ar: 'أكمل جميع مساقات اللغة الإنجليزية.' },
-      check: function(prefix){ return allCategoryCompleted(prefix, 'eng'); }
+      check: function(prefix){ return allCategoryCompleted(prefix, 'eng'); },
+      prog: function(prefix){ return countCategory(prefix, 'eng'); }
     },
     {
       id: 'mathholic', icon: '🧮',
       title: { en: 'Mathholic', ar: 'مهووس بالرياضيات' },
       desc: { en: 'Finish all math courses with a 3.5+ GPA in them.', ar: 'أكمل كل مساقات الرياضيات بمعدل أعلى من 3.5.' },
-      check: mathholicDone
+      check: mathholicDone,
+      prog: function(prefix){ return countCategory(prefix, 'math'); }
     },
     {
       id: 'cpphoster', icon: '⚙️',
       title: { en: 'C++ Hoster', ar: 'محترف ++C' },
       desc: { en: 'Complete Programming Fundamentals I & II.', ar: 'أكمل أساسيات البرمجة 1 و2.' },
       appliesTo: cppHosterApplies,
-      check: cppHosterDone
+      check: cppHosterDone,
+      prog: function(prefix){ return countSlugs(prefix, ['progfund1', 'progfund2']); }
     }
   ];
 
@@ -7980,6 +8387,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         var t = resolveTitle(a, gender);
         if(window.__showToast){ window.__showToast('🏆 ' + (rtl ? 'إنجاز جديد: ' : 'Achievement unlocked: ') + (rtl ? t.ar : t.en)); }
       });
+      // A real "you earned something" moment deserves a little burst.
+      if(window.__confetti){ window.__confetti(); }
     }
     return unlocked;
   }
@@ -8012,11 +8421,44 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var cls = !applies ? 'na' : (isUnlocked ? 'unlocked' : 'locked');
       var tag = isUnlocked ? ('✓ ' + (rtl ? 'مُنجَز' : 'Unlocked'))
         : (!applies ? (rtl ? 'غير متاح لهذا التخصص' : 'Not applicable here') : '');
+
+      // For a locked-but-applicable achievement with a countable goal, show
+      // exactly how much is left plus a small bar — turns a mystery box into
+      // something concrete to aim for.
+      var progHtml = '';
+      if(applies && !isUnlocked && typeof a.prog === 'function'){
+        var pr = null;
+        try{ pr = a.prog(prefix); }catch(e){ pr = null; }
+        if(pr && pr.total > 0 && pr.done < pr.total){
+          var remaining = pr.total - pr.done;
+          var pctBar = Math.round(pr.done / pr.total * 100);
+          var unit;
+          if(pr.unit === 'credit hours'){ unit = rtl ? 'ساعة معتمدة' : (remaining === 1 ? 'credit hour' : 'credit hours'); }
+          else if(pr.unit === 'minutes'){ unit = rtl ? 'دقيقة' : (remaining === 1 ? 'minute' : 'minutes'); }
+          else { unit = rtl ? 'مساقات' : (remaining === 1 ? 'course' : 'courses'); }
+          var hintText = rtl
+            ? ('باقٍ ' + remaining + ' ' + unit)
+            : (remaining + ' more ' + unit + ' to go');
+          progHtml =
+            '<div class="ab-progress"><div class="ab-progress-track"><span style="width:' + pctBar + '%;"></span></div>' +
+            '<div class="ab-progress-text">' + hintText + ' · ' + pr.done + '/' + pr.total + '</div></div>';
+        }
+      }
+      var shareBtn = '';
+      if(isUnlocked){
+        var majorName = (window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.planDisplayInfo) ? window.AAUP_DASHBOARD.planDisplayInfo(prefix).name : '';
+        shareBtn = '<button type="button" class="ab-share" ' +
+          'data-ach-icon="' + window.__escapeHtml(a.icon) + '" ' +
+          'data-ach-title="' + window.__escapeHtml(rtl ? title.ar : title.en) + '" ' +
+          'data-ach-sub="' + window.__escapeHtml(majorName) + '">📤 ' + (rtl ? 'مشاركة' : 'Share') + '</button>';
+      }
       return '<div class="achievement-badge ' + cls + '">' +
         '<div class="ab-icon">' + a.icon + '</div>' +
         '<div class="ab-title">' + (rtl ? title.ar : title.en) + '</div>' +
         '<div class="ab-desc">' + (rtl ? a.desc.ar : a.desc.en) + '</div>' +
+        progHtml +
         (tag ? '<div class="ab-tag">' + tag + '</div>' : '') +
+        shareBtn +
         '</div>';
     }).join('');
 
@@ -8043,6 +8485,18 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
     var card = overlay.querySelector('.modal-card');
     if(card) card.addEventListener('click', function(e){ e.stopPropagation(); });
+    // Delegated so it keeps working after every re-render of the badge grid.
+    overlay.addEventListener('click', function(e){
+      var btn = e.target.closest && e.target.closest('.ab-share');
+      if(!btn || !window.AAUP_CELEBRATE) return;
+      e.stopPropagation();
+      window.AAUP_CELEBRATE.shareAchievement({
+        icon: btn.getAttribute('data-ach-icon'),
+        title: btn.getAttribute('data-ach-title'),
+        subtitle: btn.getAttribute('data-ach-sub'),
+        footer: 'AAUP Study Plans'
+      });
+    });
   }
   if(document.readyState === 'complete'){ bind(); }
   else { window.addEventListener('load', bind); }
@@ -8263,6 +8717,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     catch(e){ return { ok: false, errors: ['That is not valid JSON.'] }; }
     var errors = validatePlanJson(obj);
     if(errors.length){ return { ok: false, errors: errors }; }
+    // Same trust boundary as the online feed: this JSON usually came from
+    // ANOTHER student (that's what Export/Contribute are for), and its
+    // strings flow into the same innerHTML render paths as everything
+    // else — so it gets the same escape-and-reslugify pass. Idempotent,
+    // so a plan exported from this app re-imports byte-identical.
+    if(window.__sanitizeImportedPlan){ obj = window.__sanitizeImportedPlan(obj); }
     var id = slugify(obj.majorName.en && obj.majorName.en.big ? obj.majorName.en.big : obj.majorName.en);
     var plans = loadImportedPlans();
     var entry = { majorName: obj.majorName, courses: obj.courses, prerequisites: obj.prerequisites, importedAt: new Date().toISOString() };
@@ -8502,7 +8962,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         return;
       }
       if(!known[item.courseId]){
-        warnings.push('Skipped unknown course: ' + item.courseId);
+        // courseId is straight out of a pasted email and this warning is
+        // rendered via innerHTML — escape it like any other foreign text.
+        warnings.push('Skipped unknown course: ' + window.__escapeHtml(String(item.courseId).slice(0, 60)));
         return;
       }
       var entry = community[item.courseId] || { totalDifficulty: 0, difficultyVotes: 0, workloadCounts: {}, sampleNotes: [] };
@@ -8510,11 +8972,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         entry.totalDifficulty += item.difficulty;
         entry.difficultyVotes += 1;
       }
-      if(item.workload){
+      // Whitelisted, not just escaped: workload becomes an object KEY that
+      // later lands in innerHTML (the ⚡ badge), and the app only has
+      // meaning for these three values anyway.
+      if(['Easy','Medium','Hard'].indexOf(item.workload) !== -1){
         entry.workloadCounts[item.workload] = (entry.workloadCounts[item.workload] || 0) + 1;
       }
       if(item.note && String(item.note).trim()){
-        entry.sampleNotes.push(String(item.note).trim().slice(0, 200));
+        // Notes render inside the 📝 popover via innerHTML — a student
+        // email is exactly as untrusted as the network feed, so they get
+        // the same escape-at-the-boundary treatment.
+        entry.sampleNotes.push(window.__cleanText(String(item.note).trim().slice(0, 200)));
         if(entry.sampleNotes.length > 5){ entry.sampleNotes = entry.sampleNotes.slice(-5); }
       }
       community[item.courseId] = entry;
@@ -9011,68 +9479,75 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var plans = loadImportedPlans();
     var plan = plans[planId];
     if(!plan) return;
+    var rtl = !!rtlState[planId];
 
     var courseOptions = (plan.courses || []).map(function(c){
       return '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:5px;">' +
-        '<input type="checkbox" value="' + c.id + '" class="ncq-prereq-check"> ' + c.name + '</label>';
-    }).join('') || '<p class="ex-note">No other courses yet \u2014 this will be the first one.</p>';
+        '<input type="checkbox" value="' + c.id + '" class="ncq-prereq-check"> ' + window.__escapeHtml(rtl && c.ar ? c.ar : c.name) + '</label>';
+    }).join('') || '<p class="ex-note">' + (rtl ? 'لا توجد مساقات أخرى بعد \u2014 سيكون هذا الأول.' : 'No other courses yet \u2014 this will be the first one.') + '</p>';
 
     var categories = ['core','math','dept','eng','uni','free','skills'];
-    var categoryLabels = { core:'Core', math:'Math', dept:'Department Elective', eng:'English', uni:'University Elective', free:'Free Elective', skills:'University Requirement' };
+    var categoryLabels = rtl
+      ? { core:'إجباري', math:'رياضيات', dept:'اختياري تخصصي', eng:'إنجليزي', uni:'اختياري جامعي', free:'اختياري حر', skills:'متطلب جامعي' }
+      : { core:'Core', math:'Math', dept:'Department Elective', eng:'English', uni:'University Elective', free:'Free Elective', skills:'University Requirement' };
 
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">➕ Add Course</h2>' +
+      '<h2 style="margin-top:0;">➕ ' + (rtl ? 'إضافة مساق' : 'Add Course') + '</h2>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="ncqNameEn">Name (English)</label><input type="text" id="ncqNameEn" maxlength="80"></div>' +
-        '<div class="form-field"><label for="ncqNameAr">Name (Arabic)</label><input type="text" id="ncqNameAr" maxlength="80"></div>' +
+        '<div class="form-field"><label for="ncqNameEn">' + (rtl ? 'الاسم (بالإنجليزية)' : 'Name (English)') + '</label><input type="text" id="ncqNameEn" maxlength="80"></div>' +
+        '<div class="form-field"><label for="ncqNameAr">' + (rtl ? 'الاسم (بالعربية)' : 'Name (Arabic)') + '</label><input type="text" id="ncqNameAr" maxlength="80"></div>' +
       '</div>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="ncqId">Course ID</label><input type="text" id="ncqId" maxlength="40" placeholder="e.g. intro-stats"></div>' +
-        '<div class="form-field"><label for="ncqCredits">Credit Hours</label><input type="number" id="ncqCredits" min="0" step="0.5" value="3"></div>' +
+        '<div class="form-field"><label for="ncqId">' + (rtl ? 'معرّف المساق' : 'Course ID') + '</label><input type="text" id="ncqId" maxlength="40" placeholder="e.g. intro-stats"></div>' +
+        '<div class="form-field"><label for="ncqCredits">' + (rtl ? 'الساعات المعتمدة' : 'Credit Hours') + '</label><input type="number" id="ncqCredits" min="0" step="0.5" value="3"></div>' +
       '</div>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="ncqNumber">Course Number (optional)</label><input type="text" id="ncqNumber" maxlength="20" placeholder="e.g. 100411010"></div>' +
-        '<div class="form-field"><label for="ncqCategory">Category</label><select id="ncqCategory">' +
+        '<div class="form-field"><label for="ncqNumber">' + (rtl ? 'رقم المساق (اختياري)' : 'Course Number (optional)') + '</label><input type="text" id="ncqNumber" maxlength="20" placeholder="e.g. 100411010"></div>' +
+        '<div class="form-field"><label for="ncqCategory">' + (rtl ? 'الفئة' : 'Category') + '</label><select id="ncqCategory">' +
           categories.map(function(c){ return '<option value="' + c + '">' + categoryLabels[c] + '</option>'; }).join('') +
         '</select></div>' +
       '</div>' +
-      '<p class="form-note">The course number is the most reliable way to tell whether this is the same course as one that already exists elsewhere \u2014 fill it in if you know it.</p>' +
-      '<div class="form-field"><label>Prerequisites (optional)</label>' +
+      '<p class="form-note">' + (rtl ? 'رقم المساق هو أفضل طريقة لمعرفة ما إذا كان هذا نفس المساق الموجود في مكان آخر \u2014 أدخله إن كنت تعرفه.' : 'The course number is the most reliable way to tell whether this is the same course as one that already exists elsewhere \u2014 fill it in if you know it.') + '</p>' +
+      '<div class="form-field"><label>' + (rtl ? 'المتطلبات السابقة (اختياري)' : 'Prerequisites (optional)') + '</label>' +
       '<div style="max-height:140px;overflow-y:auto;background:var(--search-bg);border:1px solid var(--line);border-radius:8px;padding:8px;">' + courseOptions + '</div></div>' +
-      '<div class="form-actions"><button type="button" class="home-btn" id="ncqCancel">Cancel</button>' +
-      '<button type="button" class="home-btn" id="ncqCreate" style="border-color:var(--accent);color:var(--text);">Add Course</button></div>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="ncqCancel">' + (rtl ? 'إلغاء' : 'Cancel') + '</button>' +
+      '<button type="button" class="home-btn" id="ncqCreate" style="border-color:var(--accent);color:var(--text);">' + (rtl ? 'إضافة المساق' : 'Add Course') + '</button></div>' +
       '<div id="ncqMsg"></div>';
     overlay.classList.add('open');
 
     document.getElementById('ncqCancel').addEventListener('click', function(){ overlay.classList.remove('open'); });
     document.getElementById('ncqCreate').addEventListener('click', function(){
-      var nameEn = document.getElementById('ncqNameEn').value.trim();
-      var nameAr = document.getElementById('ncqNameAr').value.trim();
+      // __cleanText, not raw: these names go straight into innerHTML-built
+      // course cards, popups and the Course Library — typing markup here
+      // (or pasting it from somewhere) must render as text, not run.
+      var nameEn = window.__cleanText(document.getElementById('ncqNameEn').value.trim());
+      var nameAr = window.__cleanText(document.getElementById('ncqNameAr').value.trim());
       var id = document.getElementById('ncqId').value.trim();
       var credits = parseFloat(document.getElementById('ncqCredits').value);
       var category = document.getElementById('ncqCategory').value;
-      var courseNumber = document.getElementById('ncqNumber').value.trim();
+      var courseNumber = window.__cleanText(document.getElementById('ncqNumber').value.trim());
       var msg = document.getElementById('ncqMsg');
 
       if(!nameEn || !nameAr || !id || isNaN(credits)){
-        msg.innerHTML = '<p class="dev-error-msg">Please fill in the name (both languages), an ID, and credit hours.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">' + (rtl ? 'يرجى إدخال الاسم (باللغتين) والمعرّف والساعات المعتمدة.' : 'Please fill in the name (both languages), an ID, and credit hours.') + '</p>';
         return;
       }
       if(!/^[a-z0-9-]+$/.test(id)){
-        msg.innerHTML = '<p class="dev-error-msg">Course ID can only use lowercase letters, numbers, and hyphens.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">' + (rtl ? 'معرّف المساق يمكن أن يحتوي فقط على أحرف إنجليزية صغيرة وأرقام وشرطات.' : 'Course ID can only use lowercase letters, numbers, and hyphens.') + '</p>';
         return;
       }
       var plansNow = loadImportedPlans();
       var p = plansNow[planId];
       if((p.courses || []).some(function(c){ return c.id === id; })){
-        msg.innerHTML = '<p class="dev-error-msg">A course with that ID already exists in this plan.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">' + (rtl ? 'يوجد مساق بهذا المعرّف بالفعل في هذه الخطة.' : 'A course with that ID already exists in this plan.') + '</p>';
         return;
       }
 
       var prereqIds = Array.prototype.slice.call(document.querySelectorAll('.ncq-prereq-check:checked')).map(function(cb){ return cb.value; });
       var candidate = findDuplicateCandidate(nameEn, courseNumber, id);
       if(candidate && candidate.name){
-        var question = 'This looks like it might already be "' + candidate.name + '"' + (candidate.num && candidate.num !== '-' ? ' (' + candidate.num + ')' : '') + '. Use those exact details instead, so it links up correctly with the same course elsewhere?';
+        var question = (rtl ? ('يبدو أن هذا قد يكون "' + candidate.name + '"' + (candidate.num && candidate.num !== '-' ? ' (' + candidate.num + ')' : '') + '. هل تريد استخدام تلك التفاصيل بالضبط ليرتبط بشكل صحيح مع نفس المساق في أماكن أخرى؟') : ('This looks like it might already be "' + candidate.name + '"' + (candidate.num && candidate.num !== '-' ? ' (' + candidate.num + ')' : '') + '. Use those exact details instead, so it links up correctly with the same course elsewhere?'));
         if(window.__showConfirmDialog){
           window.__showConfirmDialog(question, function(){
             finalizeCourseCreation(planId, yearId, semester, candidate.name, candidate.ar || nameAr, candidate.slug, parseFloat(candidate.cr) || credits, category, prereqIds, overlay);
@@ -9124,48 +9599,53 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var courseOptions = (plan.courses || []).filter(function(c){ return c.id !== slug; }).map(function(c){
       var checked = currentNeeds.indexOf(c.id) !== -1 ? ' checked' : '';
       return '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:5px;">' +
-        '<input type="checkbox" value="' + c.id + '" class="ecq-prereq-check"' + checked + '> ' + c.name + '</label>';
-    }).join('') || '<p class="ex-note">No other courses to require.</p>';
+        '<input type="checkbox" value="' + c.id + '" class="ecq-prereq-check"' + checked + '> ' + window.__escapeHtml((!!rtlState[planId] && c.ar) ? c.ar : c.name) + '</label>';
+    }).join('') || '<p class="ex-note">' + (!!rtlState[planId] ? 'لا توجد مساقات أخرى لاشتراطها.' : 'No other courses to require.') + '</p>';
 
+    var rtl = !!rtlState[planId];
     var categories = ['core','math','dept','eng','uni','free','skills'];
-    var categoryLabels = { core:'Core', math:'Math', dept:'Department Elective', eng:'English', uni:'University Elective', free:'Free Elective', skills:'University Requirement' };
+    var categoryLabels = rtl
+      ? { core:'إجباري', math:'رياضيات', dept:'اختياري تخصصي', eng:'إنجليزي', uni:'اختياري جامعي', free:'اختياري حر', skills:'متطلب جامعي' }
+      : { core:'Core', math:'Math', dept:'Department Elective', eng:'English', uni:'University Elective', free:'Free Elective', skills:'University Requirement' };
 
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">✏️ Edit Course</h2>' +
+      '<h2 style="margin-top:0;">✏️ ' + (rtl ? 'تعديل المساق' : 'Edit Course') + '</h2>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="ecqNameEn">Name (English)</label><input type="text" id="ecqNameEn" maxlength="80" value="' + course.name.replace(/"/g, '&quot;') + '"></div>' +
-        '<div class="form-field"><label for="ecqNameAr">Name (Arabic)</label><input type="text" id="ecqNameAr" maxlength="80" value="' + (course.ar || '').replace(/"/g, '&quot;') + '"></div>' +
+        '<div class="form-field"><label for="ecqNameEn">' + (rtl ? 'الاسم (بالإنجليزية)' : 'Name (English)') + '</label><input type="text" id="ecqNameEn" maxlength="80" value="' + course.name.replace(/"/g, '&quot;') + '"></div>' +
+        '<div class="form-field"><label for="ecqNameAr">' + (rtl ? 'الاسم (بالعربية)' : 'Name (Arabic)') + '</label><input type="text" id="ecqNameAr" maxlength="80" value="' + (course.ar || '').replace(/"/g, '&quot;') + '"></div>' +
       '</div>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="ecqId">Course ID</label><input type="text" id="ecqId" maxlength="40" value="' + course.id + '"></div>' +
-        '<div class="form-field"><label for="ecqCredits">Credit Hours</label><input type="number" id="ecqCredits" min="0" step="0.5" value="' + course.creditHours + '"></div>' +
+        '<div class="form-field"><label for="ecqId">' + (rtl ? 'معرّف المساق' : 'Course ID') + '</label><input type="text" id="ecqId" maxlength="40" value="' + course.id + '"></div>' +
+        '<div class="form-field"><label for="ecqCredits">' + (rtl ? 'الساعات المعتمدة' : 'Credit Hours') + '</label><input type="number" id="ecqCredits" min="0" step="0.5" value="' + course.creditHours + '"></div>' +
       '</div>' +
-      '<div class="form-field"><label for="ecqCategory">Category</label><select id="ecqCategory">' +
+      '<div class="form-field"><label for="ecqCategory">' + (rtl ? 'الفئة' : 'Category') + '</label><select id="ecqCategory">' +
         categories.map(function(c){ return '<option value="' + c + '"' + (c === course.category ? ' selected' : '') + '>' + categoryLabels[c] + '</option>'; }).join('') +
       '</select></div>' +
-      '<div class="form-field"><label>Prerequisites</label>' +
+      '<div class="form-field"><label>' + (rtl ? 'المتطلبات السابقة' : 'Prerequisites') + '</label>' +
       '<div style="max-height:140px;overflow-y:auto;background:var(--search-bg);border:1px solid var(--line);border-radius:8px;padding:8px;">' + courseOptions + '</div></div>' +
-      '<p class="form-note">Changing the name, ID, credit hours, or category means this may no longer automatically link to matching courses in other plans the way it used to \u2014 it\u2019ll be re-checked against whatever the new details actually match.</p>' +
-      '<div class="form-actions"><button type="button" class="home-btn" id="ecqCancel">Cancel</button>' +
-      '<button type="button" class="home-btn" id="ecqSave" style="border-color:var(--accent);color:var(--text);">Save Changes</button></div>' +
+      '<p class="form-note">' + (rtl ? 'تغيير الاسم أو المعرّف أو الساعات أو الفئة قد يعني أن هذا المساق لن يرتبط تلقائيًا بالمساقات المطابقة في الخطط الأخرى كما كان \u2014 سيُعاد فحصه وفق التفاصيل الجديدة.' : 'Changing the name, ID, credit hours, or category means this may no longer automatically link to matching courses in other plans the way it used to \u2014 it\u2019ll be re-checked against whatever the new details actually match.') + '</p>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="ecqCancel">' + (rtl ? 'إلغاء' : 'Cancel') + '</button>' +
+      '<button type="button" class="home-btn" id="ecqSave" style="border-color:var(--accent);color:var(--text);">' + (rtl ? 'حفظ التغييرات' : 'Save Changes') + '</button></div>' +
       '<div id="ecqMsg"></div>';
     overlay.classList.add('open');
 
     document.getElementById('ecqCancel').addEventListener('click', function(){ overlay.classList.remove('open'); });
     document.getElementById('ecqSave').addEventListener('click', function(){
-      var nameEn = document.getElementById('ecqNameEn').value.trim();
-      var nameAr = document.getElementById('ecqNameAr').value.trim();
+      // Same reason as the Add Course form: these strings feed innerHTML.
+      var nameEn = window.__cleanText(document.getElementById('ecqNameEn').value.trim());
+      var nameAr = window.__cleanText(document.getElementById('ecqNameAr').value.trim());
       var newId = document.getElementById('ecqId').value.trim();
       var credits = parseFloat(document.getElementById('ecqCredits').value);
       var category = document.getElementById('ecqCategory').value;
       var msg = document.getElementById('ecqMsg');
 
       if(!nameEn || !nameAr || !newId || isNaN(credits)){
-        msg.innerHTML = '<p class="dev-error-msg">Please fill in the name (both languages), an ID, and credit hours.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">' + (rtl ? 'يرجى إدخال الاسم (باللغتين) والمعرّف والساعات المعتمدة.' : 'Please fill in the name (both languages), an ID, and credit hours.') + '</p>';
         return;
       }
       if(!/^[a-z0-9-]+$/.test(newId)){
-        msg.innerHTML = '<p class="dev-error-msg">Course ID can only use lowercase letters, numbers, and hyphens.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">' + (rtl ? 'معرّف المساق يمكن أن يحتوي فقط على أحرف إنجليزية صغيرة وأرقام وشرطات.' : 'Course ID can only use lowercase letters, numbers, and hyphens.') + '</p>';
         return;
       }
       var plansNow = loadImportedPlans();
@@ -9173,7 +9653,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var target = (p.courses || []).filter(function(c){ return c.id === slug; })[0];
       if(!target) return;
       if(newId !== slug && (p.courses || []).some(function(c){ return c.id === newId; })){
-        msg.innerHTML = '<p class="dev-error-msg">Another course already uses that ID.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">' + (rtl ? 'مساق آخر يستخدم هذا المعرّف بالفعل.' : 'Another course already uses that ID.') + '</p>';
         return;
       }
 
@@ -9438,11 +9918,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var opts = '<option value="">\u2014</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
       return '<option value="' + g + '"' + (g === current ? ' selected' : '') + '>' + g + '</option>';
     }).join('');
+    var rtl = !!rtlState[planId];
+    var dispName = rtl && course.ar ? course.ar : course.name;
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">📊 Grade \u2014 ' + course.name + '</h2>' +
-      '<div class="form-field"><label for="impGradeSelect">Grade</label><select id="impGradeSelect">' + opts + '</select></div>' +
-      '<p class="form-note">Setting F automatically schedules a retake in the next semester.</p>' +
-      '<div class="form-actions"><button type="button" class="home-btn" id="impGradeClose">Close</button></div>';
+      '<h2 style="margin-top:0;">📊 ' + (rtl ? 'العلامة \u2014 ' : 'Grade \u2014 ') + window.__escapeHtml(dispName) + '</h2>' +
+      '<div class="form-field"><label for="impGradeSelect">' + (rtl ? 'العلامة' : 'Grade') + '</label><select id="impGradeSelect">' + opts + '</select></div>' +
+      '<p class="form-note">' + (rtl ? 'اختيار F يجدول إعادة المساق تلقائيًا في الفصل التالي.' : 'Setting F automatically schedules a retake in the next semester.') + '</p>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="impGradeClose">' + (rtl ? 'إغلاق' : 'Close') + '</button></div>';
     overlay.classList.add('open');
     document.getElementById('impGradeClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
     document.getElementById('impGradeSelect').addEventListener('change', function(e){
@@ -9572,6 +10055,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
     if(window.AAUP_PLAN_EDITOR){ window.AAUP_PLAN_EDITOR.bindDraggable(id); }
     if(window.AAUP_COMMUNITY){ window.AAUP_COMMUNITY.refreshAllCommunityBadges(); }
+    if(window.__refreshCollapse){ window.__refreshCollapse(id); }
+    if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
+    // Runs against the freshly-rebuilt DOM. The first call per plan (on open)
+    // silently seeds already-complete semesters; later ones (after a toggle
+    // re-renders) fire confetti for a semester that just became complete.
+    if(window.__celebrateCheck){ window.__celebrateCheck(id); }
   }
 
   function toggle(planId, slug){
@@ -10027,7 +10516,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     resizeT = setTimeout(function(){ drawConnectors(currentOpenPlanId); }, 120);
   });
 
-  function init(){ renderHomeCards(); }
+  function init(){
+    // One-time cleanup of plans saved BEFORE imports were sanitized —
+    // anything already sitting in storage with markup in its names gets
+    // the same escape-and-reslugify pass new imports now get at the door.
+    // __sanitizeImportedPlan is idempotent, so on every later boot this
+    // finds nothing to change and skips the write entirely.
+    try{
+      if(window.__sanitizeImportedPlan){
+        var stored = loadImportedPlans();
+        var before = JSON.stringify(stored);
+        Object.keys(stored).forEach(function(pid){
+          stored[pid] = window.__sanitizeImportedPlan(stored[pid]);
+        });
+        if(JSON.stringify(stored) !== before){ saveImportedPlans(stored); }
+      }
+    }catch(e){ /* never let a migration failure stop the app from loading */ }
+    renderHomeCards();
+  }
   if(document.readyState === 'complete'){ init(); }
   else { window.addEventListener('load', init); }
 })();
@@ -10118,6 +10624,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     document.getElementById('homeStepUniversities').style.display = step === 'universities' ? 'block' : 'none';
     document.getElementById('homeStepColleges').style.display = step === 'colleges' ? 'block' : 'none';
     document.getElementById('homeStepPlans').style.display = step === 'plans' ? 'block' : 'none';
+    // The resume card belongs only on the top-level step (it lives outside
+    // the three step containers, so it has to be toggled explicitly).
+    var resume = document.getElementById('homeResumeCard');
+    if(resume && step !== 'universities'){ resume.style.display = 'none'; }
     var intro = document.getElementById('homeIntroText');
     if(!intro) return;
     if(step === 'universities'){
@@ -10186,8 +10696,48 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     updatePlansEmptyState();
   }
 
+  // Quick-resume card — the last plan the student actually opened is
+  // already remembered (AAUP_DASHBOARD keeps aaup_selectedPlan), so offer a
+  // one-tap jump straight back into it instead of making a returning user
+  // walk University -> College -> Plan every single time. Only shown on the
+  // top-level step, and only when that remembered plan still exists.
+  function renderResumeCard(){
+    var card = document.getElementById('homeResumeCard');
+    if(!card) return;
+    var dash = window.AAUP_DASHBOARD;
+    var prefix = dash && dash.getSelected ? dash.getSelected() : null;
+    var known = false;
+    if(prefix){
+      if(dash.isImportedPlan && dash.isImportedPlan(prefix)){
+        known = !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
+      } else {
+        known = !!document.getElementById('page-' + prefix);
+      }
+    }
+    if(!prefix || !known){ card.style.display = 'none'; card.innerHTML = ''; card.onclick = null; return; }
+
+    var info = dash.planDisplayInfo ? dash.planDisplayInfo(prefix) : { icon: '🎓', name: prefix };
+    var pct = dash.planPercent ? dash.planPercent(prefix) : null;
+    var esc = window.__escapeHtml;
+    card.innerHTML =
+      '<div class="hr-icon">' + esc(info.icon || '🎓') + '</div>' +
+      '<div class="hr-body">' +
+        '<div class="hr-kicker">Continue · تابع</div>' +
+        '<div class="hr-name">' + esc(info.name || prefix) + '</div>' +
+        (pct !== null
+          ? '<div class="hr-sub">' + pct + '% complete · مكتمل</div><div class="hr-progress"><span style="width:' + pct + '%;"></span></div>'
+          : '<div class="hr-sub">Jump back in · العودة إلى خطتك</div>') +
+      '</div>' +
+      '<div class="hr-go">→</div>';
+    card.style.display = 'flex';
+    var go = function(){ if(window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.open(prefix); } };
+    card.onclick = go;
+    card.onkeydown = function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } };
+  }
+
   function showUniversities(){
     state.university = null; state.college = null;
+    renderResumeCard();
     renderUniversities();
     renderBreadcrumb();
     showStep('universities');
@@ -10923,10 +11473,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   // ---------- applying a move ----------
-  function applyMove(prefix, slug, targetContainerId){
+  // isUndo suppresses the "Undo" toast on the reverse move, so undoing a
+  // move doesn't itself offer to undo the undo (and re-toast forever).
+  function applyMove(prefix, slug, targetContainerId, isUndo){
     var courseEl = document.getElementById(prefix + '-c-' + slug);
     var target = document.getElementById(targetContainerId);
     if(!courseEl || !target) return false;
+
+    // Where it's coming FROM, captured before the DOM move, so Undo has an
+    // exact semester slot to send it back to.
+    var fromRow = courseEl.closest('.course-row[id]');
+    var fromContainerId = fromRow ? fromRow.id : null;
 
     target.appendChild(dragUnitFor(courseEl));
 
@@ -10947,7 +11504,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       saveOverrides(all);
       if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
     }
-    if(window.__showToast){ window.__showToast('✅ Moved — saved automatically.'); }
+    if(!isUndo && fromContainerId && fromContainerId !== targetContainerId && window.__showActionToast){
+      window.__showActionToast('✅ Moved — saved.', '↩ Undo', function(){
+        applyMove(prefix, slug, fromContainerId, true);
+      });
+    } else if(window.__showToast){
+      window.__showToast(isUndo ? '↩ Move undone.' : '✅ Moved — saved automatically.');
+    }
     return true;
   }
 
@@ -11178,34 +11741,34 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var selectedIcon = icons[0];
 
     body.innerHTML =
-      '<h2 style="margin-top:0;">➕ New Study Plan</h2>' +
-      '<div class="form-field"><label>Icon</label><div class="icon-picker-grid" id="npIconGrid">' +
+      '<h2 style="margin-top:0;">➕ New Study Plan · خطة دراسية جديدة</h2>' +
+      '<div class="form-field"><label>Icon · الأيقونة</label><div class="icon-picker-grid" id="npIconGrid">' +
       icons.map(function(ic, i){ return '<div class="icon-picker-option' + (i === 0 ? ' selected' : '') + '" data-icon="' + ic + '">' + ic + '</div>'; }).join('') +
       '</div></div>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="npNameEnBig">Major name — English (big, white)</label><input type="text" id="npNameEnBig" maxlength="60" placeholder="e.g. Data Science"></div>' +
-        '<div class="form-field"><label for="npUniversity">University</label><select id="npUniversity">' +
+        '<div class="form-field"><label for="npNameEnBig">Major name — English · اسم التخصص بالإنجليزية</label><input type="text" id="npNameEnBig" maxlength="60" placeholder="e.g. Data Science"></div>' +
+        '<div class="form-field"><label for="npUniversity">University · الجامعة</label><select id="npUniversity">' +
           Object.keys(window.APP_UNIVERSITIES || {}).map(function(uid){
             var u = window.APP_UNIVERSITIES[uid];
             return '<option value="' + uid + '">' + u.icon + ' ' + u.name.en + '</option>';
           }).join('') +
         '</select></div>' +
-        '<div class="form-field"><label for="npNameEnSmall">English subtitle (small, blue)</label><input type="text" id="npNameEnSmall" maxlength="40" placeholder="optional"></div>' +
+        '<div class="form-field"><label for="npNameEnSmall">English subtitle · عنوان فرعي إنجليزي</label><input type="text" id="npNameEnSmall" maxlength="40" placeholder="optional · اختياري"></div>' +
       '</div>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="npNameArBig">Major name — Arabic (big, white)</label><input type="text" id="npNameArBig" maxlength="60" placeholder="مثال: علم البيانات"></div>' +
-        '<div class="form-field"><label for="npNameArSmall">Arabic subtitle (small, blue)</label><input type="text" id="npNameArSmall" maxlength="40" placeholder="اختياري"></div>' +
+        '<div class="form-field"><label for="npNameArBig">Major name — Arabic · اسم التخصص بالعربية</label><input type="text" id="npNameArBig" maxlength="60" placeholder="مثال: علم البيانات"></div>' +
+        '<div class="form-field"><label for="npNameArSmall">Arabic subtitle · عنوان فرعي عربي</label><input type="text" id="npNameArSmall" maxlength="40" placeholder="اختياري"></div>' +
       '</div>' +
       '<div class="form-field-row">' +
-        '<div class="form-field"><label for="npCollegeEn">College / Faculty name (English)</label><input type="text" id="npCollegeEn" maxlength="80" placeholder="e.g. Faculty of Fine Arts"></div>' +
-        '<div class="form-field"><label for="npCollegeAr">College / Faculty name (Arabic)</label><input type="text" id="npCollegeAr" maxlength="80" placeholder="مثال: كلية الفنون الجميلة"></div>' +
+        '<div class="form-field"><label for="npCollegeEn">College / Faculty (English) · الكلية بالإنجليزية</label><input type="text" id="npCollegeEn" maxlength="80" placeholder="e.g. Faculty of Fine Arts"></div>' +
+        '<div class="form-field"><label for="npCollegeAr">College / Faculty (Arabic) · الكلية بالعربية</label><input type="text" id="npCollegeAr" maxlength="80" placeholder="مثال: كلية الفنون الجميلة"></div>' +
       '</div>' +
-      '<div class="form-field"><label for="npBioEn">Bio (English)</label><textarea id="npBioEn" class="notes-textarea" rows="2" maxlength="220" placeholder="A short description shown on the home page card"></textarea></div>' +
-      '<div class="form-field"><label for="npBioAr">Bio (Arabic)</label><textarea id="npBioAr" class="notes-textarea" rows="2" maxlength="220"></textarea></div>' +
-      '<div class="form-actions"><button type="button" class="home-btn" id="npCancel">Cancel</button>' +
-      '<button type="button" class="home-btn" id="npCreate" style="border-color:var(--accent);color:var(--text);">Create</button></div>' +
+      '<div class="form-field"><label for="npBioEn">Bio (English) · نبذة بالإنجليزية</label><textarea id="npBioEn" class="notes-textarea" rows="2" maxlength="220" placeholder="A short description shown on the home page card"></textarea></div>' +
+      '<div class="form-field"><label for="npBioAr">Bio (Arabic) · نبذة بالعربية</label><textarea id="npBioAr" class="notes-textarea" rows="2" maxlength="220"></textarea></div>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="npCancel">Cancel · إلغاء</button>' +
+      '<button type="button" class="home-btn" id="npCreate" style="border-color:var(--accent);color:var(--text);">Create · إنشاء</button></div>' +
       '<div id="npMsg"></div>' +
-      '<p class="form-note">This creates the plan with one empty Year 1 — add courses and more years from inside it once created.</p>';
+      '<p class="form-note">This creates the plan with one empty Year 1 — add courses and more years from inside it once created. · يُنشئ الخطة بسنة أولى فارغة — أضف المساقات والسنوات من داخلها بعد الإنشاء.</p>';
     overlay.classList.add('open');
 
     // Prefill from wherever the "+ New Plan" tile was clicked from, so a
@@ -11233,17 +11796,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
     document.getElementById('npCancel').addEventListener('click', function(){ overlay.classList.remove('open'); });
     document.getElementById('npCreate').addEventListener('click', function(){
-      var enBig = document.getElementById('npNameEnBig').value.trim();
-      var enSmall = document.getElementById('npNameEnSmall').value.trim();
-      var arBig = document.getElementById('npNameArBig').value.trim();
-      var arSmall = document.getElementById('npNameArSmall').value.trim();
-      var collegeEn = document.getElementById('npCollegeEn').value.trim();
-      var collegeAr = document.getElementById('npCollegeAr').value.trim();
-      var bioEn = document.getElementById('npBioEn').value.trim();
-      var bioAr = document.getElementById('npBioAr').value.trim();
+      // Everything typed here ends up in innerHTML-built markup (home
+      // cards, plan header, drill-down tiles) — cleaned at the source.
+      var enBig = window.__cleanText(document.getElementById('npNameEnBig').value.trim());
+      var enSmall = window.__cleanText(document.getElementById('npNameEnSmall').value.trim());
+      var arBig = window.__cleanText(document.getElementById('npNameArBig').value.trim());
+      var arSmall = window.__cleanText(document.getElementById('npNameArSmall').value.trim());
+      var collegeEn = window.__cleanText(document.getElementById('npCollegeEn').value.trim());
+      var collegeAr = window.__cleanText(document.getElementById('npCollegeAr').value.trim());
+      var bioEn = window.__cleanText(document.getElementById('npBioEn').value.trim());
+      var bioAr = window.__cleanText(document.getElementById('npBioAr').value.trim());
       var msg = document.getElementById('npMsg');
       if(!enBig || !arBig){
-        msg.innerHTML = '<p class="dev-error-msg">Please fill in at least the big English and Arabic name.</p>';
+        msg.innerHTML = '<p class="dev-error-msg">Please fill in at least the big English and Arabic name. · يرجى إدخال الاسم الكبير بالإنجليزية والعربية على الأقل.</p>';
         return;
       }
       var id = slugify(enBig);
@@ -11261,7 +11826,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       };
       saveImportedPlans(plans);
       if(window.AAUP_IMPORTED){ window.AAUP_IMPORTED.renderHomeCards(); }
-      msg.innerHTML = '<p class="dev-success-msg">✅ Created "' + enBig + '". Close this and open it from the home page to start adding courses.</p>';
+      msg.innerHTML = '<p class="dev-success-msg">✅ Created "' + window.__escapeHtml(enBig) + '". Close this and open it from the home page to start adding courses. · تم الإنشاء — أغلق هذه النافذة وافتح الخطة من الصفحة الرئيسية لإضافة المساقات.</p>';
     });
   }
 
@@ -11461,7 +12026,27 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   window.AAUP_DASHBOARD = {
     open: open, selectAndOpen: selectAndOpen, openStudyPlan: openStudyPlan,
-    choosePlan: choosePlan, getSelected: getSelected
+    choosePlan: choosePlan, getSelected: getSelected,
+    planDisplayInfo: planDisplayInfo, isImportedPlan: isImportedPlan,
+    // Best-effort completion percentage for the Home "continue" card.
+    // Built-in plan pages are always in the DOM (just hidden) so
+    // computeStats works directly; an imported plan that hasn't been
+    // opened yet has no rendered page, so fall back to its audit rows,
+    // and to null if neither can produce a number.
+    planPercent: function(prefix){
+      try{
+        if(!isImportedPlan(prefix) && window.__computeStats){
+          var s = window.__computeStats(prefix);
+          if(s && s.totalCredits > 0){ return s.pct; }
+        }
+        if(window.AAUP_AUDIT && window.AAUP_AUDIT.computeAudit){
+          var total = 0, done = 0;
+          window.AAUP_AUDIT.computeAudit(prefix).forEach(function(r){ total += r.total; done += r.completed; });
+          if(total > 0){ return Math.round(done / total * 100); }
+        }
+      }catch(e){}
+      return null;
+    }
   };
 
   function init(){
@@ -11516,7 +12101,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     { key: 'studyplan', icon: '🗺️', label: 'My Study Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
     { key: 'audit', icon: '📋', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
     { key: 'achievements', icon: '🏆', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
-    { key: 'advisor', icon: '🧠', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } }
+    { key: 'advisor', icon: '🧠', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
+    { key: 'overview', icon: '🖨️', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } }
   ];
 
   var currentPrefix = null;
@@ -11617,48 +12203,53 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var devEditBtn = document.querySelector('[data-dev-edit-btn]');
     var devUnlocked = !!(devEditBtn && devEditBtn.style.display !== 'none');
 
+    // Settings is reachable from within a plan (its language) or from the
+    // picker; follow the selected plan's language when there is one, English
+    // otherwise. Everything user-facing below is bilingual.
+    var r = isRtlNow;
+    body.setAttribute('dir', r ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">⚙️ Settings</h2>' +
+      '<h2 style="margin-top:0;">⚙️ ' + (r ? 'الإعدادات' : 'Settings') + '</h2>' +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setThemeBtn">🌙 Toggle Theme</button>' +
+      '<button type="button" class="home-btn" id="setThemeBtn">🌙 ' + (r ? 'تبديل السمة' : 'Toggle Theme') + '</button>' +
       (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">🌐 ' + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
-      '<button type="button" class="home-btn" id="setExportBtn">📤 Export Progress</button>' +
-      '<button type="button" class="home-btn" id="setImportBtn">📥 Import Progress</button>' +
-      '<button type="button" class="home-btn" id="setResetBtn">🗑 Reset All Data</button>' +
+      '<button type="button" class="home-btn" id="setExportBtn">📤 ' + (r ? 'تصدير التقدّم' : 'Export Progress') + '</button>' +
+      '<button type="button" class="home-btn" id="setImportBtn">📥 ' + (r ? 'استيراد التقدّم' : 'Import Progress') + '</button>' +
+      '<button type="button" class="home-btn" id="setResetBtn">🗑 ' + (r ? 'مسح كل البيانات' : 'Reset All Data') + '</button>' +
       '</div>' +
       (window.APP_PLANS_FEED_URL ? (
-        '<h3 style="margin-bottom:6px;">🌐 Online Plans</h3>' +
-        '<p class="form-note" style="margin-top:0;">Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.</p>' +
+        '<h3 style="margin-bottom:6px;">🌐 ' + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
+        '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
-        '<button type="button" class="home-btn" id="setSyncBtn">🔄 Check for updates</button>' +
+        '<button type="button" class="home-btn" id="setSyncBtn">🔄 ' + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
         '</div>' +
         '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
       ) : '') +
-      '<h3 style="margin-bottom:6px;">❓ Tours</h3>' +
-      '<p class="form-note" style="margin-top:0;">Replay the spotlight walkthrough for any screen.</p>' +
+      '<h3 style="margin-bottom:6px;">❓ ' + (r ? 'الجولات التعريفية' : 'Tours') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + (r ? 'أعد تشغيل الجولة التوضيحية لأي شاشة.' : 'Replay the spotlight walkthrough for any screen.') + '</p>' +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 Home tour</button>' +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 Dashboard tour</button>' : '') +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 Study Plan tour</button>' : '') +
-      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 Plan Editor tour</button>' : '') +
-      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 Developer Edit tour</button>' : '') +
+      '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 ' + (r ? 'جولة الرئيسية' : 'Home tour') + '</button>' +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 ' + (r ? 'جولة اللوحة' : 'Dashboard tour') + '</button>' : '') +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 ' + (r ? 'جولة الخطة الدراسية' : 'Study Plan tour') + '</button>' : '') +
+      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
+      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
       '</div>' +
-      '<h3 style="margin-bottom:6px;">👤 Accounts</h3>' +
-      '<p class="form-note" style="margin-top:0;">Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.</p>' +
-      '<p style="font-size:12.5px;">Current account: <b>' + current + '</b></p>' +
+      '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'الحسابات' : 'Accounts') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + (r ? '\u0643\u0644 \u062d\u0633\u0627\u0628 \u064a\u062d\u062a\u0641\u0638 \u0628\u062e\u0637\u0637\u0647 \u0648\u062a\u0642\u062f\u0651\u0645\u0647 \u0648\u0645\u0639\u062f\u0651\u0644\u0647 \u0628\u0634\u0643\u0644 \u0645\u0646\u0641\u0635\u0644 \u2014 \u0645\u0641\u064a\u062f \u0625\u0630\u0627 \u0643\u0627\u0646 \u0623\u0643\u062b\u0631 \u0645\u0646 \u0634\u062e\u0635 \u064a\u0634\u0627\u0631\u0643 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u060c \u0623\u0648 \u0623\u0631\u062f\u062a \u0645\u0644\u0641\u064b\u0627 \u0634\u062e\u0635\u064a\u064b\u0627 \u062b\u0627\u0646\u064a\u064b\u0627.' : 'Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.') + '</p>' +
+      '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
       (others.length
         ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
           others.map(function(a){
-            return '<button type="button" class="home-btn acct-switch-btn" data-acct="' + a.replace(/"/g, '&quot;') + '">🔁 Switch to ' + a + '</button>';
+            return '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>';
           }).join('') + '</div>'
         : '') +
       '<div class="form-field-row">' +
-      '<div class="form-field"><input type="text" id="newAcctName" maxlength="40" placeholder="New account name"></div>' +
-      '<button type="button" class="home-btn" id="newAcctBtn" style="border-color:var(--accent);color:var(--text);align-self:flex-start;">➕ Create</button>' +
+      '<div class="form-field"><input type="text" id="newAcctName" maxlength="40" placeholder="' + (r ? 'اسم حساب جديد' : 'New account name') + '"></div>' +
+      '<button type="button" class="home-btn" id="newAcctBtn" style="border-color:var(--accent);color:var(--text);align-self:flex-start;">➕ ' + (r ? 'إنشاء' : 'Create') + '</button>' +
       '</div>' +
       '<div id="acctMsg"></div>' +
-      '<div class="form-actions"><button type="button" class="home-btn" id="setClose">Close</button></div>' +
-      '<p class="form-note" style="text-align:center;opacity:.6;">v' + (window.APP_VERSION || '?') + ' \u00b7 an open student project</p>';
+      '<div class="form-actions"><button type="button" class="home-btn" id="setClose">' + (r ? 'إغلاق' : 'Close') + '</button></div>' +
+      '<p class="form-note" style="text-align:center;opacity:.6;">v' + (window.APP_VERSION || '?') + ' \u00b7 ' + (r ? '\u0645\u0634\u0631\u0648\u0639 \u0637\u0644\u0627\u0628\u064a \u0645\u0641\u062a\u0648\u062d' : 'an open student project') + '</p>';
 
     document.getElementById('setClose').addEventListener('click', function(){ document.getElementById('devModalOverlay').classList.remove('open'); });
     document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
@@ -12083,6 +12674,602 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   };
 })();
 
+</script>
+
+<script>
+// ==========================
+// COLLAPSE FINISHED YEARS — a "focus on what's left" view. A year every
+// course of which is completed folds down to a one-line "all done" strip,
+// so a later-year student doesn't scroll past semesters of checked-off
+// courses to reach what's current. Works on both built-in majors
+// (.year-row) and imported plans (.imp-year-block) through one generic
+// pass, and is a no-op (its toggle stays hidden) until at least one year
+// is actually finished.
+// ==========================
+(function(){
+  var STATE_KEY = 'aaup_collapseFinished';
+  // Years the student manually re-opened this session, so refresh() doesn't
+  // immediately re-collapse them out from under a deliberate expand. Keyed
+  // by "<prefix>::<year index>". Cleared whenever the master toggle flips.
+  var manuallyExpanded = {};
+
+  function isOn(){
+    try{ return localStorage.getItem(STATE_KEY) === '1'; }catch(e){ return false; }
+  }
+  function setOn(v){
+    try{ localStorage.setItem(STATE_KEY, v ? '1' : '0'); }catch(e){}
+  }
+
+  function rootFor(prefix){ return document.getElementById('page-' + prefix); }
+  function isImported(prefix){
+    return !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
+  }
+  function yearContainers(root){
+    var built = root.querySelectorAll('.year-row');
+    if(built.length) return Array.prototype.slice.call(built);
+    return Array.prototype.slice.call(root.querySelectorAll('.imp-year-block'));
+  }
+  function yearIsFinished(yearEl){
+    var courses = yearEl.querySelectorAll('.course[id]');
+    if(!courses.length) return false;
+    for(var i = 0; i < courses.length; i++){
+      if(!courses[i].classList.contains('completed')) return false;
+    }
+    return true;
+  }
+  function yearLabel(yearEl, rtl, index){
+    // Built-in years carry a .year-badge .label; imported ones an
+    // .imp-year-header h3. Fall back to a plain "Year N" either way.
+    var badge = yearEl.querySelector('.year-badge .label') || yearEl.querySelector('.imp-year-header h3');
+    var txt = badge ? badge.textContent.replace(/\s+/g, ' ').trim() : '';
+    if(txt) return txt;
+    return (rtl ? 'السنة ' : 'Year ') + (index + 1);
+  }
+
+  function clearCollapse(root){
+    root.classList.remove('finished-collapsed');
+    yearContainers(root).forEach(function(y){
+      y.classList.remove('year-collapsed');
+      var hint = y.querySelector(':scope > .collapse-hint');
+      if(hint) hint.remove();
+    });
+  }
+
+  function applyCollapse(prefix, root, rtl){
+    root.classList.add('finished-collapsed');
+    yearContainers(root).forEach(function(yearEl, idx){
+      var key = prefix + '::' + idx;
+      var hint = yearEl.querySelector(':scope > .collapse-hint');
+      var finished = yearIsFinished(yearEl);
+      if(finished && !manuallyExpanded[key]){
+        yearEl.classList.add('year-collapsed');
+        if(!hint){
+          hint = document.createElement('div');
+          hint.className = 'collapse-hint';
+          hint.setAttribute('role', 'button');
+          hint.setAttribute('tabindex', '0');
+          hint.innerHTML = '<span>✓ ' + window.__escapeHtml(yearLabel(yearEl, rtl, idx)) + ' — ' +
+            (rtl ? 'كل المساقات مكتملة' : 'all courses completed') + '</span>' +
+            '<span class="ch-expand">' + (rtl ? 'إظهار ▾' : 'Show ▾') + '</span>';
+          var expand = function(){
+            manuallyExpanded[key] = true;
+            yearEl.classList.remove('year-collapsed');
+            if(hint) hint.remove();
+          };
+          hint.addEventListener('click', expand);
+          hint.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); expand(); } });
+          yearEl.insertBefore(hint, yearEl.firstChild);
+        }
+      } else {
+        yearEl.classList.remove('year-collapsed');
+        if(hint) hint.remove();
+      }
+    });
+  }
+
+  function anyFinished(root){
+    return yearContainers(root).some(yearIsFinished);
+  }
+
+  function ensureToggle(prefix, root, rtl){
+    var toggle = root.querySelector(':scope .collapse-toggle');
+    if(!toggle){
+      var anchor = root.querySelector('.course-search-wrap');
+      if(!anchor) return null;
+      toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'collapse-toggle';
+      anchor.parentNode.insertBefore(toggle, anchor);
+      toggle.addEventListener('click', function(){
+        var turningOn = !isOn();
+        setOn(turningOn);
+        manuallyExpanded = {}; // a fresh flip re-evaluates every year
+        refresh(prefix);
+        // Restore prerequisite connectors when leaving collapse mode: their
+        // geometry is stale after years folded/unfolded, so force a redraw.
+        if(!turningOn){
+          if(isImported(prefix) && window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
+          else if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
+        }
+      });
+    }
+    var on = isOn();
+    toggle.innerHTML =
+      '<span>' + (rtl ? '📁 طيّ السنوات المكتملة' : '📁 Collapse finished years') + '</span>' +
+      '<span class="ct-state">' + (on ? (rtl ? 'مفعّل' : 'ON') : (rtl ? 'معطّل' : 'OFF')) + '</span>';
+    return toggle;
+  }
+
+  function refresh(prefix){
+    var root = rootFor(prefix);
+    if(!root) return;
+    var rtl = root.classList.contains('rtl-mode');
+    var toggle = ensureToggle(prefix, root, rtl);
+    if(!toggle) return;
+    // Only offer the control once there's actually something to fold —
+    // otherwise it's a button that does nothing.
+    toggle.classList.toggle('available', anyFinished(root) || isOn());
+    if(isOn()){ applyCollapse(prefix, root, rtl); }
+    else { clearCollapse(root); }
+  }
+
+  window.__refreshCollapse = refresh;
+})();
+</script>
+
+<script>
+// ==========================
+// PER-SEMESTER WORKLOAD SUMMARY — surfaces the private Easy/Medium/Hard
+// difficulty ratings the student can already set on each course (from its
+// details popup) as a small "⚡2 hard · 1 easy" roll-up on every semester
+// header, so the data the app was already collecting is actually shown
+// back. Reads the exact same aaup_ratings map the course badges use.
+// ==========================
+(function(){
+  function rootFor(prefix){ return document.getElementById('page-' + prefix); }
+
+  // Built-in majors group a semester as `.sem` (label = .sem-label);
+  // imported plans as `.imp-semester-block` (label = .imp-semester-title).
+  function semesterBlocks(root){
+    var built = root.querySelectorAll('.sem');
+    if(built.length) return Array.prototype.slice.call(built).map(function(el){
+      return { block: el, label: el.querySelector('.sem-label') };
+    });
+    return Array.prototype.slice.call(root.querySelectorAll('.imp-semester-block')).map(function(el){
+      return { block: el, label: el.querySelector('.imp-semester-title') };
+    });
+  }
+
+  function refresh(prefix){
+    var root = rootFor(prefix);
+    if(!root) return;
+    var ratings = (window.AAUP_PERSONAL && window.AAUP_PERSONAL.loadRatings) ? window.AAUP_PERSONAL.loadRatings() : {};
+    var rtl = root.classList.contains('rtl-mode');
+    var LABELS = rtl
+      ? { Hard: 'صعب', Medium: 'متوسط', Easy: 'سهل' }
+      : { Hard: 'hard', Medium: 'medium', Easy: 'easy' };
+
+    semesterBlocks(root).forEach(function(entry){
+      var label = entry.label;
+      if(!label) return;
+      var counts = { Hard: 0, Medium: 0, Easy: 0 };
+      var seen = {};
+      entry.block.querySelectorAll('.course[id]').forEach(function(course){
+        var parts = window.__splitCourseId(course.id);
+        if(!parts) return;
+        // A lecture + its lab share one rating (same primaryId) — count once.
+        var pid = (window.AAUP_GPA && window.AAUP_GPA.primaryId) ? window.AAUP_GPA.primaryId(parts.prefix, parts.slug) : course.id;
+        if(seen[pid]) return;
+        seen[pid] = true;
+        var w = ratings[pid] && ratings[pid].workload;
+        if(w && counts.hasOwnProperty(w)){ counts[w]++; }
+      });
+
+      var existing = label.querySelector('.sem-workload');
+      var total = counts.Hard + counts.Medium + counts.Easy;
+      if(!total){ if(existing) existing.remove(); return; }
+      var parts = [];
+      ['Hard','Medium','Easy'].forEach(function(k){
+        if(counts[k]){
+          parts.push('<span class="swl swl-' + k.toLowerCase() + '">' + counts[k] + ' ' + LABELS[k] + '</span>');
+        }
+      });
+      var html = parts.join('');
+      if(!existing){
+        existing = document.createElement('span');
+        existing.className = 'sem-workload';
+        label.appendChild(existing);
+      }
+      existing.innerHTML = html;
+    });
+  }
+
+  window.__refreshWorkloadSummary = refresh;
+})();
+</script>
+
+<script>
+// ==========================
+// PLAN OVERVIEW & PRINT — a compact, all-semesters-at-once view of the whole
+// plan that doubles as a print-friendly layout for an advising meeting
+// (Export already produces JSON, but nobody hands an advisor a JSON file).
+// Reads the currently-rendered plan page — which exists for both built-in
+// majors (always in the DOM) and imported plans (rendered on open) — plus
+// window.__PLAN_DATA for credit hours and the grades map, so one code path
+// covers every plan type.
+// ==========================
+(function(){
+  var esc = window.__escapeHtml;
+
+  function splitId(id){ return window.__splitCourseId ? window.__splitCourseId(id) : null; }
+
+  function buildModel(prefix){
+    var root = document.getElementById('page-' + prefix);
+    if(!root) return null;
+    var rtl = root.classList.contains('rtl-mode');
+    var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
+    var grades = (window.AAUP_GPA && window.AAUP_GPA.loadGrades) ? window.AAUP_GPA.loadGrades() : {};
+    var progress = window.__getProgress ? window.__getProgress() : {};
+
+    // Built-in majors nest .year-row > .semesters > .sem; imported plans use
+    // .imp-year-block > .imp-semester-block. Normalize both to the same shape.
+    var builtInYears = root.querySelectorAll('.year-row');
+    var years = [];
+    if(builtInYears.length){
+      Array.prototype.slice.call(builtInYears).forEach(function(yr){
+        var label = (yr.querySelector('.year-badge .label') || {}).textContent || '';
+        var sems = [];
+        yr.querySelectorAll('.sem').forEach(function(sem){
+          var semLabel = (sem.querySelector('.sem-label') || {}).textContent || '';
+          sems.push({ label: semLabel.replace(/\s+/g, ' ').trim(), courses: collectCourses(sem, info, grades, progress, prefix, rtl) });
+        });
+        years.push({ label: label.replace(/\s+/g, ' ').trim(), semesters: sems });
+      });
+    } else {
+      Array.prototype.slice.call(root.querySelectorAll('.imp-year-block')).forEach(function(yb){
+        var label = (yb.querySelector('.imp-year-header h3') || {}).textContent || '';
+        var sems = [];
+        yb.querySelectorAll('.imp-semester-block').forEach(function(sb){
+          var semLabel = (sb.querySelector('.imp-semester-title') || {}).textContent || '';
+          sems.push({ label: semLabel.replace(/\s+/g, ' ').trim(), courses: collectCourses(sb, info, grades, progress, prefix, rtl) });
+        });
+        years.push({ label: label.replace(/\s+/g, ' ').trim(), semesters: sems });
+      });
+    }
+    return { rtl: rtl, years: years };
+  }
+
+  function collectCourses(container, info, grades, progress, prefix, rtl){
+    var out = [];
+    container.querySelectorAll('.course[id]').forEach(function(el){
+      var parts = splitId(el.id);
+      if(!parts) return;
+      var nameEl = el.querySelector('.name');
+      var name = nameEl ? nameEl.textContent.replace(/\s*✓\s*$/, '').trim() : parts.slug;
+      var meta = info[parts.slug] || {};
+      var cr = meta.cr != null ? meta.cr : '';
+      var pid = (window.AAUP_GPA && window.AAUP_GPA.primaryId) ? window.AAUP_GPA.primaryId(prefix, parts.slug) : el.id;
+      var grade = grades[pid] || '';
+      out.push({ name: name, credits: cr, done: !!progress[el.id], grade: grade });
+    });
+    return out;
+  }
+
+  function planHeader(prefix, rtl){
+    var dash = window.AAUP_DASHBOARD;
+    var info = dash && dash.planDisplayInfo ? dash.planDisplayInfo(prefix) : { icon: '🎓', name: prefix };
+    var student = window.AAUP_STUDENT ? window.AAUP_STUDENT.get() : null;
+    var pct = dash && dash.planPercent ? dash.planPercent(prefix) : null;
+    var stats = window.__computeStats ? (function(){ try{ return window.__computeStats(prefix); }catch(e){ return null; } })() : null;
+    var gpaObj = (window.AAUP_GPA && window.AAUP_GPA.gpaFor) ? (function(){ try{ return window.AAUP_GPA.gpaFor(prefix); }catch(e){ return null; } })() : null;
+    var gpa = gpaObj && gpaObj.gpa != null ? gpaObj.gpa.toFixed(2) : null;
+
+    var rows = [];
+    if(student && student.name){ rows.push((rtl ? 'الطالب: ' : 'Student: ') + esc(student.name)); }
+    if(gpa){ rows.push((rtl ? 'المعدل التراكمي: ' : 'GPA: ') + gpa); }
+    if(stats && stats.totalCredits){ rows.push((rtl ? 'الساعات: ' : 'Credit hours: ') + stats.doneCredits + ' / ' + stats.totalCredits + (pct != null ? ' (' + pct + '%)' : '')); }
+    var today = new Date();
+    rows.push((rtl ? 'أُنشئ في: ' : 'Generated: ') + today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0'));
+
+    return '<div class="po-header">' +
+      '<div class="po-title"><span class="po-icon">' + esc(info.icon || '🎓') + '</span>' +
+      '<div><div class="po-name">' + esc(info.name || prefix) + '</div>' +
+      '<div class="po-uni">The Arab American University · الجامعة العربية الأمريكية</div></div></div>' +
+      '<div class="po-meta">' + rows.map(function(r){ return '<span>' + r + '</span>'; }).join('') + '</div>' +
+      '</div>';
+  }
+
+  function renderOverview(prefix){
+    var model = buildModel(prefix);
+    if(!model) return '<p class="ex-note">Open a study plan first.</p>';
+    var rtl = model.rtl;
+    var html = planHeader(prefix, rtl);
+    html += '<div class="po-years">';
+    model.years.forEach(function(y){
+      html += '<div class="po-year"><div class="po-year-label">' + esc(y.label) + '</div>';
+      y.semesters.forEach(function(s){
+        if(!s.courses.length) return;
+        html += '<div class="po-sem"><div class="po-sem-label">' + esc(s.label) + '</div><ul class="po-courses">';
+        s.courses.forEach(function(c){
+          var mark = c.done ? '✓' : '○';
+          var gradeTag = c.grade ? ' <span class="po-grade">' + esc(c.grade) + '</span>' : '';
+          var crTag = c.credits !== '' ? ' <span class="po-cr">' + esc(String(c.credits)) + 'H</span>' : '';
+          html += '<li class="' + (c.done ? 'po-done' : '') + '"><span class="po-mark">' + mark + '</span>' +
+            '<span class="po-cname">' + esc(c.name) + '</span>' + crTag + gradeTag + '</li>';
+        });
+        html += '</ul></div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<p class="po-foot">Unofficial student planning tool — always confirm with your academic advisor. · أداة طلابية غير رسمية — تأكد دائمًا من مرشدك الأكاديمي.</p>';
+    return html;
+  }
+
+  function ensureOverlay(){
+    var overlay = document.getElementById('planOverviewOverlay');
+    if(overlay) return overlay;
+    overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'planOverviewOverlay';
+    overlay.innerHTML =
+      '<div class="modal-card po-card">' +
+        '<button class="modal-close" id="planOverviewClose" aria-label="Close">&times;</button>' +
+        '<div class="po-actions"><button type="button" class="home-btn" id="planOverviewPrintBtn" style="border-color:var(--accent);color:var(--text);">🖨️ Print / Save PDF</button></div>' +
+        '<div id="planOverviewPrintRoot"><div id="planOverviewBody"></div></div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e){ if(e.target === overlay){ overlay.classList.remove('open'); } });
+    overlay.querySelector('.modal-card').addEventListener('click', function(e){ e.stopPropagation(); });
+    document.getElementById('planOverviewClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
+    // The print stylesheet (see @media print in the <style> block) hides
+    // everything except #planOverviewPrintRoot, so window.print() yields a
+    // clean one-page plan with none of the app chrome around it.
+    document.getElementById('planOverviewPrintBtn').addEventListener('click', function(){ window.print(); });
+    return overlay;
+  }
+
+  function open(prefix){
+    var overlay = ensureOverlay();
+    document.getElementById('planOverviewBody').innerHTML = renderOverview(prefix);
+    overlay.classList.add('open');
+  }
+
+  window.AAUP_OVERVIEW = { open: open };
+})();
+</script>
+
+<script>
+// ==========================
+// CELEBRATIONS — confetti when a whole semester (or summer) gets completed,
+// and a shareable achievement image card. Both are pure "reward" polish on
+// top of data the app already tracks; both no-op gracefully where they
+// can't run (reduced-motion users get no animation; a browser without
+// canvas/share just downloads or skips).
+// ==========================
+(function(){
+  var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- confetti ----------
+  var COLORS = ['#5db8ff', '#4ade80', '#ff6fb8', '#f2b93d', '#a78bfa'];
+  function confettiBurst(originEl){
+    if(prefersReducedMotion) return;
+    var canvas = document.getElementById('confettiCanvas');
+    if(!canvas){
+      canvas = document.createElement('canvas');
+      canvas.id = 'confettiCanvas';
+      canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3000;';
+      document.body.appendChild(canvas);
+    }
+    var ctx = canvas.getContext('2d');
+    if(!ctx) return;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var ox = window.innerWidth / 2, oy = window.innerHeight / 3;
+    if(originEl && originEl.getBoundingClientRect){
+      var r = originEl.getBoundingClientRect();
+      if(r.width && r.top < window.innerHeight && r.bottom > 0){
+        ox = r.left + r.width / 2;
+        oy = Math.max(40, r.top + r.height / 2);
+      }
+    }
+
+    var particles = [];
+    var N = 90;
+    for(var i = 0; i < N; i++){
+      var angle = (Math.PI * 2 * i) / N + Math.random();
+      var speed = 3 + Math.random() * 6;
+      particles.push({
+        x: ox, y: oy,
+        vx: Math.cos(angle) * speed * (0.6 + Math.random()),
+        vy: Math.sin(angle) * speed - (2 + Math.random() * 3),
+        size: 4 + Math.random() * 5,
+        color: COLORS[i % COLORS.length],
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        life: 1
+      });
+    }
+    var start = null;
+    var DURATION = 2200;
+    function frame(ts){
+      if(!start) start = ts;
+      var elapsed = ts - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function(p){
+        p.vy += 0.16;      // gravity
+        p.vx *= 0.99;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.life = Math.max(0, 1 - elapsed / DURATION);
+        ctx.save();
+        ctx.globalAlpha = p.life;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+        ctx.restore();
+      });
+      if(elapsed < DURATION){
+        requestAnimationFrame(frame);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  window.__confetti = confettiBurst;
+
+  // ---------- semester-completion detection ----------
+  // A session-only set of already-celebrated semesters, keyed by their
+  // course-row id, so a fully-completed semester fires exactly once — and
+  // becomes eligible to fire again only if it's later made incomplete and
+  // re-completed.
+  var celebrated = {};
+  function celebrateCheck(prefix){
+    var root = document.getElementById('page-' + prefix);
+    if(!root) return;
+    var progress = window.__getProgress ? window.__getProgress() : {};
+    var rows = root.querySelectorAll('.course-row[id]');
+    Array.prototype.slice.call(rows).forEach(function(row){
+      var courses = row.querySelectorAll('.course[id]');
+      if(!courses.length){ delete celebrated[row.id]; return; }
+      var allDone = Array.prototype.slice.call(courses).every(function(c){ return !!progress[c.id]; });
+      if(allDone){
+        if(!celebrated[row.id]){
+          celebrated[row.id] = true;
+          confettiBurst(row);
+        }
+      } else {
+        delete celebrated[row.id];
+      }
+    });
+  }
+  // Ignore the very first pass right after a plan loads — otherwise a
+  // returning student with an already-finished semester would get a
+  // confetti blast on every page open. First call just seeds the set.
+  var seeded = {};
+  function celebrateCheckGuarded(prefix){
+    if(!seeded[prefix]){
+      seeded[prefix] = true;
+      // seed silently: mark currently-complete semesters as already celebrated
+      var root = document.getElementById('page-' + prefix);
+      if(root){
+        var progress = window.__getProgress ? window.__getProgress() : {};
+        root.querySelectorAll('.course-row[id]').forEach(function(row){
+          var courses = row.querySelectorAll('.course[id]');
+          if(courses.length && Array.prototype.slice.call(courses).every(function(c){ return !!progress[c.id]; })){
+            celebrated[row.id] = true;
+          }
+        });
+      }
+      return;
+    }
+    celebrateCheck(prefix);
+  }
+  window.__celebrateCheck = celebrateCheckGuarded;
+
+  // ---------- shareable achievement card ----------
+  function drawCard(opts){
+    // opts: { icon, title, subtitle, footer }
+    var W = 1080, H = 1080;
+    var canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    var ctx = canvas.getContext('2d');
+    if(!ctx) return null;
+
+    // background gradient
+    var g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, '#0a1428');
+    g.addColorStop(1, '#132540');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // accent frame
+    ctx.strokeStyle = '#5db8ff';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(40, 40, W - 80, H - 80);
+
+    ctx.textAlign = 'center';
+
+    // trophy + icon
+    ctx.font = '150px serif';
+    ctx.fillText('🏆', W / 2, 320);
+    ctx.font = '120px serif';
+    ctx.fillText(opts.icon || '⭐', W / 2, 470);
+
+    // "Achievement Unlocked"
+    ctx.fillStyle = '#5db8ff';
+    ctx.font = 'bold 40px sans-serif';
+    ctx.fillText('ACHIEVEMENT UNLOCKED', W / 2, 590);
+
+    // title
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 72px sans-serif';
+    wrapText(ctx, opts.title || '', W / 2, 690, W - 200, 84);
+
+    // subtitle (major)
+    if(opts.subtitle){
+      ctx.fillStyle = '#9fb4d0';
+      ctx.font = '38px sans-serif';
+      wrapText(ctx, opts.subtitle, W / 2, 880, W - 240, 48);
+    }
+
+    // footer
+    ctx.fillStyle = '#5db8ff';
+    ctx.font = 'bold 34px sans-serif';
+    ctx.fillText(opts.footer || 'Study Plans', W / 2, H - 90);
+
+    return canvas;
+  }
+
+  function wrapText(ctx, text, cx, y, maxWidth, lineHeight){
+    var words = String(text).split(' ');
+    var line = '', lines = [];
+    words.forEach(function(w){
+      var test = line ? (line + ' ' + w) : w;
+      if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line = w; }
+      else { line = test; }
+    });
+    if(line) lines.push(line);
+    var startY = y - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach(function(l, i){ ctx.fillText(l, cx, startY + i * lineHeight); });
+  }
+
+  function shareAchievement(opts){
+    var canvas = drawCard(opts);
+    if(!canvas){ return; }
+    canvas.toBlob(function(blob){
+      if(!blob) return;
+      var file = null;
+      try{ file = new File([blob], 'achievement.png', { type: 'image/png' }); }catch(e){ file = null; }
+      // Prefer the native share sheet (mobile) with the image attached;
+      // fall back to a plain download everywhere else.
+      if(file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share){
+        navigator.share({ files: [file], title: 'Achievement Unlocked', text: (opts.title || '') }).catch(function(){ downloadBlob(blob); });
+      } else {
+        downloadBlob(blob);
+      }
+    }, 'image/png');
+  }
+  function downloadBlob(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'achievement-card.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    if(window.__showToast){ window.__showToast('🏆 Achievement card saved!'); }
+  }
+
+  window.AAUP_CELEBRATE = { confetti: confettiBurst, shareAchievement: shareAchievement };
+})();
 </script>
 
 <script>
