@@ -6,9 +6,10 @@ name: Deploy Study Plans app to GitHub Pages
 # and the Trusted Web Activity wrapper Google Play packaging needs
 # (see app/PUBLISHING.md).
 #
-# One-time manual step this workflow can't do for you: in this repo's
-# Settings -> Pages, set "Source" to "GitHub Actions". Until that's set,
-# this workflow will run successfully but nothing will actually go live.
+# configure-pages' `enablement: true` below makes it create the Pages site
+# itself on first run (its default is to error out instead, expecting a
+# manual "Settings -> Pages -> Source -> GitHub Actions" click first) — so
+# there's no manual repo-settings step needed before this works.
 
 on:
   push:
@@ -39,6 +40,8 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload app/ as the Pages artifact
         uses: actions/upload-pages-artifact@v3
