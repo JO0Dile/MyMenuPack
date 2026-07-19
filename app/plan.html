@@ -574,6 +574,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     padding:16px 32px 28px;
   }
 
+  /* Imported/custom plans use a simpler single-column wrapper (no sidebar
+     grid) around the same .years content .body-grid wraps for built-in
+     majors — same horizontal padding, so both get the same mobile
+     treatment below via one shared media-query rule. */
+  .imp-body-pad{padding:20px 32px;}
+
 
   .years{display:flex;flex-direction:column;gap:16px;position:relative;}
 
@@ -1154,6 +1160,27 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   }
 
   .course.drop-rejected{animation:dropShake .35s ease;}
+
+  /* Mobile course grid — this app is meant to be used on a phone first, not
+     as a shrunk-down desktop layout. Smaller, denser cards fit two per row
+     instead of the desktop 120-190px range collapsing to one per row at a
+     real phone width, and the idle prerequisite lines are hidden entirely:
+     a permanent web of thin lines down a single tall column of stacked
+     semesters reads as noise, not information. Press-and-hold a course
+     (see bindHover's touchstart handling above) still draws the ones
+     relevant to it — .edge.active/.dim keep a higher specificity than the
+     opacity:0 below regardless of source order, so that still works
+     exactly as before. Placed here, after every rule it overrides, since a
+     same-specificity rule inside a media query does NOT automatically win
+     over a later non-media rule — only source order decides that tie. */
+  @media (max-width:640px){
+    .body-grid, .imp-body-pad{padding:14px 10px 22px;}
+    .legend{margin-left:16px;margin-right:16px;padding:10px 14px;gap:14px;}
+    .year-row{padding:10px;}
+    .course{flex:1 1 44%;min-width:0;max-width:none;padding:7px 8px 6px;}
+    .course .name{font-size:11.5px;}
+    .connector-layer path.edge{opacity:0;}
+  }
 
   /* ==========================================================================
      8. SIDEBAR — MY PROGRESS PANEL — the sidebar shell, generic .panel styling,
@@ -2058,7 +2085,15 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      (900) and modals (1000) since a step can legitimately point at
      something inside either.
      ========================================================================== */
-  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;}
+  /* pointer-events:none on the whole layer (not just the spotlight cutout)
+     is deliberate — it's what lets the interactive steps' real gesture
+     (press-and-hold an actual course card) reach that real card at all.
+     Without it, this full-screen fixed layer — despite being visually
+     "cut out" over the target via the spotlight's box-shadow trick — would
+     still be the topmost element there and swallow the touch/click before
+     it ever reached the page underneath. Only the tooltip card opts back
+     into being interactive, for its own Next/Skip buttons. */
+  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;pointer-events:none;}
   .tut-layer.open{display:block;}
   .tut-spotlight{
     position:fixed;
@@ -2072,6 +2107,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .tut-tooltip{
     position:fixed;
     max-width:300px;
+    pointer-events:auto;
     background:var(--panel);
     border:1px solid var(--accent);
     border-radius:12px;
@@ -4066,96 +4102,111 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var order = (row && window.AAUP_PLAN_EDITOR) ? window.AAUP_PLAN_EDITOR.orderOfContainerId(row.id) : null;
       return (order === null || order === undefined) ? Infinity : order;
     }
+    // Trace/clear are named (not inline in the event listeners below) so
+    // both mouse hover AND touch-hold can trigger the exact same behavior
+    // without duplicating it a third time.
+    function startTrace(el){
+      clearHoverSequence();
+      var id = el.id;
+      var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      var incoming = [], outgoing = [];
+      paths.forEach(function(p){
+        if(p.getAttribute('data-to') === id){ incoming.push(p); }
+        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
+      });
+      if(incoming.length === 0 && outgoing.length === 0) return;
+
+      // Order: every prerequisite feeding INTO the hovered course first,
+      // then everything it unlocks — and within each group, whichever
+      // semester sits CLOSEST to the hovered course draws first, farther
+      // ones after. "From the course right before it, to the nearest
+      // course it leads to, to farther ones."
+      var hoveredOrder = semesterOrderOf(id);
+      function distance(p, isIncoming){
+        var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
+        var otherOrder = semesterOrderOf(otherId);
+        if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
+        return Math.abs(hoveredOrder - otherOrder);
+      }
+      incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
+      outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
+      var sequence = incoming.concat(outgoing);
+
+      // "Sketch" effect: measure each related path's real length and set
+      // it as a hidden starting point (one dash spanning the path,
+      // offset so none of it is visible yet) BEFORE the .active class
+      // adds the transition — that's what the CSS animates from, so the
+      // line draws itself in rather than just popping into place.
+      sequence.forEach(function(p){
+        // getTotalLength() is universally supported by real browsers for
+        // SVG path elements, but fall back to a generously large fixed
+        // value rather than throwing if some environment lacks it.
+        var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+      // Force the browser to commit that starting state as a real frame
+      // before the class change below sets the target (dashoffset:0) —
+      // otherwise both changes can get coalesced into one paint and the
+      // draw-in transition never actually has anything to animate from.
+      void svg.getBoundingClientRect();
+      requestAnimationFrame(function(){
+        paths.forEach(function(p){
+          if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
+          else { p.classList.add('dim'); }
+        });
+        // Dimming the rest of the graph happens immediately above — only
+        // the reveal of the related lines themselves is staggered, one
+        // at a time, each starting only once the previous has finished
+        // drawing (STEP_MS matches the .6s draw transition + a small
+        // pause). Reduced-motion users get every related line at once
+        // instead, matching how the draw-in itself is already skipped.
+        var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var STEP_MS = reducedMotion ? 0 : 650;
+        sequence.forEach(function(p, i){
+          var t = setTimeout(function(){
+            // The actual animated value has to be set inline too, not
+            // left for the CSS class to provide — an inline style always
+            // beats a class rule on specificity, so stroke-dashoffset:0
+            // declared only in .edge.active would be silently ignored as
+            // long as the inline value from above is still sitting there.
+            p.style.strokeDashoffset = 0;
+            ['data-from','data-to'].forEach(function(attr){
+              var otherId = p.getAttribute(attr);
+              var otherEl = document.getElementById(otherId);
+              if(otherEl) otherEl.classList.add('node-active');
+            });
+          }, i * STEP_MS);
+          hoverSequenceTimers.push(t);
+        });
+      });
+    }
+    function endTrace(){
+      clearHoverSequence();
+      var paths = svg.querySelectorAll('path.edge');
+      paths.forEach(function(p){
+        p.classList.remove('active');
+        p.classList.remove('dim');
+        // Clear the inline length values set on mouseenter so a plain,
+        // undashed line is what's left once .active/.dim are gone.
+        p.style.strokeDasharray = '';
+        p.style.strokeDashoffset = '';
+      });
+      courses.forEach(function(c){ c.classList.remove('node-active'); });
+    }
     courses.forEach(function(el){
-      el.addEventListener('mouseenter', function(){
-        clearHoverSequence();
-        var id = el.id;
-        var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
-        var incoming = [], outgoing = [];
-        paths.forEach(function(p){
-          if(p.getAttribute('data-to') === id){ incoming.push(p); }
-          else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-        });
-        if(incoming.length === 0 && outgoing.length === 0) return;
-
-        // Order: every prerequisite feeding INTO the hovered course first,
-        // then everything it unlocks — and within each group, whichever
-        // semester sits CLOSEST to the hovered course draws first, farther
-        // ones after. "From the course right before it, to the nearest
-        // course it leads to, to farther ones."
-        var hoveredOrder = semesterOrderOf(id);
-        function distance(p, isIncoming){
-          var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
-          var otherOrder = semesterOrderOf(otherId);
-          if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
-          return Math.abs(hoveredOrder - otherOrder);
-        }
-        incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
-        outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
-        var sequence = incoming.concat(outgoing);
-
-        // "Sketch" effect: measure each related path's real length and set
-        // it as a hidden starting point (one dash spanning the path,
-        // offset so none of it is visible yet) BEFORE the .active class
-        // adds the transition — that's what the CSS animates from, so the
-        // line draws itself in rather than just popping into place.
-        sequence.forEach(function(p){
-          // getTotalLength() is universally supported by real browsers for
-          // SVG path elements, but fall back to a generously large fixed
-          // value rather than throwing if some environment lacks it.
-          var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
-          p.style.strokeDasharray = len;
-          p.style.strokeDashoffset = len;
-        });
-        // Force the browser to commit that starting state as a real frame
-        // before the class change below sets the target (dashoffset:0) —
-        // otherwise both changes can get coalesced into one paint and the
-        // draw-in transition never actually has anything to animate from.
-        void svg.getBoundingClientRect();
-        requestAnimationFrame(function(){
-          paths.forEach(function(p){
-            if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
-            else { p.classList.add('dim'); }
-          });
-          // Dimming the rest of the graph happens immediately above — only
-          // the reveal of the related lines themselves is staggered, one
-          // at a time, each starting only once the previous has finished
-          // drawing (STEP_MS matches the .6s draw transition + a small
-          // pause). Reduced-motion users get every related line at once
-          // instead, matching how the draw-in itself is already skipped.
-          var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          var STEP_MS = reducedMotion ? 0 : 650;
-          sequence.forEach(function(p, i){
-            var t = setTimeout(function(){
-              // The actual animated value has to be set inline too, not
-              // left for the CSS class to provide — an inline style always
-              // beats a class rule on specificity, so stroke-dashoffset:0
-              // declared only in .edge.active would be silently ignored as
-              // long as the inline value from above is still sitting there.
-              p.style.strokeDashoffset = 0;
-              ['data-from','data-to'].forEach(function(attr){
-                var otherId = p.getAttribute(attr);
-                var otherEl = document.getElementById(otherId);
-                if(otherEl) otherEl.classList.add('node-active');
-              });
-            }, i * STEP_MS);
-            hoverSequenceTimers.push(t);
-          });
-        });
-      });
-      el.addEventListener('mouseleave', function(){
-        clearHoverSequence();
-        var paths = svg.querySelectorAll('path.edge');
-        paths.forEach(function(p){
-          p.classList.remove('active');
-          p.classList.remove('dim');
-          // Clear the inline length values set on mouseenter so a plain,
-          // undashed line is what's left once .active/.dim are gone.
-          p.style.strokeDasharray = '';
-          p.style.strokeDashoffset = '';
-        });
-        courses.forEach(function(c){ c.classList.remove('node-active'); });
-      });
+      el.addEventListener('mouseenter', function(){ startTrace(el); });
+      el.addEventListener('mouseleave', endTrace);
+      // Touch devices have no hover — press and hold a course instead. A
+      // quick tap still falls through to the course-info popup (bound
+      // separately below); only a sustained, still press starts the trace.
+      var holdTimer = null;
+      el.addEventListener('touchstart', function(){
+        holdTimer = setTimeout(function(){ startTrace(el); }, 450);
+      }, { passive: true });
+      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
+      el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
   }
 
@@ -4420,96 +4471,111 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var order = (row && window.AAUP_PLAN_EDITOR) ? window.AAUP_PLAN_EDITOR.orderOfContainerId(row.id) : null;
       return (order === null || order === undefined) ? Infinity : order;
     }
+    // Trace/clear are named (not inline in the event listeners below) so
+    // both mouse hover AND touch-hold can trigger the exact same behavior
+    // without duplicating it a third time.
+    function startTrace(el){
+      clearHoverSequence();
+      var id = el.id;
+      var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      var incoming = [], outgoing = [];
+      paths.forEach(function(p){
+        if(p.getAttribute('data-to') === id){ incoming.push(p); }
+        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
+      });
+      if(incoming.length === 0 && outgoing.length === 0) return;
+
+      // Order: every prerequisite feeding INTO the hovered course first,
+      // then everything it unlocks — and within each group, whichever
+      // semester sits CLOSEST to the hovered course draws first, farther
+      // ones after. "From the course right before it, to the nearest
+      // course it leads to, to farther ones."
+      var hoveredOrder = semesterOrderOf(id);
+      function distance(p, isIncoming){
+        var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
+        var otherOrder = semesterOrderOf(otherId);
+        if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
+        return Math.abs(hoveredOrder - otherOrder);
+      }
+      incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
+      outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
+      var sequence = incoming.concat(outgoing);
+
+      // "Sketch" effect: measure each related path's real length and set
+      // it as a hidden starting point (one dash spanning the path,
+      // offset so none of it is visible yet) BEFORE the .active class
+      // adds the transition — that's what the CSS animates from, so the
+      // line draws itself in rather than just popping into place.
+      sequence.forEach(function(p){
+        // getTotalLength() is universally supported by real browsers for
+        // SVG path elements, but fall back to a generously large fixed
+        // value rather than throwing if some environment lacks it.
+        var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+      // Force the browser to commit that starting state as a real frame
+      // before the class change below sets the target (dashoffset:0) —
+      // otherwise both changes can get coalesced into one paint and the
+      // draw-in transition never actually has anything to animate from.
+      void svg.getBoundingClientRect();
+      requestAnimationFrame(function(){
+        paths.forEach(function(p){
+          if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
+          else { p.classList.add('dim'); }
+        });
+        // Dimming the rest of the graph happens immediately above — only
+        // the reveal of the related lines themselves is staggered, one
+        // at a time, each starting only once the previous has finished
+        // drawing (STEP_MS matches the .6s draw transition + a small
+        // pause). Reduced-motion users get every related line at once
+        // instead, matching how the draw-in itself is already skipped.
+        var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var STEP_MS = reducedMotion ? 0 : 650;
+        sequence.forEach(function(p, i){
+          var t = setTimeout(function(){
+            // The actual animated value has to be set inline too, not
+            // left for the CSS class to provide — an inline style always
+            // beats a class rule on specificity, so stroke-dashoffset:0
+            // declared only in .edge.active would be silently ignored as
+            // long as the inline value from above is still sitting there.
+            p.style.strokeDashoffset = 0;
+            ['data-from','data-to'].forEach(function(attr){
+              var otherId = p.getAttribute(attr);
+              var otherEl = document.getElementById(otherId);
+              if(otherEl) otherEl.classList.add('node-active');
+            });
+          }, i * STEP_MS);
+          hoverSequenceTimers.push(t);
+        });
+      });
+    }
+    function endTrace(){
+      clearHoverSequence();
+      var paths = svg.querySelectorAll('path.edge');
+      paths.forEach(function(p){
+        p.classList.remove('active');
+        p.classList.remove('dim');
+        // Clear the inline length values set on mouseenter so a plain,
+        // undashed line is what's left once .active/.dim are gone.
+        p.style.strokeDasharray = '';
+        p.style.strokeDashoffset = '';
+      });
+      courses.forEach(function(c){ c.classList.remove('node-active'); });
+    }
     courses.forEach(function(el){
-      el.addEventListener('mouseenter', function(){
-        clearHoverSequence();
-        var id = el.id;
-        var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
-        var incoming = [], outgoing = [];
-        paths.forEach(function(p){
-          if(p.getAttribute('data-to') === id){ incoming.push(p); }
-          else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-        });
-        if(incoming.length === 0 && outgoing.length === 0) return;
-
-        // Order: every prerequisite feeding INTO the hovered course first,
-        // then everything it unlocks — and within each group, whichever
-        // semester sits CLOSEST to the hovered course draws first, farther
-        // ones after. "From the course right before it, to the nearest
-        // course it leads to, to farther ones."
-        var hoveredOrder = semesterOrderOf(id);
-        function distance(p, isIncoming){
-          var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
-          var otherOrder = semesterOrderOf(otherId);
-          if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
-          return Math.abs(hoveredOrder - otherOrder);
-        }
-        incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
-        outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
-        var sequence = incoming.concat(outgoing);
-
-        // "Sketch" effect: measure each related path's real length and set
-        // it as a hidden starting point (one dash spanning the path,
-        // offset so none of it is visible yet) BEFORE the .active class
-        // adds the transition — that's what the CSS animates from, so the
-        // line draws itself in rather than just popping into place.
-        sequence.forEach(function(p){
-          // getTotalLength() is universally supported by real browsers for
-          // SVG path elements, but fall back to a generously large fixed
-          // value rather than throwing if some environment lacks it.
-          var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
-          p.style.strokeDasharray = len;
-          p.style.strokeDashoffset = len;
-        });
-        // Force the browser to commit that starting state as a real frame
-        // before the class change below sets the target (dashoffset:0) —
-        // otherwise both changes can get coalesced into one paint and the
-        // draw-in transition never actually has anything to animate from.
-        void svg.getBoundingClientRect();
-        requestAnimationFrame(function(){
-          paths.forEach(function(p){
-            if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
-            else { p.classList.add('dim'); }
-          });
-          // Dimming the rest of the graph happens immediately above — only
-          // the reveal of the related lines themselves is staggered, one
-          // at a time, each starting only once the previous has finished
-          // drawing (STEP_MS matches the .6s draw transition + a small
-          // pause). Reduced-motion users get every related line at once
-          // instead, matching how the draw-in itself is already skipped.
-          var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          var STEP_MS = reducedMotion ? 0 : 650;
-          sequence.forEach(function(p, i){
-            var t = setTimeout(function(){
-              // The actual animated value has to be set inline too, not
-              // left for the CSS class to provide — an inline style always
-              // beats a class rule on specificity, so stroke-dashoffset:0
-              // declared only in .edge.active would be silently ignored as
-              // long as the inline value from above is still sitting there.
-              p.style.strokeDashoffset = 0;
-              ['data-from','data-to'].forEach(function(attr){
-                var otherId = p.getAttribute(attr);
-                var otherEl = document.getElementById(otherId);
-                if(otherEl) otherEl.classList.add('node-active');
-              });
-            }, i * STEP_MS);
-            hoverSequenceTimers.push(t);
-          });
-        });
-      });
-      el.addEventListener('mouseleave', function(){
-        clearHoverSequence();
-        var paths = svg.querySelectorAll('path.edge');
-        paths.forEach(function(p){
-          p.classList.remove('active');
-          p.classList.remove('dim');
-          // Clear the inline length values set on mouseenter so a plain,
-          // undashed line is what's left once .active/.dim are gone.
-          p.style.strokeDasharray = '';
-          p.style.strokeDashoffset = '';
-        });
-        courses.forEach(function(c){ c.classList.remove('node-active'); });
-      });
+      el.addEventListener('mouseenter', function(){ startTrace(el); });
+      el.addEventListener('mouseleave', endTrace);
+      // Touch devices have no hover — press and hold a course instead. A
+      // quick tap still falls through to the course-info popup (bound
+      // separately below); only a sustained, still press starts the trace.
+      var holdTimer = null;
+      el.addEventListener('touchstart', function(){
+        holdTimer = setTimeout(function(){ startTrace(el); }, 450);
+      }, { passive: true });
+      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
+      el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
   }
 
@@ -4787,96 +4853,111 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var order = (row && window.AAUP_PLAN_EDITOR) ? window.AAUP_PLAN_EDITOR.orderOfContainerId(row.id) : null;
       return (order === null || order === undefined) ? Infinity : order;
     }
+    // Trace/clear are named (not inline in the event listeners below) so
+    // both mouse hover AND touch-hold can trigger the exact same behavior
+    // without duplicating it a third time.
+    function startTrace(el){
+      clearHoverSequence();
+      var id = el.id;
+      var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      var incoming = [], outgoing = [];
+      paths.forEach(function(p){
+        if(p.getAttribute('data-to') === id){ incoming.push(p); }
+        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
+      });
+      if(incoming.length === 0 && outgoing.length === 0) return;
+
+      // Order: every prerequisite feeding INTO the hovered course first,
+      // then everything it unlocks — and within each group, whichever
+      // semester sits CLOSEST to the hovered course draws first, farther
+      // ones after. "From the course right before it, to the nearest
+      // course it leads to, to farther ones."
+      var hoveredOrder = semesterOrderOf(id);
+      function distance(p, isIncoming){
+        var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
+        var otherOrder = semesterOrderOf(otherId);
+        if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
+        return Math.abs(hoveredOrder - otherOrder);
+      }
+      incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
+      outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
+      var sequence = incoming.concat(outgoing);
+
+      // "Sketch" effect: measure each related path's real length and set
+      // it as a hidden starting point (one dash spanning the path,
+      // offset so none of it is visible yet) BEFORE the .active class
+      // adds the transition — that's what the CSS animates from, so the
+      // line draws itself in rather than just popping into place.
+      sequence.forEach(function(p){
+        // getTotalLength() is universally supported by real browsers for
+        // SVG path elements, but fall back to a generously large fixed
+        // value rather than throwing if some environment lacks it.
+        var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+      // Force the browser to commit that starting state as a real frame
+      // before the class change below sets the target (dashoffset:0) —
+      // otherwise both changes can get coalesced into one paint and the
+      // draw-in transition never actually has anything to animate from.
+      void svg.getBoundingClientRect();
+      requestAnimationFrame(function(){
+        paths.forEach(function(p){
+          if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
+          else { p.classList.add('dim'); }
+        });
+        // Dimming the rest of the graph happens immediately above — only
+        // the reveal of the related lines themselves is staggered, one
+        // at a time, each starting only once the previous has finished
+        // drawing (STEP_MS matches the .6s draw transition + a small
+        // pause). Reduced-motion users get every related line at once
+        // instead, matching how the draw-in itself is already skipped.
+        var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var STEP_MS = reducedMotion ? 0 : 650;
+        sequence.forEach(function(p, i){
+          var t = setTimeout(function(){
+            // The actual animated value has to be set inline too, not
+            // left for the CSS class to provide — an inline style always
+            // beats a class rule on specificity, so stroke-dashoffset:0
+            // declared only in .edge.active would be silently ignored as
+            // long as the inline value from above is still sitting there.
+            p.style.strokeDashoffset = 0;
+            ['data-from','data-to'].forEach(function(attr){
+              var otherId = p.getAttribute(attr);
+              var otherEl = document.getElementById(otherId);
+              if(otherEl) otherEl.classList.add('node-active');
+            });
+          }, i * STEP_MS);
+          hoverSequenceTimers.push(t);
+        });
+      });
+    }
+    function endTrace(){
+      clearHoverSequence();
+      var paths = svg.querySelectorAll('path.edge');
+      paths.forEach(function(p){
+        p.classList.remove('active');
+        p.classList.remove('dim');
+        // Clear the inline length values set on mouseenter so a plain,
+        // undashed line is what's left once .active/.dim are gone.
+        p.style.strokeDasharray = '';
+        p.style.strokeDashoffset = '';
+      });
+      courses.forEach(function(c){ c.classList.remove('node-active'); });
+    }
     courses.forEach(function(el){
-      el.addEventListener('mouseenter', function(){
-        clearHoverSequence();
-        var id = el.id;
-        var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
-        var incoming = [], outgoing = [];
-        paths.forEach(function(p){
-          if(p.getAttribute('data-to') === id){ incoming.push(p); }
-          else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-        });
-        if(incoming.length === 0 && outgoing.length === 0) return;
-
-        // Order: every prerequisite feeding INTO the hovered course first,
-        // then everything it unlocks — and within each group, whichever
-        // semester sits CLOSEST to the hovered course draws first, farther
-        // ones after. "From the course right before it, to the nearest
-        // course it leads to, to farther ones."
-        var hoveredOrder = semesterOrderOf(id);
-        function distance(p, isIncoming){
-          var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
-          var otherOrder = semesterOrderOf(otherId);
-          if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
-          return Math.abs(hoveredOrder - otherOrder);
-        }
-        incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
-        outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
-        var sequence = incoming.concat(outgoing);
-
-        // "Sketch" effect: measure each related path's real length and set
-        // it as a hidden starting point (one dash spanning the path,
-        // offset so none of it is visible yet) BEFORE the .active class
-        // adds the transition — that's what the CSS animates from, so the
-        // line draws itself in rather than just popping into place.
-        sequence.forEach(function(p){
-          // getTotalLength() is universally supported by real browsers for
-          // SVG path elements, but fall back to a generously large fixed
-          // value rather than throwing if some environment lacks it.
-          var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
-          p.style.strokeDasharray = len;
-          p.style.strokeDashoffset = len;
-        });
-        // Force the browser to commit that starting state as a real frame
-        // before the class change below sets the target (dashoffset:0) —
-        // otherwise both changes can get coalesced into one paint and the
-        // draw-in transition never actually has anything to animate from.
-        void svg.getBoundingClientRect();
-        requestAnimationFrame(function(){
-          paths.forEach(function(p){
-            if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
-            else { p.classList.add('dim'); }
-          });
-          // Dimming the rest of the graph happens immediately above — only
-          // the reveal of the related lines themselves is staggered, one
-          // at a time, each starting only once the previous has finished
-          // drawing (STEP_MS matches the .6s draw transition + a small
-          // pause). Reduced-motion users get every related line at once
-          // instead, matching how the draw-in itself is already skipped.
-          var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          var STEP_MS = reducedMotion ? 0 : 650;
-          sequence.forEach(function(p, i){
-            var t = setTimeout(function(){
-              // The actual animated value has to be set inline too, not
-              // left for the CSS class to provide — an inline style always
-              // beats a class rule on specificity, so stroke-dashoffset:0
-              // declared only in .edge.active would be silently ignored as
-              // long as the inline value from above is still sitting there.
-              p.style.strokeDashoffset = 0;
-              ['data-from','data-to'].forEach(function(attr){
-                var otherId = p.getAttribute(attr);
-                var otherEl = document.getElementById(otherId);
-                if(otherEl) otherEl.classList.add('node-active');
-              });
-            }, i * STEP_MS);
-            hoverSequenceTimers.push(t);
-          });
-        });
-      });
-      el.addEventListener('mouseleave', function(){
-        clearHoverSequence();
-        var paths = svg.querySelectorAll('path.edge');
-        paths.forEach(function(p){
-          p.classList.remove('active');
-          p.classList.remove('dim');
-          // Clear the inline length values set on mouseenter so a plain,
-          // undashed line is what's left once .active/.dim are gone.
-          p.style.strokeDasharray = '';
-          p.style.strokeDashoffset = '';
-        });
-        courses.forEach(function(c){ c.classList.remove('node-active'); });
-      });
+      el.addEventListener('mouseenter', function(){ startTrace(el); });
+      el.addEventListener('mouseleave', endTrace);
+      // Touch devices have no hover — press and hold a course instead. A
+      // quick tap still falls through to the course-info popup (bound
+      // separately below); only a sustained, still press starts the trace.
+      var holdTimer = null;
+      el.addEventListener('touchstart', function(){
+        holdTimer = setTimeout(function(){ startTrace(el); }, 450);
+      }, { passive: true });
+      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
+      el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
   }
 
@@ -5165,96 +5246,111 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var order = (row && window.AAUP_PLAN_EDITOR) ? window.AAUP_PLAN_EDITOR.orderOfContainerId(row.id) : null;
       return (order === null || order === undefined) ? Infinity : order;
     }
+    // Trace/clear are named (not inline in the event listeners below) so
+    // both mouse hover AND touch-hold can trigger the exact same behavior
+    // without duplicating it a third time.
+    function startTrace(el){
+      clearHoverSequence();
+      var id = el.id;
+      var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      var incoming = [], outgoing = [];
+      paths.forEach(function(p){
+        if(p.getAttribute('data-to') === id){ incoming.push(p); }
+        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
+      });
+      if(incoming.length === 0 && outgoing.length === 0) return;
+
+      // Order: every prerequisite feeding INTO the hovered course first,
+      // then everything it unlocks — and within each group, whichever
+      // semester sits CLOSEST to the hovered course draws first, farther
+      // ones after. "From the course right before it, to the nearest
+      // course it leads to, to farther ones."
+      var hoveredOrder = semesterOrderOf(id);
+      function distance(p, isIncoming){
+        var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
+        var otherOrder = semesterOrderOf(otherId);
+        if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
+        return Math.abs(hoveredOrder - otherOrder);
+      }
+      incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
+      outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
+      var sequence = incoming.concat(outgoing);
+
+      // "Sketch" effect: measure each related path's real length and set
+      // it as a hidden starting point (one dash spanning the path,
+      // offset so none of it is visible yet) BEFORE the .active class
+      // adds the transition — that's what the CSS animates from, so the
+      // line draws itself in rather than just popping into place.
+      sequence.forEach(function(p){
+        // getTotalLength() is universally supported by real browsers for
+        // SVG path elements, but fall back to a generously large fixed
+        // value rather than throwing if some environment lacks it.
+        var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+      // Force the browser to commit that starting state as a real frame
+      // before the class change below sets the target (dashoffset:0) —
+      // otherwise both changes can get coalesced into one paint and the
+      // draw-in transition never actually has anything to animate from.
+      void svg.getBoundingClientRect();
+      requestAnimationFrame(function(){
+        paths.forEach(function(p){
+          if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
+          else { p.classList.add('dim'); }
+        });
+        // Dimming the rest of the graph happens immediately above — only
+        // the reveal of the related lines themselves is staggered, one
+        // at a time, each starting only once the previous has finished
+        // drawing (STEP_MS matches the .6s draw transition + a small
+        // pause). Reduced-motion users get every related line at once
+        // instead, matching how the draw-in itself is already skipped.
+        var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var STEP_MS = reducedMotion ? 0 : 650;
+        sequence.forEach(function(p, i){
+          var t = setTimeout(function(){
+            // The actual animated value has to be set inline too, not
+            // left for the CSS class to provide — an inline style always
+            // beats a class rule on specificity, so stroke-dashoffset:0
+            // declared only in .edge.active would be silently ignored as
+            // long as the inline value from above is still sitting there.
+            p.style.strokeDashoffset = 0;
+            ['data-from','data-to'].forEach(function(attr){
+              var otherId = p.getAttribute(attr);
+              var otherEl = document.getElementById(otherId);
+              if(otherEl) otherEl.classList.add('node-active');
+            });
+          }, i * STEP_MS);
+          hoverSequenceTimers.push(t);
+        });
+      });
+    }
+    function endTrace(){
+      clearHoverSequence();
+      var paths = svg.querySelectorAll('path.edge');
+      paths.forEach(function(p){
+        p.classList.remove('active');
+        p.classList.remove('dim');
+        // Clear the inline length values set on mouseenter so a plain,
+        // undashed line is what's left once .active/.dim are gone.
+        p.style.strokeDasharray = '';
+        p.style.strokeDashoffset = '';
+      });
+      courses.forEach(function(c){ c.classList.remove('node-active'); });
+    }
     courses.forEach(function(el){
-      el.addEventListener('mouseenter', function(){
-        clearHoverSequence();
-        var id = el.id;
-        var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
-        var incoming = [], outgoing = [];
-        paths.forEach(function(p){
-          if(p.getAttribute('data-to') === id){ incoming.push(p); }
-          else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-        });
-        if(incoming.length === 0 && outgoing.length === 0) return;
-
-        // Order: every prerequisite feeding INTO the hovered course first,
-        // then everything it unlocks — and within each group, whichever
-        // semester sits CLOSEST to the hovered course draws first, farther
-        // ones after. "From the course right before it, to the nearest
-        // course it leads to, to farther ones."
-        var hoveredOrder = semesterOrderOf(id);
-        function distance(p, isIncoming){
-          var otherId = p.getAttribute(isIncoming ? 'data-from' : 'data-to');
-          var otherOrder = semesterOrderOf(otherId);
-          if(otherOrder === Infinity || hoveredOrder === Infinity) return Infinity;
-          return Math.abs(hoveredOrder - otherOrder);
-        }
-        incoming.sort(function(a,b){ return distance(a,true) - distance(b,true); });
-        outgoing.sort(function(a,b){ return distance(a,false) - distance(b,false); });
-        var sequence = incoming.concat(outgoing);
-
-        // "Sketch" effect: measure each related path's real length and set
-        // it as a hidden starting point (one dash spanning the path,
-        // offset so none of it is visible yet) BEFORE the .active class
-        // adds the transition — that's what the CSS animates from, so the
-        // line draws itself in rather than just popping into place.
-        sequence.forEach(function(p){
-          // getTotalLength() is universally supported by real browsers for
-          // SVG path elements, but fall back to a generously large fixed
-          // value rather than throwing if some environment lacks it.
-          var len; try{ len = p.getTotalLength(); }catch(e){ len = 2000; }
-          p.style.strokeDasharray = len;
-          p.style.strokeDashoffset = len;
-        });
-        // Force the browser to commit that starting state as a real frame
-        // before the class change below sets the target (dashoffset:0) —
-        // otherwise both changes can get coalesced into one paint and the
-        // draw-in transition never actually has anything to animate from.
-        void svg.getBoundingClientRect();
-        requestAnimationFrame(function(){
-          paths.forEach(function(p){
-            if(sequence.indexOf(p) !== -1){ p.classList.add('active'); }
-            else { p.classList.add('dim'); }
-          });
-          // Dimming the rest of the graph happens immediately above — only
-          // the reveal of the related lines themselves is staggered, one
-          // at a time, each starting only once the previous has finished
-          // drawing (STEP_MS matches the .6s draw transition + a small
-          // pause). Reduced-motion users get every related line at once
-          // instead, matching how the draw-in itself is already skipped.
-          var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          var STEP_MS = reducedMotion ? 0 : 650;
-          sequence.forEach(function(p, i){
-            var t = setTimeout(function(){
-              // The actual animated value has to be set inline too, not
-              // left for the CSS class to provide — an inline style always
-              // beats a class rule on specificity, so stroke-dashoffset:0
-              // declared only in .edge.active would be silently ignored as
-              // long as the inline value from above is still sitting there.
-              p.style.strokeDashoffset = 0;
-              ['data-from','data-to'].forEach(function(attr){
-                var otherId = p.getAttribute(attr);
-                var otherEl = document.getElementById(otherId);
-                if(otherEl) otherEl.classList.add('node-active');
-              });
-            }, i * STEP_MS);
-            hoverSequenceTimers.push(t);
-          });
-        });
-      });
-      el.addEventListener('mouseleave', function(){
-        clearHoverSequence();
-        var paths = svg.querySelectorAll('path.edge');
-        paths.forEach(function(p){
-          p.classList.remove('active');
-          p.classList.remove('dim');
-          // Clear the inline length values set on mouseenter so a plain,
-          // undashed line is what's left once .active/.dim are gone.
-          p.style.strokeDasharray = '';
-          p.style.strokeDashoffset = '';
-        });
-        courses.forEach(function(c){ c.classList.remove('node-active'); });
-      });
+      el.addEventListener('mouseenter', function(){ startTrace(el); });
+      el.addEventListener('mouseleave', endTrace);
+      // Touch devices have no hover — press and hold a course instead. A
+      // quick tap still falls through to the course-info popup (bound
+      // separately below); only a sustained, still press starts the trace.
+      var holdTimer = null;
+      el.addEventListener('touchstart', function(){
+        holdTimer = setTimeout(function(){ startTrace(el); }, 450);
+      }, { passive: true });
+      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
+      el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
   }
 
@@ -9077,6 +9173,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     });
     document.querySelectorAll('#page-' + planId + ' .course[id]').forEach(function(c){ c.classList.remove('node-active'); });
   }
+  var touchHoldTimer = null;
+  var touchHoldEl = null;
   function bindImportedHover(planId){
     if(hoverBoundPlans[planId]) return;
     hoverBoundPlans[planId] = true;
@@ -9095,6 +9193,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(!el || el.id.indexOf(planId + '-c-') !== 0) return;
       if(el.contains(e.relatedTarget)) return;
       handleCourseHoverLeave(planId);
+    });
+    // Touch devices have no hover — press and hold a course instead. A
+    // quick tap still falls through to the normal onclick (toggle/edit);
+    // only a sustained, still press starts the trace.
+    document.addEventListener('touchstart', function(e){
+      var el = e.target.closest && e.target.closest('.course[id]');
+      if(!el || el.id.indexOf(planId + '-c-') !== 0) return;
+      touchHoldEl = el;
+      touchHoldTimer = setTimeout(function(){ handleCourseHoverEnter(planId, el); }, 450);
+    }, { passive: true });
+    document.addEventListener('touchmove', function(){ clearTimeout(touchHoldTimer); });
+    document.addEventListener('touchend', function(){
+      clearTimeout(touchHoldTimer);
+      if(touchHoldEl){ handleCourseHoverLeave(planId); touchHoldEl = null; }
+    });
+    document.addEventListener('touchcancel', function(){
+      clearTimeout(touchHoldTimer);
+      if(touchHoldEl){ handleCourseHoverLeave(planId); touchHoldEl = null; }
     });
   }
 
@@ -9219,7 +9335,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<input type="text" id="' + id + '-courseSearchInput" class="search-input" placeholder="' + (rtl ? 'ابحث عن مساق بالاسم أو الرقم…' : 'Search a course by name or code…') + '" autocomplete="off">' +
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
-      '<div style="padding:20px 32px;">' +
+      '<div class="imp-body-pad">' +
       (bioEn ? '<p style="font-size:12px;color:var(--text-dim);opacity:.85;">' + (rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
       '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
@@ -9344,7 +9460,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var html = '<div class="sheet" style="max-width:1100px;margin:20px auto;">' +
       '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>🏠</span><span>Home</span></button></div>' +
       '<h1>' + en.big + (en.small ? ' ' + en.small : '') + ' <em style="opacity:.6;font-size:.6em;">' + ar.big + (ar.small ? ' ' + ar.small : '') + '</em></h1></header>' +
-      '<div style="padding:20px 32px;">' +
+      '<div class="imp-body-pad">' +
       '<p style="font-size:12px;color:var(--text-dim);">This is a community-imported plan \u2014 a simplified view without the custom prerequisite-arrow diagram the built-in majors have, but progress tracking and prerequisite locking both work normally.</p>' +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
       '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
@@ -10091,6 +10207,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
   function nth(list, i){ return list && list[i] ? list[i] : null; }
 
+  // A course guaranteed to have at least one prerequisite connection —
+  // needed for the interactive hold-to-trace step, since holding a course
+  // with zero connections draws nothing and the step would never complete.
+  function aConnectedCourse(){
+    var root = visiblePlanRoot();
+    var svg = root.querySelector('.connector-layer');
+    var edge = svg && svg.querySelector('path.edge[data-to]');
+    var id = edge && edge.getAttribute('data-to');
+    return (id && document.getElementById(id)) || root.querySelector('.course[id]');
+  }
+
   var TOURS = {
     home: [
       { target: '#homeSearchBox',
@@ -10127,6 +10254,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       { target: function(){ return visiblePlanRoot().querySelector('.course'); },
         title: 'Courses',
         text: 'Tap a course to see its details and prerequisites, or check the box once you’ve completed it — that’s what feeds Progress and GPA on your Dashboard.' },
+      { target: aConnectedCourse,
+        title: 'Trace prerequisites',
+        text: 'Press and hold this course (or hover it on a computer) — the lines connecting it to what it needs, and what it unlocks, light up. Go ahead, try it now.',
+        interactive: true },
       { target: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-box'); },
         title: 'Search a course',
         text: 'Find any course on this page by name or course number instead of hunting through every semester.' }
@@ -10135,6 +10266,28 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   function resolve(step){
     return typeof step.target === 'function' ? step.target() : document.querySelector(step.target);
+  }
+
+  // For steps marked interactive: true — rather than just describing the
+  // gesture, wait for the user to actually perform it (detected via the
+  // 'node-active' class the real trace logic already adds to a course once
+  // its connections light up) and auto-advance, instead of taking their
+  // word for it via a Next click. Next is relabeled "Skip" during this wait
+  // rather than disabled — the step should never be able to soft-lock the
+  // tour for someone whose device/input doesn't cooperate.
+  var interactiveObserver = null;
+  function stopWatchingInteractive(){
+    if(interactiveObserver){ interactiveObserver.disconnect(); interactiveObserver = null; }
+  }
+  function watchInteractive(el){
+    stopWatchingInteractive();
+    interactiveObserver = new MutationObserver(function(){
+      if(el.classList.contains('node-active')){
+        stopWatchingInteractive();
+        setTimeout(advance, 900); // let them actually see the lines before moving on
+      }
+    });
+    interactiveObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
   }
 
   function render(){
@@ -10156,7 +10309,16 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         document.getElementById('tutTitle').textContent = step.title;
         document.getElementById('tutText').textContent = step.text;
         document.getElementById('tutProgress').textContent = (active.index + 1) + ' / ' + active.steps.length;
-        document.getElementById('tutNext').textContent = (active.index === active.steps.length - 1) ? 'Got it!' : 'Next';
+        document.getElementById('tutNext').textContent = step.interactive ? 'Skip' : ((active.index === active.steps.length - 1) ? 'Got it!' : 'Next');
+
+        if(step.interactive){
+          if(active._watchedIndex !== active.index){
+            active._watchedIndex = active.index;
+            watchInteractive(el);
+          }
+        } else {
+          stopWatchingInteractive();
+        }
 
         var tip = document.getElementById('tutTooltip');
         tip.style.left = '';
@@ -10178,6 +10340,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   function advance(){
     if(!active) return;
+    stopWatchingInteractive();
     active.index++;
     if(active.index >= active.steps.length){ finish(); return; }
     render();
@@ -10185,6 +10348,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   function finish(){
     if(!active) return;
+    stopWatchingInteractive();
     markDone(active.id);
     document.getElementById('tutLayer').classList.remove('open');
     window.removeEventListener('resize', reflow);
