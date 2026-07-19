@@ -2095,16 +2095,17 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      (900) and modals (1000) since a step can legitimately point at
      something inside either.
      ========================================================================== */
-  /* pointer-events:none on the whole layer (not just the spotlight cutout)
-     is deliberate — it's what lets the interactive steps' real gesture
-     (press-and-hold an actual course card) reach that real card at all.
-     Without it, this full-screen fixed layer — despite being visually
-     "cut out" over the target via the spotlight's box-shadow trick — would
-     still be the topmost element there and swallow the touch/click before
-     it ever reached the page underneath. Only the tooltip card opts back
-     into being interactive, for its own Next/Skip buttons. */
-  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;pointer-events:none;}
+  /* Blocking by default (pointer-events:auto) — a plain descriptive step
+     ("tap a course to see its details") must NOT let that tap fall through
+     to the real page, or the real course modal opens underneath while the
+     tutorial stays stuck pointing at now-stale coordinates. Only while the
+     CURRENT step is interactive does .interactive-step switch this to
+     pointer-events:none, letting a real press-and-hold gesture reach the
+     real element it's spotlighting. The tooltip card always stays
+     interactive itself, for its own Next/Skip buttons. */
+  .tut-layer{position:fixed;inset:0;z-index:1500;display:none;pointer-events:auto;}
   .tut-layer.open{display:block;}
+  .tut-layer.interactive-step{pointer-events:none;}
   .tut-spotlight{
     position:fixed;
     border-radius:10px;
@@ -2112,8 +2113,13 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     outline:2px solid var(--accent);
     outline-offset:4px;
     pointer-events:none;
-    transition:top .25s ease, left .25s ease, width .25s ease, height .25s ease;
+    transition:top .25s ease, left .25s ease, width .25s ease, height .25s ease, box-shadow .2s ease;
   }
+  /* The interactive trace step's whole point is watching lines reach OTHER
+     courses elsewhere on the page — those would just be hidden under the
+     same darkness a normal spotlight uses, so this step skips the dimming
+     and keeps only the guide ring around the course being held. */
+  .tut-spotlight.no-dim{box-shadow:none;}
   .tut-tooltip{
     position:fixed;
     max-width:300px;
@@ -10348,7 +10354,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     interactiveObserver = new MutationObserver(function(){
       if(el.classList.contains('node-active')){
         stopWatchingInteractive();
-        setTimeout(advance, 900); // let them actually see the lines before moving on
+        // node-active fires the instant the FIRST related line starts its
+        // staggered reveal (startTrace's own STEP_MS-per-edge animation),
+        // not once every related line has finished drawing — advancing
+        // right away would cut that reveal off practically before it
+        // started. 3.2s comfortably covers a handful of staggered edges
+        // (~650ms each) plus their own draw-in transition, so there's
+        // something to actually look at before the tour moves on.
+        setTimeout(advance, 3200);
       }
     });
     interactiveObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
@@ -10369,6 +10382,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         spot.style.left = Math.max(0, r.left - pad) + 'px';
         spot.style.width = (r.width + pad * 2) + 'px';
         spot.style.height = (r.height + pad * 2) + 'px';
+        spot.classList.toggle('no-dim', !!step.interactive);
+        document.getElementById('tutLayer').classList.toggle('interactive-step', !!step.interactive);
 
         document.getElementById('tutTitle').textContent = step.title;
         document.getElementById('tutText').textContent = step.text;
