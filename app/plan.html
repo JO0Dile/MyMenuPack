@@ -133,6 +133,24 @@ window.APP_COLLEGES = {
 // AAUP_IMPORTED.submitPlan) — no account setup needed. Once you have a
 // Google Form (or any URL) for collecting community plans, paste it here.
 window.APP_SUBMIT_URL = '';
+// AUTO-COLLECT endpoint. When set, every plan a user builds or edits in the
+// app — its college, courses, prerequisites: plan STRUCTURE only, never any
+// personal progress, GPA, grades, name, or ID — is sent here quietly in the
+// background so you can gather community plans without anyone pressing a
+// "submit" button. This MUST be a small serverless endpoint that holds a
+// GitHub token PRIVATELY and commits on the app's behalf (see COLLECTING.md
+// for a ready-to-deploy Cloudflare Worker + setup). A static GitHub Pages
+// site can't write to the repo by itself, and a token pasted into this file
+// would be public — anyone could wipe the repo, and GitHub auto-revokes
+// leaked tokens — so it never goes here, only in the collector's secrets.
+// Leave '' to disable auto-collection entirely (nothing is sent anywhere).
+window.APP_COLLECT_URL = '';
+// Optional shared secret sent as a header with each auto-collect POST, so
+// your collector can ignore random traffic. Match it to the collector's
+// COLLECT_SECRET. It's not a login and grants no repo access on its own —
+// worst case someone reads it and can POST plan JSON to your collector, same
+// as using the app — so a simple value is fine. Leave '' to send none.
+window.APP_COLLECT_SECRET = '';
 // Hosted JSON manifest of official/community plans the app can pull updates
 // from when online (see "Check for updates" in Settings). A relative path
 // works once this file is served (GitHub Pages, any static host) alongside
@@ -154,7 +172,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.01';
+window.APP_VERSION = '3.1';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -7003,8 +7021,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     catch(e){ return fallback; }
   }
   function setJSON(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); return true; }
+    try{ localStorage.setItem(key, JSON.stringify(value)); }
     catch(e){ return false; }
+    // Every create/edit of a user-built plan (a new college, a new plan, an
+    // added course, a moved course) writes aaup_importedPlans through here —
+    // one chokepoint — so this is the one place auto-collection needs to
+    // notice a change. Guarded + debounced inside AAUP_COLLECT; a no-op when
+    // APP_COLLECT_URL isn't configured, so it costs nothing until turned on.
+    if(key === 'aaup_importedPlans' && typeof window.__collectOnPlansChanged === 'function'){
+      try{ window.__collectOnPlansChanged(value); }catch(e){}
+    }
+    return true;
   }
   window.AAUP_STORAGE = { getJSON: getJSON, setJSON: setJSON };
 
@@ -10926,6 +10953,142 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // or (via the Settings button) if someone asked it to.
     if(navigator.onLine === false) return;
     setTimeout(function(){ checkForUpdates(false); }, 1500);
+  }
+  if(document.readyState === 'complete'){ init(); }
+  else { window.addEventListener('load', init); }
+})();
+
+// ==========================
+// AUTO-COLLECT — quietly sends user-built plans (structure only) to the
+// collector so the owner can gather community plans with no "submit" step.
+//
+// The whole thing is a no-op unless window.APP_COLLECT_URL is set. It never
+// touches personal data: it sends exactly the same plan-only bundle that the
+// manual Contribute button builds (college, courses, prerequisites) and
+// never progress, GPA, grades, name, or ID. It can't and doesn't write to
+// GitHub from the browser — it POSTs to a small serverless collector that
+// holds the write token privately (see COLLECTING.md). Offline-safe: unsent
+// plans wait in a local queue and retry on the next change, the next time
+// the app opens, and whenever the device comes back online. Deduped by a
+// content hash so an unchanged plan is never re-sent.
+// ==========================
+(function(){
+  var QUEUE_KEY = 'aaup_collectQueue'; // { id: {hash, bundle} } waiting to send
+  var SENT_KEY  = 'aaup_collectSent';  // { id: hash } already accepted, to dedupe
+  var scanTimer = null, flushing = false;
+
+  function enabled(){ return !!(window.APP_COLLECT_URL && typeof fetch === 'function'); }
+  function getMap(k){ return (window.AAUP_STORAGE ? window.AAUP_STORAGE.getJSON(k, {}) : {}) || {}; }
+  function setMap(k, v){ if(window.AAUP_STORAGE){ window.AAUP_STORAGE.setJSON(k, v); } }
+
+  // djb2 — a tiny, fast string hash. Only used to tell "did this plan change
+  // since we last sent it?", so collisions are harmless (worst case: a rare
+  // re-send). Not security-sensitive.
+  function hashStr(s){
+    var h = 5381, i = s.length;
+    while(i){ h = (h * 33) ^ s.charCodeAt(--i); }
+    return (h >>> 0).toString(36);
+  }
+
+  // Plan-only bundle — deliberately mirrors AAUP_IMPORTED.planBundle: no
+  // progress, no importedAt, no anything personal. Just the definition of the
+  // plan itself, which is the only thing worth collecting.
+  function bundleOf(id, p){
+    if(!p) return null;
+    return {
+      id: id,
+      majorName: p.majorName, icon: p.icon, bio: p.bio,
+      structure: p.structure, courses: p.courses, prerequisites: p.prerequisites,
+      university: p.university || 'aaup', college: p.college
+    };
+  }
+
+  // Called (debounced) from AAUP_STORAGE.setJSON whenever aaup_importedPlans
+  // is written. Figures out which plans actually changed and queues those.
+  function onPlansChanged(plansObj){
+    if(!enabled()) return;
+    if(scanTimer){ clearTimeout(scanTimer); }
+    scanTimer = setTimeout(function(){ scan(plansObj); }, 1200);
+  }
+
+  function scan(plansObj){
+    var plans = plansObj || getMap('aaup_importedPlans');
+    var sent = getMap(SENT_KEY);
+    var queue = getMap(QUEUE_KEY);
+    var changed = false;
+    Object.keys(plans || {}).forEach(function(id){
+      var bundle = bundleOf(id, plans[id]);
+      if(!bundle) return;
+      var text = JSON.stringify(bundle);
+      var h = hashStr(text);
+      // Skip empty shells: a plan with no courses AND no college text isn't
+      // worth sending yet — it'll get collected once the student adds to it.
+      var hasContent = (bundle.courses && bundle.courses.length) ||
+        (bundle.college && (String((bundle.college.en||'')).trim() || String((bundle.college.ar||'')).trim()));
+      if(!hasContent){ return; }
+      if(sent[id] === h){ return; }        // already delivered, unchanged
+      if(queue[id] && queue[id].hash === h){ return; } // already queued
+      queue[id] = { hash: h, bundle: bundle };
+      changed = true;
+    });
+    if(changed){ setMap(QUEUE_KEY, queue); }
+    flush();
+  }
+
+  function flush(){
+    if(!enabled() || flushing) return;
+    if(navigator.onLine === false) return;
+    var queue = getMap(QUEUE_KEY);
+    var ids = Object.keys(queue);
+    if(!ids.length) return;
+    flushing = true;
+    sendNext(ids, 0, queue);
+  }
+
+  function sendNext(ids, i, queue){
+    if(i >= ids.length){ flushing = false; return; }
+    var id = ids[i];
+    var item = queue[id];
+    if(!item){ return sendNext(ids, i + 1, queue); }
+    var headers = { 'Content-Type': 'application/json' };
+    if(window.APP_COLLECT_SECRET){ headers['X-Collect-Secret'] = window.APP_COLLECT_SECRET; }
+    fetch(window.APP_COLLECT_URL, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        id: id,
+        plan: item.bundle,
+        appVersion: window.APP_VERSION || '',
+        submittedAt: new Date().toISOString()
+      }),
+      keepalive: true
+    }).then(function(res){
+      if(res && res.ok){
+        // Delivered — remember its hash and drop it from the queue.
+        var sent = getMap(SENT_KEY); sent[id] = item.hash; setMap(SENT_KEY, sent);
+        var q = getMap(QUEUE_KEY); delete q[id]; setMap(QUEUE_KEY, q);
+        sendNext(ids, i + 1, queue);
+      } else {
+        // Server reachable but unhappy (bad secret, rate limit, 5xx). Leave it
+        // queued and stop this pass; it retries later without spamming.
+        flushing = false;
+      }
+    }).catch(function(){
+      // Network dropped mid-send. Keep it queued; the 'online' listener and
+      // the next change/app-open will retry.
+      flushing = false;
+    });
+  }
+
+  window.__collectOnPlansChanged = onPlansChanged;
+  window.AAUP_COLLECT = { flush: flush, scan: function(){ scan(null); } };
+
+  function init(){
+    if(!enabled()) return;
+    // Catch anything created before the collector URL existed (or left over
+    // from an offline session) and try to deliver it.
+    setTimeout(function(){ scan(null); }, 2000);
+    window.addEventListener('online', flush);
   }
   if(document.readyState === 'complete'){ init(); }
   else { window.addEventListener('load', init); }

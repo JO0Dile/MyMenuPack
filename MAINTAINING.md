@@ -27,11 +27,28 @@ walkthrough that sits on top of it.
 
 ---
 
-## Part 1 — A student sent you a plan. How do I add it?
+## Two ways plans reach you
 
-When a student taps **📨 Contribute** in the app, they get a `.json` file and
-(if set up) a pre-filled GitHub issue to attach it to. Here's what to do with
-it.
+1. **Automatic collection (recommended).** With auto-collect turned on, every
+   plan/college/course a student builds is saved into `app/plans/collected/`
+   in this repo on its own — no submit button. You review those files and
+   promote the good ones to the live feed. Full setup:
+   [COLLECTING.md](COLLECTING.md). Publishing a collected plan is the same
+   copy-into-`index.json` step described below — just copy the inner `plan`
+   object out of its `collected/<id>.json` file.
+2. **Manual submission.** A student taps **📨 Contribute**, gets a `.json`
+   file, and sends it to you (or opens a pre-filled GitHub issue). Same
+   destination — you copy it into `index.json`.
+
+Either way, **nothing goes live until you copy it into `index.json`.** That's
+deliberate: collected plans sit in a holding area so junk or abusive
+submissions never auto-appear for real students.
+
+## Part 1 — A plan reached you (collected or sent). How do I publish it?
+
+Whether it arrived automatically in `app/plans/collected/<id>.json` or a
+student sent you a `.json` file, publishing it is the same: copy its plan into
+`app/plans/index.json`.
 
 ### Step 1 — Open the submission and give it a quick read
 
