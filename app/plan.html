@@ -158,6 +158,16 @@ window.APP_VERSION = '1.0.0';
 if (('serviceWorker' in navigator) && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', function () {
     navigator.serviceWorker.register('sw.js').catch(function () { /* hosting without sw.js is fine */ });
+    // sw.js tells us this once it's confirmed a background refresh actually
+    // changed something — otherwise a deployed update sits fully downloaded
+    // and cached but invisible until whatever random later reload happens
+    // to pick it up, with no way to know that reload would even help.
+    navigator.serviceWorker.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'AAUP_UPDATE_AVAILABLE') {
+        var bar = document.getElementById('updateBar');
+        if (bar) bar.style.display = 'flex';
+      }
+    });
   });
 }
 </script>
@@ -2147,10 +2157,26 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     white-space:nowrap;
   }
+  .update-bar{
+    position:fixed; top:0; left:0; right:0; z-index:2000;
+    background:var(--accent); color:var(--navy-900);
+    padding:9px 14px; font-size:12.5px; font-weight:700;
+    display:none; align-items:center; justify-content:center; gap:12px;
+    text-align:center;
+  }
+  .update-bar button{
+    background:var(--navy-900); color:var(--accent); border:none;
+    padding:6px 14px; border-radius:999px; font-weight:800; font-size:12px;
+    cursor:pointer; font-family:inherit; white-space:nowrap;
+  }
 </style>
 <body>
 
 <div class="watermark-layer" aria-hidden="true">@Dile (AL-Hammam_Natsha)</div>
+<div class="update-bar" id="updateBar">
+  <span>🔄 A new version of the app is ready.</span>
+  <button type="button" onclick="location.reload()">Refresh</button>
+</div>
 
 <button type="button" class="sb-toggle-btn" id="sbToggleBtn" onclick="AAUP_SIDEBAR.toggleMobile()" aria-label="Menu">☰</button>
 <div class="sb-overlay" id="sbOverlay" onclick="AAUP_SIDEBAR.closeMobile()"></div>
@@ -3927,7 +3953,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['dsa','elective-swarm-robotics'],
     ['robotics-foundation','elective-swarm-robotics'],
     ['robotics-foundation','elective-sensors-perception'],
-    ['computer-vision','elective-sensors-perception']
+    ['computer-vision','elective-sensors-perception'],
+    // Both match prereq text already on the course itself (nlp/research-methods
+    // below) that had no corresponding arrow — added alongside the existing
+    // fund-se -> nlp edge rather than replacing it, same AND-prerequisite
+    // pattern used elsewhere in this file (e.g. advanced-english needing
+    // both Intermediate English and its lab).
+    ['machine-learning','nlp'],
+    ['advanced-english','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -4287,7 +4320,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['intro-cybersecurity','cyber-physical-security'],
     ['computer-networks','network-security'],
     ['computer-networks','elective-wireless-networks'],
-    ['ethical-hacking','elective-advanced-ethical-hacking']
+    ['ethical-hacking','elective-advanced-ethical-hacking'],
+    // Matches prereq text already on research-methods itself, which had no
+    // corresponding arrow.
+    ['advanced-english','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -4664,7 +4700,18 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['bio-medsci','elective-ai-genomics-personalized-med'],
     ['fund-ai','elective-ai-genomics-personalized-med'],
     ['fund-ai','elective-ai-medical-imaging'],
-    ['fund-ai','elective-ai-diagnostic-predictive-2']
+    ['fund-ai','elective-ai-diagnostic-predictive-2'],
+    // Each matches prereq text already on the course itself (chem-medsci-lab,
+    // gen-microbio, anatomy-physio, ethics-ai, nlp, research-methods below)
+    // that had no corresponding arrow — added alongside their existing
+    // edges rather than replacing them, same AND-prerequisite pattern used
+    // elsewhere in this file.
+    ['chem-medsci','bio-medsci-lab'],
+    ['bio-medsci-lab','gen-microbio'],
+    ['bio-medsci-lab','anatomy-physio'],
+    ['fund-ai','ethics-ai'],
+    ['machine-learning','nlp'],
+    ['advanced-english','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -5035,6 +5082,18 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['oop-principles','advanced-oop'],
     ['intro-db','web-dev-1'],
     ['progfund2','visual-prog'],
+    // English sequence: Beginning -> Intermediate (+ its lab) -> Advanced
+    // (+ its lab) -> Speech Communication. Matches the prereq text already
+    // on 'intermediate-english'/'advanced-english' above and the pattern
+    // already established just below (both the lecture AND lab feeding the
+    // next course, not just the lecture) — this was previously only wired
+    // for the last leg (advanced-english[-lab] -> speech-comm).
+    ['beginning-english','intermediate-english'],
+    ['beginning-english','intermediate-english-lab'],
+    ['intermediate-english','advanced-english'],
+    ['intermediate-english-lab','advanced-english'],
+    ['intermediate-english','advanced-english-lab'],
+    ['intermediate-english-lab','advanced-english-lab'],
     ['advanced-english','speech-comm'],
     ['advanced-english-lab','speech-comm'],
     ['digital-logic','elective-networks-1'],
@@ -5048,7 +5107,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     ['intro-db','elective-data-mining'],
     ['algo-prog-tech','elective-parallel-prog'],
     ['web-dev-1','elective-web-dev-2'],
-    ['intro-os','elective-cloud-computing']
+    ['intro-os','elective-cloud-computing'],
+    // Each matches prereq text already on the course itself (progfund1-lab,
+    // progfund2-lab, research-methods below) that had no corresponding arrow.
+    ['progfund1','progfund1-lab'],
+    ['progfund2','progfund2-lab'],
+    ['advanced-english','research-methods']
   ];
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -5065,16 +5129,16 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'uni-elective-2': {num:'-', name:'University Elective', th:'-', pr:'-', cr:'2', prereq:'-', ar:'اختياري جامعي'},
     'intro-it-lab': {num:'110111030', name:'Introduction to Information Technology Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر مدخل إلى تكنولوجيا المعلومات'},
     'intro-it': {num:'240221010', name:'Introduction to Information Technology', th:'2', pr:'-', cr:'2', prereq:'-', ar:'مدخل إلى تكنولوجيا المعلومات'},
-    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة الإنجليزية المتوسطة'},
+    'intermediate-english': {num:'010610025', name:'Intermediate English', th:'2', pr:'-', cr:'2', prereq:'Beginning English (010610014)', ar:'اللغة الإنجليزية المتوسطة'},
     'intermediate-english-lab': {num:'010610026', name:'Intermediate English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتوسطة'},
     'calc-2': {num:'100411020', name:'Calculus II', th:'3', pr:'-', cr:'3', prereq:'Calculus I (100411010)', ar:'التفاضل والتكامل (2)'},
     'discrete-math': {num:'100413750', name:'Discrete Mathematics', th:'3', pr:'-', cr:'3', prereq:'-', ar:'الرياضيات المتقطعة'},
     'progfund1': {num:'240111011', name:'Programming Fundamentals (C++)', th:'3', pr:'-', cr:'3', prereq:'-', ar:'أساسيات البرمجة (++C)'},
     'progfund1-lab': {num:'240111021', name:'Programming Fundamentals I Lab', th:'-', pr:'2', cr:'1', prereq:'Programming Fundamentals (C++) (240111011)', ar:'مختبر أساسيات البرمجة (1)'},
     'digital-logic': {num:'110411100', name:'Digital Logic Design', th:'3', pr:'-', cr:'3', prereq:'-', ar:'تصميم المنطق الرقمي'},
-    'advanced-english': {num:'010610035', name:'Advanced English', th:'2', pr:'-', cr:'2', prereq:'-', ar:'اللغة الإنجليزية المتقدمة'},
+    'advanced-english': {num:'010610035', name:'Advanced English', th:'2', pr:'-', cr:'2', prereq:'Intermediate English (010610025) & Intermediate English Lab (010610026)', ar:'اللغة الإنجليزية المتقدمة'},
     'advanced-english-lab': {num:'010610036', name:'Advanced English Lab', th:'-', pr:'2', cr:'1', prereq:'-', ar:'مختبر اللغة الإنجليزية المتقدمة'},
-    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'-', ar:'أساسيات مناهج البحث'},
+    'research-methods': {num:'040521301', name:'Fundamentals of Research Methods', th:'2', pr:'-', cr:'2', prereq:'Advanced English (010610035)', ar:'أساسيات مناهج البحث'},
     'math-it': {num:'100412040', name:'Mathematics for Information Technology', th:'3', pr:'-', cr:'3', prereq:'Calculus II (100411020)', ar:'الرياضيات لتكنولوجيا المعلومات'},
     'progfund2-lab': {num:'110412120', name:'Programming Fundamentals II Lab', th:'-', pr:'2', cr:'1', prereq:'Programming Fundamentals II (240112003)', ar:'مختبر أساسيات البرمجة (2)'},
     'progfund2': {num:'240112003', name:'Programming Fundamentals II', th:'3', pr:'-', cr:'3', prereq:'Programming Fundamentals (C++) (240111011)', ar:'أساسيات البرمجة (2)'},

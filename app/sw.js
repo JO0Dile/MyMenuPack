@@ -24,14 +24,29 @@ self.addEventListener('activate', function (e) {
   );
 });
 
+// Stale-while-revalidate hides updates by design (you always get the fast
+// cached copy first) — which is exactly what confused a real user testing
+// this: a merged, deployed change silently didn't show up until a second
+// reload, with nothing telling them a reload would even help. For the app
+// shell specifically (plan.html), diff the freshly-fetched body against
+// what was already cached and tell every open tab if they differ, so the
+// page can offer a one-tap refresh instead of a "why isn't this here" reload
+// loop the size of everything else this file was already fetching anyway.
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
+  var isAppShell = e.request.mode === 'navigate' || /\/plan\.html(\?|$)/.test(e.request.url);
   e.respondWith(
     caches.match(e.request).then(function (cached) {
       var fetched = fetch(e.request).then(function (resp) {
         if (resp && resp.ok) {
-          var copy = resp.clone();
-          caches.open(CACHE).then(function (c) { c.put(e.request, copy); });
+          var copyForCache = resp.clone();
+          var copyForDiff = isAppShell ? resp.clone() : null;
+          caches.open(CACHE).then(function (c) { c.put(e.request, copyForCache); });
+          if (isAppShell && cached) {
+            Promise.all([cached.clone().text(), copyForDiff.text()]).then(function (texts) {
+              if (texts[0] !== texts[1]) { notifyUpdate(); }
+            }).catch(function () {});
+          }
         }
         return resp;
       }).catch(function () { return cached; });
@@ -39,3 +54,9 @@ self.addEventListener('fetch', function (e) {
     })
   );
 });
+
+function notifyUpdate() {
+  self.clients.matchAll({ type: 'window' }).then(function (clients) {
+    clients.forEach(function (c) { c.postMessage({ type: 'AAUP_UPDATE_AVAILABLE' }); });
+  });
+}
