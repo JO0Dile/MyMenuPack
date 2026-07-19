@@ -82,6 +82,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Study Plans — By Students, For Students</title>
 <script>
 // ============================================================================
@@ -1492,7 +1493,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     background:rgba(5,8,20,.65);
     display:none;
     align-items:center; justify-content:center;
-    z-index:100;
+    /* Must clear .app-sidebar's z-index:900 — that sidebar is fixed and
+       opaque, so a lower-stacked modal renders with its left portion
+       physically covered by it (looks like the dialog is cut off/missing
+       its left edge whenever the sidebar is showing, i.e. whenever a plan
+       is open). */
+    z-index:1000;
     padding:20px;
   }
 
@@ -1543,7 +1549,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     border:1px solid var(--accent);
     border-radius:12px;
     box-shadow:0 20px 55px rgba(0,0,0,.55);
-    z-index:200;
+    z-index:1000; /* same app-sidebar-clearance reason as .modal-overlay above */
     overflow:hidden;
     animation:popupIn .18s ease-out;
   }
