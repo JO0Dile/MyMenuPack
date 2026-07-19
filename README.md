@@ -5,7 +5,7 @@
 **By students, for students — plan your degree, track your progress.**
 **من الطلاب، إلى الطلاب — خطّط لدرجتك وتابع تقدّمك.**
 
-An unofficial, offline-first study-planning app for university students.
+An unofficial study-planning app for university students.
 Pick your university → college → study plan, then track every course,
 prerequisite, and your GPA — in English or Arabic, on any phone.
 
@@ -28,8 +28,9 @@ prerequisite, and your GPA — in English or Arabic, on any phone.
   what it unlocks; press and hold a course to trace its chain.
 - **Bilingual** — the whole study plan flips between English and Arabic
   (with full right-to-left layout).
-- **Works offline** — install it once and it opens instantly with no
-  internet, like a real app.
+- **Installs like an app, stays up to date** — add it to your home screen;
+  your own progress is saved on your device, and new or updated study plans
+  are pulled in automatically when you're online.
 - **Achievements, a printable advising sheet, difficulty ratings,
   interactive tutorials**, and more.
 
@@ -88,8 +89,7 @@ You don't need an app store. Open the app in your browser, then:
 
 1. Open the browser menu and choose **Install and create shortcut**.
 2. Tap **Install**.
-3. It now lives on your home screen and opens like a normal app — even
-   offline.
+3. It now lives on your home screen and opens like a normal app.
 
 <img src="docs/screenshots/install-1-menu.png" width="220" alt="Browser menu → Install">
 <img src="docs/screenshots/install-2-sheet.png" width="220" alt="Install prompt">
@@ -99,10 +99,16 @@ You don't need an app store. Open the app in your browser, then:
 
 ## 🔒 Your data stays yours
 
-Everything — your progress, GPA, custom plans, notes — is saved **only in
-your own browser** (`localStorage`). Nothing is uploaded, no account is
-needed, and the app never transmits your data anywhere. Use **Export
-Progress** in Settings to back it up or move it to another device.
+Everything personal — your progress, GPA, grades, notes — is saved **only
+in your own browser** (`localStorage`). No account, and none of it is ever
+uploaded. Use **Export Progress** in Settings to back it up or move it to
+another device.
+
+The app **does** fetch new and updated study plans from this repo when
+you're online — an anonymous download of a plain file (`app/plans/index.json`),
+with nothing about you sent. And if you choose to share a plan you built,
+via **📨 Contribute**, only the *plan itself* is shared — its courses,
+years, and prerequisites — **never your name, student ID, GPA, or grades**.
 
 ---
 
@@ -110,10 +116,15 @@ Progress** in Settings to back it up or move it to another device.
 
 - A single self-contained HTML file (`app/plan.html`) — no build step, no
   framework, no dependencies.
-- A Progressive Web App: a service worker (`app/sw.js`) caches it for
-  offline use and quietly picks up updates when online.
+- A Progressive Web App: a service worker (`app/sw.js`) caches the app for
+  fast loading and pulls in new/updated study plans from the plans feed
+  (`app/plans/index.json`) when you're online.
 - Hosted free on GitHub Pages; deployed automatically from the `app/`
   folder on every push.
+- Study plans live in a single file, `app/plans/index.json`, that every app
+  copy checks for updates — no server, no database software. Adding or
+  updating a plan is a plain-language, step-by-step process:
+  see **[MAINTAINING.md](MAINTAINING.md)**.
 
 ---
 
