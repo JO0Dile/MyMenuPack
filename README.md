@@ -121,6 +121,10 @@ years, and prerequisites — **never your name, student ID, GPA, or grades**.
   (`app/plans/index.json`) when you're online.
 - Hosted free on GitHub Pages; deployed automatically from the `app/`
   folder on every push.
+- Study plans live in a single file, `app/plans/index.json`, that every app
+  copy checks for updates — no server, no database software. Adding or
+  updating a plan is a plain-language, step-by-step process:
+  see **[MAINTAINING.md](MAINTAINING.md)**.
 
 ---
 

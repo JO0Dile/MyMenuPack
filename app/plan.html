@@ -154,7 +154,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.0';
+window.APP_VERSION = '3.01';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -4076,6 +4076,16 @@ window.__unescapeHtml = function(s){
 window.__cleanText = function(s){
   return window.__escapeHtml(window.__unescapeHtml(s));
 };
+// The app's three semester slots are s1, s2, and s3 (summer). "summer" is
+// accepted everywhere as a friendly alias for s3, so a hand-written plan or
+// a feed submission can spell it the obvious way and still land in the
+// summer semester instead of silently not rendering. Defined top-level (not
+// inside a sanitizer) so both the import and online-sync paths can rely on
+// it regardless of which runs first on a given load.
+window.__normalizeSemester = function(s){
+  if(s === 'summer' || s === 's3') return 's3';
+  return (s === 's2') ? 's2' : 's1';
+};
 // The same escape-and-reslugify treatment AAUP_SYNC applies to plans that
 // arrive over the network, for plans that arrive any OTHER way: pasted
 // into the Developer Panel, restored from a "progress backup" file, or
@@ -4099,6 +4109,7 @@ window.__sanitizeImportedPlan = function(p){
     var out = str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     return out || fallback || ('x-' + Math.random().toString(36).slice(2, 8));
   }
+  var normalizeSemester = window.__normalizeSemester;
   function cleanName(n){
     if(n == null) return n;
     if(typeof n === 'object') return { big: clean(n.big || ''), small: clean(n.small || '') };
@@ -4126,7 +4137,10 @@ window.__sanitizeImportedPlan = function(p){
         ar: clean(c.ar || ''),
         creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
         category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
-        semester: ['s1','s2','s3','summer'].indexOf(c.semester) !== -1 ? c.semester : 's1'
+        // The renderer's summer slot is 's3'; a plan (or feed submission) may
+        // spell it the friendlier "summer" — normalize so it lands in the
+        // summer semester instead of silently not rendering.
+        semester: normalizeSemester(c.semester)
       };
       if(c.yearId != null){ out.yearId = safeId(c.yearId, 'y1'); }
       if(c.courseNumber != null){ out.courseNumber = clean(c.courseNumber).slice(0, 30); }
@@ -10820,7 +10834,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
         category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
         yearId: yearIds.indexOf(safeId(c.yearId)) !== -1 ? safeId(c.yearId) : yearIds[0],
-        semester: ['s1','s2','summer'].indexOf(c.semester) !== -1 ? c.semester : 's1'
+        // "summer" is a friendly alias for the renderer's s3 summer slot —
+        // normalize so a feed plan's summer courses actually render.
+        semester: window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1')
       };
     }) : [];
     var prerequisites = Array.isArray(fp.prerequisites) ? fp.prerequisites.slice(0, 800).map(function(pair){

@@ -1,4 +1,46 @@
 {
   "updatedAt": "2026-07-19T00:00:00Z",
-  "plans": []
+  "plans": [
+    {
+      "id": "example-demo-plan",
+      "version": 1,
+      "majorName": {
+        "en": { "big": "Example Program", "small": "demo — safe to delete" },
+        "ar": { "big": "برنامج تجريبي", "small": "نموذج — يمكن حذفه" }
+      },
+      "icon": "🧪",
+      "university": "aaup",
+      "college": { "en": "Example Faculty", "ar": "كلية تجريبية" },
+      "bio": {
+        "en": "A sample plan that shows exactly what a feed entry looks like. Delete this whole object once you've seen it appear in the app, then add real student submissions the same way.",
+        "ar": "خطة نموذجية توضّح شكل المدخل في القائمة. احذف هذا الكائن بالكامل بعد أن تراه يظهر في التطبيق، ثم أضف خطط الطلاب الحقيقية بنفس الطريقة."
+      },
+      "structure": {
+        "years": [
+          { "id": "y1", "hasSummer": true },
+          { "id": "y2", "hasSummer": false }
+        ]
+      },
+      "courses": [
+        { "id": "intro-example",       "name": "Introduction to the Example",   "ar": "مقدمة في المثال",          "creditHours": 3, "category": "core",   "yearId": "y1", "semester": "s1" },
+        { "id": "calc-1",              "name": "Calculus I",                    "ar": "التفاضل والتكامل 1",      "creditHours": 3, "category": "math",   "yearId": "y1", "semester": "s1" },
+        { "id": "arabic-language",     "name": "Arabic Language",               "ar": "اللغة العربية",           "creditHours": 2, "category": "skills", "yearId": "y1", "semester": "s1" },
+        { "id": "uni-elective-1",      "name": "University Elective (1)",       "ar": "متطلب جامعي اختياري (1)", "creditHours": 3, "category": "uni",    "yearId": "y1", "semester": "s1" },
+
+        { "id": "example-fundamentals","name": "Example Fundamentals",          "ar": "أساسيات المثال",          "creditHours": 3, "category": "core",   "yearId": "y1", "semester": "s2" },
+        { "id": "calc-2",              "name": "Calculus II",                   "ar": "التفاضل والتكامل 2",      "creditHours": 3, "category": "math",   "yearId": "y1", "semester": "s2" },
+        { "id": "english-1",           "name": "English Language",              "ar": "اللغة الإنجليزية",        "creditHours": 3, "category": "eng",    "yearId": "y1", "semester": "s2" },
+
+        { "id": "free-elective-1",     "name": "Free Elective (1)",             "ar": "متطلب حر اختياري (1)",    "creditHours": 3, "category": "free",   "yearId": "y1", "semester": "summer" },
+
+        { "id": "advanced-example",    "name": "Advanced Example",              "ar": "المثال المتقدّم",         "creditHours": 3, "category": "core",   "yearId": "y2", "semester": "s1" },
+        { "id": "statistics",          "name": "Statistics",                    "ar": "الإحصاء",                 "creditHours": 3, "category": "math",   "yearId": "y2", "semester": "s1" }
+      ],
+      "prerequisites": [
+        ["intro-example", "example-fundamentals"],
+        ["calc-1", "calc-2"],
+        ["example-fundamentals", "advanced-example"]
+      ]
+    }
+  ]
 }
