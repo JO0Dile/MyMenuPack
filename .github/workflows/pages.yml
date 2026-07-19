@@ -1,0 +1,50 @@
+name: Deploy Study Plans app to GitHub Pages
+
+# Publishes the app/ folder (plan.html, manifest.json, sw.js, plans/, icons/)
+# as a static site. That live HTTPS URL is what makes "online" features
+# actually work: the plans/index.json feed the app checks for updates,
+# and the Trusted Web Activity wrapper Google Play packaging needs
+# (see app/PUBLISHING.md).
+#
+# One-time manual step this workflow can't do for you: in this repo's
+# Settings -> Pages, set "Source" to "GitHub Actions". Until that's set,
+# this workflow will run successfully but nothing will actually go live.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload app/ as the Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: app
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
