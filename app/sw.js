@@ -37,7 +37,14 @@ self.addEventListener('fetch', function (e) {
   var isAppShell = e.request.mode === 'navigate' || /\/plan\.html(\?|$)/.test(e.request.url);
   e.respondWith(
     caches.match(e.request).then(function (cached) {
-      var fetched = fetch(e.request).then(function (resp) {
+      // cache: 'no-store' on the background-refresh fetch specifically —
+      // this call's entire purpose is "what does the server actually have
+      // right now," so it must never be satisfied by the browser's own
+      // regular HTTP cache. Without this, a same-origin response cached at
+      // that layer (independent of the Cache Storage this file manages
+      // above) could make even this diff-and-notify check itself compare
+      // against a stale copy and silently never detect a real update.
+      var fetched = fetch(e.request, { cache: 'no-store' }).then(function (resp) {
         if (resp && resp.ok) {
           var copyForCache = resp.clone();
           var copyForDiff = isAppShell ? resp.clone() : null;
