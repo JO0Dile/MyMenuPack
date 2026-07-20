@@ -146,12 +146,44 @@ manual Contribute flow — nothing else depends on it.
 
 ---
 
-## Alternative host
+## Alternative host — Google Apps Script (ready for later)
 
-If you'd rather not use Cloudflare, the app just POSTs JSON `{ id, plan,
-appVersion, submittedAt }` with an optional `X-Collect-Secret` header to
-whatever URL you set. Any endpoint that can receive that and commit to GitHub
-works — e.g. a Google Apps Script web app (uses your Google account, stores
-the token in Script Properties) or a Vercel/Netlify function. The Cloudflare
-Worker is just the most robust free option. Ask me and I'll write the version
-for whichever host you pick.
+If you'd rather stay inside Google than sign up for Cloudflare, there's a
+ready-to-deploy version in
+[`collector/google-apps-script.gs`](collector/google-apps-script.gs). It does
+the same job — commits each plan to `app/plans/collected/<id>.json` — using
+your Google account, with the GitHub token stored privately in Script
+Properties. **It's optional and sits dormant until you deploy it and flip one
+setting; the Cloudflare Worker above is the tested default.**
+
+To use it later:
+
+1. **script.google.com → New project**, paste in the whole
+   `google-apps-script.gs` file.
+2. **Project Settings → Script Properties**, add the same five values as the
+   Worker: `GITHUB_TOKEN`, `REPO_OWNER`, `REPO_NAME`, `REPO_BRANCH`,
+   `COLLECT_SECRET`.
+3. **Deploy → New deployment → Web app**, "Execute as: Me", "Who has access:
+   Anyone". Copy the `/exec` URL.
+4. In `plan.html` set **both**:
+   ```js
+   window.APP_COLLECT_URL = 'https://script.google.com/macros/s/.../exec';
+   window.APP_COLLECT_MODE = 'appsscript';   // <- the one extra flip vs Cloudflare
+   window.APP_COLLECT_SECRET = 'myplans2026'; // match COLLECT_SECRET
+   ```
+
+**One honest caveat.** A Google Apps Script web app can't return the CORS
+headers a browser needs to *read* the reply, so in `appsscript` mode the app
+sends a simple text POST and can't confirm the response came back OK. Delivery
+is best-effort — but the collector overwrites each plan by its id, so a rare
+unconfirmed retry just re-saves the same plan, never a duplicate. For a "gather
+community plans" job that's completely fine. (The Cloudflare Worker *can* do
+full CORS, which is why it's the default and confirms every send.)
+
+### Any other host
+
+The app just POSTs the payload `{ id, plan, appVersion, submittedAt }` (plus
+`secret` in the body in `appsscript` mode, or an `X-Collect-Secret` header in
+`cloudflare` mode). Any endpoint that receives that and commits to GitHub works
+— a Vercel/Netlify function, your own server, etc. Ask me and I'll write the
+version for whichever host you pick.
