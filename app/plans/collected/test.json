@@ -43,9 +43,27 @@
         "category": "math",
         "semester": "s1",
         "yearId": "y1"
+      },
+      {
+        "id": "sun",
+        "name": "Testsum",
+        "ar": "اختبار صيف",
+        "creditHours": 3,
+        "category": "core",
+        "yearId": "y1",
+        "semester": "s3"
       }
     ],
-    "prerequisites": [],
+    "prerequisites": [
+      [
+        "12345678910",
+        "sun"
+      ],
+      [
+        "calc-1",
+        "sun"
+      ]
+    ],
     "university": "birzeit",
     "college": {
       "en": "Collage test",
@@ -53,6 +71,6 @@
     }
   },
   "appVersion": "3.11",
-  "submittedAt": "2026-07-20T11:42:31.883Z",
-  "collectedAt": "2026-07-20T11:42:32.145Z"
+  "submittedAt": "2026-07-20T11:43:12.182Z",
+  "collectedAt": "2026-07-20T11:43:12.392Z"
 }
