@@ -4306,6 +4306,929 @@
           "240514980"
         ]
       ]
+    },
+    {
+      "id": "aaup-nursing",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Nursing",
+          "small": "B.Sc. · Program 17011 · 146 CH"
+        },
+        "ar": {
+          "big": "التمريض",
+          "small": "بكالوريوس · برنامج 17011 · 146 ساعة"
+        }
+      },
+      "icon": "🩺",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Nursing",
+        "ar": "كلية التمريض"
+      },
+      "bio": {
+        "en": "B.Sc. in Nursing (Program 17011 · Jenin & Ramallah). Patient- and family-centered care across diverse healthcare settings, with simulation, VR, and an AHA-accredited resuscitation center. 146 credit hours over 4 years (summers in years 1-3), following the official advisory plan. The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في التمريض (برنامج 17011 · حرم جنين ورام الله). رعاية متمحورة حول المريض والأسرة في مختلف بيئات الرعاية الصحية، مع مختبرات محاكاة وواقع افتراضي ومركز إنعاش معتمد. 146 ساعة معتمدة على 4 سنوات (بفصول صيفية في السنوات 1-3) وفق الخطة الإرشادية الرسمية. تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": true
+          },
+          {
+            "id": "y2",
+            "hasSummer": true
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "010610071",
+          "name": "English for Nursing I",
+          "ar": "اللغة الإنجليزية للتمريض 1",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610071"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511260",
+          "name": "Introduction to Psychology",
+          "ar": "مقدمة في علم النفس",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040511260"
+        },
+        {
+          "id": "040511270",
+          "name": "Introduction to Sociology",
+          "ar": "مقدمة في علم الاجتماع",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040511270"
+        },
+        {
+          "id": "060511040",
+          "name": "Epidemiology and Public Health",
+          "ar": "علم الأوبئة والصحة العامة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "060511040"
+        },
+        {
+          "id": "100211630",
+          "name": "Biology for Nursing",
+          "ar": "الأحياء للتمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100211630"
+        },
+        {
+          "id": "100311630",
+          "name": "Chemistry for Nursing",
+          "ar": "الكيمياء للتمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100311630"
+        },
+        {
+          "id": "170111200",
+          "name": "Nursing Theories and Clinical Application",
+          "ar": "نظريات التمريض والتطبيق السريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "170111200"
+        },
+        {
+          "id": "010610072",
+          "name": "English for Nursing II",
+          "ar": "اللغة الإنجليزية للتمريض 2",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610072"
+        },
+        {
+          "id": "170111220",
+          "name": "Nutrition Across the Human Life Span",
+          "ar": "التغذية عبر مراحل حياة الإنسان",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111220"
+        },
+        {
+          "id": "170111290",
+          "name": "First Aid and Basic Life Support",
+          "ar": "الإسعافات الأولية ودعم الحياة الأساسي",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111290"
+        },
+        {
+          "id": "170111510",
+          "name": "Fundamentals and Health Assessment Nursing Theory",
+          "ar": "أساسيات وتقييم الصحة التمريضي - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111510"
+        },
+        {
+          "id": "170111520",
+          "name": "Fundamentals and Health Assessment Nursing Applications",
+          "ar": "أساسيات وتقييم الصحة التمريضي - تطبيقات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111520"
+        },
+        {
+          "id": "170111530",
+          "name": "Fundamentals and Health Assessment Nursing Clinical",
+          "ar": "أساسيات وتقييم الصحة التمريضي - سريري",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111530"
+        },
+        {
+          "id": "170111540",
+          "name": "Human Anatomy and Physiology I",
+          "ar": "تشريح وفسيولوجيا الإنسان 1",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111540"
+        },
+        {
+          "id": "170111550",
+          "name": "Quality, Safety, and Ethics in Nursing",
+          "ar": "الجودة والسلامة والأخلاقيات في التمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111550"
+        },
+        {
+          "id": "010610073",
+          "name": "English for Nursing III",
+          "ar": "اللغة الإنجليزية للتمريض 3",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "010610073"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "100211240",
+          "name": "Biochemistry for Nursing",
+          "ar": "الكيمياء الحيوية للتمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "100211240"
+        },
+        {
+          "id": "170112150",
+          "name": "Human Anatomy & Physiology II",
+          "ar": "تشريح وفسيولوجيا الإنسان 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "170112150"
+        },
+        {
+          "id": "170112190",
+          "name": "Adult Medical Surgical Nursing I Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 1 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112190"
+        },
+        {
+          "id": "170112200",
+          "name": "Adult Medical Surgical Nursing II Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 2 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112200"
+        },
+        {
+          "id": "170112240",
+          "name": "Pharmacology for Nursing I",
+          "ar": "علم الأدوية للتمريض 1",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112240"
+        },
+        {
+          "id": "170112270",
+          "name": "Adult Medical Surgical Nursing III Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 3 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112270"
+        },
+        {
+          "id": "170112280",
+          "name": "Adult Medical Surgical Nursing Clinical I",
+          "ar": "تمريض البالغين الطبي الجراحي - سريري 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112280"
+        },
+        {
+          "id": "170112290",
+          "name": "Adult Medical Surgical Nursing Simulation",
+          "ar": "تمريض البالغين الطبي الجراحي - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112290"
+        },
+        {
+          "id": "170112180",
+          "name": "Therapeutic Communication and Patient / Nurse Centered Care",
+          "ar": "التواصل العلاجي والرعاية المتمحورة حول المريض والممرض",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112180"
+        },
+        {
+          "id": "170112310",
+          "name": "Adult Medical Surgical Nursing IV Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 4 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112310"
+        },
+        {
+          "id": "170112320",
+          "name": "Adult Medical Surgical Nursing V Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 5 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112320"
+        },
+        {
+          "id": "170112330",
+          "name": "Adult Medical Surgical Nursing Clinical II",
+          "ar": "تمريض البالغين الطبي الجراحي - سريري 2",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112330"
+        },
+        {
+          "id": "170113130",
+          "name": "Pharmacology for Nursing II",
+          "ar": "علم الأدوية للتمريض 2",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170113130"
+        },
+        {
+          "id": "170112170",
+          "name": "Developmental Psychology",
+          "ar": "علم النفس التطوري",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y2",
+          "semester": "summer",
+          "courseNumber": "170112170"
+        },
+        {
+          "id": "170112340",
+          "name": "Pathology",
+          "ar": "علم الأمراض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "summer",
+          "courseNumber": "170112340"
+        },
+        {
+          "id": "170113190",
+          "name": "Maternity Health Nursing I Theory",
+          "ar": "تمريض صحة الأمومة 1 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113190"
+        },
+        {
+          "id": "170113200",
+          "name": "Maternity Health Nursing II Theory",
+          "ar": "تمريض صحة الأمومة 2 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113200"
+        },
+        {
+          "id": "170113270",
+          "name": "Maternity Health Nursing Clinical",
+          "ar": "تمريض صحة الأمومة - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113270"
+        },
+        {
+          "id": "170113280",
+          "name": "Maternity Health Nursing Simulation",
+          "ar": "تمريض صحة الأمومة - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113280"
+        },
+        {
+          "id": "170113370",
+          "name": "Community and Family Health Nursing Theory",
+          "ar": "تمريض صحة المجتمع والأسرة - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113370"
+        },
+        {
+          "id": "170113380",
+          "name": "Community and Family Health Nursing Clinical",
+          "ar": "تمريض صحة المجتمع والأسرة - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113380"
+        },
+        {
+          "id": "170113390",
+          "name": "Nursing Management and Digital Leadership",
+          "ar": "الإدارة التمريضية والقيادة الرقمية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113390"
+        },
+        {
+          "id": "170113290",
+          "name": "Pediatric Health Nursing I Theory",
+          "ar": "تمريض صحة الأطفال 1 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113290"
+        },
+        {
+          "id": "170113300",
+          "name": "Pediatric Health Nursing II Theory",
+          "ar": "تمريض صحة الأطفال 2 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113300"
+        },
+        {
+          "id": "170113320",
+          "name": "Pediatric Health Nursing Clinical",
+          "ar": "تمريض صحة الأطفال - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113320"
+        },
+        {
+          "id": "170113340",
+          "name": "Pediatric Health Nursing Simulation",
+          "ar": "تمريض صحة الأطفال - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113340"
+        },
+        {
+          "id": "170113350",
+          "name": "Psychiatric and Mental Health Nursing Theory",
+          "ar": "تمريض الصحة النفسية والعقلية - نظري",
+          "creditHours": 5,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113350"
+        },
+        {
+          "id": "170113360",
+          "name": "Psychiatric Clinical Nursing",
+          "ar": "تمريض الصحة النفسية - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113360"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "170113400",
+          "name": "Microbiology and Immunology for Nursing",
+          "ar": "الأحياء الدقيقة والمناعة للتمريض",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "170113400"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "100414890",
+          "name": "Biostatistics for Nursing",
+          "ar": "الإحصاء الحيوي للتمريض",
+          "creditHours": 2,
+          "category": "math",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "100414890"
+        },
+        {
+          "id": "170114170",
+          "name": "Health Promotion and Disease Prevention Theory",
+          "ar": "تعزيز الصحة والوقاية من الأمراض - نظري",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114170"
+        },
+        {
+          "id": "170114180",
+          "name": "Health Promotion and Disease Prevention Clinical",
+          "ar": "تعزيز الصحة والوقاية من الأمراض - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114180"
+        },
+        {
+          "id": "170114190",
+          "name": "Clinical Pharmacology for Nursing",
+          "ar": "علم الأدوية السريري للتمريض",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114190"
+        },
+        {
+          "id": "170114260",
+          "name": "Advanced Cardiac Life Support (ACLS)",
+          "ar": "دعم الحياة القلبي المتقدم",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114260"
+        },
+        {
+          "id": "170114330",
+          "name": "Critical, Emergency, and Trauma Nursing Theory",
+          "ar": "التمريض الحرج والطارئ والرضحي - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114330"
+        },
+        {
+          "id": "170114340",
+          "name": "Critical, Emergency, and Trauma Nursing Clinical",
+          "ar": "التمريض الحرج والطارئ والرضحي - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114340"
+        },
+        {
+          "id": "170114350",
+          "name": "Critical, Emergency, and Trauma Nursing Simulation",
+          "ar": "التمريض الحرج والطارئ والرضحي - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114350"
+        },
+        {
+          "id": "170114200",
+          "name": "Genetic and Genomic Nursing",
+          "ar": "التمريض الوراثي والجينومي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114200"
+        },
+        {
+          "id": "170114250",
+          "name": "Comprehensive Exam",
+          "ar": "الامتحان الشامل",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114250"
+        },
+        {
+          "id": "170114280",
+          "name": "Nursing Seminar and Evidence Based Practice (EBP)",
+          "ar": "حلقة نقاش تمريضية والممارسة المبنية على الأدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114280"
+        },
+        {
+          "id": "170114290",
+          "name": "Advanced Clinical Practice",
+          "ar": "الممارسة السريرية المتقدمة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114290"
+        },
+        {
+          "id": "170114360",
+          "name": "Integrative and Clinical Decision Making in Nursing",
+          "ar": "التكامل واتخاذ القرار السريري في التمريض",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114360"
+        },
+        {
+          "id": "170114370",
+          "name": "Geriatric Health Nursing",
+          "ar": "تمريض صحة المسنين",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114370"
+        },
+        {
+          "id": "170114380",
+          "name": "Rehabilitation in Nursing",
+          "ar": "إعادة التأهيل في التمريض",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114380"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100311630",
+          "100211240"
+        ],
+        [
+          "170111510",
+          "170111290"
+        ],
+        [
+          "170111200",
+          "170111510"
+        ],
+        [
+          "170111530",
+          "170111510"
+        ],
+        [
+          "170111200",
+          "170111520"
+        ],
+        [
+          "170111530",
+          "170111520"
+        ],
+        [
+          "170111200",
+          "170111530"
+        ],
+        [
+          "170111510",
+          "170111540"
+        ],
+        [
+          "170111540",
+          "170112150"
+        ],
+        [
+          "170112150",
+          "170112190"
+        ],
+        [
+          "170112150",
+          "170112200"
+        ],
+        [
+          "170111540",
+          "170112240"
+        ],
+        [
+          "170112150",
+          "170112270"
+        ],
+        [
+          "170112190",
+          "170112280"
+        ],
+        [
+          "170112190",
+          "170112290"
+        ],
+        [
+          "170113130",
+          "170112310"
+        ],
+        [
+          "170113130",
+          "170112320"
+        ],
+        [
+          "170112270",
+          "170112330"
+        ],
+        [
+          "170111540",
+          "170112340"
+        ],
+        [
+          "170112150",
+          "170112340"
+        ],
+        [
+          "100311630",
+          "170113130"
+        ],
+        [
+          "170112240",
+          "170113130"
+        ],
+        [
+          "170112170",
+          "170113190"
+        ],
+        [
+          "170112170",
+          "170113200"
+        ],
+        [
+          "170113190",
+          "170113270"
+        ],
+        [
+          "170113190",
+          "170113280"
+        ],
+        [
+          "170112170",
+          "170113290"
+        ],
+        [
+          "170112170",
+          "170113300"
+        ],
+        [
+          "170113290",
+          "170113320"
+        ],
+        [
+          "170113290",
+          "170113340"
+        ],
+        [
+          "040511260",
+          "170113350"
+        ],
+        [
+          "170113350",
+          "170113360"
+        ],
+        [
+          "170112320",
+          "170113370"
+        ],
+        [
+          "170113370",
+          "170113380"
+        ],
+        [
+          "170112320",
+          "170113390"
+        ],
+        [
+          "100211630",
+          "170113400"
+        ],
+        [
+          "170113370",
+          "170114170"
+        ],
+        [
+          "170114170",
+          "170114180"
+        ],
+        [
+          "170112240",
+          "170114190"
+        ],
+        [
+          "170113130",
+          "170114190"
+        ],
+        [
+          "170112320",
+          "170114200"
+        ],
+        [
+          "170112190",
+          "170114250"
+        ],
+        [
+          "040521301",
+          "170114280"
+        ],
+        [
+          "100414890",
+          "170114280"
+        ],
+        [
+          "170111530",
+          "170114290"
+        ],
+        [
+          "170114330",
+          "170114340"
+        ],
+        [
+          "170114330",
+          "170114350"
+        ],
+        [
+          "170112320",
+          "170114360"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-respiratory",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Respiratory Therapy",
+          "small": "🚧 Study plan coming soon"
+        },
+        "ar": {
+          "big": "العلاج التنفسي",
+          "small": "🚧 الخطة الدراسية قريبًا"
+        }
+      },
+      "icon": "🫁",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Nursing",
+        "ar": "كلية التمريض"
+      },
+      "bio": {
+        "en": "B.Sc. in Respiratory Therapy (Jenin & Ramallah) — proposed to be the first respiratory therapy program in Palestine. Prepares practitioners to provide diagnostic, therapy, and rehabilitation services for clients with cardio-pulmonary disorders. 🚧 The study plan is not available yet — coming soon.",
+        "ar": "بكالوريوس في العلاج التنفسي (حرم جنين ورام الله) — يُقترح أن يكون أول برنامج علاج تنفسي في فلسطين. يُعِدّ ممارسين لتقديم خدمات التشخيص والعلاج وإعادة التأهيل لمرضى اضطرابات القلب والرئة. 🚧 الخطة الدراسية غير متوفرة بعد — قريبًا."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
     }
   ]
 }
