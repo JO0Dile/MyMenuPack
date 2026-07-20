@@ -1,0 +1,58 @@
+{
+  "id": "test",
+  "plan": {
+    "id": "test",
+    "majorName": {
+      "en": {
+        "big": "Test",
+        "small": "Test"
+      },
+      "ar": {
+        "big": "اختبار",
+        "small": "اختبار"
+      }
+    },
+    "icon": "🤖",
+    "bio": {
+      "en": "Test",
+      "ar": "اختبار"
+    },
+    "structure": {
+      "years": [
+        {
+          "id": "y1",
+          "hasSummer": false
+        }
+      ]
+    },
+    "courses": [
+      {
+        "id": "12345678910",
+        "name": "Testcourse",
+        "ar": "اختبار",
+        "creditHours": 3,
+        "category": "core",
+        "semester": "s1",
+        "yearId": "y1"
+      },
+      {
+        "id": "calc-1",
+        "name": "Calculus I",
+        "ar": "التفاضل والتكامل (1)",
+        "creditHours": 3,
+        "category": "math",
+        "semester": "s1",
+        "yearId": "y1"
+      }
+    ],
+    "prerequisites": [],
+    "university": "birzeit",
+    "college": {
+      "en": "Collage test",
+      "ar": "كلية اختبار"
+    }
+  },
+  "appVersion": "3.11",
+  "submittedAt": "2026-07-20T11:40:03.471Z",
+  "collectedAt": "2026-07-20T11:40:03.738Z"
+}
