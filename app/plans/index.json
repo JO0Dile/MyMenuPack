@@ -1,45 +1,811 @@
 {
-  "updatedAt": "2026-07-19T00:00:00Z",
+  "updatedAt": "2026-07-20T00:00:00Z",
   "plans": [
     {
       "id": "example-demo-plan",
       "version": 1,
       "majorName": {
-        "en": { "big": "Example Program", "small": "demo — safe to delete" },
-        "ar": { "big": "برنامج تجريبي", "small": "نموذج — يمكن حذفه" }
+        "en": {
+          "big": "Example Program",
+          "small": "demo — safe to delete"
+        },
+        "ar": {
+          "big": "برنامج تجريبي",
+          "small": "نموذج — يمكن حذفه"
+        }
       },
       "icon": "🧪",
       "university": "aaup",
-      "college": { "en": "Example Faculty", "ar": "كلية تجريبية" },
+      "college": {
+        "en": "Example Faculty",
+        "ar": "كلية تجريبية"
+      },
       "bio": {
         "en": "A sample plan that shows exactly what a feed entry looks like. Delete this whole object once you've seen it appear in the app, then add real student submissions the same way.",
         "ar": "خطة نموذجية توضّح شكل المدخل في القائمة. احذف هذا الكائن بالكامل بعد أن تراه يظهر في التطبيق، ثم أضف خطط الطلاب الحقيقية بنفس الطريقة."
       },
       "structure": {
         "years": [
-          { "id": "y1", "hasSummer": true },
-          { "id": "y2", "hasSummer": false }
+          {
+            "id": "y1",
+            "hasSummer": true
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          }
         ]
       },
       "courses": [
-        { "id": "intro-example",       "name": "Introduction to the Example",   "ar": "مقدمة في المثال",          "creditHours": 3, "category": "core",   "yearId": "y1", "semester": "s1" },
-        { "id": "calc-1",              "name": "Calculus I",                    "ar": "التفاضل والتكامل 1",      "creditHours": 3, "category": "math",   "yearId": "y1", "semester": "s1" },
-        { "id": "arabic-language",     "name": "Arabic Language",               "ar": "اللغة العربية",           "creditHours": 2, "category": "skills", "yearId": "y1", "semester": "s1" },
-        { "id": "uni-elective-1",      "name": "University Elective (1)",       "ar": "متطلب جامعي اختياري (1)", "creditHours": 3, "category": "uni",    "yearId": "y1", "semester": "s1" },
-
-        { "id": "example-fundamentals","name": "Example Fundamentals",          "ar": "أساسيات المثال",          "creditHours": 3, "category": "core",   "yearId": "y1", "semester": "s2" },
-        { "id": "calc-2",              "name": "Calculus II",                   "ar": "التفاضل والتكامل 2",      "creditHours": 3, "category": "math",   "yearId": "y1", "semester": "s2" },
-        { "id": "english-1",           "name": "English Language",              "ar": "اللغة الإنجليزية",        "creditHours": 3, "category": "eng",    "yearId": "y1", "semester": "s2" },
-
-        { "id": "free-elective-1",     "name": "Free Elective (1)",             "ar": "متطلب حر اختياري (1)",    "creditHours": 3, "category": "free",   "yearId": "y1", "semester": "summer" },
-
-        { "id": "advanced-example",    "name": "Advanced Example",              "ar": "المثال المتقدّم",         "creditHours": 3, "category": "core",   "yearId": "y2", "semester": "s1" },
-        { "id": "statistics",          "name": "Statistics",                    "ar": "الإحصاء",                 "creditHours": 3, "category": "math",   "yearId": "y2", "semester": "s1" }
+        {
+          "id": "intro-example",
+          "name": "Introduction to the Example",
+          "ar": "مقدمة في المثال",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1"
+        },
+        {
+          "id": "calc-1",
+          "name": "Calculus I",
+          "ar": "التفاضل والتكامل 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1"
+        },
+        {
+          "id": "arabic-language",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective (1)",
+          "ar": "متطلب جامعي اختياري (1)",
+          "creditHours": 3,
+          "category": "uni",
+          "yearId": "y1",
+          "semester": "s1"
+        },
+        {
+          "id": "example-fundamentals",
+          "name": "Example Fundamentals",
+          "ar": "أساسيات المثال",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2"
+        },
+        {
+          "id": "calc-2",
+          "name": "Calculus II",
+          "ar": "التفاضل والتكامل 2",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2"
+        },
+        {
+          "id": "english-1",
+          "name": "English Language",
+          "ar": "اللغة الإنجليزية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "متطلب حر اختياري (1)",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y1",
+          "semester": "summer"
+        },
+        {
+          "id": "advanced-example",
+          "name": "Advanced Example",
+          "ar": "المثال المتقدّم",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1"
+        },
+        {
+          "id": "statistics",
+          "name": "Statistics",
+          "ar": "الإحصاء",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1"
+        }
       ],
       "prerequisites": [
-        ["intro-example", "example-fundamentals"],
-        ["calc-1", "calc-2"],
-        ["example-fundamentals", "advanced-example"]
+        [
+          "intro-example",
+          "example-fundamentals"
+        ],
+        [
+          "calc-1",
+          "calc-2"
+        ],
+        [
+          "example-fundamentals",
+          "advanced-example"
+        ]
+      ]
+    },
+    {
+      "id": "aasu-rme",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Robotics & Mechatronics Engineering",
+          "small": "B.Sc. · 132 CH · 4 years"
+        },
+        "ar": {
+          "big": "هندسة الروبوتات والميكاترونكس",
+          "small": "بكالوريوس · 132 ساعة · 4 سنوات"
+        }
+      },
+      "icon": "🤖",
+      "university": "aasu",
+      "college": {
+        "en": "College of Engineering and Energy",
+        "ar": "كلية الهندسة والطاقة"
+      },
+      "bio": {
+        "en": "Blends mechanical, electrical, computer, and control engineering to design robotic and intelligent systems. B.Sc., 132 credit hours over 4 years. Preparatory (0-level) courses are excluded. The semester order shown is a suggested prerequisite-valid sequence — confirm the official order with your academic advisor.",
+        "ar": "يجمع بين الهندسة الميكانيكية والكهربائية والحاسوب وأنظمة التحكم لتصميم الأنظمة الروبوتية والذكية. بكالوريوس، 132 ساعة معتمدة على 4 سنوات. لا تشمل المساقات التمهيدية. ترتيب الفصول هنا تسلسل مقترح يراعي المتطلبات السابقة — تأكد من الترتيب الرسمي مع مرشدك الأكاديمي."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": false
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "enl101",
+          "name": "English for Academic Studies",
+          "ar": "اللغة الإنجليزية للدراسة الأكاديمية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "ENL101"
+        },
+        {
+          "id": "mat101",
+          "name": "Calculus I",
+          "ar": "التفاضل والتكامل 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "MAT101"
+        },
+        {
+          "id": "phy101",
+          "name": "Physics I",
+          "ar": "الفيزياء 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "PHY101"
+        },
+        {
+          "id": "phy105",
+          "name": "Physics Lab I",
+          "ar": "مختبر الفيزياء 1",
+          "creditHours": 1,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "PHY105"
+        },
+        {
+          "id": "chm101",
+          "name": "Chemistry I",
+          "ar": "الكيمياء 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "CHM101"
+        },
+        {
+          "id": "chm105",
+          "name": "Chemistry I Lab",
+          "ar": "مختبر الكيمياء 1",
+          "creditHours": 1,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "CHM105"
+        },
+        {
+          "id": "gen150",
+          "name": "Professionalism and Ethics",
+          "ar": "المهنية والأخلاقيات",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "GEN150"
+        },
+        {
+          "id": "enl102",
+          "name": "English Composition",
+          "ar": "الكتابة باللغة الإنجليزية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "ENL102"
+        },
+        {
+          "id": "mat102",
+          "name": "Calculus II",
+          "ar": "التفاضل والتكامل 2",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "MAT102"
+        },
+        {
+          "id": "phy102",
+          "name": "Physics II",
+          "ar": "الفيزياء 2",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "PHY102"
+        },
+        {
+          "id": "phy107",
+          "name": "Physics II Lab",
+          "ar": "مختبر الفيزياء 2",
+          "creditHours": 1,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "PHY107"
+        },
+        {
+          "id": "inf120",
+          "name": "Computers and Information Systems",
+          "ar": "الحاسوب ونظم المعلومات",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "INF120"
+        },
+        {
+          "id": "hst101",
+          "name": "Islamic Culture and Values",
+          "ar": "الثقافة والقيم الإسلامية",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "HST101"
+        },
+        {
+          "id": "enl201",
+          "name": "Writing and Research",
+          "ar": "الكتابة والبحث",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "ENL201"
+        },
+        {
+          "id": "mat201",
+          "name": "Calculus III",
+          "ar": "التفاضل والتكامل 3",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "MAT201"
+        },
+        {
+          "id": "mat202",
+          "name": "Linear Algebra",
+          "ar": "الجبر الخطي",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "MAT202"
+        },
+        {
+          "id": "mat240",
+          "name": "Differential Equations",
+          "ar": "المعادلات التفاضلية",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "MAT240"
+        },
+        {
+          "id": "eng205",
+          "name": "Electrical and Electronic Circuits",
+          "ar": "الدوائر الكهربائية والإلكترونية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "ENG205"
+        },
+        {
+          "id": "elec-global",
+          "name": "Global Citizen Elective",
+          "ar": "متطلب اختياري (المواطنة العالمية)",
+          "creditHours": 3,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s1"
+        },
+        {
+          "id": "eng206",
+          "name": "Electrical and Electronic Circuits Lab",
+          "ar": "مختبر الدوائر الكهربائية والإلكترونية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENG206"
+        },
+        {
+          "id": "eng207",
+          "name": "Programming",
+          "ar": "البرمجة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENG207"
+        },
+        {
+          "id": "eng208",
+          "name": "Introduction to Energy and Sustainability",
+          "ar": "مقدمة في الطاقة والاستدامة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENG208"
+        },
+        {
+          "id": "eng209",
+          "name": "Statics and Strength of Materials",
+          "ar": "الاستاتيكا ومقاومة المواد",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENG209"
+        },
+        {
+          "id": "eng304",
+          "name": "Engineering Probability & Statistics",
+          "ar": "الاحتمالات والإحصاء الهندسي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENG304"
+        },
+        {
+          "id": "elec-innovation",
+          "name": "Innovation & Creativity Elective",
+          "ar": "متطلب اختياري (الابتكار والإبداع)",
+          "creditHours": 3,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "ese211",
+          "name": "Industrial Electronics",
+          "ar": "الإلكترونيات الصناعية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "ESE211"
+        },
+        {
+          "id": "rme301",
+          "name": "Introduction to Mechatronics and Robotics",
+          "ar": "مقدمة في الميكاترونكس والروبوتات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "RME301"
+        },
+        {
+          "id": "rme302",
+          "name": "Introduction to Mechatronics and Robotics Lab",
+          "ar": "مختبر مقدمة في الميكاترونكس والروبوتات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "RME302"
+        },
+        {
+          "id": "eng308",
+          "name": "Numerical Methods",
+          "ar": "الطرق العددية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "ENG308"
+        },
+        {
+          "id": "eng309",
+          "name": "Engineering Project Management and Economics",
+          "ar": "إدارة المشاريع الهندسية والاقتصاد",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "ENG309"
+        },
+        {
+          "id": "elec-art-1",
+          "name": "Arts & Humanities Elective I",
+          "ar": "اختياري (الفنون والإنسانيات) 1",
+          "creditHours": 3,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "rme304",
+          "name": "Instrumentation, Sensors, and Actuators",
+          "ar": "الأجهزة والحساسات والمشغلات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "RME304"
+        },
+        {
+          "id": "rme352",
+          "name": "Digital Systems Design & Microcontrollers",
+          "ar": "تصميم النظم الرقمية والمتحكمات الدقيقة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "RME352"
+        },
+        {
+          "id": "rme353",
+          "name": "Digital Systems Design & Microcontrollers Lab",
+          "ar": "مختبر تصميم النظم الرقمية والمتحكمات الدقيقة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "RME353"
+        },
+        {
+          "id": "mse211",
+          "name": "Introduction to Materials Science and Engineering",
+          "ar": "مقدمة في علم وهندسة المواد",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "MSE211"
+        },
+        {
+          "id": "rme363",
+          "name": "Engineering Mechanisms for Automation",
+          "ar": "الآليات الهندسية للأتمتة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "RME363"
+        },
+        {
+          "id": "elec-art-2",
+          "name": "Arts & Humanities Elective II",
+          "ar": "اختياري (الفنون والإنسانيات) 2",
+          "creditHours": 3,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "rme360",
+          "name": "Control Systems Analysis & Design",
+          "ar": "تحليل وتصميم أنظمة التحكم",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME360"
+        },
+        {
+          "id": "rme361",
+          "name": "Control Systems Analysis & Design Lab",
+          "ar": "مختبر تحليل وتصميم أنظمة التحكم",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME361"
+        },
+        {
+          "id": "rme401",
+          "name": "Robotics, Dynamics & Controls",
+          "ar": "الروبوتات والديناميكا والتحكم",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME401"
+        },
+        {
+          "id": "rme402",
+          "name": "Robotics, Dynamics & Controls Lab",
+          "ar": "مختبر الروبوتات والديناميكا والتحكم",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME402"
+        },
+        {
+          "id": "rme430",
+          "name": "Digital Signal Processing",
+          "ar": "معالجة الإشارات الرقمية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME430"
+        },
+        {
+          "id": "rme431",
+          "name": "Digital Signal Processing Lab",
+          "ar": "مختبر معالجة الإشارات الرقمية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME431"
+        },
+        {
+          "id": "rme490",
+          "name": "Capstone Design 1",
+          "ar": "مشروع التخرج 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "RME490"
+        },
+        {
+          "id": "rme403",
+          "name": "Computer-Integrated Manufacturing Systems",
+          "ar": "أنظمة التصنيع المتكاملة حاسوبياً",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "RME403"
+        },
+        {
+          "id": "rme460",
+          "name": "Design of Machine Elements",
+          "ar": "تصميم عناصر الآلات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "RME460"
+        },
+        {
+          "id": "rme491",
+          "name": "Capstone Design 2",
+          "ar": "مشروع التخرج 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "RME491"
+        },
+        {
+          "id": "elec-prog-1",
+          "name": "Program Elective I",
+          "ar": "اختياري تخصصي 1",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "elec-prog-2",
+          "name": "Program Elective II",
+          "ar": "اختياري تخصصي 2",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "elec-prog-3",
+          "name": "Program Elective III",
+          "ar": "اختياري تخصصي 3",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "enl101",
+          "enl102"
+        ],
+        [
+          "enl102",
+          "enl201"
+        ],
+        [
+          "mat101",
+          "mat102"
+        ],
+        [
+          "mat102",
+          "mat201"
+        ],
+        [
+          "mat101",
+          "mat202"
+        ],
+        [
+          "mat102",
+          "mat240"
+        ],
+        [
+          "phy101",
+          "phy102"
+        ],
+        [
+          "phy105",
+          "phy107"
+        ],
+        [
+          "phy102",
+          "eng205"
+        ],
+        [
+          "eng205",
+          "eng206"
+        ],
+        [
+          "mat202",
+          "eng207"
+        ],
+        [
+          "phy102",
+          "eng208"
+        ],
+        [
+          "phy102",
+          "eng209"
+        ],
+        [
+          "mat102",
+          "eng304"
+        ],
+        [
+          "mat202",
+          "eng308"
+        ],
+        [
+          "eng207",
+          "eng309"
+        ],
+        [
+          "eng205",
+          "ese211"
+        ],
+        [
+          "eng205",
+          "rme301"
+        ],
+        [
+          "eng209",
+          "rme301"
+        ],
+        [
+          "ese211",
+          "rme304"
+        ],
+        [
+          "eng206",
+          "rme352"
+        ],
+        [
+          "eng207",
+          "rme352"
+        ],
+        [
+          "mat201",
+          "rme360"
+        ],
+        [
+          "mat240",
+          "rme360"
+        ],
+        [
+          "eng209",
+          "mse211"
+        ],
+        [
+          "eng209",
+          "rme363"
+        ],
+        [
+          "rme301",
+          "rme401"
+        ],
+        [
+          "rme301",
+          "rme403"
+        ],
+        [
+          "eng304",
+          "rme430"
+        ],
+        [
+          "rme304",
+          "rme460"
+        ],
+        [
+          "rme490",
+          "rme491"
+        ]
       ]
     }
   ]
