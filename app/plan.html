@@ -197,7 +197,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.21';
+window.APP_VERSION = '3.22';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -8397,7 +8397,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       prog: function(prefix){ return countSlugs(prefix, ['computer-skills', 'research-methods']); }
     },
     {
-      id: 'englishmaster', icon: '🇬🇧',
+      id: 'englishmaster', icon: '🔤',
       title: { en: 'English Master', ar: 'أستاذ اللغة الإنجليزية' },
       desc: { en: 'Complete every English course.', ar: 'أكمل جميع مساقات اللغة الإنجليزية.' },
       check: function(prefix){ return allCategoryCompleted(prefix, 'eng'); },
@@ -8549,8 +8549,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var close = function(){ overlay.classList.remove('open'); };
     if(closeBtn) closeBtn.addEventListener('click', close);
     overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
-    var card = overlay.querySelector('.modal-card');
-    if(card) card.addEventListener('click', function(e){ e.stopPropagation(); });
+    // NOTE: the modal card deliberately does NOT stopPropagation on clicks.
+    // The close handler above only fires when e.target === overlay (the
+    // backdrop itself), so inner clicks never close the modal anyway — and a
+    // stopPropagation here would swallow the Share button's click before it
+    // reached the delegated handler below (that was the "Share does nothing"
+    // bug).
     // Delegated so it keeps working after every re-render of the badge grid.
     overlay.addEventListener('click', function(e){
       var btn = e.target.closest && e.target.closest('.ab-share');
@@ -8560,7 +8564,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         icon: btn.getAttribute('data-ach-icon'),
         title: btn.getAttribute('data-ach-title'),
         subtitle: btn.getAttribute('data-ach-sub'),
-        footer: 'AAUP Study Plans'
+        footer: 'Student Study Plans'
       });
     });
   }
