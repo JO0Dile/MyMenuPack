@@ -3631,6 +3631,40 @@
           "240224700"
         ]
       ]
+    },
+    {
+      "id": "aaup-cs-gamedev",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Computer Science — Game Design & Development",
+          "small": "🚧 Study plan coming soon · Program 24013"
+        },
+        "ar": {
+          "big": "علوم الحاسوب — تصميم وتطوير الألعاب",
+          "small": "🚧 الخطة الدراسية قريبًا · برنامج 24013"
+        }
+      },
+      "icon": "🎮",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Computer Science — Specialization in Game Design and Development (Program 24013 · Jenin). Blends computer science with game mechanics, interactive media, visual design, and immersive tech (Unity, Unreal Engine, Blender, AI-driven design). 🚧 The full study plan is not available yet — coming soon.",
+        "ar": "بكالوريوس علوم الحاسوب — تخصص تصميم وتطوير الألعاب (برنامج 24013 · حرم جنين). يمزج علوم الحاسوب مع ميكانيكا الألعاب والوسائط التفاعلية والتصميم البصري والتقنيات الغامرة (يونتي، أنريل، بلندر، والتصميم المدعوم بالذكاء الاصطناعي). 🚧 الخطة الدراسية الكاملة غير متوفرة بعد — قريبًا."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
     }
   ]
 }
