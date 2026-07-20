@@ -145,12 +145,25 @@ window.APP_SUBMIT_URL = '';
 // leaked tokens — so it never goes here, only in the collector's secrets.
 // Leave '' to disable auto-collection entirely (nothing is sent anywhere).
 window.APP_COLLECT_URL = '';
-// Optional shared secret sent as a header with each auto-collect POST, so
-// your collector can ignore random traffic. Match it to the collector's
-// COLLECT_SECRET. It's not a login and grants no repo access on its own —
-// worst case someone reads it and can POST plan JSON to your collector, same
-// as using the app — so a simple value is fine. Leave '' to send none.
+// Optional shared secret sent with each auto-collect POST, so your collector
+// can ignore random traffic. Match it to the collector's COLLECT_SECRET. It's
+// not a login and grants no repo access on its own — worst case someone reads
+// it and can POST plan JSON to your collector, same as using the app — so a
+// simple value is fine. Leave '' to send none.
 window.APP_COLLECT_SECRET = '';
+// Which collector you're pointing at, so the app sends in the shape that host
+// accepts. Only two values:
+//   'cloudflare'  (default) — sends JSON with the secret in a header, and
+//                 reads the response to confirm delivery. Use with
+//                 collector/cloudflare-worker.js. This is the tested path.
+//   'appsscript'  — for a Google Apps Script web app (collector/
+//                 google-apps-script.gs). Apps Script can't do the same CORS,
+//                 so the app sends a "simple" text POST with the secret inside
+//                 the body and can't read the reply back — delivery is
+//                 best-effort (the collector overwrites by id, so a rare
+//                 retry just re-saves the same plan, never a duplicate).
+// Leave it 'cloudflare' unless/until you deploy the Apps Script version.
+window.APP_COLLECT_MODE = 'cloudflare';
 // Hosted JSON manifest of official/community plans the app can pull updates
 // from when online (see "Check for updates" in Settings). A relative path
 // works once this file is served (GitHub Pages, any static host) alongside
@@ -11017,7 +11030,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var queue = getMap(QUEUE_KEY);
     var changed = false;
     Object.keys(plans || {}).forEach(function(id){
-      var bundle = bundleOf(id, plans[id]);
+      var p = plans[id];
+      // Only collect plans a student actually BUILT. Plans pulled from the
+      // feed live in this same store but carry official:true — collecting
+      // those would just bounce official content back to the collector from
+      // every device. (An official plan a user edited stays official:true and
+      // is likewise left alone.)
+      if(p && p.official){ return; }
+      var bundle = bundleOf(id, p);
       if(!bundle) return;
       var text = JSON.stringify(bundle);
       var h = hashStr(text);
@@ -11050,34 +11070,55 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var id = ids[i];
     var item = queue[id];
     if(!item){ return sendNext(ids, i + 1, queue); }
+
+    function delivered(){
+      // Remember its hash and drop it from the queue so it's never re-sent
+      // until it actually changes again.
+      var sent = getMap(SENT_KEY); sent[id] = item.hash; setMap(SENT_KEY, sent);
+      var q = getMap(QUEUE_KEY); delete q[id]; setMap(QUEUE_KEY, q);
+      sendNext(ids, i + 1, queue);
+    }
+    // Stop this pass but keep the item queued — it retries on the next change,
+    // the next app open, and the 'online' event, without spamming.
+    function retryLater(){ flushing = false; }
+
+    var payload = {
+      id: id,
+      plan: item.bundle,
+      appVersion: window.APP_VERSION || '',
+      submittedAt: new Date().toISOString()
+    };
+
+    if(window.APP_COLLECT_MODE === 'appsscript'){
+      // Google Apps Script web apps can't return the CORS headers we'd need to
+      // read the response, so we send a "simple request" (text/plain, secret
+      // in the body, no custom headers) that never triggers a CORS preflight,
+      // and treat a resolved fetch as delivered. The collector overwrites by
+      // id, so an occasional unconfirmed retry just re-saves the same plan.
+      if(window.APP_COLLECT_SECRET){ payload.secret = window.APP_COLLECT_SECRET; }
+      fetch(window.APP_COLLECT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).then(function(){ delivered(); }).catch(function(){ retryLater(); });
+      return;
+    }
+
+    // Default: Cloudflare Worker — JSON body, secret in a header, confirmed by
+    // reading res.ok.
     var headers = { 'Content-Type': 'application/json' };
     if(window.APP_COLLECT_SECRET){ headers['X-Collect-Secret'] = window.APP_COLLECT_SECRET; }
     fetch(window.APP_COLLECT_URL, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({
-        id: id,
-        plan: item.bundle,
-        appVersion: window.APP_VERSION || '',
-        submittedAt: new Date().toISOString()
-      }),
+      body: JSON.stringify(payload),
       keepalive: true
     }).then(function(res){
-      if(res && res.ok){
-        // Delivered — remember its hash and drop it from the queue.
-        var sent = getMap(SENT_KEY); sent[id] = item.hash; setMap(SENT_KEY, sent);
-        var q = getMap(QUEUE_KEY); delete q[id]; setMap(QUEUE_KEY, q);
-        sendNext(ids, i + 1, queue);
-      } else {
-        // Server reachable but unhappy (bad secret, rate limit, 5xx). Leave it
-        // queued and stop this pass; it retries later without spamming.
-        flushing = false;
-      }
-    }).catch(function(){
-      // Network dropped mid-send. Keep it queued; the 'online' listener and
-      // the next change/app-open will retry.
-      flushing = false;
-    });
+      if(res && res.ok){ delivered(); }
+      else { retryLater(); } // reachable but unhappy (bad secret, rate limit, 5xx)
+    }).catch(function(){ retryLater(); }); // network dropped mid-send
   }
 
   window.__collectOnPlansChanged = onPlansChanged;

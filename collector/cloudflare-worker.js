@@ -31,15 +31,19 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     if (request.method !== 'POST') return json({ error: 'POST only' }, 405, cors);
 
-    // Optional shared secret so random traffic can't spam your repo.
-    if (env.COLLECT_SECRET) {
-      const got = request.headers.get('X-Collect-Secret') || '';
-      if (got !== env.COLLECT_SECRET) return json({ error: 'forbidden' }, 403, cors);
-    }
-
+    // Parse first so the secret can come from either the header (the app's
+    // default 'cloudflare' mode) or the body (its 'appsscript' mode, which
+    // can't send custom headers). request.json() parses the body regardless of
+    // content-type, so a text/plain JSON body works too.
     let body;
     try { body = await request.json(); }
     catch { return json({ error: 'invalid json' }, 400, cors); }
+
+    // Optional shared secret so random traffic can't spam your repo.
+    if (env.COLLECT_SECRET) {
+      const got = request.headers.get('X-Collect-Secret') || (body && body.secret) || '';
+      if (got !== env.COLLECT_SECRET) return json({ error: 'forbidden' }, 403, cors);
+    }
 
     // Re-slugify the id server-side — never trust the path to client input.
     const id = String(body.id || '')
