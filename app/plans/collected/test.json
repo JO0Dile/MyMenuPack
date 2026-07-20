@@ -21,7 +21,7 @@
       "years": [
         {
           "id": "y1",
-          "hasSummer": false
+          "hasSummer": true
         }
       ]
     },
@@ -53,6 +53,6 @@
     }
   },
   "appVersion": "3.11",
-  "submittedAt": "2026-07-20T11:40:03.471Z",
-  "collectedAt": "2026-07-20T11:40:03.738Z"
+  "submittedAt": "2026-07-20T11:42:31.883Z",
+  "collectedAt": "2026-07-20T11:42:32.145Z"
 }
