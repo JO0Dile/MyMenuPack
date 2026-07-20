@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.52';
+window.APP_VERSION = '3.53';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1082,13 +1082,11 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     fill:none;
     stroke:var(--prereq);
     stroke-width:1.3;
-    /* Was .16 — nearly invisible against the dark background at this
-       stroke-width, especially on a phone screen or in a screenshot, so a
-       course's prerequisite lines effectively never showed unless actively
-       held/hovered to trace. Bumped to a level that's genuinely visible at
-       rest while staying clearly secondary to the traced state below
-       (opacity 1, thicker stroke, brighter color, glow). */
-    opacity:.5;
+    /* Idle state: a faint 5% hint that a connection exists — not meant to
+       be read at rest. Tracing a course (hover or hold) is what actually
+       shows its chain, at full opacity / thicker stroke / brighter pink /
+       glow via .active below. */
+    opacity:.05;
     transition:opacity .5s cubic-bezier(.4,0,.2,1), stroke-width .35s cubic-bezier(.4,0,.2,1), filter .35s cubic-bezier(.4,0,.2,1), stroke .35s cubic-bezier(.4,0,.2,1);
   }
 
@@ -1426,22 +1424,19 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   /* Mobile course grid — this app is meant to be used on a phone first, not
      as a shrunk-down desktop layout. Smaller, denser cards fit two per row
      instead of the desktop 120-190px range collapsing to one per row at a
-     real phone width, and the idle prerequisite lines are hidden entirely:
-     a permanent web of thin lines down a single tall column of stacked
-     semesters reads as noise, not information. Press-and-hold a course
-     (see bindHover's touchstart handling above) still draws the ones
-     relevant to it — .edge.active/.dim keep a higher specificity than the
-     opacity:0 below regardless of source order, so that still works
-     exactly as before. Placed here, after every rule it overrides, since a
-     same-specificity rule inside a media query does NOT automatically win
-     over a later non-media rule — only source order decides that tie. */
+     real phone width. Idle prerequisite lines used to be hidden entirely
+     here (opacity:0) on the theory that a permanent web of lines down a
+     single tall stacked column reads as noise — but that meant a student on
+     a phone (the primary way this app is used) never saw a hint that a
+     connection even existed unless they successfully held a course to trace
+     it. Removed: the faint 5% idle opacity from the base .connector-layer
+     path.edge rule now applies here too, same as desktop. */
   @media (max-width:640px){
     .body-grid, .imp-body-pad{padding:14px 10px 22px;}
     .legend{margin-left:16px;margin-right:16px;padding:10px 14px;gap:14px;}
     .year-row{padding:10px;}
     .course{flex:1 1 44%;min-width:0;max-width:none;padding:7px 8px 6px;}
     .course .name{font-size:11.5px;}
-    .connector-layer path.edge{opacity:0;}
   }
 
   /* ==========================================================================
@@ -4748,11 +4743,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // Touch devices have no hover — press and hold a course instead. A
       // quick tap still falls through to the course-info popup (bound
       // separately below); only a sustained, still press starts the trace.
-      var holdTimer = null;
-      el.addEventListener('touchstart', function(){
+      var holdTimer = null, holdStartX = 0, holdStartY = 0;
+      el.addEventListener('touchstart', function(e){
+        var t = e.touches && e.touches[0];
+        holdStartX = t ? t.clientX : 0;
+        holdStartY = t ? t.clientY : 0;
         holdTimer = setTimeout(function(){ startTrace(el); }, 450);
       }, { passive: true });
-      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchmove', function(e){
+        // A real finger held "still" always drifts a few pixels — cancelling
+        // on ANY movement (the old behavior) meant a genuine hold attempt
+        // almost never survived to the 450ms mark on an actual phone, even
+        // though it worked fine in a zero-jitter synthetic test. Only an
+        // actual scroll/drag past a small radius cancels the hold now.
+        var t = e.touches && e.touches[0];
+        if(!t){ clearTimeout(holdTimer); return; }
+        var dx = t.clientX - holdStartX, dy = t.clientY - holdStartY;
+        if((dx * dx + dy * dy) > 100){ clearTimeout(holdTimer); }
+      });
       el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
       el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
@@ -5126,11 +5134,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // Touch devices have no hover — press and hold a course instead. A
       // quick tap still falls through to the course-info popup (bound
       // separately below); only a sustained, still press starts the trace.
-      var holdTimer = null;
-      el.addEventListener('touchstart', function(){
+      var holdTimer = null, holdStartX = 0, holdStartY = 0;
+      el.addEventListener('touchstart', function(e){
+        var t = e.touches && e.touches[0];
+        holdStartX = t ? t.clientX : 0;
+        holdStartY = t ? t.clientY : 0;
         holdTimer = setTimeout(function(){ startTrace(el); }, 450);
       }, { passive: true });
-      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchmove', function(e){
+        // A real finger held "still" always drifts a few pixels — cancelling
+        // on ANY movement (the old behavior) meant a genuine hold attempt
+        // almost never survived to the 450ms mark on an actual phone, even
+        // though it worked fine in a zero-jitter synthetic test. Only an
+        // actual scroll/drag past a small radius cancels the hold now.
+        var t = e.touches && e.touches[0];
+        if(!t){ clearTimeout(holdTimer); return; }
+        var dx = t.clientX - holdStartX, dy = t.clientY - holdStartY;
+        if((dx * dx + dy * dy) > 100){ clearTimeout(holdTimer); }
+      });
       el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
       el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
@@ -5525,11 +5546,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // Touch devices have no hover — press and hold a course instead. A
       // quick tap still falls through to the course-info popup (bound
       // separately below); only a sustained, still press starts the trace.
-      var holdTimer = null;
-      el.addEventListener('touchstart', function(){
+      var holdTimer = null, holdStartX = 0, holdStartY = 0;
+      el.addEventListener('touchstart', function(e){
+        var t = e.touches && e.touches[0];
+        holdStartX = t ? t.clientX : 0;
+        holdStartY = t ? t.clientY : 0;
         holdTimer = setTimeout(function(){ startTrace(el); }, 450);
       }, { passive: true });
-      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchmove', function(e){
+        // A real finger held "still" always drifts a few pixels — cancelling
+        // on ANY movement (the old behavior) meant a genuine hold attempt
+        // almost never survived to the 450ms mark on an actual phone, even
+        // though it worked fine in a zero-jitter synthetic test. Only an
+        // actual scroll/drag past a small radius cancels the hold now.
+        var t = e.touches && e.touches[0];
+        if(!t){ clearTimeout(holdTimer); return; }
+        var dx = t.clientX - holdStartX, dy = t.clientY - holdStartY;
+        if((dx * dx + dy * dy) > 100){ clearTimeout(holdTimer); }
+      });
       el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
       el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
@@ -5936,11 +5970,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // Touch devices have no hover — press and hold a course instead. A
       // quick tap still falls through to the course-info popup (bound
       // separately below); only a sustained, still press starts the trace.
-      var holdTimer = null;
-      el.addEventListener('touchstart', function(){
+      var holdTimer = null, holdStartX = 0, holdStartY = 0;
+      el.addEventListener('touchstart', function(e){
+        var t = e.touches && e.touches[0];
+        holdStartX = t ? t.clientX : 0;
+        holdStartY = t ? t.clientY : 0;
         holdTimer = setTimeout(function(){ startTrace(el); }, 450);
       }, { passive: true });
-      el.addEventListener('touchmove', function(){ clearTimeout(holdTimer); });
+      el.addEventListener('touchmove', function(e){
+        // A real finger held "still" always drifts a few pixels — cancelling
+        // on ANY movement (the old behavior) meant a genuine hold attempt
+        // almost never survived to the 450ms mark on an actual phone, even
+        // though it worked fine in a zero-jitter synthetic test. Only an
+        // actual scroll/drag past a small radius cancels the hold now.
+        var t = e.touches && e.touches[0];
+        if(!t){ clearTimeout(holdTimer); return; }
+        var dx = t.clientX - holdStartX, dy = t.clientY - holdStartY;
+        if((dx * dx + dy * dy) > 100){ clearTimeout(holdTimer); }
+      });
       el.addEventListener('touchend', function(){ clearTimeout(holdTimer); endTrace(); });
       el.addEventListener('touchcancel', function(){ clearTimeout(holdTimer); endTrace(); });
     });
@@ -10144,6 +10191,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
   var touchHoldTimer = null;
   var touchHoldEl = null;
+  var touchHoldStartX = 0, touchHoldStartY = 0;
   function bindImportedHover(planId){
     if(hoverBoundPlans[planId]) return;
     hoverBoundPlans[planId] = true;
@@ -10170,9 +10218,22 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var el = e.target.closest && e.target.closest('.course[id]');
       if(!el || el.id.indexOf(planId + '-c-') !== 0) return;
       touchHoldEl = el;
+      var t = e.touches && e.touches[0];
+      touchHoldStartX = t ? t.clientX : 0;
+      touchHoldStartY = t ? t.clientY : 0;
       touchHoldTimer = setTimeout(function(){ handleCourseHoverEnter(planId, el); }, 450);
     }, { passive: true });
-    document.addEventListener('touchmove', function(){ clearTimeout(touchHoldTimer); });
+    document.addEventListener('touchmove', function(e){
+      // Same tolerance as the built-in majors' hold-to-trace: a real finger
+      // held "still" always drifts a few pixels, so only an actual
+      // scroll/drag past a small radius should cancel the hold — cancelling
+      // on any movement at all meant the hold almost never survived to the
+      // 450ms mark in real use.
+      var t = e.touches && e.touches[0];
+      if(!t){ clearTimeout(touchHoldTimer); return; }
+      var dx = t.clientX - touchHoldStartX, dy = t.clientY - touchHoldStartY;
+      if((dx * dx + dy * dy) > 100){ clearTimeout(touchHoldTimer); }
+    });
     document.addEventListener('touchend', function(){
       clearTimeout(touchHoldTimer);
       if(touchHoldEl){ handleCourseHoverLeave(planId); touchHoldEl = null; }
