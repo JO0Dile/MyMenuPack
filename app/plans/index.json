@@ -2248,6 +2248,700 @@
           "110114080"
         ]
       ]
+    },
+    {
+      "id": "aaup-cyber-security",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Cyber Security",
+          "small": "B.Sc. · Program 24051 · 132 CH"
+        },
+        "ar": {
+          "big": "الأمن السيبراني",
+          "small": "بكالوريوس · برنامج 24051 · 132 ساعة"
+        }
+      },
+      "icon": "🔐",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Cyber Security (Program 24051 · Jenin & Ramallah). Design, implement, and manage security systems — network security, digital forensics, ethical hacking, and secure software development for web, mobile, and cloud. 132 credit hours over 4 years, following the official advisory plan. The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في الأمن السيبراني (برنامج 24051 · حرم جنين ورام الله). تصميم وتنفيذ وإدارة أنظمة الأمن — أمن الشبكات والأدلة الجنائية الرقمية والاختراق الأخلاقي وتطوير البرمجيات الآمنة للويب والمحمول والسحابة. 132 ساعة معتمدة على 4 سنوات وفق الخطة الإرشادية الرسمية. تُستثنى مادة الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "240111000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240111000"
+        },
+        {
+          "id": "univ-elec-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y1",
+          "semester": "s1"
+        },
+        {
+          "id": "univ-elec-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y1",
+          "semester": "s1"
+        },
+        {
+          "id": "100411010",
+          "name": "Calculus I",
+          "ar": "التفاضل والتكامل 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100411010"
+        },
+        {
+          "id": "240211013",
+          "name": "Introduction to Information Technology",
+          "ar": "مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211013"
+        },
+        {
+          "id": "240211030",
+          "name": "Introduction to Information Technology Lab",
+          "ar": "مختبر مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211030"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "100411020",
+          "name": "Calculus II",
+          "ar": "التفاضل والتكامل 2",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411020"
+        },
+        {
+          "id": "100413750",
+          "name": "Discrete Mathematics",
+          "ar": "الرياضيات المتقطعة",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100413750"
+        },
+        {
+          "id": "240111050",
+          "name": "Programming Fundamentals I for IT",
+          "ar": "أساسيات البرمجة 1 لتكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111050"
+        },
+        {
+          "id": "240111060",
+          "name": "Programming Fundamentals I Lab for IT",
+          "ar": "مختبر أساسيات البرمجة 1 لتكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111060"
+        },
+        {
+          "id": "240111100",
+          "name": "Digital Logic Design",
+          "ar": "تصميم المنطق الرقمي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111100"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "100412040",
+          "name": "Mathematics for Information Technology",
+          "ar": "رياضيات تكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "100412040"
+        },
+        {
+          "id": "240112100",
+          "name": "Programming Fundamentals II for IT",
+          "ar": "أساسيات البرمجة 2 لتكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112100"
+        },
+        {
+          "id": "240112110",
+          "name": "Introduction to Computer Organization",
+          "ar": "مقدمة في تنظيم الحاسوب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112110"
+        },
+        {
+          "id": "240112200",
+          "name": "Programming Fundamentals II Lab for IT",
+          "ar": "مختبر أساسيات البرمجة 2 لتكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112200"
+        },
+        {
+          "id": "240213040",
+          "name": "Computer Networks I",
+          "ar": "شبكات الحاسوب 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240213040"
+        },
+        {
+          "id": "univ-elec-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "240113310",
+          "name": "Introduction to Operating Systems",
+          "ar": "مقدمة في نظم التشغيل",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240113310"
+        },
+        {
+          "id": "240213220",
+          "name": "Computer Networks Lab",
+          "ar": "مختبر شبكات الحاسوب",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240213220"
+        },
+        {
+          "id": "240314150",
+          "name": "Applied Cryptography",
+          "ar": "التشفير التطبيقي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240314150"
+        },
+        {
+          "id": "240512200",
+          "name": "Cyber Law and Ethics",
+          "ar": "القانون والأخلاقيات السيبرانية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240512200"
+        },
+        {
+          "id": "240512210",
+          "name": "Data Structures and Algorithms",
+          "ar": "هياكل البيانات والخوارزميات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240512210"
+        },
+        {
+          "id": "univ-elec-4",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "240113121",
+          "name": "Introduction to Database",
+          "ar": "مقدمة في قواعد البيانات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240113121"
+        },
+        {
+          "id": "240113131",
+          "name": "Introduction to Database (Lab)",
+          "ar": "مختبر مقدمة في قواعد البيانات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240113131"
+        },
+        {
+          "id": "240113170",
+          "name": "Introduction to Software Engineering",
+          "ar": "مقدمة في هندسة البرمجيات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240113170"
+        },
+        {
+          "id": "240214471",
+          "name": "Information Technology Project Management",
+          "ar": "إدارة مشاريع تكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240214471"
+        },
+        {
+          "id": "240513160",
+          "name": "Network Security Fundamentals",
+          "ar": "أساسيات أمن الشبكات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240513160"
+        },
+        {
+          "id": "240513170",
+          "name": "Operating Systems Security",
+          "ar": "أمن نظم التشغيل",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240513170"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "240213080",
+          "name": "Web Development I",
+          "ar": "تطوير الويب 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240213080"
+        },
+        {
+          "id": "240313260",
+          "name": "Networks Programming",
+          "ar": "برمجة الشبكات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240313260"
+        },
+        {
+          "id": "240513200",
+          "name": "Secure Software Development",
+          "ar": "تطوير البرمجيات الآمنة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240513200"
+        },
+        {
+          "id": "240513210",
+          "name": "Cybersecurity Risk Management",
+          "ar": "إدارة مخاطر الأمن السيبراني",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240513210"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "خدمة المجتمع",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "240513300",
+          "name": "Internship",
+          "ar": "التدريب الميداني",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "240513300"
+        },
+        {
+          "id": "240314770",
+          "name": "Ethical Hacking",
+          "ar": "الاختراق الأخلاقي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240314770"
+        },
+        {
+          "id": "240514110",
+          "name": "Cyber Threat Hunting",
+          "ar": "اصطياد التهديدات السيبرانية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240514110"
+        },
+        {
+          "id": "240514140",
+          "name": "Senior Project I",
+          "ar": "مشروع التخرج 1",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240514140"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "240514100",
+          "name": "Secure Mobile Programming",
+          "ar": "برمجة الأجهزة المحمولة الآمنة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240514100"
+        },
+        {
+          "id": "240514200",
+          "name": "Digital Forensics and Investigations",
+          "ar": "الأدلة الجنائية الرقمية والتحقيقات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240514200"
+        },
+        {
+          "id": "240514210",
+          "name": "Senior Project II",
+          "ar": "مشروع التخرج 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240514210"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100411010",
+          "100411020"
+        ],
+        [
+          "100411020",
+          "100412040"
+        ],
+        [
+          "100411010",
+          "100413750"
+        ],
+        [
+          "240111050",
+          "240111060"
+        ],
+        [
+          "240111050",
+          "240112100"
+        ],
+        [
+          "240111100",
+          "240112110"
+        ],
+        [
+          "240112100",
+          "240112200"
+        ],
+        [
+          "240211013",
+          "240113121"
+        ],
+        [
+          "240113121",
+          "240113131"
+        ],
+        [
+          "240211013",
+          "240113131"
+        ],
+        [
+          "240112100",
+          "240113170"
+        ],
+        [
+          "240211013",
+          "240113310"
+        ],
+        [
+          "240211013",
+          "240211030"
+        ],
+        [
+          "240211013",
+          "240213040"
+        ],
+        [
+          "240112100",
+          "240213080"
+        ],
+        [
+          "240211013",
+          "240213220"
+        ],
+        [
+          "240213040",
+          "240213220"
+        ],
+        [
+          "240213040",
+          "240313260"
+        ],
+        [
+          "100412040",
+          "240314150"
+        ],
+        [
+          "240213040",
+          "240314770"
+        ],
+        [
+          "240112100",
+          "240512210"
+        ],
+        [
+          "240213040",
+          "240513160"
+        ],
+        [
+          "240113310",
+          "240513170"
+        ],
+        [
+          "240112100",
+          "240513200"
+        ],
+        [
+          "240213080",
+          "240514100"
+        ],
+        [
+          "240213040",
+          "240514110"
+        ],
+        [
+          "040521301",
+          "240514140"
+        ],
+        [
+          "240113310",
+          "240514200"
+        ],
+        [
+          "240514140",
+          "240514210"
+        ]
+      ]
     }
   ]
 }
