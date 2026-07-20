@@ -1,0 +1,39 @@
+{
+  "id": "modern-artart",
+  "plan": {
+    "id": "modern-artart",
+    "majorName": {
+      "en": {
+        "big": "Modern artart",
+        "small": ""
+      },
+      "ar": {
+        "big": "فن حديث",
+        "small": ""
+      }
+    },
+    "icon": "🎨",
+    "bio": {
+      "en": "Faculty of fine art (if you don&#39;t get accepted, plz don&#39;t go into politics)",
+      "ar": "كلية بتدفع عليها دم قلبك وبالاخير ما بتلاقي وظيفة"
+    },
+    "structure": {
+      "years": [
+        {
+          "id": "y1",
+          "hasSummer": false
+        }
+      ]
+    },
+    "courses": [],
+    "prerequisites": [],
+    "university": "birzeit",
+    "college": {
+      "en": "Faculty of fine arts",
+      "ar": "كلية فنون جميلة"
+    }
+  },
+  "appVersion": "3.11",
+  "submittedAt": "2026-07-20T11:59:33.636Z",
+  "collectedAt": "2026-07-20T11:59:39.492Z"
+}
