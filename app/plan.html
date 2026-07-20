@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.5';
+window.APP_VERSION = '3.51';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -9583,7 +9583,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var info = {};
     (plan.courses || []).forEach(function(c){
       info[c.id] = {
-        num: c.num || '-', name: c.name, th: '-', pr: '-',
+        // A course's real catalog code can arrive as either "num" (an older
+        // field name still accepted for backward compatibility) or
+        // "courseNumber" (the field the plans feed's documented schema and
+        // every plan built this session actually use) — without this
+        // fallback, every course popup showed "-" instead of its real code
+        // even when the plan data had one.
+        num: c.num || c.courseNumber || '-', name: c.name, th: '-', pr: '-',
         cr: String(c.creditHours != null ? c.creditHours : 0),
         prereq: '-', ar: c.ar || c.name
       };
@@ -11193,7 +11199,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     }) : [{ id: 'y1', hasSummer: false }];
     var yearIds = years.map(function(y){ return y.id; });
     var courses = Array.isArray(fp.courses) ? fp.courses.slice(0, 400).map(function(c){
-      return {
+      var out = {
         id: safeId(c.id), name: esc(c.name || c.id || ''), ar: esc(c.ar || ''),
         creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
         category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
@@ -11202,6 +11208,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         // normalize so a feed plan's summer courses actually render.
         semester: window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1')
       };
+      // The real catalog code (e.g. "100411010") — was silently dropped by
+      // this sanitizer even though __sanitizeImportedPlan (the other entry
+      // point, for manually-pasted/imported plans) already preserved it;
+      // every course synced from the online feed showed "-" for its course
+      // number in the popup and couldn't be found by searching its code.
+      if(c.courseNumber != null){ out.courseNumber = esc(String(c.courseNumber)).slice(0, 30); }
+      return out;
     }) : [];
     var prerequisites = Array.isArray(fp.prerequisites) ? fp.prerequisites.slice(0, 800).map(function(pair){
       return [safeId(pair[0]), safeId(pair[1])];
