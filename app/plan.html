@@ -148,6 +148,61 @@ window.APP_COLLEGES = {
   }
   // next: 'aaup-xxx': { university: 'aaup', icon: '...', name: { en: '...', ar: '...' } }
 };
+// The real, official pool of "University Elective" courses, keyed by
+// university id. When a plan's generic "uni-elective-N" placeholder is
+// tapped, the course popup offers this exact list to choose from instead of
+// a free-text box — same course catalog every major at that university
+// draws its University Elective requirement from. No Arabic name is given
+// here because none was provided as source material (see RULE ONE — not
+// guessing a translation); the picker shows the English title regardless of
+// UI language rather than invent one. A university with no entry here (or a
+// plan whose "uni-elective" slot doesn't apply, e.g. AASU) falls back to the
+// original free-text field.
+window.APP_UNIV_ELECTIVES = {
+  aaup: [
+    { code: '040511052', en: 'Israeli & Zionism Studies I' },
+    { code: '040511053', en: 'Jerusalem: Civilization and History' },
+    { code: '040511061', en: 'Israeli & Zionism Studies II' },
+    { code: '040511071', en: 'Development Management' },
+    { code: '040511081', en: 'Home Gardening' },
+    { code: '040511091', en: 'Fine Arts' },
+    { code: '040511101', en: 'Current World Issues' },
+    { code: '040511121', en: 'Physical Education' },
+    { code: '040511132', en: 'Election and Political Participation' },
+    { code: '040511133', en: 'The Palestinian Prisoners Movement' },
+    { code: '040511140', en: 'Law in Our Life' },
+    { code: '040511150', en: 'Islamic Culture' },
+    { code: '040511160', en: 'Democracy and Human Rights' },
+    { code: '040511170', en: 'Technology in Our Life' },
+    { code: '040511180', en: 'Introduction to Astronomy Science' },
+    { code: '040511200', en: 'Introduction to Economics' },
+    { code: '040511211', en: 'Anthropology' },
+    { code: '040511220', en: 'Anti-Corruption Challenges and Solution' },
+    { code: '040511230', en: 'French Language' },
+    { code: '040511240', en: 'German Language' },
+    { code: '040511260', en: 'Introduction to Psychology' },
+    { code: '040511270', en: 'Introduction to Sociology' },
+    { code: '040511280', en: 'Human & Environment' },
+    { code: '040511290', en: 'History of Science' },
+    { code: '040511311', en: 'International Relations' },
+    { code: '040511321', en: 'Science, Technology and Society' },
+    { code: '040511400', en: 'Turkish Language' },
+    { code: '040511411', en: 'Political Sciences' },
+    { code: '040511421', en: 'Critical Thinking' },
+    { code: '040511470', en: 'Medical Terminology in Hebrew' },
+    { code: '040511490', en: 'Human Rights and Gender' },
+    { code: '040511500', en: 'The Palestinian Cinema: An Alternative Narrative' },
+    { code: '040511511', en: 'Modern Arab Thought' },
+    { code: '040511521', en: 'Archeology' },
+    { code: '040511611', en: 'Hebrew Language' },
+    { code: '040511621', en: 'Civil Society Organizations' },
+    { code: '040511990', en: 'Effective Communication' },
+    { code: '060411001', en: 'Nutrition & Food Security' },
+    { code: '280311100', en: 'Financial Literacy' },
+    { code: '280311110', en: 'Introduction to Sign Language' }
+  ]
+  // next: xxx: [ { code: '...', en: '...' }, ... ]
+};
 // Where "Share this plan with the app maintainer" sends people. Leave ''
 // to fall back to opening a pre-filled GitHub issue on the app's repo (see
 // AAUP_IMPORTED.submitPlan) — no account setup needed. Once you have a
@@ -205,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.3';
+window.APP_VERSION = '3.4';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1667,6 +1722,32 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   }
 
   .status-btn:hover{border-color:var(--accent);color:var(--text);}
+
+  /* University Elective picker — a real, searchable list of that
+     university's actual elective courses, opened from the course popup's
+     "what did you actually take?" button instead of a free-text box. */
+  .elective-picker-field .home-btn{display:flex;align-items:center;gap:8px;font-size:12.5px;text-align:left;}
+  .plan-page.rtl-mode .elective-picker-field .home-btn,
+  html[dir="rtl"] .elective-picker-field .home-btn{text-align:right;}
+  .elective-picker-list{
+    margin-top:8px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel);padding:8px;
+  }
+  .elective-pick-options{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+  .elective-pick-option{
+    display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:6px;padding:7px 8px;
+    color:var(--text);font-size:12.5px;font-family:inherit;cursor:pointer;
+  }
+  .plan-page.rtl-mode .elective-pick-option,
+  html[dir="rtl"] .elective-pick-option{text-align:right;}
+  .elective-pick-option:hover{background:rgba(93,184,255,.12);}
+  .elective-pick-option .epo-code{color:var(--text-dim);font-size:10.5px;flex:0 0 auto;}
+  .elective-pick-option .epo-name{flex:1;}
+  .elective-pick-clear{
+    color:#ff9ecb;border-bottom:1px solid var(--line);border-radius:6px 6px 0 0;
+    margin-bottom:4px;padding-bottom:9px;
+  }
 
   .status-btn.active{background:var(--accent);border-color:var(--accent);color:var(--navy-900);font-weight:700;}
   .status-btn-auto{cursor:default;}
@@ -7924,6 +8005,41 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 // existing per-course info popup rather than adding a new one)
 // ==========================
 (function(){
+  // Which university a plan prefix belongs to, so the University Elective
+  // picker offers that university's real course pool (built-in majors are
+  // always AAUP; an imported/feed plan carries its own university field).
+  function planUniversity(prefix){
+    var BUILT_IN = { robotics: 1, cybersecurity: 1, medical: 1, cs: 1 };
+    if(BUILT_IN[prefix]) return 'aaup';
+    var imported = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans) ? window.AAUP_IMPORTED.loadImportedPlans() : {};
+    var p = imported[prefix];
+    return (p && p.university) || 'aaup';
+  }
+  // Only the plain "uni-elective-N" pool slot gets the real-course picker —
+  // free/dept/spec elective pools aren't university-wide catalogs, so there's
+  // no single real list to offer for them; they keep the free-text field.
+  function univElectivePool(prefix, slug){
+    if(!/^uni-elective-\d+$/.test(slug)) return null;
+    var pool = window.APP_UNIV_ELECTIVES && window.APP_UNIV_ELECTIVES[planUniversity(prefix)];
+    return (pool && pool.length) ? pool : null;
+  }
+
+  function electivePickerListHtml(pool, rtl, hasCurrent){
+    var esc = window.__escapeHtml;
+    var searchHtml = '<input type="text" class="search-input" id="electivePickerSearch" placeholder="' +
+      (rtl ? 'ابحث عن مادة…' : 'Search courses…') + '" autocomplete="off" style="margin-bottom:8px;width:100%;">';
+    var clearHtml = hasCurrent
+      ? '<button type="button" class="elective-pick-option elective-pick-clear" data-code="" data-en="">✕ ' + (rtl ? 'إلغاء الاختيار' : 'Clear selection') + '</button>'
+      : '';
+    var itemsHtml = pool.map(function(c){
+      return '<button type="button" class="elective-pick-option" data-code="' + esc(c.code) + '" data-en="' + esc(c.en) + '">' +
+        '<span class="epo-code">' + esc(c.code) + '</span><span class="epo-name">' + esc(c.en) + '</span></button>';
+    }).join('');
+    return searchHtml + clearHtml +
+      '<div class="elective-pick-options" id="electivePickerOptions">' + itemsHtml + '</div>' +
+      '<p class="ex-note" id="electivePickerEmpty" style="display:none;">' + (rtl ? 'لا توجد نتائج' : 'No matching courses') + '</p>';
+  }
+
   function render(prefix, slug){
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var meta = info[slug];
@@ -7944,7 +8060,20 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var isDone = !!progress[pid];
 
     var nameFieldHtml = '';
-    if(window.AAUP_PERSONAL.isGenericElectiveSlot(slug)){
+    var electivePool = univElectivePool(prefix, slug);
+    if(electivePool){
+      var poolCustomNames = window.AAUP_PERSONAL.loadCustomNames();
+      var poolCurrentName = poolCustomNames[pid] || '';
+      nameFieldHtml = '<div class="form-field elective-picker-field" style="margin-bottom:14px;">' +
+        '<label>' + (rtl ? 'ما هو المساق الذي أخذته فعليًا؟' : 'What course did you actually take?') + '</label>' +
+        '<button type="button" id="electivePickerBtn" class="home-btn" data-placeholder="' + window.__escapeHtml(rtl ? 'اضغط لاختيار مادتك الاختيارية' : 'Tap to choose your elective') + '" style="width:100%;justify-content:space-between;">' +
+        '<span id="electivePickerBtnLabel">' + (poolCurrentName ? window.__escapeHtml(poolCurrentName) : (rtl ? 'اضغط لاختيار مادتك الاختيارية' : 'Tap to choose your elective')) + '</span>' +
+        '<span aria-hidden="true">▾</span></button>' +
+        '<div class="elective-picker-list" id="electivePickerList" style="display:none;">' +
+        electivePickerListHtml(electivePool, rtl, !!poolCurrentName) +
+        '</div>' +
+        '</div>';
+    } else if(window.AAUP_PERSONAL.isGenericElectiveSlot(slug)){
       var customNames = window.AAUP_PERSONAL.loadCustomNames();
       var currentName = customNames[pid] || '';
       nameFieldHtml = '<div class="form-field" style="margin-bottom:14px;">' +
@@ -8034,6 +8163,57 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         if(nameInput.value.trim()){ names[pid] = nameInput.value; } else { delete names[pid]; }
         window.AAUP_PERSONAL.saveCustomNames(names);
         window.AAUP_PERSONAL.refreshCard(prefix, slug);
+      });
+    }
+
+    // ---- University Elective picker: tap the button to reveal a real,
+    // searchable list of that university's actual elective courses instead
+    // of typing a name in free-text. ----
+    var pickerBtn = container.querySelector('#electivePickerBtn');
+    var pickerList = container.querySelector('#electivePickerList');
+    if(pickerBtn && pickerList){
+      pickerBtn.addEventListener('click', function(){
+        var opening = pickerList.style.display === 'none';
+        pickerList.style.display = opening ? 'block' : 'none';
+        if(opening){
+          var search = pickerList.querySelector('#electivePickerSearch');
+          if(search){ search.value = ''; search.focus(); }
+          pickerList.querySelectorAll('.elective-pick-option').forEach(function(o){ o.style.display = ''; });
+          var empty = pickerList.querySelector('#electivePickerEmpty');
+          if(empty){ empty.style.display = 'none'; }
+        }
+      });
+
+      var searchInput = pickerList.querySelector('#electivePickerSearch');
+      if(searchInput){
+        searchInput.addEventListener('input', function(){
+          var q = searchInput.value.trim().toLowerCase();
+          var options = pickerList.querySelectorAll('.elective-pick-option:not(.elective-pick-clear)');
+          var anyVisible = false;
+          options.forEach(function(o){
+            var hay = (o.getAttribute('data-en') + ' ' + o.getAttribute('data-code')).toLowerCase();
+            var match = !q || hay.indexOf(q) !== -1;
+            o.style.display = match ? '' : 'none';
+            if(match) anyVisible = true;
+          });
+          var empty = pickerList.querySelector('#electivePickerEmpty');
+          if(empty){ empty.style.display = anyVisible ? 'none' : 'block'; }
+        });
+      }
+
+      pickerList.querySelectorAll('.elective-pick-option').forEach(function(opt){
+        opt.addEventListener('click', function(){
+          var en = opt.getAttribute('data-en');
+          var names = window.AAUP_PERSONAL.loadCustomNames();
+          if(en){ names[pid] = en; } else { delete names[pid]; }
+          window.AAUP_PERSONAL.saveCustomNames(names);
+          window.AAUP_PERSONAL.refreshCard(prefix, slug);
+          var label = pickerBtn.querySelector('#electivePickerBtnLabel');
+          if(label){
+            label.textContent = en || pickerBtn.getAttribute('data-placeholder') || label.textContent;
+          }
+          pickerList.style.display = 'none';
+        });
       });
     }
 

@@ -873,7 +873,7 @@
           "courseNumber": "110411000"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -882,7 +882,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1021,7 +1021,7 @@
           "courseNumber": "040511011"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1080,7 +1080,7 @@
           "courseNumber": "040521301"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1615,7 +1615,7 @@
           "courseNumber": "110411000"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1624,7 +1624,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1802,7 +1802,7 @@
           "courseNumber": "040511011"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1921,7 +1921,7 @@
           "courseNumber": "240213480"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2314,7 +2314,7 @@
           "courseNumber": "240111000"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2323,7 +2323,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2512,7 +2512,7 @@
           "courseNumber": "240213040"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2571,7 +2571,7 @@
           "courseNumber": "240512210"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -3068,7 +3068,7 @@
           "courseNumber": "010610026"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -3403,7 +3403,7 @@
           "courseNumber": "240213970"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -3470,7 +3470,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -3920,7 +3920,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -3978,7 +3978,7 @@
           "semester": "s2"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -4046,7 +4046,7 @@
           "courseNumber": "040521301"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -5539,7 +5539,7 @@
           "courseNumber": "070112360"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -6084,7 +6084,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -6093,7 +6093,7 @@
           "semester": "s2"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -6102,7 +6102,7 @@
           "semester": "s2"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
