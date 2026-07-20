@@ -5229,6 +5229,1180 @@
       },
       "courses": [],
       "prerequisites": []
+    },
+    {
+      "id": "aaup-pharmacy",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Pharmacy",
+          "small": "B.Sc. · 5 years · Program 7011 · 167 CH"
+        },
+        "ar": {
+          "big": "الصيدلة",
+          "small": "بكالوريوس · 5 سنوات · برنامج 7011 · 167 ساعة"
+        }
+      },
+      "icon": "💊",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Pharmacy",
+        "ar": "كلية الصيدلة"
+      },
+      "bio": {
+        "en": "B.Sc. in Pharmacy (Program 7011 · Jenin & Ramallah) — a 5-year program in its own Faculty of Pharmacy (est. 2021). Pharmaceutical sciences, medicinal chemistry, pharmacology, pharmaceutics, and clinical pharmacy with community field training. 167 credit hours over 5 years (summers in years 3-4), following the official advisory plan. The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في الصيدلة (برنامج 7011 · حرم جنين ورام الله) — برنامج مدته 5 سنوات في كلية الصيدلة (تأسست 2021). العلوم الصيدلانية والكيمياء الدوائية وعلم الأدوية والصيدلانيات والصيدلة السريرية مع تدريب ميداني مجتمعي. 167 ساعة معتمدة على 5 سنوات (بفصول صيفية في السنتين 3-4) وفق الخطة الإرشادية الرسمية. تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": true
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "060511030",
+          "name": "Medical Terminology",
+          "ar": "المصطلحات الطبية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "060511030"
+        },
+        {
+          "id": "100211710",
+          "name": "General Biology for Pharmacy Students",
+          "ar": "الأحياء العامة لطلبة الصيدلة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100211710"
+        },
+        {
+          "id": "100211751",
+          "name": "General Biology Lab for Pharmacy Students",
+          "ar": "مختبر الأحياء العامة لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100211751"
+        },
+        {
+          "id": "100311710",
+          "name": "General Chemistry for Pharmacy Students",
+          "ar": "الكيمياء العامة لطلبة الصيدلة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100311710"
+        },
+        {
+          "id": "100311750",
+          "name": "General Chemistry Lab for Pharmacy Students",
+          "ar": "مختبر الكيمياء العامة لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100311750"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "070111240",
+          "name": "Anatomy & Histology for Pharmacy Students",
+          "ar": "التشريح والأنسجة لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111240"
+        },
+        {
+          "id": "070111250",
+          "name": "Anatomy & Histology Lab for Pharmacy Students",
+          "ar": "مختبر التشريح والأنسجة لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111250"
+        },
+        {
+          "id": "070112100",
+          "name": "Physiology for Pharmacy Students I",
+          "ar": "الفسيولوجيا لطلبة الصيدلة 1",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070112100"
+        },
+        {
+          "id": "100111620",
+          "name": "Physics for Medical Sciences",
+          "ar": "الفيزياء للعلوم الطبية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100111620"
+        },
+        {
+          "id": "100411001",
+          "name": "Basic Mathematics",
+          "ar": "الرياضيات الأساسية",
+          "creditHours": 2,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411001"
+        },
+        {
+          "id": "070111170",
+          "name": "Pharmaceutical Organic Chemistry I",
+          "ar": "الكيمياء العضوية الصيدلانية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111170"
+        },
+        {
+          "id": "070111180",
+          "name": "Pharmaceutical Organic Chemistry I Lab",
+          "ar": "مختبر الكيمياء العضوية الصيدلانية 1",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111180"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "070112200",
+          "name": "Physiology for Pharmacy Students II",
+          "ar": "الفسيولوجيا لطلبة الصيدلة 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112200"
+        },
+        {
+          "id": "070112280",
+          "name": "Physiology Lab for Pharmacy Students",
+          "ar": "مختبر الفسيولوجيا لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112280"
+        },
+        {
+          "id": "070112160",
+          "name": "Pharmaceutical Organic Chemistry II",
+          "ar": "الكيمياء العضوية الصيدلانية 2",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112160"
+        },
+        {
+          "id": "070112170",
+          "name": "Pharmaceutical Analytical Chemistry",
+          "ar": "الكيمياء التحليلية الصيدلانية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112170"
+        },
+        {
+          "id": "070112180",
+          "name": "Pharmaceutical Analytical Chemistry Lab",
+          "ar": "مختبر الكيمياء التحليلية الصيدلانية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112180"
+        },
+        {
+          "id": "070112190",
+          "name": "Biochemistry for Pharmacy Students I (Structural)",
+          "ar": "الكيمياء الحيوية لطلبة الصيدلة 1 (البنيوية)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112190"
+        },
+        {
+          "id": "070112360",
+          "name": "Pharmaceutical Microbiology I",
+          "ar": "الأحياء الدقيقة الصيدلانية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112360"
+        },
+        {
+          "id": "univ-elec-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "070113100",
+          "name": "Pathophysiology for Pharmacy Students",
+          "ar": "علم الأمراض الوظيفي لطلبة الصيدلة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070113100"
+        },
+        {
+          "id": "070112210",
+          "name": "Pharmaceutics I",
+          "ar": "الصيدلانيات 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112210"
+        },
+        {
+          "id": "070112260",
+          "name": "Pharmaceutical Instrumental Analysis",
+          "ar": "التحليل الآلي الصيدلاني",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112260"
+        },
+        {
+          "id": "070112270",
+          "name": "Pharmaceutical Instrumental Analysis Lab",
+          "ar": "مختبر التحليل الآلي الصيدلاني",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112270"
+        },
+        {
+          "id": "070112290",
+          "name": "Biochemistry for Pharmacy Students II (Metabolic)",
+          "ar": "الكيمياء الحيوية لطلبة الصيدلة 2 (الأيضية)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112290"
+        },
+        {
+          "id": "070112300",
+          "name": "Biochemistry Lab for Pharmacy Students",
+          "ar": "مختبر الكيمياء الحيوية لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112300"
+        },
+        {
+          "id": "070112370",
+          "name": "Pharmaceutical Microbiology II",
+          "ar": "الأحياء الدقيقة الصيدلانية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112370"
+        },
+        {
+          "id": "070112390",
+          "name": "Pharmaceutical Microbiology Lab",
+          "ar": "مختبر الأحياء الدقيقة الصيدلانية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112390"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "070113111",
+          "name": "Pharmacology I",
+          "ar": "علم الأدوية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113111"
+        },
+        {
+          "id": "070113150",
+          "name": "Medicinal Chemistry I & Drug Design",
+          "ar": "الكيمياء الدوائية 1 وتصميم الأدوية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113150"
+        },
+        {
+          "id": "070113160",
+          "name": "Pharmaceutics II",
+          "ar": "الصيدلانيات 2",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113160"
+        },
+        {
+          "id": "070113170",
+          "name": "Pharmaceutics II Lab",
+          "ar": "مختبر الصيدلانيات 2",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113170"
+        },
+        {
+          "id": "070113260",
+          "name": "Pharmacognosy",
+          "ar": "العقاقير",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113260"
+        },
+        {
+          "id": "070113270",
+          "name": "Pharmacognosy Lab",
+          "ar": "مختبر العقاقير",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113270"
+        },
+        {
+          "id": "070113390",
+          "name": "Immunology for Pharmacy Students",
+          "ar": "علم المناعة لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113390"
+        },
+        {
+          "id": "070114500",
+          "name": "Clinical Nutrition",
+          "ar": "التغذية السريرية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070114500"
+        },
+        {
+          "id": "100412810",
+          "name": "Biostatistics",
+          "ar": "الإحصاء الحيوي",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "100412810"
+        },
+        {
+          "id": "070113200",
+          "name": "Pharmacology II",
+          "ar": "علم الأدوية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113200"
+        },
+        {
+          "id": "070113211",
+          "name": "Pharmaceutics III",
+          "ar": "الصيدلانيات 3",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113211"
+        },
+        {
+          "id": "070113230",
+          "name": "Medicinal Chemistry II",
+          "ar": "الكيمياء الدوائية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113230"
+        },
+        {
+          "id": "070113240",
+          "name": "Medicinal Chemistry Lab",
+          "ar": "مختبر الكيمياء الدوائية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113240"
+        },
+        {
+          "id": "070114110",
+          "name": "Communication Skills in Pharmacy",
+          "ar": "مهارات الاتصال في الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070114110"
+        },
+        {
+          "id": "070114140",
+          "name": "Phytochemistry",
+          "ar": "الكيمياء النباتية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070114140"
+        },
+        {
+          "id": "070114150",
+          "name": "Phytochemistry Lab",
+          "ar": "مختبر الكيمياء النباتية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070114150"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "070115400",
+          "name": "Community Pharmacy and Field Training I A",
+          "ar": "صيدلة المجتمع والتدريب الميداني 1 أ",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "070115400"
+        },
+        {
+          "id": "070113400",
+          "name": "Drug Information Resources",
+          "ar": "مصادر المعلومات الدوائية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070113400"
+        },
+        {
+          "id": "070114100",
+          "name": "Pharmacology III",
+          "ar": "علم الأدوية 3",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114100"
+        },
+        {
+          "id": "070114130",
+          "name": "Medicinal Chemistry III",
+          "ar": "الكيمياء الدوائية 3",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114130"
+        },
+        {
+          "id": "070114200",
+          "name": "Therapeutics & Clinical Pharmacy I",
+          "ar": "العلاجيات والصيدلة السريرية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114200"
+        },
+        {
+          "id": "070114230",
+          "name": "Industrial Pharmacy",
+          "ar": "الصيدلة الصناعية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114230"
+        },
+        {
+          "id": "070114250",
+          "name": "Pharmaceutical Calculations",
+          "ar": "الحسابات الصيدلانية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114250"
+        },
+        {
+          "id": "070114260",
+          "name": "Industrial Pharmacy Lab",
+          "ar": "مختبر الصيدلة الصناعية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114260"
+        },
+        {
+          "id": "070114310",
+          "name": "Genetics & Pharmacogenomics",
+          "ar": "الوراثة والجينوم الدوائي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114310"
+        },
+        {
+          "id": "070115401",
+          "name": "Community Pharmacy and Field Training I B",
+          "ar": "صيدلة المجتمع والتدريب الميداني 1 ب",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070115401"
+        },
+        {
+          "id": "070114210",
+          "name": "Pharmacoeconomics",
+          "ar": "اقتصاديات الدواء",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114210"
+        },
+        {
+          "id": "070114240",
+          "name": "Biopharmaceutics & Pharmacokinetics",
+          "ar": "الصيدلة الحيوية وحركية الدواء",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114240"
+        },
+        {
+          "id": "070114290",
+          "name": "Biopharmaceutics & Pharmacokinetics Lab",
+          "ar": "مختبر الصيدلة الحيوية وحركية الدواء",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114290"
+        },
+        {
+          "id": "070114320",
+          "name": "Clinical Biochemistry",
+          "ar": "الكيمياء الحيوية السريرية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114320"
+        },
+        {
+          "id": "070114330",
+          "name": "Epidemiology & Public Health for Pharmacy Students",
+          "ar": "علم الأوبئة والصحة العامة لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114330"
+        },
+        {
+          "id": "070115100",
+          "name": "Therapeutics & Clinical Pharmacy II",
+          "ar": "العلاجيات والصيدلة السريرية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115100"
+        },
+        {
+          "id": "070115200",
+          "name": "Over the Counter Drugs (OTC)",
+          "ar": "الأدوية المصروفة بدون وصفة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115200"
+        },
+        {
+          "id": "070115310",
+          "name": "Toxicology",
+          "ar": "علم السموم",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115310"
+        },
+        {
+          "id": "070115402",
+          "name": "Community Pharmacy and Field Training I C",
+          "ar": "صيدلة المجتمع والتدريب الميداني 1 ج",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115402"
+        },
+        {
+          "id": "070115410",
+          "name": "Community Pharmacy and Field Training II A",
+          "ar": "صيدلة المجتمع والتدريب الميداني 2 أ",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "summer",
+          "courseNumber": "070115410"
+        },
+        {
+          "id": "070115110",
+          "name": "Research Project",
+          "ar": "مشروع بحث",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115110"
+        },
+        {
+          "id": "070115120",
+          "name": "Pharmaceutical Regulations and Ethics",
+          "ar": "التشريعات والأخلاقيات الصيدلانية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115120"
+        },
+        {
+          "id": "070115160",
+          "name": "First Aid for Pharmacy Students",
+          "ar": "الإسعافات الأولية لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115160"
+        },
+        {
+          "id": "070115411",
+          "name": "Community Pharmacy and Field Training II B",
+          "ar": "صيدلة المجتمع والتدريب الميداني 2 ب",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115411"
+        },
+        {
+          "id": "170112160",
+          "name": "Basic Life Support (BLS)",
+          "ar": "دعم الحياة الأساسي",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "170112160"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y5",
+          "semester": "s1"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y5",
+          "semester": "s1"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y5",
+          "semester": "s1"
+        },
+        {
+          "id": "univ-elec-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "univ-elec-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "univ-elec-4",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y5",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "060511030",
+          "070111240"
+        ],
+        [
+          "100211710",
+          "070111240"
+        ],
+        [
+          "070111240",
+          "070111250"
+        ],
+        [
+          "070111240",
+          "070112100"
+        ],
+        [
+          "070112100",
+          "070112200"
+        ],
+        [
+          "070112200",
+          "070112280"
+        ],
+        [
+          "070112200",
+          "070113100"
+        ],
+        [
+          "100211710",
+          "100211751"
+        ],
+        [
+          "100311710",
+          "100311750"
+        ],
+        [
+          "100311710",
+          "070111170"
+        ],
+        [
+          "100311750",
+          "070111170"
+        ],
+        [
+          "070111170",
+          "070111180"
+        ],
+        [
+          "070111170",
+          "070112160"
+        ],
+        [
+          "100311710",
+          "070112170"
+        ],
+        [
+          "100311750",
+          "070112170"
+        ],
+        [
+          "070112170",
+          "070112180"
+        ],
+        [
+          "070111170",
+          "070112190"
+        ],
+        [
+          "070111170",
+          "070112210"
+        ],
+        [
+          "100311710",
+          "070112260"
+        ],
+        [
+          "100311750",
+          "070112260"
+        ],
+        [
+          "070112260",
+          "070112270"
+        ],
+        [
+          "070112190",
+          "070112290"
+        ],
+        [
+          "070112290",
+          "070112300"
+        ],
+        [
+          "100211710",
+          "070112360"
+        ],
+        [
+          "070112360",
+          "070112370"
+        ],
+        [
+          "070112370",
+          "070112390"
+        ],
+        [
+          "070112190",
+          "070113111"
+        ],
+        [
+          "070112200",
+          "070113111"
+        ],
+        [
+          "070112160",
+          "070113150"
+        ],
+        [
+          "070112210",
+          "070113160"
+        ],
+        [
+          "070113160",
+          "070113170"
+        ],
+        [
+          "070113111",
+          "070113200"
+        ],
+        [
+          "070113160",
+          "070113211"
+        ],
+        [
+          "070113150",
+          "070113230"
+        ],
+        [
+          "070113230",
+          "070113240"
+        ],
+        [
+          "070111170",
+          "070113260"
+        ],
+        [
+          "070113260",
+          "070113270"
+        ],
+        [
+          "070112360",
+          "070113390"
+        ],
+        [
+          "070113200",
+          "070113400"
+        ],
+        [
+          "070112370",
+          "070114100"
+        ],
+        [
+          "070113200",
+          "070114100"
+        ],
+        [
+          "070113111",
+          "070114110"
+        ],
+        [
+          "070113230",
+          "070114130"
+        ],
+        [
+          "070113260",
+          "070114140"
+        ],
+        [
+          "070114140",
+          "070114150"
+        ],
+        [
+          "070113200",
+          "070114200"
+        ],
+        [
+          "070114100",
+          "070114210"
+        ],
+        [
+          "070113211",
+          "070114230"
+        ],
+        [
+          "070113211",
+          "070114240"
+        ],
+        [
+          "070113211",
+          "070114250"
+        ],
+        [
+          "070114230",
+          "070114260"
+        ],
+        [
+          "070114240",
+          "070114290"
+        ],
+        [
+          "070113200",
+          "070114310"
+        ],
+        [
+          "070112290",
+          "070114320"
+        ],
+        [
+          "070113100",
+          "070114320"
+        ],
+        [
+          "070113100",
+          "070114330"
+        ],
+        [
+          "070112290",
+          "070114500"
+        ],
+        [
+          "070114200",
+          "070115100"
+        ],
+        [
+          "070115100",
+          "070115110"
+        ],
+        [
+          "070113200",
+          "070115120"
+        ],
+        [
+          "070114100",
+          "070115200"
+        ],
+        [
+          "070114100",
+          "070115310"
+        ],
+        [
+          "070113111",
+          "070115400"
+        ],
+        [
+          "070115400",
+          "070115401"
+        ],
+        [
+          "070115401",
+          "070115402"
+        ],
+        [
+          "070115402",
+          "070115410"
+        ],
+        [
+          "070115410",
+          "070115411"
+        ],
+        [
+          "070115160",
+          "170112160"
+        ]
+      ]
     }
   ]
 }
