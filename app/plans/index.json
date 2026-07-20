@@ -873,7 +873,7 @@
           "courseNumber": "110411000"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -882,7 +882,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1021,7 +1021,7 @@
           "courseNumber": "040511011"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1080,7 +1080,7 @@
           "courseNumber": "040521301"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1615,7 +1615,7 @@
           "courseNumber": "110411000"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1624,7 +1624,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1802,7 +1802,7 @@
           "courseNumber": "040511011"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -1921,7 +1921,7 @@
           "courseNumber": "240213480"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2314,7 +2314,7 @@
           "courseNumber": "240111000"
         },
         {
-          "id": "univ-elec-1",
+          "id": "uni-elective-1",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2323,7 +2323,7 @@
           "semester": "s1"
         },
         {
-          "id": "univ-elec-2",
+          "id": "uni-elective-2",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2512,7 +2512,7 @@
           "courseNumber": "240213040"
         },
         {
-          "id": "univ-elec-3",
+          "id": "uni-elective-3",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2571,7 +2571,7 @@
           "courseNumber": "240512210"
         },
         {
-          "id": "univ-elec-4",
+          "id": "uni-elective-4",
           "name": "University Elective",
           "ar": "متطلب جامعي اختياري",
           "creditHours": 2,
@@ -2940,6 +2940,3467 @@
         [
           "240514140",
           "240514210"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-multimedia",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Multimedia Technology",
+          "small": "B.Sc. · Program 24022"
+        },
+        "ar": {
+          "big": "تكنولوجيا الوسائط المتعددة",
+          "small": "بكالوريوس · برنامج 24022"
+        }
+      },
+      "icon": "🎨",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Multimedia Technology (Program 24022 · Jenin & Ramallah). Computer graphics, games, animation, digital video/audio, photography, and virtual reality. 4 years, following the official advisory plan — its listed courses total 133 CH (the program page states 135). The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في تكنولوجيا الوسائط المتعددة (برنامج 24022 · حرم جنين ورام الله). رسوميات الحاسوب والألعاب والرسوم المتحركة والفيديو والصوت الرقمي والتصوير والواقع الافتراضي. 4 سنوات وفق الخطة الإرشادية الرسمية — مجموع مساقاتها المدرجة 133 ساعة (صفحة البرنامج تذكر 135). تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "100411010",
+          "name": "Calculus I",
+          "ar": "التفاضل والتكامل 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100411010"
+        },
+        {
+          "id": "240211013",
+          "name": "Introduction to Information Technology",
+          "ar": "مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211013"
+        },
+        {
+          "id": "240211030",
+          "name": "Introduction to Information Technology Lab",
+          "ar": "مختبر مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211030"
+        },
+        {
+          "id": "240211200",
+          "name": "Creative Arts",
+          "ar": "الفنون الإبداعية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211200"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y1",
+          "semester": "s2"
+        },
+        {
+          "id": "100413750",
+          "name": "Discrete Mathematics",
+          "ar": "الرياضيات المتقطعة",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100413750"
+        },
+        {
+          "id": "240111050",
+          "name": "Programming Fundamentals I for IT",
+          "ar": "أساسيات البرمجة 1 لتكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111050"
+        },
+        {
+          "id": "240111060",
+          "name": "Programming Fundamentals I Lab for IT",
+          "ar": "مختبر أساسيات البرمجة 1 لتكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111060"
+        },
+        {
+          "id": "240212020",
+          "name": "Introduction to Multimedia",
+          "ar": "مقدمة في الوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240212020"
+        },
+        {
+          "id": "240212031",
+          "name": "Introduction to Multimedia Lab",
+          "ar": "مختبر مقدمة في الوسائط المتعددة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240212031"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "240112100",
+          "name": "Programming Fundamentals II for IT",
+          "ar": "أساسيات البرمجة 2 لتكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112100"
+        },
+        {
+          "id": "240112200",
+          "name": "Programming Fundamentals II Lab for IT",
+          "ar": "مختبر أساسيات البرمجة 2 لتكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112200"
+        },
+        {
+          "id": "240212401",
+          "name": "Computer Modeling",
+          "ar": "النمذجة الحاسوبية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240212401"
+        },
+        {
+          "id": "240222500",
+          "name": "Digital Photography and Composition",
+          "ar": "التصوير الرقمي والتكوين",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240222500"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "240213480",
+          "name": "Speech Communication and Technical Writing",
+          "ar": "مهارات الاتصال والكتابة التقنية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240213480"
+        },
+        {
+          "id": "240113121",
+          "name": "Introduction to Database",
+          "ar": "مقدمة في قواعد البيانات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240113121"
+        },
+        {
+          "id": "240113131",
+          "name": "Introduction to Database (Lab)",
+          "ar": "مختبر مقدمة في قواعد البيانات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240113131"
+        },
+        {
+          "id": "240212100",
+          "name": "Fundamentals of Computer Graphics",
+          "ar": "أساسيات رسوميات الحاسوب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240212100"
+        },
+        {
+          "id": "240223100",
+          "name": "Advanced Computer Modeling",
+          "ar": "النمذجة الحاسوبية المتقدمة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240223100"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "240213081",
+          "name": "Web Development I",
+          "ar": "تطوير الويب 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240213081"
+        },
+        {
+          "id": "240213231",
+          "name": "Visual Programming (Basic)",
+          "ar": "البرمجة المرئية (بيسك)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240213231"
+        },
+        {
+          "id": "240213250",
+          "name": "Computer Games Design and Development",
+          "ar": "تصميم وتطوير ألعاب الحاسوب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240213250"
+        },
+        {
+          "id": "240214350",
+          "name": "Online Advertising Fundamentals",
+          "ar": "أساسيات الإعلان عبر الإنترنت",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240214350"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "240213120",
+          "name": "Digital Image Processing",
+          "ar": "معالجة الصور الرقمية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240213120"
+        },
+        {
+          "id": "240213340",
+          "name": "Multimedia Systems Analysis and Design",
+          "ar": "تحليل وتصميم أنظمة الوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240213340"
+        },
+        {
+          "id": "240214200",
+          "name": "Advanced Computer Games Design and Development",
+          "ar": "تصميم وتطوير ألعاب الحاسوب المتقدم",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240214200"
+        },
+        {
+          "id": "240214311",
+          "name": "Computer Animation",
+          "ar": "الرسوم المتحركة الحاسوبية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240214311"
+        },
+        {
+          "id": "240214330",
+          "name": "Virtual Reality",
+          "ar": "الواقع الافتراضي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240214330"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "خدمة المجتمع",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "240213970",
+          "name": "Internship",
+          "ar": "التدريب الميداني",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "240213970"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "240214100",
+          "name": "Digital Video and Audio",
+          "ar": "الفيديو والصوت الرقمي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240214100"
+        },
+        {
+          "id": "240214301",
+          "name": "Multimedia and Business",
+          "ar": "الوسائط المتعددة والأعمال",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240214301"
+        },
+        {
+          "id": "240214971",
+          "name": "Multimedia Senior Project I",
+          "ar": "مشروع التخرج 1 للوسائط المتعددة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240214971"
+        },
+        {
+          "id": "240224700",
+          "name": "Mobile Programming for MMT",
+          "ar": "برمجة الأجهزة المحمولة للوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240224700"
+        },
+        {
+          "id": "spec-elec-5",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "240214210",
+          "name": "Interactive Multimedia",
+          "ar": "الوسائط المتعددة التفاعلية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240214210"
+        },
+        {
+          "id": "240214990",
+          "name": "Multimedia Senior Project II",
+          "ar": "مشروع التخرج 2 للوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240214990"
+        },
+        {
+          "id": "spec-elec-6",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100411010",
+          "100413750"
+        ],
+        [
+          "240111050",
+          "240111060"
+        ],
+        [
+          "010610035",
+          "240213480"
+        ],
+        [
+          "240111050",
+          "240112100"
+        ],
+        [
+          "240111060",
+          "240112200"
+        ],
+        [
+          "240112100",
+          "240112200"
+        ],
+        [
+          "240112100",
+          "240113121"
+        ],
+        [
+          "240113121",
+          "240113131"
+        ],
+        [
+          "240211013",
+          "240211030"
+        ],
+        [
+          "240212020",
+          "240212031"
+        ],
+        [
+          "240111050",
+          "240212100"
+        ],
+        [
+          "240212020",
+          "240212401"
+        ],
+        [
+          "240112100",
+          "240213081"
+        ],
+        [
+          "100413750",
+          "240213120"
+        ],
+        [
+          "240112100",
+          "240213231"
+        ],
+        [
+          "240112100",
+          "240213250"
+        ],
+        [
+          "240113121",
+          "240213340"
+        ],
+        [
+          "240222500",
+          "240214100"
+        ],
+        [
+          "240213250",
+          "240214200"
+        ],
+        [
+          "240213231",
+          "240214210"
+        ],
+        [
+          "240212020",
+          "240214301"
+        ],
+        [
+          "240223100",
+          "240214311"
+        ],
+        [
+          "240112100",
+          "240214330"
+        ],
+        [
+          "240212020",
+          "240214350"
+        ],
+        [
+          "240214971",
+          "240214990"
+        ],
+        [
+          "240212020",
+          "240222500"
+        ],
+        [
+          "240212401",
+          "240223100"
+        ],
+        [
+          "240213231",
+          "240224700"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-cs-gamedev",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Computer Science — Game Design & Development",
+          "small": "🚧 Study plan coming soon · Program 24013"
+        },
+        "ar": {
+          "big": "علوم الحاسوب — تصميم وتطوير الألعاب",
+          "small": "🚧 الخطة الدراسية قريبًا · برنامج 24013"
+        }
+      },
+      "icon": "🎮",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Computer Science — Specialization in Game Design and Development (Program 24013 · Jenin). Blends computer science with game mechanics, interactive media, visual design, and immersive tech (Unity, Unreal Engine, Blender, AI-driven design). 🚧 The full study plan is not available yet — coming soon.",
+        "ar": "بكالوريوس علوم الحاسوب — تخصص تصميم وتطوير الألعاب (برنامج 24013 · حرم جنين). يمزج علوم الحاسوب مع ميكانيكا الألعاب والوسائط التفاعلية والتصميم البصري والتقنيات الغامرة (يونتي، أنريل، بلندر، والتصميم المدعوم بالذكاء الاصطناعي). 🚧 الخطة الدراسية الكاملة غير متوفرة بعد — قريبًا."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-gis",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Geographic Information Systems (GIS)",
+          "small": "B.Sc. · Program 24041"
+        },
+        "ar": {
+          "big": "نظم المعلومات الجغرافية",
+          "small": "بكالوريوس · برنامج 24041"
+        }
+      },
+      "icon": "🗺️",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Geographic Information Systems (Program 24041 · Jenin) — the first GIS program in Palestine (since 2014). Spatial data collection, analysis, cartography, remote sensing, and web/mobile GIS. 4 years, following the official advisory plan — its listed courses total 130 CH (the program page states 132). The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في نظم المعلومات الجغرافية (برنامج 24041 · حرم جنين) — أول برنامج نظم معلومات جغرافية في فلسطين (منذ 2014). جمع وتحليل البيانات المكانية ورسم الخرائط والاستشعار عن بعد وتطبيقات الويب والمحمول. 4 سنوات وفق الخطة الإرشادية الرسمية — مجموع مساقاتها المدرجة 130 ساعة (صفحة البرنامج تذكر 132). تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "110111030",
+          "name": "Introduction to Information Technology Lab",
+          "ar": "مختبر مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110111030"
+        },
+        {
+          "id": "240221010",
+          "name": "Introduction to Information Technology",
+          "ar": "مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240221010"
+        },
+        {
+          "id": "240511100",
+          "name": "Physical Geography",
+          "ar": "الجغرافيا الطبيعية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240511100"
+        },
+        {
+          "id": "240512120",
+          "name": "GPS and Surveying",
+          "ar": "نظام تحديد المواقع والمساحة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240512120"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "100411090",
+          "name": "Mathematics for GIS Students",
+          "ar": "الرياضيات لطلبة نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411090"
+        },
+        {
+          "id": "240411120",
+          "name": "Principles of Maps",
+          "ar": "مبادئ الخرائط",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240411120"
+        },
+        {
+          "id": "240411160",
+          "name": "Computer Skills for GIS",
+          "ar": "مهارات الحاسوب لنظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240411160"
+        },
+        {
+          "id": "240412100",
+          "name": "Introduction to GIS",
+          "ar": "مقدمة في نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240412100"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "240111011",
+          "name": "Programming Fundamentals (C++)",
+          "ar": "أساسيات البرمجة (سي++)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240111011"
+        },
+        {
+          "id": "240111021",
+          "name": "Programming Fundamentals I (Lab)",
+          "ar": "مختبر أساسيات البرمجة 1",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240111021"
+        },
+        {
+          "id": "240411130",
+          "name": "Principles of Geology",
+          "ar": "مبادئ الجيولوجيا",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240411130"
+        },
+        {
+          "id": "240411140",
+          "name": "Human Geography",
+          "ar": "الجغرافيا البشرية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240411140"
+        },
+        {
+          "id": "240512130",
+          "name": "Introduction to Remote Sensing",
+          "ar": "مقدمة في الاستشعار عن بعد",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240512130"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "100411100",
+          "name": "Statistics for GIS Students",
+          "ar": "الإحصاء لطلبة نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "100411100"
+        },
+        {
+          "id": "240213480",
+          "name": "Speech Communication and Technical Writing",
+          "ar": "مهارات الاتصال والكتابة التقنية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240213480"
+        },
+        {
+          "id": "240412150",
+          "name": "GIS Data Analysis",
+          "ar": "تحليل بيانات نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240412150"
+        },
+        {
+          "id": "240412160",
+          "name": "Intermediate GIS",
+          "ar": "نظم المعلومات الجغرافية المتوسطة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240412160"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "240412170",
+          "name": "GIS Applications in Hydrology and Spatial Modeling",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في الهيدرولوجيا والنمذجة المكانية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240412170"
+        },
+        {
+          "id": "240513140",
+          "name": "GIS Programming and Automation",
+          "ar": "برمجة وأتمتة نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240513140"
+        },
+        {
+          "id": "240513230",
+          "name": "Digitizing Maps Lab",
+          "ar": "مختبر رقمنة الخرائط",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240513230"
+        },
+        {
+          "id": "240514130",
+          "name": "GIS Applications in Geological Studies",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في الدراسات الجيولوجية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240514130"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "240414110",
+          "name": "Three-Dimensional Concepts of GIS",
+          "ar": "المفاهيم ثلاثية الأبعاد في نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240414110"
+        },
+        {
+          "id": "240513120",
+          "name": "Geo-Database Design and Management",
+          "ar": "تصميم وإدارة قواعد البيانات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240513120"
+        },
+        {
+          "id": "240513130",
+          "name": "GIS Applications in Urban and Municipal Planning",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في التخطيط الحضري والبلدي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240513130"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "240513990",
+          "name": "Internship",
+          "ar": "التدريب الميداني",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "240513990"
+        },
+        {
+          "id": "240513100",
+          "name": "Digital Cartography",
+          "ar": "رسم الخرائط الرقمي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240513100"
+        },
+        {
+          "id": "240513110",
+          "name": "Geo-Statistics and Spatial Data Mining",
+          "ar": "الإحصاء الجغرافي والتنقيب في البيانات المكانية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240513110"
+        },
+        {
+          "id": "240514120",
+          "name": "GIS Project Management",
+          "ar": "إدارة مشاريع نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240514120"
+        },
+        {
+          "id": "spec-elec-5",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "240413160",
+          "name": "GIS Applications in Network Analysis",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في تحليل الشبكات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240413160"
+        },
+        {
+          "id": "240513150",
+          "name": "Online and Web GIS Applications",
+          "ar": "تطبيقات نظم المعلومات الجغرافية عبر الإنترنت والويب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240513150"
+        },
+        {
+          "id": "240514980",
+          "name": "Senior Graduation Project",
+          "ar": "مشروع التخرج",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240514980"
+        },
+        {
+          "id": "spec-elec-6",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100411090",
+          "100411100"
+        ],
+        [
+          "240221010",
+          "110111030"
+        ],
+        [
+          "240221010",
+          "240111011"
+        ],
+        [
+          "240221010",
+          "240111021"
+        ],
+        [
+          "010610035",
+          "240213480"
+        ],
+        [
+          "240512120",
+          "240411120"
+        ],
+        [
+          "110411000",
+          "240412100"
+        ],
+        [
+          "240221010",
+          "240412100"
+        ],
+        [
+          "240411130",
+          "240412170"
+        ],
+        [
+          "240412100",
+          "240412170"
+        ],
+        [
+          "240513120",
+          "240413160"
+        ],
+        [
+          "240412100",
+          "240414110"
+        ],
+        [
+          "240412160",
+          "240414110"
+        ],
+        [
+          "240512120",
+          "240512130"
+        ],
+        [
+          "240412160",
+          "240513100"
+        ],
+        [
+          "100411100",
+          "240513110"
+        ],
+        [
+          "240111011",
+          "240513110"
+        ],
+        [
+          "240221010",
+          "240513120"
+        ],
+        [
+          "240111011",
+          "240513140"
+        ],
+        [
+          "240412100",
+          "240513140"
+        ],
+        [
+          "240513120",
+          "240513150"
+        ],
+        [
+          "240411120",
+          "240513230"
+        ],
+        [
+          "240412160",
+          "240514120"
+        ],
+        [
+          "240411130",
+          "240514130"
+        ],
+        [
+          "240412100",
+          "240514130"
+        ],
+        [
+          "240514120",
+          "240514980"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-nursing",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Nursing",
+          "small": "B.Sc. · Program 17011 · 146 CH"
+        },
+        "ar": {
+          "big": "التمريض",
+          "small": "بكالوريوس · برنامج 17011 · 146 ساعة"
+        }
+      },
+      "icon": "🩺",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Nursing",
+        "ar": "كلية التمريض"
+      },
+      "bio": {
+        "en": "B.Sc. in Nursing (Program 17011 · Jenin & Ramallah). Patient- and family-centered care across diverse healthcare settings, with simulation, VR, and an AHA-accredited resuscitation center. 146 credit hours over 4 years (summers in years 1-3), following the official advisory plan. The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في التمريض (برنامج 17011 · حرم جنين ورام الله). رعاية متمحورة حول المريض والأسرة في مختلف بيئات الرعاية الصحية، مع مختبرات محاكاة وواقع افتراضي ومركز إنعاش معتمد. 146 ساعة معتمدة على 4 سنوات (بفصول صيفية في السنوات 1-3) وفق الخطة الإرشادية الرسمية. تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": true
+          },
+          {
+            "id": "y2",
+            "hasSummer": true
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "010610071",
+          "name": "English for Nursing I",
+          "ar": "اللغة الإنجليزية للتمريض 1",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610071"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511260",
+          "name": "Introduction to Psychology",
+          "ar": "مقدمة في علم النفس",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040511260"
+        },
+        {
+          "id": "040511270",
+          "name": "Introduction to Sociology",
+          "ar": "مقدمة في علم الاجتماع",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040511270"
+        },
+        {
+          "id": "060511040",
+          "name": "Epidemiology and Public Health",
+          "ar": "علم الأوبئة والصحة العامة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "060511040"
+        },
+        {
+          "id": "100211630",
+          "name": "Biology for Nursing",
+          "ar": "الأحياء للتمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100211630"
+        },
+        {
+          "id": "100311630",
+          "name": "Chemistry for Nursing",
+          "ar": "الكيمياء للتمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100311630"
+        },
+        {
+          "id": "170111200",
+          "name": "Nursing Theories and Clinical Application",
+          "ar": "نظريات التمريض والتطبيق السريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "170111200"
+        },
+        {
+          "id": "010610072",
+          "name": "English for Nursing II",
+          "ar": "اللغة الإنجليزية للتمريض 2",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610072"
+        },
+        {
+          "id": "170111220",
+          "name": "Nutrition Across the Human Life Span",
+          "ar": "التغذية عبر مراحل حياة الإنسان",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111220"
+        },
+        {
+          "id": "170111290",
+          "name": "First Aid and Basic Life Support",
+          "ar": "الإسعافات الأولية ودعم الحياة الأساسي",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111290"
+        },
+        {
+          "id": "170111510",
+          "name": "Fundamentals and Health Assessment Nursing Theory",
+          "ar": "أساسيات وتقييم الصحة التمريضي - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111510"
+        },
+        {
+          "id": "170111520",
+          "name": "Fundamentals and Health Assessment Nursing Applications",
+          "ar": "أساسيات وتقييم الصحة التمريضي - تطبيقات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111520"
+        },
+        {
+          "id": "170111530",
+          "name": "Fundamentals and Health Assessment Nursing Clinical",
+          "ar": "أساسيات وتقييم الصحة التمريضي - سريري",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111530"
+        },
+        {
+          "id": "170111540",
+          "name": "Human Anatomy and Physiology I",
+          "ar": "تشريح وفسيولوجيا الإنسان 1",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111540"
+        },
+        {
+          "id": "170111550",
+          "name": "Quality, Safety, and Ethics in Nursing",
+          "ar": "الجودة والسلامة والأخلاقيات في التمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "170111550"
+        },
+        {
+          "id": "010610073",
+          "name": "English for Nursing III",
+          "ar": "اللغة الإنجليزية للتمريض 3",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "010610073"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "100211240",
+          "name": "Biochemistry for Nursing",
+          "ar": "الكيمياء الحيوية للتمريض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "100211240"
+        },
+        {
+          "id": "170112150",
+          "name": "Human Anatomy & Physiology II",
+          "ar": "تشريح وفسيولوجيا الإنسان 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "summer",
+          "courseNumber": "170112150"
+        },
+        {
+          "id": "170112190",
+          "name": "Adult Medical Surgical Nursing I Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 1 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112190"
+        },
+        {
+          "id": "170112200",
+          "name": "Adult Medical Surgical Nursing II Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 2 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112200"
+        },
+        {
+          "id": "170112240",
+          "name": "Pharmacology for Nursing I",
+          "ar": "علم الأدوية للتمريض 1",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112240"
+        },
+        {
+          "id": "170112270",
+          "name": "Adult Medical Surgical Nursing III Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 3 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112270"
+        },
+        {
+          "id": "170112280",
+          "name": "Adult Medical Surgical Nursing Clinical I",
+          "ar": "تمريض البالغين الطبي الجراحي - سريري 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112280"
+        },
+        {
+          "id": "170112290",
+          "name": "Adult Medical Surgical Nursing Simulation",
+          "ar": "تمريض البالغين الطبي الجراحي - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "170112290"
+        },
+        {
+          "id": "170112180",
+          "name": "Therapeutic Communication and Patient / Nurse Centered Care",
+          "ar": "التواصل العلاجي والرعاية المتمحورة حول المريض والممرض",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112180"
+        },
+        {
+          "id": "170112310",
+          "name": "Adult Medical Surgical Nursing IV Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 4 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112310"
+        },
+        {
+          "id": "170112320",
+          "name": "Adult Medical Surgical Nursing V Theory",
+          "ar": "تمريض البالغين الطبي الجراحي 5 - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112320"
+        },
+        {
+          "id": "170112330",
+          "name": "Adult Medical Surgical Nursing Clinical II",
+          "ar": "تمريض البالغين الطبي الجراحي - سريري 2",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170112330"
+        },
+        {
+          "id": "170113130",
+          "name": "Pharmacology for Nursing II",
+          "ar": "علم الأدوية للتمريض 2",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "170113130"
+        },
+        {
+          "id": "170112170",
+          "name": "Developmental Psychology",
+          "ar": "علم النفس التطوري",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y2",
+          "semester": "summer",
+          "courseNumber": "170112170"
+        },
+        {
+          "id": "170112340",
+          "name": "Pathology",
+          "ar": "علم الأمراض",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "summer",
+          "courseNumber": "170112340"
+        },
+        {
+          "id": "170113190",
+          "name": "Maternity Health Nursing I Theory",
+          "ar": "تمريض صحة الأمومة 1 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113190"
+        },
+        {
+          "id": "170113200",
+          "name": "Maternity Health Nursing II Theory",
+          "ar": "تمريض صحة الأمومة 2 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113200"
+        },
+        {
+          "id": "170113270",
+          "name": "Maternity Health Nursing Clinical",
+          "ar": "تمريض صحة الأمومة - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113270"
+        },
+        {
+          "id": "170113280",
+          "name": "Maternity Health Nursing Simulation",
+          "ar": "تمريض صحة الأمومة - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113280"
+        },
+        {
+          "id": "170113370",
+          "name": "Community and Family Health Nursing Theory",
+          "ar": "تمريض صحة المجتمع والأسرة - نظري",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113370"
+        },
+        {
+          "id": "170113380",
+          "name": "Community and Family Health Nursing Clinical",
+          "ar": "تمريض صحة المجتمع والأسرة - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113380"
+        },
+        {
+          "id": "170113390",
+          "name": "Nursing Management and Digital Leadership",
+          "ar": "الإدارة التمريضية والقيادة الرقمية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "170113390"
+        },
+        {
+          "id": "170113290",
+          "name": "Pediatric Health Nursing I Theory",
+          "ar": "تمريض صحة الأطفال 1 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113290"
+        },
+        {
+          "id": "170113300",
+          "name": "Pediatric Health Nursing II Theory",
+          "ar": "تمريض صحة الأطفال 2 - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113300"
+        },
+        {
+          "id": "170113320",
+          "name": "Pediatric Health Nursing Clinical",
+          "ar": "تمريض صحة الأطفال - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113320"
+        },
+        {
+          "id": "170113340",
+          "name": "Pediatric Health Nursing Simulation",
+          "ar": "تمريض صحة الأطفال - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113340"
+        },
+        {
+          "id": "170113350",
+          "name": "Psychiatric and Mental Health Nursing Theory",
+          "ar": "تمريض الصحة النفسية والعقلية - نظري",
+          "creditHours": 5,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113350"
+        },
+        {
+          "id": "170113360",
+          "name": "Psychiatric Clinical Nursing",
+          "ar": "تمريض الصحة النفسية - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "170113360"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "170113400",
+          "name": "Microbiology and Immunology for Nursing",
+          "ar": "الأحياء الدقيقة والمناعة للتمريض",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "170113400"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "100414890",
+          "name": "Biostatistics for Nursing",
+          "ar": "الإحصاء الحيوي للتمريض",
+          "creditHours": 2,
+          "category": "math",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "100414890"
+        },
+        {
+          "id": "170114170",
+          "name": "Health Promotion and Disease Prevention Theory",
+          "ar": "تعزيز الصحة والوقاية من الأمراض - نظري",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114170"
+        },
+        {
+          "id": "170114180",
+          "name": "Health Promotion and Disease Prevention Clinical",
+          "ar": "تعزيز الصحة والوقاية من الأمراض - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114180"
+        },
+        {
+          "id": "170114190",
+          "name": "Clinical Pharmacology for Nursing",
+          "ar": "علم الأدوية السريري للتمريض",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114190"
+        },
+        {
+          "id": "170114260",
+          "name": "Advanced Cardiac Life Support (ACLS)",
+          "ar": "دعم الحياة القلبي المتقدم",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114260"
+        },
+        {
+          "id": "170114330",
+          "name": "Critical, Emergency, and Trauma Nursing Theory",
+          "ar": "التمريض الحرج والطارئ والرضحي - نظري",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114330"
+        },
+        {
+          "id": "170114340",
+          "name": "Critical, Emergency, and Trauma Nursing Clinical",
+          "ar": "التمريض الحرج والطارئ والرضحي - سريري",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114340"
+        },
+        {
+          "id": "170114350",
+          "name": "Critical, Emergency, and Trauma Nursing Simulation",
+          "ar": "التمريض الحرج والطارئ والرضحي - محاكاة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "170114350"
+        },
+        {
+          "id": "170114200",
+          "name": "Genetic and Genomic Nursing",
+          "ar": "التمريض الوراثي والجينومي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114200"
+        },
+        {
+          "id": "170114250",
+          "name": "Comprehensive Exam",
+          "ar": "الامتحان الشامل",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114250"
+        },
+        {
+          "id": "170114280",
+          "name": "Nursing Seminar and Evidence Based Practice (EBP)",
+          "ar": "حلقة نقاش تمريضية والممارسة المبنية على الأدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114280"
+        },
+        {
+          "id": "170114290",
+          "name": "Advanced Clinical Practice",
+          "ar": "الممارسة السريرية المتقدمة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114290"
+        },
+        {
+          "id": "170114360",
+          "name": "Integrative and Clinical Decision Making in Nursing",
+          "ar": "التكامل واتخاذ القرار السريري في التمريض",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114360"
+        },
+        {
+          "id": "170114370",
+          "name": "Geriatric Health Nursing",
+          "ar": "تمريض صحة المسنين",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114370"
+        },
+        {
+          "id": "170114380",
+          "name": "Rehabilitation in Nursing",
+          "ar": "إعادة التأهيل في التمريض",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "170114380"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100311630",
+          "100211240"
+        ],
+        [
+          "170111510",
+          "170111290"
+        ],
+        [
+          "170111200",
+          "170111510"
+        ],
+        [
+          "170111530",
+          "170111510"
+        ],
+        [
+          "170111200",
+          "170111520"
+        ],
+        [
+          "170111530",
+          "170111520"
+        ],
+        [
+          "170111200",
+          "170111530"
+        ],
+        [
+          "170111510",
+          "170111540"
+        ],
+        [
+          "170111540",
+          "170112150"
+        ],
+        [
+          "170112150",
+          "170112190"
+        ],
+        [
+          "170112150",
+          "170112200"
+        ],
+        [
+          "170111540",
+          "170112240"
+        ],
+        [
+          "170112150",
+          "170112270"
+        ],
+        [
+          "170112190",
+          "170112280"
+        ],
+        [
+          "170112190",
+          "170112290"
+        ],
+        [
+          "170113130",
+          "170112310"
+        ],
+        [
+          "170113130",
+          "170112320"
+        ],
+        [
+          "170112270",
+          "170112330"
+        ],
+        [
+          "170111540",
+          "170112340"
+        ],
+        [
+          "170112150",
+          "170112340"
+        ],
+        [
+          "100311630",
+          "170113130"
+        ],
+        [
+          "170112240",
+          "170113130"
+        ],
+        [
+          "170112170",
+          "170113190"
+        ],
+        [
+          "170112170",
+          "170113200"
+        ],
+        [
+          "170113190",
+          "170113270"
+        ],
+        [
+          "170113190",
+          "170113280"
+        ],
+        [
+          "170112170",
+          "170113290"
+        ],
+        [
+          "170112170",
+          "170113300"
+        ],
+        [
+          "170113290",
+          "170113320"
+        ],
+        [
+          "170113290",
+          "170113340"
+        ],
+        [
+          "040511260",
+          "170113350"
+        ],
+        [
+          "170113350",
+          "170113360"
+        ],
+        [
+          "170112320",
+          "170113370"
+        ],
+        [
+          "170113370",
+          "170113380"
+        ],
+        [
+          "170112320",
+          "170113390"
+        ],
+        [
+          "100211630",
+          "170113400"
+        ],
+        [
+          "170113370",
+          "170114170"
+        ],
+        [
+          "170114170",
+          "170114180"
+        ],
+        [
+          "170112240",
+          "170114190"
+        ],
+        [
+          "170113130",
+          "170114190"
+        ],
+        [
+          "170112320",
+          "170114200"
+        ],
+        [
+          "170112190",
+          "170114250"
+        ],
+        [
+          "040521301",
+          "170114280"
+        ],
+        [
+          "100414890",
+          "170114280"
+        ],
+        [
+          "170111530",
+          "170114290"
+        ],
+        [
+          "170114330",
+          "170114340"
+        ],
+        [
+          "170114330",
+          "170114350"
+        ],
+        [
+          "170112320",
+          "170114360"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-respiratory",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Respiratory Therapy",
+          "small": "🚧 Study plan coming soon"
+        },
+        "ar": {
+          "big": "العلاج التنفسي",
+          "small": "🚧 الخطة الدراسية قريبًا"
+        }
+      },
+      "icon": "🫁",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Nursing",
+        "ar": "كلية التمريض"
+      },
+      "bio": {
+        "en": "B.Sc. in Respiratory Therapy (Jenin & Ramallah) — proposed to be the first respiratory therapy program in Palestine. Prepares practitioners to provide diagnostic, therapy, and rehabilitation services for clients with cardio-pulmonary disorders. 🚧 The study plan is not available yet — coming soon.",
+        "ar": "بكالوريوس في العلاج التنفسي (حرم جنين ورام الله) — يُقترح أن يكون أول برنامج علاج تنفسي في فلسطين. يُعِدّ ممارسين لتقديم خدمات التشخيص والعلاج وإعادة التأهيل لمرضى اضطرابات القلب والرئة. 🚧 الخطة الدراسية غير متوفرة بعد — قريبًا."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-pharmacy",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Pharmacy",
+          "small": "B.Sc. · 5 years · Program 7011 · 167 CH"
+        },
+        "ar": {
+          "big": "الصيدلة",
+          "small": "بكالوريوس · 5 سنوات · برنامج 7011 · 167 ساعة"
+        }
+      },
+      "icon": "💊",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Pharmacy",
+        "ar": "كلية الصيدلة"
+      },
+      "bio": {
+        "en": "B.Sc. in Pharmacy (Program 7011 · Jenin & Ramallah) — a 5-year program in its own Faculty of Pharmacy (est. 2021). Pharmaceutical sciences, medicinal chemistry, pharmacology, pharmaceutics, and clinical pharmacy with community field training. 167 credit hours over 5 years (summers in years 3-4), following the official advisory plan. The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في الصيدلة (برنامج 7011 · حرم جنين ورام الله) — برنامج مدته 5 سنوات في كلية الصيدلة (تأسست 2021). العلوم الصيدلانية والكيمياء الدوائية وعلم الأدوية والصيدلانيات والصيدلة السريرية مع تدريب ميداني مجتمعي. 167 ساعة معتمدة على 5 سنوات (بفصول صيفية في السنتين 3-4) وفق الخطة الإرشادية الرسمية. تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": true
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "060511030",
+          "name": "Medical Terminology",
+          "ar": "المصطلحات الطبية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "060511030"
+        },
+        {
+          "id": "100211710",
+          "name": "General Biology for Pharmacy Students",
+          "ar": "الأحياء العامة لطلبة الصيدلة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100211710"
+        },
+        {
+          "id": "100211751",
+          "name": "General Biology Lab for Pharmacy Students",
+          "ar": "مختبر الأحياء العامة لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100211751"
+        },
+        {
+          "id": "100311710",
+          "name": "General Chemistry for Pharmacy Students",
+          "ar": "الكيمياء العامة لطلبة الصيدلة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100311710"
+        },
+        {
+          "id": "100311750",
+          "name": "General Chemistry Lab for Pharmacy Students",
+          "ar": "مختبر الكيمياء العامة لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100311750"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "070111240",
+          "name": "Anatomy & Histology for Pharmacy Students",
+          "ar": "التشريح والأنسجة لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111240"
+        },
+        {
+          "id": "070111250",
+          "name": "Anatomy & Histology Lab for Pharmacy Students",
+          "ar": "مختبر التشريح والأنسجة لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111250"
+        },
+        {
+          "id": "070112100",
+          "name": "Physiology for Pharmacy Students I",
+          "ar": "الفسيولوجيا لطلبة الصيدلة 1",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070112100"
+        },
+        {
+          "id": "100111620",
+          "name": "Physics for Medical Sciences",
+          "ar": "الفيزياء للعلوم الطبية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100111620"
+        },
+        {
+          "id": "100411001",
+          "name": "Basic Mathematics",
+          "ar": "الرياضيات الأساسية",
+          "creditHours": 2,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411001"
+        },
+        {
+          "id": "070111170",
+          "name": "Pharmaceutical Organic Chemistry I",
+          "ar": "الكيمياء العضوية الصيدلانية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111170"
+        },
+        {
+          "id": "070111180",
+          "name": "Pharmaceutical Organic Chemistry I Lab",
+          "ar": "مختبر الكيمياء العضوية الصيدلانية 1",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "070111180"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "070112200",
+          "name": "Physiology for Pharmacy Students II",
+          "ar": "الفسيولوجيا لطلبة الصيدلة 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112200"
+        },
+        {
+          "id": "070112280",
+          "name": "Physiology Lab for Pharmacy Students",
+          "ar": "مختبر الفسيولوجيا لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112280"
+        },
+        {
+          "id": "070112160",
+          "name": "Pharmaceutical Organic Chemistry II",
+          "ar": "الكيمياء العضوية الصيدلانية 2",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112160"
+        },
+        {
+          "id": "070112170",
+          "name": "Pharmaceutical Analytical Chemistry",
+          "ar": "الكيمياء التحليلية الصيدلانية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112170"
+        },
+        {
+          "id": "070112180",
+          "name": "Pharmaceutical Analytical Chemistry Lab",
+          "ar": "مختبر الكيمياء التحليلية الصيدلانية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112180"
+        },
+        {
+          "id": "070112190",
+          "name": "Biochemistry for Pharmacy Students I (Structural)",
+          "ar": "الكيمياء الحيوية لطلبة الصيدلة 1 (البنيوية)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112190"
+        },
+        {
+          "id": "070112360",
+          "name": "Pharmaceutical Microbiology I",
+          "ar": "الأحياء الدقيقة الصيدلانية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "070112360"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "070113100",
+          "name": "Pathophysiology for Pharmacy Students",
+          "ar": "علم الأمراض الوظيفي لطلبة الصيدلة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070113100"
+        },
+        {
+          "id": "070112210",
+          "name": "Pharmaceutics I",
+          "ar": "الصيدلانيات 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112210"
+        },
+        {
+          "id": "070112260",
+          "name": "Pharmaceutical Instrumental Analysis",
+          "ar": "التحليل الآلي الصيدلاني",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112260"
+        },
+        {
+          "id": "070112270",
+          "name": "Pharmaceutical Instrumental Analysis Lab",
+          "ar": "مختبر التحليل الآلي الصيدلاني",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112270"
+        },
+        {
+          "id": "070112290",
+          "name": "Biochemistry for Pharmacy Students II (Metabolic)",
+          "ar": "الكيمياء الحيوية لطلبة الصيدلة 2 (الأيضية)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112290"
+        },
+        {
+          "id": "070112300",
+          "name": "Biochemistry Lab for Pharmacy Students",
+          "ar": "مختبر الكيمياء الحيوية لطلبة الصيدلة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112300"
+        },
+        {
+          "id": "070112370",
+          "name": "Pharmaceutical Microbiology II",
+          "ar": "الأحياء الدقيقة الصيدلانية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112370"
+        },
+        {
+          "id": "070112390",
+          "name": "Pharmaceutical Microbiology Lab",
+          "ar": "مختبر الأحياء الدقيقة الصيدلانية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "070112390"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "070113111",
+          "name": "Pharmacology I",
+          "ar": "علم الأدوية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113111"
+        },
+        {
+          "id": "070113150",
+          "name": "Medicinal Chemistry I & Drug Design",
+          "ar": "الكيمياء الدوائية 1 وتصميم الأدوية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113150"
+        },
+        {
+          "id": "070113160",
+          "name": "Pharmaceutics II",
+          "ar": "الصيدلانيات 2",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113160"
+        },
+        {
+          "id": "070113170",
+          "name": "Pharmaceutics II Lab",
+          "ar": "مختبر الصيدلانيات 2",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113170"
+        },
+        {
+          "id": "070113260",
+          "name": "Pharmacognosy",
+          "ar": "العقاقير",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113260"
+        },
+        {
+          "id": "070113270",
+          "name": "Pharmacognosy Lab",
+          "ar": "مختبر العقاقير",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113270"
+        },
+        {
+          "id": "070113390",
+          "name": "Immunology for Pharmacy Students",
+          "ar": "علم المناعة لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070113390"
+        },
+        {
+          "id": "070114500",
+          "name": "Clinical Nutrition",
+          "ar": "التغذية السريرية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "070114500"
+        },
+        {
+          "id": "100412810",
+          "name": "Biostatistics",
+          "ar": "الإحصاء الحيوي",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "100412810"
+        },
+        {
+          "id": "070113200",
+          "name": "Pharmacology II",
+          "ar": "علم الأدوية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113200"
+        },
+        {
+          "id": "070113211",
+          "name": "Pharmaceutics III",
+          "ar": "الصيدلانيات 3",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113211"
+        },
+        {
+          "id": "070113230",
+          "name": "Medicinal Chemistry II",
+          "ar": "الكيمياء الدوائية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113230"
+        },
+        {
+          "id": "070113240",
+          "name": "Medicinal Chemistry Lab",
+          "ar": "مختبر الكيمياء الدوائية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070113240"
+        },
+        {
+          "id": "070114110",
+          "name": "Communication Skills in Pharmacy",
+          "ar": "مهارات الاتصال في الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070114110"
+        },
+        {
+          "id": "070114140",
+          "name": "Phytochemistry",
+          "ar": "الكيمياء النباتية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070114140"
+        },
+        {
+          "id": "070114150",
+          "name": "Phytochemistry Lab",
+          "ar": "مختبر الكيمياء النباتية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "070114150"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "070115400",
+          "name": "Community Pharmacy and Field Training I A",
+          "ar": "صيدلة المجتمع والتدريب الميداني 1 أ",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "070115400"
+        },
+        {
+          "id": "070113400",
+          "name": "Drug Information Resources",
+          "ar": "مصادر المعلومات الدوائية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070113400"
+        },
+        {
+          "id": "070114100",
+          "name": "Pharmacology III",
+          "ar": "علم الأدوية 3",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114100"
+        },
+        {
+          "id": "070114130",
+          "name": "Medicinal Chemistry III",
+          "ar": "الكيمياء الدوائية 3",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114130"
+        },
+        {
+          "id": "070114200",
+          "name": "Therapeutics & Clinical Pharmacy I",
+          "ar": "العلاجيات والصيدلة السريرية 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114200"
+        },
+        {
+          "id": "070114230",
+          "name": "Industrial Pharmacy",
+          "ar": "الصيدلة الصناعية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114230"
+        },
+        {
+          "id": "070114250",
+          "name": "Pharmaceutical Calculations",
+          "ar": "الحسابات الصيدلانية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114250"
+        },
+        {
+          "id": "070114260",
+          "name": "Industrial Pharmacy Lab",
+          "ar": "مختبر الصيدلة الصناعية",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114260"
+        },
+        {
+          "id": "070114310",
+          "name": "Genetics & Pharmacogenomics",
+          "ar": "الوراثة والجينوم الدوائي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070114310"
+        },
+        {
+          "id": "070115401",
+          "name": "Community Pharmacy and Field Training I B",
+          "ar": "صيدلة المجتمع والتدريب الميداني 1 ب",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "070115401"
+        },
+        {
+          "id": "070114210",
+          "name": "Pharmacoeconomics",
+          "ar": "اقتصاديات الدواء",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114210"
+        },
+        {
+          "id": "070114240",
+          "name": "Biopharmaceutics & Pharmacokinetics",
+          "ar": "الصيدلة الحيوية وحركية الدواء",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114240"
+        },
+        {
+          "id": "070114290",
+          "name": "Biopharmaceutics & Pharmacokinetics Lab",
+          "ar": "مختبر الصيدلة الحيوية وحركية الدواء",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114290"
+        },
+        {
+          "id": "070114320",
+          "name": "Clinical Biochemistry",
+          "ar": "الكيمياء الحيوية السريرية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114320"
+        },
+        {
+          "id": "070114330",
+          "name": "Epidemiology & Public Health for Pharmacy Students",
+          "ar": "علم الأوبئة والصحة العامة لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070114330"
+        },
+        {
+          "id": "070115100",
+          "name": "Therapeutics & Clinical Pharmacy II",
+          "ar": "العلاجيات والصيدلة السريرية 2",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115100"
+        },
+        {
+          "id": "070115200",
+          "name": "Over the Counter Drugs (OTC)",
+          "ar": "الأدوية المصروفة بدون وصفة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115200"
+        },
+        {
+          "id": "070115310",
+          "name": "Toxicology",
+          "ar": "علم السموم",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115310"
+        },
+        {
+          "id": "070115402",
+          "name": "Community Pharmacy and Field Training I C",
+          "ar": "صيدلة المجتمع والتدريب الميداني 1 ج",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "070115402"
+        },
+        {
+          "id": "070115410",
+          "name": "Community Pharmacy and Field Training II A",
+          "ar": "صيدلة المجتمع والتدريب الميداني 2 أ",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "summer",
+          "courseNumber": "070115410"
+        },
+        {
+          "id": "070115110",
+          "name": "Research Project",
+          "ar": "مشروع بحث",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115110"
+        },
+        {
+          "id": "070115120",
+          "name": "Pharmaceutical Regulations and Ethics",
+          "ar": "التشريعات والأخلاقيات الصيدلانية",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115120"
+        },
+        {
+          "id": "070115160",
+          "name": "First Aid for Pharmacy Students",
+          "ar": "الإسعافات الأولية لطلبة الصيدلة",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115160"
+        },
+        {
+          "id": "070115411",
+          "name": "Community Pharmacy and Field Training II B",
+          "ar": "صيدلة المجتمع والتدريب الميداني 2 ب",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "070115411"
+        },
+        {
+          "id": "170112160",
+          "name": "Basic Life Support (BLS)",
+          "ar": "دعم الحياة الأساسي",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "170112160"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y5",
+          "semester": "s1"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y5",
+          "semester": "s1"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 2,
+          "category": "dept",
+          "yearId": "y5",
+          "semester": "s1"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "uni-elective-4",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y5",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y5",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "060511030",
+          "070111240"
+        ],
+        [
+          "100211710",
+          "070111240"
+        ],
+        [
+          "070111240",
+          "070111250"
+        ],
+        [
+          "070111240",
+          "070112100"
+        ],
+        [
+          "070112100",
+          "070112200"
+        ],
+        [
+          "070112200",
+          "070112280"
+        ],
+        [
+          "070112200",
+          "070113100"
+        ],
+        [
+          "100211710",
+          "100211751"
+        ],
+        [
+          "100311710",
+          "100311750"
+        ],
+        [
+          "100311710",
+          "070111170"
+        ],
+        [
+          "100311750",
+          "070111170"
+        ],
+        [
+          "070111170",
+          "070111180"
+        ],
+        [
+          "070111170",
+          "070112160"
+        ],
+        [
+          "100311710",
+          "070112170"
+        ],
+        [
+          "100311750",
+          "070112170"
+        ],
+        [
+          "070112170",
+          "070112180"
+        ],
+        [
+          "070111170",
+          "070112190"
+        ],
+        [
+          "070111170",
+          "070112210"
+        ],
+        [
+          "100311710",
+          "070112260"
+        ],
+        [
+          "100311750",
+          "070112260"
+        ],
+        [
+          "070112260",
+          "070112270"
+        ],
+        [
+          "070112190",
+          "070112290"
+        ],
+        [
+          "070112290",
+          "070112300"
+        ],
+        [
+          "100211710",
+          "070112360"
+        ],
+        [
+          "070112360",
+          "070112370"
+        ],
+        [
+          "070112370",
+          "070112390"
+        ],
+        [
+          "070112190",
+          "070113111"
+        ],
+        [
+          "070112200",
+          "070113111"
+        ],
+        [
+          "070112160",
+          "070113150"
+        ],
+        [
+          "070112210",
+          "070113160"
+        ],
+        [
+          "070113160",
+          "070113170"
+        ],
+        [
+          "070113111",
+          "070113200"
+        ],
+        [
+          "070113160",
+          "070113211"
+        ],
+        [
+          "070113150",
+          "070113230"
+        ],
+        [
+          "070113230",
+          "070113240"
+        ],
+        [
+          "070111170",
+          "070113260"
+        ],
+        [
+          "070113260",
+          "070113270"
+        ],
+        [
+          "070112360",
+          "070113390"
+        ],
+        [
+          "070113200",
+          "070113400"
+        ],
+        [
+          "070112370",
+          "070114100"
+        ],
+        [
+          "070113200",
+          "070114100"
+        ],
+        [
+          "070113111",
+          "070114110"
+        ],
+        [
+          "070113230",
+          "070114130"
+        ],
+        [
+          "070113260",
+          "070114140"
+        ],
+        [
+          "070114140",
+          "070114150"
+        ],
+        [
+          "070113200",
+          "070114200"
+        ],
+        [
+          "070114100",
+          "070114210"
+        ],
+        [
+          "070113211",
+          "070114230"
+        ],
+        [
+          "070113211",
+          "070114240"
+        ],
+        [
+          "070113211",
+          "070114250"
+        ],
+        [
+          "070114230",
+          "070114260"
+        ],
+        [
+          "070114240",
+          "070114290"
+        ],
+        [
+          "070113200",
+          "070114310"
+        ],
+        [
+          "070112290",
+          "070114320"
+        ],
+        [
+          "070113100",
+          "070114320"
+        ],
+        [
+          "070113100",
+          "070114330"
+        ],
+        [
+          "070112290",
+          "070114500"
+        ],
+        [
+          "070114200",
+          "070115100"
+        ],
+        [
+          "070115100",
+          "070115110"
+        ],
+        [
+          "070113200",
+          "070115120"
+        ],
+        [
+          "070114100",
+          "070115200"
+        ],
+        [
+          "070114100",
+          "070115310"
+        ],
+        [
+          "070113111",
+          "070115400"
+        ],
+        [
+          "070115400",
+          "070115401"
+        ],
+        [
+          "070115401",
+          "070115402"
+        ],
+        [
+          "070115402",
+          "070115410"
+        ],
+        [
+          "070115410",
+          "070115411"
+        ],
+        [
+          "070115160",
+          "170112160"
         ]
       ]
     }

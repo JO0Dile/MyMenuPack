@@ -125,20 +125,83 @@ window.APP_UNIVERSITIES = {
 // ============================================================================
 window.APP_COLLEGES = {
   'aaup-ai-ds': {
-    university: 'aaup',
+    university: 'aaup', icon: '🤖',
     name: { en: 'Faculty of Artificial Intelligence and Data Science', ar: 'كلية الذكاء الاصطناعي وعلوم البيانات' }
   },
   'aaup-it': {
-    university: 'aaup',
+    university: 'aaup', icon: '💻',
     name: { en: 'Faculty of Information Technology', ar: 'كلية تكنولوجيا المعلومات' }
   },
+  'aaup-nursing': {
+    university: 'aaup', icon: '🩺',
+    name: { en: 'Faculty of Nursing', ar: 'كلية التمريض' }
+  },
+  'aaup-pharmacy': {
+    university: 'aaup', icon: '💊',
+    name: { en: 'Faculty of Pharmacy', ar: 'كلية الصيدلة' }
+  },
   'aasu-cee': {
-    university: 'aasu',
+    university: 'aasu', icon: '🦾',
     // name.en must match the plan's college.en exactly (case-insensitive) so
     // feed plans (ingested by AAUP_SYNC) group under this college in the picker.
     name: { en: 'College of Engineering and Energy', ar: 'كلية الهندسة والطاقة' }
   }
-  // next: 'aaup-xxx': { university: 'aaup', name: { en: '...', ar: '...' } }
+  // next: 'aaup-xxx': { university: 'aaup', icon: '...', name: { en: '...', ar: '...' } }
+};
+// The real, official pool of "University Elective" courses, keyed by
+// university id. When a plan's generic "uni-elective-N" placeholder is
+// tapped, the course popup offers this exact list to choose from instead of
+// a free-text box — same course catalog every major at that university
+// draws its University Elective requirement from. No Arabic name is given
+// here because none was provided as source material (see RULE ONE — not
+// guessing a translation); the picker shows the English title regardless of
+// UI language rather than invent one. A university with no entry here (or a
+// plan whose "uni-elective" slot doesn't apply, e.g. AASU) falls back to the
+// original free-text field.
+window.APP_UNIV_ELECTIVES = {
+  aaup: [
+    { code: '040511052', en: 'Israeli & Zionism Studies I' },
+    { code: '040511053', en: 'Jerusalem: Civilization and History' },
+    { code: '040511061', en: 'Israeli & Zionism Studies II' },
+    { code: '040511071', en: 'Development Management' },
+    { code: '040511081', en: 'Home Gardening' },
+    { code: '040511091', en: 'Fine Arts' },
+    { code: '040511101', en: 'Current World Issues' },
+    { code: '040511121', en: 'Physical Education' },
+    { code: '040511132', en: 'Election and Political Participation' },
+    { code: '040511133', en: 'The Palestinian Prisoners Movement' },
+    { code: '040511140', en: 'Law in Our Life' },
+    { code: '040511150', en: 'Islamic Culture' },
+    { code: '040511160', en: 'Democracy and Human Rights' },
+    { code: '040511170', en: 'Technology in Our Life' },
+    { code: '040511180', en: 'Introduction to Astronomy Science' },
+    { code: '040511200', en: 'Introduction to Economics' },
+    { code: '040511211', en: 'Anthropology' },
+    { code: '040511220', en: 'Anti-Corruption Challenges and Solution' },
+    { code: '040511230', en: 'French Language' },
+    { code: '040511240', en: 'German Language' },
+    { code: '040511260', en: 'Introduction to Psychology' },
+    { code: '040511270', en: 'Introduction to Sociology' },
+    { code: '040511280', en: 'Human & Environment' },
+    { code: '040511290', en: 'History of Science' },
+    { code: '040511311', en: 'International Relations' },
+    { code: '040511321', en: 'Science, Technology and Society' },
+    { code: '040511400', en: 'Turkish Language' },
+    { code: '040511411', en: 'Political Sciences' },
+    { code: '040511421', en: 'Critical Thinking' },
+    { code: '040511470', en: 'Medical Terminology in Hebrew' },
+    { code: '040511490', en: 'Human Rights and Gender' },
+    { code: '040511500', en: 'The Palestinian Cinema: An Alternative Narrative' },
+    { code: '040511511', en: 'Modern Arab Thought' },
+    { code: '040511521', en: 'Archeology' },
+    { code: '040511611', en: 'Hebrew Language' },
+    { code: '040511621', en: 'Civil Society Organizations' },
+    { code: '040511990', en: 'Effective Communication' },
+    { code: '060411001', en: 'Nutrition & Food Security' },
+    { code: '280311100', en: 'Financial Literacy' },
+    { code: '280311110', en: 'Introduction to Sign Language' }
+  ]
+  // next: xxx: [ { code: '...', en: '...' }, ... ]
 };
 // Where "Share this plan with the app maintainer" sends people. Leave ''
 // to fall back to opening a pre-filled GitHub issue on the app's repo (see
@@ -197,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.22';
+window.APP_VERSION = '3.51';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1114,7 +1177,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .course.completed .name{text-decoration:line-through; text-decoration-thickness:1.5px;}
 
-  .plan-page.rtl-mode .course-check{right:auto; left:5px; margin:-5px;}
+  .plan-page.rtl-mode .course-check,
+  .sheet.rtl-mode .course-check{right:auto; left:5px; margin:-5px;}
   /* ---------- My Progress: status badges (Completed / Available) ---------- */
 
   .course-badge{
@@ -1660,6 +1724,32 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .status-btn:hover{border-color:var(--accent);color:var(--text);}
 
+  /* University Elective picker — a real, searchable list of that
+     university's actual elective courses, opened from the course popup's
+     "what did you actually take?" button instead of a free-text box. */
+  .elective-picker-field .home-btn{display:flex;align-items:center;gap:8px;font-size:12.5px;text-align:left;}
+  .plan-page.rtl-mode .elective-picker-field .home-btn,
+  html[dir="rtl"] .elective-picker-field .home-btn{text-align:right;}
+  .elective-picker-list{
+    margin-top:8px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel);padding:8px;
+  }
+  .elective-pick-options{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+  .elective-pick-option{
+    display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;
+    background:transparent;border:none;border-radius:6px;padding:7px 8px;
+    color:var(--text);font-size:12.5px;font-family:inherit;cursor:pointer;
+  }
+  .plan-page.rtl-mode .elective-pick-option,
+  html[dir="rtl"] .elective-pick-option{text-align:right;}
+  .elective-pick-option:hover{background:rgba(93,184,255,.12);}
+  .elective-pick-option .epo-code{color:var(--text-dim);font-size:10.5px;flex:0 0 auto;}
+  .elective-pick-option .epo-name{flex:1;}
+  .elective-pick-clear{
+    color:#ff9ecb;border-bottom:1px solid var(--line);border-radius:6px 6px 0 0;
+    margin-bottom:4px;padding-bottom:9px;
+  }
+
   .status-btn.active{background:var(--accent);border-color:var(--accent);color:var(--navy-900);font-weight:700;}
   .status-btn-auto{cursor:default;}
   .status-btn-auto.active{background:var(--unlock);border-color:var(--unlock);color:#fff;}
@@ -2170,6 +2260,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .plan-page.editing .edit-mode-banner{display:flex;}
 
+  /* Public "Enter Edit Mode" toolbar button on the built-in AI majors — same
+     unrestricted entry point every imported/custom plan already has (no
+     Developer password). Hidden once editing (the edit-mode-banner's own
+     Exit button takes over) so there's never a redundant enter button. */
+  .plan-page.editing .header-actions .enter-edit-btn{display:none;}
+
   .edit-mode-banner .emb-exit{
     background:transparent; border:1px solid #ff9ecb; color:#ff9ecb;
     border-radius:999px; padding:5px 14px; font-size:11.5px; font-weight:800;
@@ -2492,7 +2588,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="home-step" id="homeStepPlans" style="display:none;">
   <div class="plan-grid">
     <div class="plan-card" data-page="robotics" data-university="aaup" data-college="aaup-ai-ds" data-search-en="Artificial Intelligence and Robotics" data-search-ar="الذكاء الاصطناعي والروبوتات" onclick="AAUP_DASHBOARD.selectAndOpen('robotics')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('robotics')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('robotics');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2512,7 +2608,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
 
     <div class="plan-card" data-page="cybersecurity" data-university="aaup" data-college="aaup-ai-ds" data-search-en="Artificial Intelligence and Cybersecurity" data-search-ar="الذكاء الاصطناعي والأمن السيبراني" onclick="AAUP_DASHBOARD.selectAndOpen('cybersecurity')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('cybersecurity')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('cybersecurity');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2526,7 +2622,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
 
     <div class="plan-card" data-page="medical" data-university="aaup" data-college="aaup-ai-ds" data-search-en="Artificial Intelligence and Medical Sciences" data-search-ar="الذكاء الاصطناعي والعلوم الطبية" onclick="AAUP_DASHBOARD.selectAndOpen('medical')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('medical')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('medical');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2542,7 +2638,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
 
     <div class="plan-card" data-page="cs" data-university="aaup" data-college="aaup-it" data-search-en="Computer Science Department" data-search-ar="قسم علم الحاسوب" onclick="AAUP_DASHBOARD.selectAndOpen('cs')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('cs')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('cs');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2659,6 +2755,19 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- Shared course-details popup for every imported/feed plan — one instance
+     reused for any plan id, since (unlike the 4 built-in majors) there's no
+     way to have a static per-plan overlay for a plan that doesn't exist
+     until a student creates or syncs it. Gives imported plans the exact same
+     grade/status/difficulty/notes/elective-picker popup the built-in majors
+     have, instead of a bare tap-to-toggle. -->
+<div class="modal-overlay" id="impCourseModalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="impCourseModalClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="impCourseModalBody"></div>
+  </div>
+</div>
+
 <div id="importedPlanView" style="display:none;"></div>
 
 <div id="page-robotics" class="plan-page">
@@ -2708,6 +2817,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <button type="button" class="home-btn" onclick="showPage('home')">
         <span class="home-ic">🏠</span><span class="home-lbl">Home</span>
       </button>
+      <button type="button" class="home-btn enter-edit-btn" onclick="AAUP_PLAN_EDITOR.enterEditMode('robotics')">✏️ Edit Mode</button>
     </div>
   </header>
 
@@ -3048,6 +3158,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <button type="button" class="home-btn" onclick="showPage('home')">
         <span class="home-ic">🏠</span><span class="home-lbl">Home</span>
       </button>
+      <button type="button" class="home-btn enter-edit-btn" onclick="AAUP_PLAN_EDITOR.enterEditMode('cybersecurity')">✏️ Edit Mode</button>
     </div>
   </header>
 
@@ -3400,6 +3511,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <button type="button" class="home-btn" onclick="showPage('home')">
         <span class="home-ic">🏠</span><span class="home-lbl">Home</span>
       </button>
+      <button type="button" class="home-btn enter-edit-btn" onclick="AAUP_PLAN_EDITOR.enterEditMode('medical')">✏️ Edit Mode</button>
     </div>
   </header>
 
@@ -7907,6 +8019,41 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 // existing per-course info popup rather than adding a new one)
 // ==========================
 (function(){
+  // Which university a plan prefix belongs to, so the University Elective
+  // picker offers that university's real course pool (built-in majors are
+  // always AAUP; an imported/feed plan carries its own university field).
+  function planUniversity(prefix){
+    var BUILT_IN = { robotics: 1, cybersecurity: 1, medical: 1, cs: 1 };
+    if(BUILT_IN[prefix]) return 'aaup';
+    var imported = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans) ? window.AAUP_IMPORTED.loadImportedPlans() : {};
+    var p = imported[prefix];
+    return (p && p.university) || 'aaup';
+  }
+  // Only the plain "uni-elective-N" pool slot gets the real-course picker —
+  // free/dept/spec elective pools aren't university-wide catalogs, so there's
+  // no single real list to offer for them; they keep the free-text field.
+  function univElectivePool(prefix, slug){
+    if(!/^uni-elective-\d+$/.test(slug)) return null;
+    var pool = window.APP_UNIV_ELECTIVES && window.APP_UNIV_ELECTIVES[planUniversity(prefix)];
+    return (pool && pool.length) ? pool : null;
+  }
+
+  function electivePickerListHtml(pool, rtl, hasCurrent){
+    var esc = window.__escapeHtml;
+    var searchHtml = '<input type="text" class="search-input" id="electivePickerSearch" placeholder="' +
+      (rtl ? 'ابحث عن مادة…' : 'Search courses…') + '" autocomplete="off" style="margin-bottom:8px;width:100%;">';
+    var clearHtml = hasCurrent
+      ? '<button type="button" class="elective-pick-option elective-pick-clear" data-code="" data-en="">✕ ' + (rtl ? 'إلغاء الاختيار' : 'Clear selection') + '</button>'
+      : '';
+    var itemsHtml = pool.map(function(c){
+      return '<button type="button" class="elective-pick-option" data-code="' + esc(c.code) + '" data-en="' + esc(c.en) + '">' +
+        '<span class="epo-code">' + esc(c.code) + '</span><span class="epo-name">' + esc(c.en) + '</span></button>';
+    }).join('');
+    return searchHtml + clearHtml +
+      '<div class="elective-pick-options" id="electivePickerOptions">' + itemsHtml + '</div>' +
+      '<p class="ex-note" id="electivePickerEmpty" style="display:none;">' + (rtl ? 'لا توجد نتائج' : 'No matching courses') + '</p>';
+  }
+
   function render(prefix, slug){
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var meta = info[slug];
@@ -7927,7 +8074,20 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var isDone = !!progress[pid];
 
     var nameFieldHtml = '';
-    if(window.AAUP_PERSONAL.isGenericElectiveSlot(slug)){
+    var electivePool = univElectivePool(prefix, slug);
+    if(electivePool){
+      var poolCustomNames = window.AAUP_PERSONAL.loadCustomNames();
+      var poolCurrentName = poolCustomNames[pid] || '';
+      nameFieldHtml = '<div class="form-field elective-picker-field" style="margin-bottom:14px;">' +
+        '<label>' + (rtl ? 'ما هو المساق الذي أخذته فعليًا؟' : 'What course did you actually take?') + '</label>' +
+        '<button type="button" id="electivePickerBtn" class="home-btn" data-placeholder="' + window.__escapeHtml(rtl ? 'اضغط لاختيار مادتك الاختيارية' : 'Tap to choose your elective') + '" style="width:100%;justify-content:space-between;">' +
+        '<span id="electivePickerBtnLabel">' + (poolCurrentName ? window.__escapeHtml(poolCurrentName) : (rtl ? 'اضغط لاختيار مادتك الاختيارية' : 'Tap to choose your elective')) + '</span>' +
+        '<span aria-hidden="true">▾</span></button>' +
+        '<div class="elective-picker-list" id="electivePickerList" style="display:none;">' +
+        electivePickerListHtml(electivePool, rtl, !!poolCurrentName) +
+        '</div>' +
+        '</div>';
+    } else if(window.AAUP_PERSONAL.isGenericElectiveSlot(slug)){
       var customNames = window.AAUP_PERSONAL.loadCustomNames();
       var currentName = customNames[pid] || '';
       nameFieldHtml = '<div class="form-field" style="margin-bottom:14px;">' +
@@ -8004,8 +8164,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '</div>';
   }
 
-  function bind(prefix, slug){
-    var container = document.querySelector('#' + prefix + '-courseModalBody .modal-extras');
+  function bind(prefix, slug, containerEl){
+    // The 4 built-in majors each have their own static "#{prefix}-
+    // courseModalBody" overlay; every imported/feed plan shares ONE overlay
+    // instead (there's no way to pre-build a static one per plan id), so its
+    // caller passes the container element directly rather than relying on
+    // this id lookup.
+    var container = containerEl || document.querySelector('#' + prefix + '-courseModalBody .modal-extras');
     if(!container) return;
     var pid = container.getAttribute('data-pid');
     if(!pid) return;
@@ -8017,6 +8182,57 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         if(nameInput.value.trim()){ names[pid] = nameInput.value; } else { delete names[pid]; }
         window.AAUP_PERSONAL.saveCustomNames(names);
         window.AAUP_PERSONAL.refreshCard(prefix, slug);
+      });
+    }
+
+    // ---- University Elective picker: tap the button to reveal a real,
+    // searchable list of that university's actual elective courses instead
+    // of typing a name in free-text. ----
+    var pickerBtn = container.querySelector('#electivePickerBtn');
+    var pickerList = container.querySelector('#electivePickerList');
+    if(pickerBtn && pickerList){
+      pickerBtn.addEventListener('click', function(){
+        var opening = pickerList.style.display === 'none';
+        pickerList.style.display = opening ? 'block' : 'none';
+        if(opening){
+          var search = pickerList.querySelector('#electivePickerSearch');
+          if(search){ search.value = ''; search.focus(); }
+          pickerList.querySelectorAll('.elective-pick-option').forEach(function(o){ o.style.display = ''; });
+          var empty = pickerList.querySelector('#electivePickerEmpty');
+          if(empty){ empty.style.display = 'none'; }
+        }
+      });
+
+      var searchInput = pickerList.querySelector('#electivePickerSearch');
+      if(searchInput){
+        searchInput.addEventListener('input', function(){
+          var q = searchInput.value.trim().toLowerCase();
+          var options = pickerList.querySelectorAll('.elective-pick-option:not(.elective-pick-clear)');
+          var anyVisible = false;
+          options.forEach(function(o){
+            var hay = (o.getAttribute('data-en') + ' ' + o.getAttribute('data-code')).toLowerCase();
+            var match = !q || hay.indexOf(q) !== -1;
+            o.style.display = match ? '' : 'none';
+            if(match) anyVisible = true;
+          });
+          var empty = pickerList.querySelector('#electivePickerEmpty');
+          if(empty){ empty.style.display = anyVisible ? 'none' : 'block'; }
+        });
+      }
+
+      pickerList.querySelectorAll('.elective-pick-option').forEach(function(opt){
+        opt.addEventListener('click', function(){
+          var en = opt.getAttribute('data-en');
+          var names = window.AAUP_PERSONAL.loadCustomNames();
+          if(en){ names[pid] = en; } else { delete names[pid]; }
+          window.AAUP_PERSONAL.saveCustomNames(names);
+          window.AAUP_PERSONAL.refreshCard(prefix, slug);
+          var label = pickerBtn.querySelector('#electivePickerBtnLabel');
+          if(label){
+            label.textContent = en || pickerBtn.getAttribute('data-placeholder') || label.textContent;
+          }
+          pickerList.style.display = 'none';
+        });
       });
     }
 
@@ -9367,7 +9583,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var info = {};
     (plan.courses || []).forEach(function(c){
       info[c.id] = {
-        num: c.num || '-', name: c.name, th: '-', pr: '-',
+        // A course's real catalog code can arrive as either "num" (an older
+        // field name still accepted for backward compatibility) or
+        // "courseNumber" (the field the plans feed's documented schema and
+        // every plan built this session actually use) — without this
+        // fallback, every course popup showed "-" instead of its real code
+        // even when the plan data had one.
+        num: c.num || c.courseNumber || '-', name: c.name, th: '-', pr: '-',
         cr: String(c.creditHours != null ? c.creditHours : 0),
         prereq: '-', ar: c.ar || c.name
       };
@@ -9961,13 +10183,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var editing = document.getElementById('page-' + planId) && document.getElementById('page-' + planId).classList.contains('editing');
     var cls = 'course ' + (c.category || 'core') + (done ? ' completed' : '') + (avail || done ? ' available' : '') + (c.isRetake ? ' retake-course' : '');
     var displayName = (rtl && c.ar) ? c.ar : c.name;
+    // The old quick "📊 set grade" shortcut for a done course is retired —
+    // it shared the same top-right corner as the new checkbox and would
+    // visually collide with it. Grade is now set from the full course-
+    // details popup (opened by tapping the card), same as every built-in
+    // major already works — openGradePrompt() itself is untouched in case
+    // anything else still calls it directly.
     var cardButtons = editing
       ? '<div class="imp-card-btn-row">' +
         '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">✏️</button>' +
         '<button type="button" class="imp-remove-course-btn" title="Remove course" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmRemoveCourse(\'' + planId + '\',\'' + c.id + '\');">✕</button>' +
         '</div>'
-      : (done ? '<div class="imp-card-btn-row"><button type="button" class="imp-grade-btn" title="Set grade" onclick="event.stopPropagation(); AAUP_IMPORTED.openGradePrompt(\'' + planId + '\',\'' + c.id + '\');">📊</button></div>' : '');
-    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + (editing ? '' : ' onclick="AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
+      : '';
+    var checkboxHtml = editing ? '' :
+      '<span class="course-check" role="checkbox" tabindex="0" aria-checked="' + (done ? 'true' : 'false') + '" ' +
+      'aria-label="Mark course as completed" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
+      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">✓</span>';
+    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
+      checkboxHtml +
       cardButtons +
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
       '<div class="name">' + displayName + (done ? ' ✓' : '') + '</div>' +
@@ -10001,6 +10234,68 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     document.getElementById('impGradeSelect').addEventListener('change', function(e){
       if(window.__applyGradeChange){ window.__applyGradeChange(planId, pid, e.target.value); }
       render(planId);
+    });
+  }
+
+  var IMP_MODAL_LABELS = {
+    en: { num: 'Course Number', name: 'Course Name', cr: 'Cr. Hrs.', prereq: 'Prerequisite', th: 'Theoretical', pr: 'Practical' },
+    ar: { num: 'رقم المساق', name: 'اسم المساق', cr: 'الساعات المعتمدة', prereq: 'المتطلب السابق', th: 'نظري', pr: 'عملي' }
+  };
+
+  // The same course-details popup the 4 built-in majors have (grade,
+  // planning status, difficulty, workload, notes, and the University
+  // Elective picker) — reused here via window.__renderCourseModalExtras /
+  // __bindCourseModalExtras rather than re-implemented, so any future change
+  // to that popup (like the elective picker) applies to every plan type at
+  // once instead of needing to be built twice.
+  function openCourseModal(planId, slug){
+    var plan = loadImportedPlans()[planId];
+    var course = plan && (plan.courses || []).filter(function(c){ return c.id === slug; })[0];
+    if(!course) return;
+    var rtl = !!rtlState[planId];
+    var L = IMP_MODAL_LABELS[rtl ? 'ar' : 'en'];
+    var displayName = (rtl && course.ar) ? course.ar : course.name;
+    var info = ((window.__PLAN_DATA[planId] || {}).courseInfo || {})[slug] || {
+      num: course.num || course.courseNumber || '-', th: '-', pr: '-', prereq: '-'
+    };
+    var overlay = document.getElementById('impCourseModalOverlay');
+    var body = document.getElementById('impCourseModalBody');
+    if(!overlay || !body) return;
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    body.innerHTML =
+      '<h3>' + window.__escapeHtml(displayName) + '</h3>' +
+      '<div class="modal-row"><span class="k">' + L.num + '</span><span class="v">' + window.__escapeHtml(String(info.num || '-')) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.name + '</span><span class="v">' + window.__escapeHtml(displayName) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.cr + '</span><span class="v">' + window.__escapeHtml(String(course.creditHours != null ? course.creditHours : 0)) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.prereq + '</span><span class="v">' + window.__escapeHtml(String(info.prereq || '-')) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.th + '</span><span class="v">' + window.__escapeHtml(String(info.th || '-')) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.pr + '</span><span class="v">' + window.__escapeHtml(String(info.pr || '-')) + '</span></div>';
+    if(window.__renderCourseModalExtras){ body.innerHTML += window.__renderCourseModalExtras(planId, slug); }
+    overlay.classList.add('open');
+    if(window.__bindCourseModalExtras){
+      var extrasEl = body.querySelector('.modal-extras');
+      window.__bindCourseModalExtras(planId, slug, extrasEl);
+    }
+  }
+
+  function closeCourseModal(){
+    var overlay = document.getElementById('impCourseModalOverlay');
+    if(overlay){ overlay.classList.remove('open'); }
+  }
+
+  // One-time wiring for the single shared overlay — backdrop click, Escape,
+  // and stopping a click on the card itself from bubbling to the backdrop.
+  function bindCourseModal(){
+    var overlay = document.getElementById('impCourseModalOverlay');
+    if(!overlay || overlay.getAttribute('data-bound')) return;
+    overlay.setAttribute('data-bound', '1');
+    var card = overlay.querySelector('.modal-card');
+    var closeBtn = document.getElementById('impCourseModalClose');
+    if(closeBtn){ closeBtn.addEventListener('click', closeCourseModal); }
+    overlay.addEventListener('click', function(e){ if(e.target === overlay){ closeCourseModal(); } });
+    if(card){ card.addEventListener('click', function(e){ e.stopPropagation(); }); }
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && overlay.classList.contains('open')){ closeCourseModal(); }
     });
   }
 
@@ -10403,7 +10698,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(BUILT_IN[prefix]) return BUILT_IN[prefix];
     var plans = loadImportedPlans();
     var p = plans[prefix];
-    if(p){ return nameParts(p.majorName.en).big || prefix; }
+    if(p){
+      // Append the "small" subtitle when present so two plans that share a
+      // big name (e.g. this app's built-in "Computer Science" and a feed
+      // plan called "Computer Science — Minor: ...") don't render as
+      // identical, indistinguishable entries in this dropdown.
+      var parts = nameParts(p.majorName.en);
+      var big = parts.big || prefix;
+      return parts.small ? (big + ' — ' + parts.small) : big;
+    }
     return prefix;
   }
   function allKnownCourses(){
@@ -10563,7 +10866,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
     exportPlan: exportPlan, submitPlan: submitPlan, editCoursePrompt: openCourseEditPopup, runAutoLink: runAutoLink,
-    refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan
+    refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan,
+    openCourseModal: openCourseModal
   };
 
   // If the person somehow navigates to a built-in plan while an imported
@@ -10602,6 +10906,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         if(JSON.stringify(stored) !== before){ saveImportedPlans(stored); }
       }
     }catch(e){ /* never let a migration failure stop the app from loading */ }
+    bindCourseModal();
     renderHomeCards();
   }
   if(document.readyState === 'complete'){ init(); }
@@ -10661,7 +10966,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     Object.keys(window.APP_COLLEGES || {}).forEach(function(cid){
       var c = window.APP_COLLEGES[cid];
       if(c.university !== uniId) return;
-      out[cid] = { id: cid, name: c.name, count: 0 };
+      out[cid] = { id: cid, name: c.name, icon: c.icon, count: 0 };
     });
     allPlanMeta().filter(function(m){ return m.university === uniId; }).forEach(function(m){
       if(!out[m.college]){ out[m.college] = { id: m.college, name: m.collegeMeta, count: 0 }; }
@@ -10738,9 +11043,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var tiles = ids.map(function(cid){
       var c = colleges[cid];
       var name = collegeDisplayName(c);
+      // Registered colleges (APP_COLLEGES) carry their own icon; a college
+      // that only exists because a student's custom plan named it (no
+      // registered entry) falls back to a plain building.
+      var icon = c.icon || '🏫';
       return '<div class="plan-card" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0">' +
         '<span class="home-tile-badge">' + c.count + ' plan' + (c.count === 1 ? '' : 's') + '</span>' +
-        '<div class="pc-icon" style="font-size:22px;">🏫</div>' +
+        '<div class="pc-icon" style="font-size:22px;">' + icon + '</div>' +
         '<h2 style="font-size:14.5px;">' + name.en + '</h2>' +
         '<p style="direction:rtl;">' + name.ar + '</p>' +
         (c.count ? '<div class="pc-cta">View plans →</div>' : '<div class="pc-cta home-tile-empty">No plans yet</div>') +
@@ -10890,7 +11199,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     }) : [{ id: 'y1', hasSummer: false }];
     var yearIds = years.map(function(y){ return y.id; });
     var courses = Array.isArray(fp.courses) ? fp.courses.slice(0, 400).map(function(c){
-      return {
+      var out = {
         id: safeId(c.id), name: esc(c.name || c.id || ''), ar: esc(c.ar || ''),
         creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
         category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
@@ -10899,6 +11208,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         // normalize so a feed plan's summer courses actually render.
         semester: window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1')
       };
+      // The real catalog code (e.g. "100411010") — was silently dropped by
+      // this sanitizer even though __sanitizeImportedPlan (the other entry
+      // point, for manually-pasted/imported plans) already preserved it;
+      // every course synced from the online feed showed "-" for its course
+      // number in the popup and couldn't be found by searching its code.
+      if(c.courseNumber != null){ out.courseNumber = esc(String(c.courseNumber)).slice(0, 30); }
+      return out;
     }) : [];
     var prerequisites = Array.isArray(fp.prerequisites) ? fp.prerequisites.slice(0, 800).map(function(pair){
       return [safeId(pair[0]), safeId(pair[1])];
