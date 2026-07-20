@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.4';
+window.APP_VERSION = '3.5';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1177,7 +1177,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .course.completed .name{text-decoration:line-through; text-decoration-thickness:1.5px;}
 
-  .plan-page.rtl-mode .course-check{right:auto; left:5px; margin:-5px;}
+  .plan-page.rtl-mode .course-check,
+  .sheet.rtl-mode .course-check{right:auto; left:5px; margin:-5px;}
   /* ---------- My Progress: status badges (Completed / Available) ---------- */
 
   .course-badge{
@@ -2751,6 +2752,19 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="modal-card dev-modal-card">
     <button class="modal-close" id="devModalClose" aria-label="Close">&times;</button>
     <div class="modal-body" id="devModalBody"></div>
+  </div>
+</div>
+
+<!-- Shared course-details popup for every imported/feed plan — one instance
+     reused for any plan id, since (unlike the 4 built-in majors) there's no
+     way to have a static per-plan overlay for a plan that doesn't exist
+     until a student creates or syncs it. Gives imported plans the exact same
+     grade/status/difficulty/notes/elective-picker popup the built-in majors
+     have, instead of a bare tap-to-toggle. -->
+<div class="modal-overlay" id="impCourseModalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="impCourseModalClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="impCourseModalBody"></div>
   </div>
 </div>
 
@@ -8150,8 +8164,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '</div>';
   }
 
-  function bind(prefix, slug){
-    var container = document.querySelector('#' + prefix + '-courseModalBody .modal-extras');
+  function bind(prefix, slug, containerEl){
+    // The 4 built-in majors each have their own static "#{prefix}-
+    // courseModalBody" overlay; every imported/feed plan shares ONE overlay
+    // instead (there's no way to pre-build a static one per plan id), so its
+    // caller passes the container element directly rather than relying on
+    // this id lookup.
+    var container = containerEl || document.querySelector('#' + prefix + '-courseModalBody .modal-extras');
     if(!container) return;
     var pid = container.getAttribute('data-pid');
     if(!pid) return;
@@ -10158,13 +10177,24 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var editing = document.getElementById('page-' + planId) && document.getElementById('page-' + planId).classList.contains('editing');
     var cls = 'course ' + (c.category || 'core') + (done ? ' completed' : '') + (avail || done ? ' available' : '') + (c.isRetake ? ' retake-course' : '');
     var displayName = (rtl && c.ar) ? c.ar : c.name;
+    // The old quick "📊 set grade" shortcut for a done course is retired —
+    // it shared the same top-right corner as the new checkbox and would
+    // visually collide with it. Grade is now set from the full course-
+    // details popup (opened by tapping the card), same as every built-in
+    // major already works — openGradePrompt() itself is untouched in case
+    // anything else still calls it directly.
     var cardButtons = editing
       ? '<div class="imp-card-btn-row">' +
         '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">✏️</button>' +
         '<button type="button" class="imp-remove-course-btn" title="Remove course" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmRemoveCourse(\'' + planId + '\',\'' + c.id + '\');">✕</button>' +
         '</div>'
-      : (done ? '<div class="imp-card-btn-row"><button type="button" class="imp-grade-btn" title="Set grade" onclick="event.stopPropagation(); AAUP_IMPORTED.openGradePrompt(\'' + planId + '\',\'' + c.id + '\');">📊</button></div>' : '');
-    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + (editing ? '' : ' onclick="AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
+      : '';
+    var checkboxHtml = editing ? '' :
+      '<span class="course-check" role="checkbox" tabindex="0" aria-checked="' + (done ? 'true' : 'false') + '" ' +
+      'aria-label="Mark course as completed" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
+      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">✓</span>';
+    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
+      checkboxHtml +
       cardButtons +
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
       '<div class="name">' + displayName + (done ? ' ✓' : '') + '</div>' +
@@ -10198,6 +10228,68 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     document.getElementById('impGradeSelect').addEventListener('change', function(e){
       if(window.__applyGradeChange){ window.__applyGradeChange(planId, pid, e.target.value); }
       render(planId);
+    });
+  }
+
+  var IMP_MODAL_LABELS = {
+    en: { num: 'Course Number', name: 'Course Name', cr: 'Cr. Hrs.', prereq: 'Prerequisite', th: 'Theoretical', pr: 'Practical' },
+    ar: { num: 'رقم المساق', name: 'اسم المساق', cr: 'الساعات المعتمدة', prereq: 'المتطلب السابق', th: 'نظري', pr: 'عملي' }
+  };
+
+  // The same course-details popup the 4 built-in majors have (grade,
+  // planning status, difficulty, workload, notes, and the University
+  // Elective picker) — reused here via window.__renderCourseModalExtras /
+  // __bindCourseModalExtras rather than re-implemented, so any future change
+  // to that popup (like the elective picker) applies to every plan type at
+  // once instead of needing to be built twice.
+  function openCourseModal(planId, slug){
+    var plan = loadImportedPlans()[planId];
+    var course = plan && (plan.courses || []).filter(function(c){ return c.id === slug; })[0];
+    if(!course) return;
+    var rtl = !!rtlState[planId];
+    var L = IMP_MODAL_LABELS[rtl ? 'ar' : 'en'];
+    var displayName = (rtl && course.ar) ? course.ar : course.name;
+    var info = ((window.__PLAN_DATA[planId] || {}).courseInfo || {})[slug] || {
+      num: course.num || course.courseNumber || '-', th: '-', pr: '-', prereq: '-'
+    };
+    var overlay = document.getElementById('impCourseModalOverlay');
+    var body = document.getElementById('impCourseModalBody');
+    if(!overlay || !body) return;
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    body.innerHTML =
+      '<h3>' + window.__escapeHtml(displayName) + '</h3>' +
+      '<div class="modal-row"><span class="k">' + L.num + '</span><span class="v">' + window.__escapeHtml(String(info.num || '-')) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.name + '</span><span class="v">' + window.__escapeHtml(displayName) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.cr + '</span><span class="v">' + window.__escapeHtml(String(course.creditHours != null ? course.creditHours : 0)) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.prereq + '</span><span class="v">' + window.__escapeHtml(String(info.prereq || '-')) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.th + '</span><span class="v">' + window.__escapeHtml(String(info.th || '-')) + '</span></div>' +
+      '<div class="modal-row"><span class="k">' + L.pr + '</span><span class="v">' + window.__escapeHtml(String(info.pr || '-')) + '</span></div>';
+    if(window.__renderCourseModalExtras){ body.innerHTML += window.__renderCourseModalExtras(planId, slug); }
+    overlay.classList.add('open');
+    if(window.__bindCourseModalExtras){
+      var extrasEl = body.querySelector('.modal-extras');
+      window.__bindCourseModalExtras(planId, slug, extrasEl);
+    }
+  }
+
+  function closeCourseModal(){
+    var overlay = document.getElementById('impCourseModalOverlay');
+    if(overlay){ overlay.classList.remove('open'); }
+  }
+
+  // One-time wiring for the single shared overlay — backdrop click, Escape,
+  // and stopping a click on the card itself from bubbling to the backdrop.
+  function bindCourseModal(){
+    var overlay = document.getElementById('impCourseModalOverlay');
+    if(!overlay || overlay.getAttribute('data-bound')) return;
+    overlay.setAttribute('data-bound', '1');
+    var card = overlay.querySelector('.modal-card');
+    var closeBtn = document.getElementById('impCourseModalClose');
+    if(closeBtn){ closeBtn.addEventListener('click', closeCourseModal); }
+    overlay.addEventListener('click', function(e){ if(e.target === overlay){ closeCourseModal(); } });
+    if(card){ card.addEventListener('click', function(e){ e.stopPropagation(); }); }
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && overlay.classList.contains('open')){ closeCourseModal(); }
     });
   }
 
@@ -10768,7 +10860,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
     exportPlan: exportPlan, submitPlan: submitPlan, editCoursePrompt: openCourseEditPopup, runAutoLink: runAutoLink,
-    refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan
+    refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan,
+    openCourseModal: openCourseModal
   };
 
   // If the person somehow navigates to a built-in plan while an imported
@@ -10807,6 +10900,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         if(JSON.stringify(stored) !== before){ saveImportedPlans(stored); }
       }
     }catch(e){ /* never let a migration failure stop the app from loading */ }
+    bindCourseModal();
     renderHomeCards();
   }
   if(document.readyState === 'complete'){ init(); }
