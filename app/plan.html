@@ -125,28 +125,28 @@ window.APP_UNIVERSITIES = {
 // ============================================================================
 window.APP_COLLEGES = {
   'aaup-ai-ds': {
-    university: 'aaup',
+    university: 'aaup', icon: '🤖',
     name: { en: 'Faculty of Artificial Intelligence and Data Science', ar: 'كلية الذكاء الاصطناعي وعلوم البيانات' }
   },
   'aaup-it': {
-    university: 'aaup',
+    university: 'aaup', icon: '💻',
     name: { en: 'Faculty of Information Technology', ar: 'كلية تكنولوجيا المعلومات' }
   },
   'aaup-nursing': {
-    university: 'aaup',
+    university: 'aaup', icon: '🩺',
     name: { en: 'Faculty of Nursing', ar: 'كلية التمريض' }
   },
   'aaup-pharmacy': {
-    university: 'aaup',
+    university: 'aaup', icon: '💊',
     name: { en: 'Faculty of Pharmacy', ar: 'كلية الصيدلة' }
   },
   'aasu-cee': {
-    university: 'aasu',
+    university: 'aasu', icon: '🦾',
     // name.en must match the plan's college.en exactly (case-insensitive) so
     // feed plans (ingested by AAUP_SYNC) group under this college in the picker.
     name: { en: 'College of Engineering and Energy', ar: 'كلية الهندسة والطاقة' }
   }
-  // next: 'aaup-xxx': { university: 'aaup', name: { en: '...', ar: '...' } }
+  // next: 'aaup-xxx': { university: 'aaup', icon: '...', name: { en: '...', ar: '...' } }
 };
 // Where "Share this plan with the app maintainer" sends people. Leave ''
 // to fall back to opening a pre-filled GitHub issue on the app's repo (see
@@ -205,7 +205,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.22';
+window.APP_VERSION = '3.3';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2178,6 +2178,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .plan-page.editing .edit-mode-banner{display:flex;}
 
+  /* Public "Enter Edit Mode" toolbar button on the built-in AI majors — same
+     unrestricted entry point every imported/custom plan already has (no
+     Developer password). Hidden once editing (the edit-mode-banner's own
+     Exit button takes over) so there's never a redundant enter button. */
+  .plan-page.editing .header-actions .enter-edit-btn{display:none;}
+
   .edit-mode-banner .emb-exit{
     background:transparent; border:1px solid #ff9ecb; color:#ff9ecb;
     border-radius:999px; padding:5px 14px; font-size:11.5px; font-weight:800;
@@ -2500,7 +2506,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="home-step" id="homeStepPlans" style="display:none;">
   <div class="plan-grid">
     <div class="plan-card" data-page="robotics" data-university="aaup" data-college="aaup-ai-ds" data-search-en="Artificial Intelligence and Robotics" data-search-ar="الذكاء الاصطناعي والروبوتات" onclick="AAUP_DASHBOARD.selectAndOpen('robotics')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('robotics')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('robotics');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2520,7 +2526,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
 
     <div class="plan-card" data-page="cybersecurity" data-university="aaup" data-college="aaup-ai-ds" data-search-en="Artificial Intelligence and Cybersecurity" data-search-ar="الذكاء الاصطناعي والأمن السيبراني" onclick="AAUP_DASHBOARD.selectAndOpen('cybersecurity')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('cybersecurity')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('cybersecurity');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2534,7 +2540,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
 
     <div class="plan-card" data-page="medical" data-university="aaup" data-college="aaup-ai-ds" data-search-en="Artificial Intelligence and Medical Sciences" data-search-ar="الذكاء الاصطناعي والعلوم الطبية" onclick="AAUP_DASHBOARD.selectAndOpen('medical')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('medical')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('medical');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2550,7 +2556,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     </div>
 
     <div class="plan-card" data-page="cs" data-university="aaup" data-college="aaup-it" data-search-en="Computer Science Department" data-search-ar="قسم علم الحاسوب" onclick="AAUP_DASHBOARD.selectAndOpen('cs')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_DASHBOARD.selectAndOpen('cs')">
-      <span class="imp-origin-badge">🏛️ AAUP</span>
+      <span class="imp-origin-badge">🏛️ AAUP · ✅ Official</span>
       <button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;" onclick="event.stopPropagation(); AAUP_PLAN_EDITOR.enterEditMode('cs');">✏️ Edit</button>
       <div class="pc-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -2716,6 +2722,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <button type="button" class="home-btn" onclick="showPage('home')">
         <span class="home-ic">🏠</span><span class="home-lbl">Home</span>
       </button>
+      <button type="button" class="home-btn enter-edit-btn" onclick="AAUP_PLAN_EDITOR.enterEditMode('robotics')">✏️ Edit Mode</button>
     </div>
   </header>
 
@@ -3056,6 +3063,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <button type="button" class="home-btn" onclick="showPage('home')">
         <span class="home-ic">🏠</span><span class="home-lbl">Home</span>
       </button>
+      <button type="button" class="home-btn enter-edit-btn" onclick="AAUP_PLAN_EDITOR.enterEditMode('cybersecurity')">✏️ Edit Mode</button>
     </div>
   </header>
 
@@ -3408,6 +3416,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <button type="button" class="home-btn" onclick="showPage('home')">
         <span class="home-ic">🏠</span><span class="home-lbl">Home</span>
       </button>
+      <button type="button" class="home-btn enter-edit-btn" onclick="AAUP_PLAN_EDITOR.enterEditMode('medical')">✏️ Edit Mode</button>
     </div>
   </header>
 
@@ -10411,7 +10420,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(BUILT_IN[prefix]) return BUILT_IN[prefix];
     var plans = loadImportedPlans();
     var p = plans[prefix];
-    if(p){ return nameParts(p.majorName.en).big || prefix; }
+    if(p){
+      // Append the "small" subtitle when present so two plans that share a
+      // big name (e.g. this app's built-in "Computer Science" and a feed
+      // plan called "Computer Science — Minor: ...") don't render as
+      // identical, indistinguishable entries in this dropdown.
+      var parts = nameParts(p.majorName.en);
+      var big = parts.big || prefix;
+      return parts.small ? (big + ' — ' + parts.small) : big;
+    }
     return prefix;
   }
   function allKnownCourses(){
@@ -10669,7 +10686,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     Object.keys(window.APP_COLLEGES || {}).forEach(function(cid){
       var c = window.APP_COLLEGES[cid];
       if(c.university !== uniId) return;
-      out[cid] = { id: cid, name: c.name, count: 0 };
+      out[cid] = { id: cid, name: c.name, icon: c.icon, count: 0 };
     });
     allPlanMeta().filter(function(m){ return m.university === uniId; }).forEach(function(m){
       if(!out[m.college]){ out[m.college] = { id: m.college, name: m.collegeMeta, count: 0 }; }
@@ -10746,9 +10763,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var tiles = ids.map(function(cid){
       var c = colleges[cid];
       var name = collegeDisplayName(c);
+      // Registered colleges (APP_COLLEGES) carry their own icon; a college
+      // that only exists because a student's custom plan named it (no
+      // registered entry) falls back to a plain building.
+      var icon = c.icon || '🏫';
       return '<div class="plan-card" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0">' +
         '<span class="home-tile-badge">' + c.count + ' plan' + (c.count === 1 ? '' : 's') + '</span>' +
-        '<div class="pc-icon" style="font-size:22px;">🏫</div>' +
+        '<div class="pc-icon" style="font-size:22px;">' + icon + '</div>' +
         '<h2 style="font-size:14.5px;">' + name.en + '</h2>' +
         '<p style="direction:rtl;">' + name.ar + '</p>' +
         (c.count ? '<div class="pc-cta">View plans →</div>' : '<div class="pc-cta home-tile-empty">No plans yet</div>') +
