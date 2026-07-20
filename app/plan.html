@@ -104,6 +104,10 @@ window.APP_UNIVERSITIES = {
   birzeit: {
     name: { en: 'Birzeit University', ar: 'جامعة بيرزيت' },
     shortName: 'BZU', icon: '🎓', website: 'https://www.birzeit.edu'
+  },
+  aasu: {
+    name: { en: 'Abdullah Al Salem University', ar: 'جامعة عبدالله السالم' },
+    shortName: 'AASU', icon: '🇰🇼', website: 'https://aasu.edu.kw'
   }
   // next: { name: { en: '...', ar: '...' }, shortName: '...', icon: '🎓', website: '...' }
 };
@@ -125,6 +129,12 @@ window.APP_COLLEGES = {
   'aaup-it': {
     university: 'aaup',
     name: { en: 'Faculty of Information Technology', ar: 'كلية تكنولوجيا المعلومات' }
+  },
+  'aasu-cee': {
+    university: 'aasu',
+    // name.en must match the plan's college.en exactly (case-insensitive) so
+    // feed plans (ingested by AAUP_SYNC) group under this college in the picker.
+    name: { en: 'College of Engineering and Energy', ar: 'كلية الهندسة والطاقة' }
   }
   // next: 'aaup-xxx': { university: 'aaup', name: { en: '...', ar: '...' } }
 };
@@ -185,7 +195,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.11';
+window.APP_VERSION = '3.2';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -10609,7 +10619,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   function builtInCards(){
-    return Array.prototype.slice.call(document.querySelectorAll('#homeStepPlans .plan-card[data-page]'));
+    // Exclude imported/feed plan cards ([data-imported]) — they live inside
+    // #homeStepPlans too, but they're already accounted for via importedPlans()
+    // below. Without :not([data-imported]) every feed plan gets counted twice
+    // in the university/college badges (and filtered redundantly), which showed
+    // up as a college with one plan reading "2 plans".
+    return Array.prototype.slice.call(document.querySelectorAll('#homeStepPlans .plan-card[data-page]:not([data-imported])'));
   }
 
   // One flat list of {university, college, collegeMeta} across every plan
