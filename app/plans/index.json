@@ -2942,6 +2942,695 @@
           "240514210"
         ]
       ]
+    },
+    {
+      "id": "aaup-multimedia",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Multimedia Technology",
+          "small": "B.Sc. · Program 24022"
+        },
+        "ar": {
+          "big": "تكنولوجيا الوسائط المتعددة",
+          "small": "بكالوريوس · برنامج 24022"
+        }
+      },
+      "icon": "🎨",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Multimedia Technology (Program 24022 · Jenin & Ramallah). Computer graphics, games, animation, digital video/audio, photography, and virtual reality. 4 years, following the official advisory plan — its listed courses total 133 CH (the program page states 135). The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في تكنولوجيا الوسائط المتعددة (برنامج 24022 · حرم جنين ورام الله). رسوميات الحاسوب والألعاب والرسوم المتحركة والفيديو والصوت الرقمي والتصوير والواقع الافتراضي. 4 سنوات وفق الخطة الإرشادية الرسمية — مجموع مساقاتها المدرجة 133 ساعة (صفحة البرنامج تذكر 135). تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "100411010",
+          "name": "Calculus I",
+          "ar": "التفاضل والتكامل 1",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100411010"
+        },
+        {
+          "id": "240211013",
+          "name": "Introduction to Information Technology",
+          "ar": "مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211013"
+        },
+        {
+          "id": "240211030",
+          "name": "Introduction to Information Technology Lab",
+          "ar": "مختبر مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211030"
+        },
+        {
+          "id": "240211200",
+          "name": "Creative Arts",
+          "ar": "الفنون الإبداعية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240211200"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "univ-elec-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y1",
+          "semester": "s2"
+        },
+        {
+          "id": "100413750",
+          "name": "Discrete Mathematics",
+          "ar": "الرياضيات المتقطعة",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100413750"
+        },
+        {
+          "id": "240111050",
+          "name": "Programming Fundamentals I for IT",
+          "ar": "أساسيات البرمجة 1 لتكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111050"
+        },
+        {
+          "id": "240111060",
+          "name": "Programming Fundamentals I Lab for IT",
+          "ar": "مختبر أساسيات البرمجة 1 لتكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240111060"
+        },
+        {
+          "id": "240212020",
+          "name": "Introduction to Multimedia",
+          "ar": "مقدمة في الوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240212020"
+        },
+        {
+          "id": "240212031",
+          "name": "Introduction to Multimedia Lab",
+          "ar": "مختبر مقدمة في الوسائط المتعددة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240212031"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "240112100",
+          "name": "Programming Fundamentals II for IT",
+          "ar": "أساسيات البرمجة 2 لتكنولوجيا المعلومات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112100"
+        },
+        {
+          "id": "240112200",
+          "name": "Programming Fundamentals II Lab for IT",
+          "ar": "مختبر أساسيات البرمجة 2 لتكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240112200"
+        },
+        {
+          "id": "240212401",
+          "name": "Computer Modeling",
+          "ar": "النمذجة الحاسوبية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240212401"
+        },
+        {
+          "id": "240222500",
+          "name": "Digital Photography and Composition",
+          "ar": "التصوير الرقمي والتكوين",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240222500"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "240213480",
+          "name": "Speech Communication and Technical Writing",
+          "ar": "مهارات الاتصال والكتابة التقنية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240213480"
+        },
+        {
+          "id": "240113121",
+          "name": "Introduction to Database",
+          "ar": "مقدمة في قواعد البيانات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240113121"
+        },
+        {
+          "id": "240113131",
+          "name": "Introduction to Database (Lab)",
+          "ar": "مختبر مقدمة في قواعد البيانات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240113131"
+        },
+        {
+          "id": "240212100",
+          "name": "Fundamentals of Computer Graphics",
+          "ar": "أساسيات رسوميات الحاسوب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240212100"
+        },
+        {
+          "id": "240223100",
+          "name": "Advanced Computer Modeling",
+          "ar": "النمذجة الحاسوبية المتقدمة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240223100"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "240213081",
+          "name": "Web Development I",
+          "ar": "تطوير الويب 1",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240213081"
+        },
+        {
+          "id": "240213231",
+          "name": "Visual Programming (Basic)",
+          "ar": "البرمجة المرئية (بيسك)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240213231"
+        },
+        {
+          "id": "240213250",
+          "name": "Computer Games Design and Development",
+          "ar": "تصميم وتطوير ألعاب الحاسوب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240213250"
+        },
+        {
+          "id": "240214350",
+          "name": "Online Advertising Fundamentals",
+          "ar": "أساسيات الإعلان عبر الإنترنت",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240214350"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "240213120",
+          "name": "Digital Image Processing",
+          "ar": "معالجة الصور الرقمية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240213120"
+        },
+        {
+          "id": "240213340",
+          "name": "Multimedia Systems Analysis and Design",
+          "ar": "تحليل وتصميم أنظمة الوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240213340"
+        },
+        {
+          "id": "240214200",
+          "name": "Advanced Computer Games Design and Development",
+          "ar": "تصميم وتطوير ألعاب الحاسوب المتقدم",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240214200"
+        },
+        {
+          "id": "240214311",
+          "name": "Computer Animation",
+          "ar": "الرسوم المتحركة الحاسوبية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240214311"
+        },
+        {
+          "id": "240214330",
+          "name": "Virtual Reality",
+          "ar": "الواقع الافتراضي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240214330"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "خدمة المجتمع",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "240213970",
+          "name": "Internship",
+          "ar": "التدريب الميداني",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "240213970"
+        },
+        {
+          "id": "univ-elec-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "240214100",
+          "name": "Digital Video and Audio",
+          "ar": "الفيديو والصوت الرقمي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240214100"
+        },
+        {
+          "id": "240214301",
+          "name": "Multimedia and Business",
+          "ar": "الوسائط المتعددة والأعمال",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240214301"
+        },
+        {
+          "id": "240214971",
+          "name": "Multimedia Senior Project I",
+          "ar": "مشروع التخرج 1 للوسائط المتعددة",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240214971"
+        },
+        {
+          "id": "240224700",
+          "name": "Mobile Programming for MMT",
+          "ar": "برمجة الأجهزة المحمولة للوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240224700"
+        },
+        {
+          "id": "spec-elec-5",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "univ-elec-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "240214210",
+          "name": "Interactive Multimedia",
+          "ar": "الوسائط المتعددة التفاعلية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240214210"
+        },
+        {
+          "id": "240214990",
+          "name": "Multimedia Senior Project II",
+          "ar": "مشروع التخرج 2 للوسائط المتعددة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240214990"
+        },
+        {
+          "id": "spec-elec-6",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100411010",
+          "100413750"
+        ],
+        [
+          "240111050",
+          "240111060"
+        ],
+        [
+          "010610035",
+          "240213480"
+        ],
+        [
+          "240111050",
+          "240112100"
+        ],
+        [
+          "240111060",
+          "240112200"
+        ],
+        [
+          "240112100",
+          "240112200"
+        ],
+        [
+          "240112100",
+          "240113121"
+        ],
+        [
+          "240113121",
+          "240113131"
+        ],
+        [
+          "240211013",
+          "240211030"
+        ],
+        [
+          "240212020",
+          "240212031"
+        ],
+        [
+          "240111050",
+          "240212100"
+        ],
+        [
+          "240212020",
+          "240212401"
+        ],
+        [
+          "240112100",
+          "240213081"
+        ],
+        [
+          "100413750",
+          "240213120"
+        ],
+        [
+          "240112100",
+          "240213231"
+        ],
+        [
+          "240112100",
+          "240213250"
+        ],
+        [
+          "240113121",
+          "240213340"
+        ],
+        [
+          "240222500",
+          "240214100"
+        ],
+        [
+          "240213250",
+          "240214200"
+        ],
+        [
+          "240213231",
+          "240214210"
+        ],
+        [
+          "240212020",
+          "240214301"
+        ],
+        [
+          "240223100",
+          "240214311"
+        ],
+        [
+          "240112100",
+          "240214330"
+        ],
+        [
+          "240212020",
+          "240214350"
+        ],
+        [
+          "240214971",
+          "240214990"
+        ],
+        [
+          "240212020",
+          "240222500"
+        ],
+        [
+          "240212401",
+          "240223100"
+        ],
+        [
+          "240213231",
+          "240224700"
+        ]
+      ]
     }
   ]
 }
