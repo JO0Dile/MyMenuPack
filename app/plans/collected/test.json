@@ -50,8 +50,8 @@
         "ar": "اختبار صيف",
         "creditHours": 3,
         "category": "core",
-        "yearId": "y1",
-        "semester": "s3"
+        "semester": "s3",
+        "yearId": "y1"
       }
     ],
     "prerequisites": [
@@ -71,6 +71,6 @@
     }
   },
   "appVersion": "3.11",
-  "submittedAt": "2026-07-20T11:43:12.182Z",
-  "collectedAt": "2026-07-20T11:43:12.392Z"
+  "submittedAt": "2026-07-20T11:43:30.777Z",
+  "collectedAt": "2026-07-20T11:43:30.843Z"
 }
