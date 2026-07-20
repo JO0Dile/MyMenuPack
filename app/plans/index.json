@@ -3665,6 +3665,647 @@
       },
       "courses": [],
       "prerequisites": []
+    },
+    {
+      "id": "aaup-gis",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Geographic Information Systems (GIS)",
+          "small": "B.Sc. · Program 24041"
+        },
+        "ar": {
+          "big": "نظم المعلومات الجغرافية",
+          "small": "بكالوريوس · برنامج 24041"
+        }
+      },
+      "icon": "🗺️",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Information Technology",
+        "ar": "كلية تكنولوجيا المعلومات"
+      },
+      "bio": {
+        "en": "B.Sc. in Geographic Information Systems (Program 24041 · Jenin) — the first GIS program in Palestine (since 2014). Spatial data collection, analysis, cartography, remote sensing, and web/mobile GIS. 4 years, following the official advisory plan — its listed courses total 130 CH (the program page states 132). The 0-credit remedial Beginning English is omitted.",
+        "ar": "بكالوريوس في نظم المعلومات الجغرافية (برنامج 24041 · حرم جنين) — أول برنامج نظم معلومات جغرافية في فلسطين (منذ 2014). جمع وتحليل البيانات المكانية ورسم الخرائط والاستشعار عن بعد وتطبيقات الويب والمحمول. 4 سنوات وفق الخطة الإرشادية الرسمية — مجموع مساقاتها المدرجة 130 ساعة (صفحة البرنامج تذكر 132). تُستثنى الإنجليزية التمهيدية."
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "دراسات فلسطينية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "مهارات الحاسوب",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "110111030",
+          "name": "Introduction to Information Technology Lab",
+          "ar": "مختبر مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "110111030"
+        },
+        {
+          "id": "240221010",
+          "name": "Introduction to Information Technology",
+          "ar": "مقدمة في تكنولوجيا المعلومات",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240221010"
+        },
+        {
+          "id": "240511100",
+          "name": "Physical Geography",
+          "ar": "الجغرافيا الطبيعية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240511100"
+        },
+        {
+          "id": "240512120",
+          "name": "GPS and Surveying",
+          "ar": "نظام تحديد المواقع والمساحة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "240512120"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "اللغة الإنجليزية المتوسطة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتوسطة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "اللغة العربية",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "100411090",
+          "name": "Mathematics for GIS Students",
+          "ar": "الرياضيات لطلبة نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411090"
+        },
+        {
+          "id": "240411120",
+          "name": "Principles of Maps",
+          "ar": "مبادئ الخرائط",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240411120"
+        },
+        {
+          "id": "240411160",
+          "name": "Computer Skills for GIS",
+          "ar": "مهارات الحاسوب لنظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240411160"
+        },
+        {
+          "id": "240412100",
+          "name": "Introduction to GIS",
+          "ar": "مقدمة في نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "240412100"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "اللغة الإنجليزية المتقدمة",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "مختبر اللغة الإنجليزية المتقدمة",
+          "creditHours": 1,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "240111011",
+          "name": "Programming Fundamentals (C++)",
+          "ar": "أساسيات البرمجة (سي++)",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240111011"
+        },
+        {
+          "id": "240111021",
+          "name": "Programming Fundamentals I (Lab)",
+          "ar": "مختبر أساسيات البرمجة 1",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240111021"
+        },
+        {
+          "id": "240411130",
+          "name": "Principles of Geology",
+          "ar": "مبادئ الجيولوجيا",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240411130"
+        },
+        {
+          "id": "240411140",
+          "name": "Human Geography",
+          "ar": "الجغرافيا البشرية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240411140"
+        },
+        {
+          "id": "240512130",
+          "name": "Introduction to Remote Sensing",
+          "ar": "مقدمة في الاستشعار عن بعد",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240512130"
+        },
+        {
+          "id": "spec-elec-1",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1"
+        },
+        {
+          "id": "univ-elec-1",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "100411100",
+          "name": "Statistics for GIS Students",
+          "ar": "الإحصاء لطلبة نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "100411100"
+        },
+        {
+          "id": "240213480",
+          "name": "Speech Communication and Technical Writing",
+          "ar": "مهارات الاتصال والكتابة التقنية",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240213480"
+        },
+        {
+          "id": "240412150",
+          "name": "GIS Data Analysis",
+          "ar": "تحليل بيانات نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240412150"
+        },
+        {
+          "id": "240412160",
+          "name": "Intermediate GIS",
+          "ar": "نظم المعلومات الجغرافية المتوسطة",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "240412160"
+        },
+        {
+          "id": "spec-elec-2",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2"
+        },
+        {
+          "id": "univ-elec-2",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "240412170",
+          "name": "GIS Applications in Hydrology and Spatial Modeling",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في الهيدرولوجيا والنمذجة المكانية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240412170"
+        },
+        {
+          "id": "240513140",
+          "name": "GIS Programming and Automation",
+          "ar": "برمجة وأتمتة نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240513140"
+        },
+        {
+          "id": "240513230",
+          "name": "Digitizing Maps Lab",
+          "ar": "مختبر رقمنة الخرائط",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240513230"
+        },
+        {
+          "id": "240514130",
+          "name": "GIS Applications in Geological Studies",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في الدراسات الجيولوجية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "240514130"
+        },
+        {
+          "id": "spec-elec-3",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "أساسيات مناهج البحث",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "univ-elec-3",
+          "name": "University Elective",
+          "ar": "متطلب جامعي اختياري",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "240414110",
+          "name": "Three-Dimensional Concepts of GIS",
+          "ar": "المفاهيم ثلاثية الأبعاد في نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240414110"
+        },
+        {
+          "id": "240513120",
+          "name": "Geo-Database Design and Management",
+          "ar": "تصميم وإدارة قواعد البيانات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240513120"
+        },
+        {
+          "id": "240513130",
+          "name": "GIS Applications in Urban and Municipal Planning",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في التخطيط الحضري والبلدي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "240513130"
+        },
+        {
+          "id": "spec-elec-4",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2"
+        },
+        {
+          "id": "240513990",
+          "name": "Internship",
+          "ar": "التدريب الميداني",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "summer",
+          "courseNumber": "240513990"
+        },
+        {
+          "id": "240513100",
+          "name": "Digital Cartography",
+          "ar": "رسم الخرائط الرقمي",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240513100"
+        },
+        {
+          "id": "240513110",
+          "name": "Geo-Statistics and Spatial Data Mining",
+          "ar": "الإحصاء الجغرافي والتنقيب في البيانات المكانية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240513110"
+        },
+        {
+          "id": "240514120",
+          "name": "GIS Project Management",
+          "ar": "إدارة مشاريع نظم المعلومات الجغرافية",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "240514120"
+        },
+        {
+          "id": "spec-elec-5",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "free-elec-1",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1"
+        },
+        {
+          "id": "240413160",
+          "name": "GIS Applications in Network Analysis",
+          "ar": "تطبيقات نظم المعلومات الجغرافية في تحليل الشبكات",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240413160"
+        },
+        {
+          "id": "240513150",
+          "name": "Online and Web GIS Applications",
+          "ar": "تطبيقات نظم المعلومات الجغرافية عبر الإنترنت والويب",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240513150"
+        },
+        {
+          "id": "240514980",
+          "name": "Senior Graduation Project",
+          "ar": "مشروع التخرج",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "240514980"
+        },
+        {
+          "id": "spec-elec-6",
+          "name": "Specialization Elective",
+          "ar": "متطلب تخصصي اختياري",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2"
+        },
+        {
+          "id": "free-elec-2",
+          "name": "Free Elective",
+          "ar": "متطلب حر",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "100411090",
+          "100411100"
+        ],
+        [
+          "240221010",
+          "110111030"
+        ],
+        [
+          "240221010",
+          "240111011"
+        ],
+        [
+          "240221010",
+          "240111021"
+        ],
+        [
+          "010610035",
+          "240213480"
+        ],
+        [
+          "240512120",
+          "240411120"
+        ],
+        [
+          "110411000",
+          "240412100"
+        ],
+        [
+          "240221010",
+          "240412100"
+        ],
+        [
+          "240411130",
+          "240412170"
+        ],
+        [
+          "240412100",
+          "240412170"
+        ],
+        [
+          "240513120",
+          "240413160"
+        ],
+        [
+          "240412100",
+          "240414110"
+        ],
+        [
+          "240412160",
+          "240414110"
+        ],
+        [
+          "240512120",
+          "240512130"
+        ],
+        [
+          "240412160",
+          "240513100"
+        ],
+        [
+          "100411100",
+          "240513110"
+        ],
+        [
+          "240111011",
+          "240513110"
+        ],
+        [
+          "240221010",
+          "240513120"
+        ],
+        [
+          "240111011",
+          "240513140"
+        ],
+        [
+          "240412100",
+          "240513140"
+        ],
+        [
+          "240513120",
+          "240513150"
+        ],
+        [
+          "240411120",
+          "240513230"
+        ],
+        [
+          "240412160",
+          "240514120"
+        ],
+        [
+          "240411130",
+          "240514130"
+        ],
+        [
+          "240412100",
+          "240514130"
+        ],
+        [
+          "240514120",
+          "240514980"
+        ]
+      ]
     }
   ]
 }
