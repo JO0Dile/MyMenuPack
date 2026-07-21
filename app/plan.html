@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.56';
+window.APP_VERSION = '3.60';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1270,6 +1270,21 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .free{background:var(--free);color:var(--free-tx);}
 
   .misc{background:var(--misc);color:var(--misc-tx);}
+
+  /* Computer Science uses the official AAUP requirement-category palette so
+     the plan reads like the program-tree sheet: green University Req.,
+     gold University Elec., blue College Req., amber Specialization Req.,
+     pink Specialization Elec., red Free Elec. Scoped to #page-cs so the
+     three other majors keep their own (subject-based) colors untouched.
+     The category CSS *keys* are reused (skills=Univ Req, math=College Req,
+     core=Spec Req, dept=Spec Elec, uni=Univ Elec, free=Free) and relabeled
+     in this plan's legend. */
+  #page-cs .course.skills,#page-cs .chip.skills{background:#2f8f57;color:#e7f7ee;}
+  #page-cs .course.uni,#page-cs .chip.uni{background:#a8901f;color:#f9f2cf;}
+  #page-cs .course.math,#page-cs .chip.math{background:#2f6bb0;color:#e2effb;}
+  #page-cs .course.core,#page-cs .chip.core{background:#b06e2a;color:#ffeed8;}
+  #page-cs .course.dept,#page-cs .chip.dept{background:#bd5f96;color:#fbe6f2;}
+  #page-cs .course.free,#page-cs .chip.free{background:#b03a38;color:#fbdedd;}
 
   .course.jump-highlight{animation:jumpPulse 1s ease-in-out 2;}
   /* ================= COLLAPSIBLE LEGEND (mobile-friendly) ================= */
@@ -3885,13 +3900,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <span class="lt-arrow">▶</span><span class="i18n" data-ar="الدليل">Legend</span>
     </button>
     <div class="legend-items">
-    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي إجباري">University requirement</span></span>
-    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="مساقات إجبارية">Core courses</span></span>
-    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="الرياضيات والإحصاء">Math &amp; statistics</span></span>
-    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصصي">Specialized elective</span></span>
-    <span class="item"><span class="chip eng"></span><span class="i18n" data-ar="مساقات اللغة الإنجليزية">English courses</span></span>
-    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University elective</span></span>
-    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free elective</span></span>
+    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي">University Req.</span></span>
+    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University Elec.</span></span>
+    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="متطلب كلية">College Req.</span></span>
+    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="متطلب تخصص">Specialization Req.</span></span>
+    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصص">Specialization Elec.</span></span>
+    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free Elec.</span></span>
     <span class="arrow-sample"><span class="ln"></span><span class="i18n" data-ar="متطلب سابق (مرر المؤشر فوق المساق لتتبعه)">Prerequisite (hover a course to trace it)</span></span>
     <span class="item"><span class="chip pair-chip"></span><span class="i18n" data-ar="مرتبط — مثل المساق ومختبره">Connected — e.g. a course and its lab</span></span>
     </div>
@@ -3938,7 +3952,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
           <div class="sem">
             <div class="sem-label" data-ar="الفصل الأول">First semester</div>
             <div class="course-row" id="cs-y1-s1">
-              <div class="course eng" id="cs-c-beginning-english"><div class="name" data-ar="اللغة الإنجليزية للمبتدئين">Beginning English</div></div>
+              <div class="course skills" id="cs-c-beginning-english"><div class="name" data-ar="اللغة الإنجليزية للمبتدئين">Beginning English</div></div>
               <div class="course skills" id="cs-c-arabic-language"><div class="name" data-ar="اللغة العربية">Arabic Language</div></div>
               <div class="course skills" id="cs-c-computer-skills"><div class="name" data-ar="مهارات حاسوبية">Computer Skills</div></div>
               <div class="course uni" id="cs-c-uni-elective-1"><div class="name" data-ar="مادة اختيارية جامعية (1)">University elective (1)</div></div>
@@ -3955,14 +3969,14 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
             <div class="sem-label" data-ar="الفصل الثاني">Second semester</div>
             <div class="course-row" id="cs-y1-s2">
               <div class="pair-group independent-grades">
-                <div class="course eng" id="cs-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
-                <div class="course eng" id="cs-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+                <div class="course skills" id="cs-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course skills" id="cs-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
               </div>
               <div class="course math" id="cs-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="cs-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete Mathematics</div></div>
               <div class="pair-group">
-                <div class="course core" id="cs-c-progfund1"><div class="name" data-ar="أساسيات البرمجة (++C)">Programming Fundamentals (C++)</div></div>
-                <div class="course core" id="cs-c-progfund1-lab"><div class="name" data-ar="مختبر أساسيات البرمجة (1)">Programming Fundamentals I Lab</div></div>
+                <div class="course math" id="cs-c-progfund1"><div class="name" data-ar="أساسيات البرمجة (++C)">Programming Fundamentals (C++)</div></div>
+                <div class="course math" id="cs-c-progfund1-lab"><div class="name" data-ar="مختبر أساسيات البرمجة (1)">Programming Fundamentals I Lab</div></div>
               </div>
               <div class="course core" id="cs-c-digital-logic"><div class="name" data-ar="تصميم المنطق الرقمي">Digital Logic Design</div></div>
             </div>
@@ -3978,8 +3992,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
             <div class="sem-label" data-ar="الفصل الأول">First semester</div>
             <div class="course-row" id="cs-y2-s1">
               <div class="pair-group independent-grades">
-                <div class="course eng" id="cs-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
-                <div class="course eng" id="cs-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+                <div class="course skills" id="cs-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course skills" id="cs-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
               </div>
               <div class="course skills" id="cs-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fundamentals of Research Methods</div></div>
               <div class="course math" id="cs-c-math-it"><div class="name" data-ar="الرياضيات لتكنولوجيا المعلومات">Mathematics for Information Technology</div></div>
@@ -3997,7 +4011,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
             <div class="course-row" id="cs-y2-s2">
               <div class="course skills" id="cs-c-palestinian-studies"><div class="name" data-ar="دراسات فلسطينية">Palestinian Studies</div></div>
               <div class="course uni" id="cs-c-uni-elective-3"><div class="name" data-ar="مادة اختيارية جامعية (3)">University elective (3)</div></div>
-              <div class="course core" id="cs-c-comp-net-lab"><div class="name" data-ar="مختبر شبكات الحاسوب">Computer Networks Lab</div></div>
+              <div class="pair-group">
+                <div class="course core" id="cs-c-elective-networks-1"><div class="name" data-ar="شبكات الحاسوب (1)">Computer Networks I</div></div>
+                <div class="course core" id="cs-c-comp-net-lab"><div class="name" data-ar="مختبر شبكات الحاسوب">Computer Networks Lab</div></div>
+              </div>
               <div class="pair-group">
                 <div class="course core" id="cs-c-data-structures"><div class="name" data-ar="هياكل البيانات">Data Structures</div></div>
                 <div class="course core" id="cs-c-data-struct-lab"><div class="name" data-ar="مختبر هياكل البيانات">Data Structure Lab</div></div>
@@ -4006,7 +4023,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
                 <div class="course core" id="cs-c-intro-db"><div class="name" data-ar="مدخل إلى قواعد البيانات">Introduction to Database</div></div>
                 <div class="course core" id="cs-c-intro-db-lab"><div class="name" data-ar="مختبر مدخل إلى قواعد البيانات">Introduction to Database Lab</div></div>
               </div>
-              <div class="course eng" id="cs-c-speech-comm"><div class="name" data-ar="التواصل الشفهي والكتابة التقنية">Speech Communication and Technical Writing</div></div>
+              <div class="course core" id="cs-c-speech-comm"><div class="name" data-ar="التواصل الشفهي والكتابة التقنية">Speech Communication and Technical Writing</div></div>
             </div>
           </div>
         </div>
@@ -4035,7 +4052,6 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course core" id="cs-c-mobile-prog"><div class="name" data-ar="برمجة الأجهزة المحمولة">Mobile Programming</div></div>
               <div class="course core" id="cs-c-it-proj-mgmt"><div class="name" data-ar="إدارة مشاريع تكنولوجيا المعلومات">Information Technology Project Management</div></div>
               <div class="course core" id="cs-c-advanced-oop"><div class="name" data-ar="البرمجة الشيئية المتقدمة">Advanced Object Oriented Programming</div></div>
-              <div class="course free" id="cs-c-free-elective-3"><div class="name" data-ar="اختياري حر (3)">Free elective (3)</div></div>
             </div>
           </div>
         </div>
@@ -4043,8 +4059,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
       <div class="special-row">
         <div class="pill summer"><span class="ic">☀</span><span class="i18n" data-ar="الفصل الصيفي">Summer semester</span></div>
-        <div class="pill community"><span class="ic">👥</span><span class="i18n" data-ar="الخدمة المجتمعية">Community service</span></div>
-        <div class="pill internship"><span class="ic">💼</span><span class="i18n" data-ar="التدريب الميداني">Internship</span></div>
+        <div class="course-row" id="cs-summer" style="flex:1 1 320px;">
+          <div class="course skills" id="cs-c-community-service"><div class="name" data-ar="الخدمة المجتمعية">Community Service</div></div>
+          <div class="course core" id="cs-c-internship"><div class="name" data-ar="التدريب الميداني">Internship</div></div>
+        </div>
       </div>
 
       <!-- YEAR 4 -->
@@ -4080,9 +4098,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
       <div class="electives-row">
         <div class="sem-label" data-ar="اختياريات تخصصية">Specialized electives</div>
-        <div class="pool-note" data-ar="14 مادة اختيارية × 3 ساعات معتمدة = 42 ساعة معروضة — يختار الطالب 3 مساقات (9 ساعات)، كما هو موضح في الخطة أعلاه.">14 electives × 3 credit hours = 42H offered — students select 3 (9H), as placed in the plan above.</div>
+        <div class="pool-note" data-ar="13 مادة اختيارية × 3 ساعات معتمدة = 39 ساعة معروضة — يختار الطالب 3 مساقات (9 ساعات)، كما هو موضح في الخطة أعلاه.">13 electives × 3 credit hours = 39H offered — students select 3 (9H), as placed in the plan above.</div>
         <div class="course-row">
-          <div class="course dept" id="cs-c-elective-networks-1"><div class="name" data-ar="شبكات الحاسوب (1)">Computer Networks I</div></div>
           <div class="course dept" id="cs-c-elective-neural-net"><div class="name" data-ar="مدخل إلى الشبكات العصبية والتعلم العميق">Introduction to Neural Network and Deep Learning</div></div>
           <div class="course dept" id="cs-c-elective-adv-os"><div class="name" data-ar="نظم التشغيل المتقدمة">Advanced Operating Systems</div></div>
           <div class="course dept" id="cs-c-elective-machine-learning"><div class="name" data-ar="تعلم الآلة">Machine Learning</div></div>
@@ -4170,7 +4187,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
         <ul>
           <li data-ar="الأسهم الوردية تمثل المتطلبات السابقة — مرر المؤشر فوق أي مساق لمعرفة ما يفتحه وما يحتاجه بالضبط.">Pink arrows are prerequisites — hover any course to trace exactly what it unlocks and what it needs first.</li>
           <li data-ar="المربعات المظللة المنقطة تجمع المساق مع مختبره — تُؤخذ معًا، وليست شرطًا مسبقًا لبعضها.">Dashed, shaded boxes group a course with its lab — taken together, not one requiring the other.</li>
-          <li data-ar="الاختياريات التخصصية: 14 مادة × 3 ساعات = 42 ساعة معروضة — يختار الطالب 3 مساقات (9 ساعات)، كما هو موضح في الخطة.">Specialized electives: 14 courses × 3H = 42H offered — students select 3 (9H), as placed in the plan.</li>
+          <li data-ar="الاختياريات التخصصية: 13 مادة × 3 ساعات = 39 ساعة معروضة — يختار الطالب 3 مساقات (9 ساعات)، كما هو موضح في الخطة.">Specialized electives: 13 courses × 3H = 39H offered — students select 3 (9H), as placed in the plan.</li>
           <li data-ar="الاختياريات الحرة والجامعية لا تملك سلسلة متطلبات سابقة ثابتة، لذا تُركت دون روابط.">Free and university electives have no fixed prerequisite chain, so they're left unconnected.</li>
           <li data-ar="الحد الأقصى المسموح به هو 21 ساعة معتمدة لكل فصل دراسي.">Maximum of 21 credit hours per semester.</li>
           <li data-ar="قد تكون الخطة الدراسية عرضة للتغيير.">Course plan may be subject to change.</li>
@@ -5727,13 +5744,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'mobile-prog': {num:'240113291', name:'Mobile Programming', th:'3', pr:'-', cr:'3', prereq:'Programming Fundamentals II (240112003)', ar:'برمجة الأجهزة المحمولة'},
     'it-proj-mgmt': {num:'240114471', name:'Information Technology Project Management', th:'3', pr:'-', cr:'3', prereq:'Programming Fundamentals II (240112003)', ar:'إدارة مشاريع تكنولوجيا المعلومات'},
     'advanced-oop': {num:'240213010', name:'Advanced Object Oriented Programming', th:'3', pr:'-', cr:'3', prereq:'Principles of Object Oriented Programming (240212010)', ar:'البرمجة الشيئية المتقدمة'},
-    'free-elective-3': {num:'-', name:'Free Elective', th:'-', pr:'-', cr:'3', prereq:'-', ar:'اختياري حر'},
     'community-service': {num:'000011110', name:'Community Service', th:'-', pr:'-', cr:'0', prereq:'-', ar:'الخدمة المجتمعية'},
     'internship': {num:'240113990', name:'Internship', th:'9', pr:'-', cr:'3', prereq:'-', ar:'التدريب الميداني'},
     'sw-testing': {num:'240113620', name:'Software Testing and Validation', th:'3', pr:'-', cr:'3', prereq:'Introduction to Software Engineering (240113171)', ar:'اختبار البرمجيات والتحقق منها'},
     'comp-arch': {num:'240114331', name:'Computer Architecture', th:'3', pr:'-', cr:'3', prereq:'Introduction to Computer Organization (240112111)', ar:'معمارية الحاسوب'},
     'unix-lab': {num:'240114341', name:'Unix Lab', th:'-', pr:'2', cr:'1', prereq:'Introduction to Operating Systems (240113311)', ar:'مختبر يونكس'},
-    'senior-proj-1': {num:'240114974', name:'Senior Project I', th:'1', pr:'-', cr:'1', prereq:'-', ar:'مشروع التخرج (1)'},
+    'senior-proj-1': {num:'240114974', name:'Senior Project I', th:'1', pr:'-', cr:'1', prereq:'Completion of 90 credit hours', ar:'مشروع التخرج (1)'},
     'comp-graphics': {num:'240212100', name:'Fundamentals of Computer Graphics', th:'3', pr:'-', cr:'3', prereq:'Mathematics for Information Technology (100412040) &amp; Programming Fundamentals (C++) (240111011)', ar:'أساسيات الرسوميات الحاسوبية'},
     'visual-prog': {num:'240213231', name:'Visual Programming (Basic)', th:'3', pr:'-', cr:'3', prereq:'Programming Fundamentals II (240112003)', ar:'البرمجة المرئية'},
     'spec-elective-1': {num:'-', name:'Specialized Elective', th:'-', pr:'-', cr:'3', prereq:'-', ar:'اختياري تخصصي'},
@@ -6564,7 +6580,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     robotics: 6,       // 6 of 7 department electives
     cybersecurity: 3,  // 3 department elective slots, chosen from the pool of 8
     medical: 3,        // students select 3 of the 10 offered
-    cs: 3               // students select 3 of the 14 offered
+    cs: 3               // students select 3 of the 13 offered
   };
   window.__DEPT_REQUIRED = DEPT_REQUIRED;
 
@@ -6621,6 +6637,39 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // Completed courses are never themselves marked "available". Courses with
   // no prerequisites at all are available from the start. Runs after every
   // completion toggle, reset, and on initial load, so the glow/badge always
+  // Some courses gate on total credit-hours completed, not on any specific
+  // prerequisite course — e.g. CS Senior Project I can only be taken once the
+  // student has finished 90 credit hours. slug -> required completed credits.
+  var CREDIT_GATES = {
+    cs: { 'senior-proj-1': 90 }
+  };
+
+  // Total credit-hours the student has actually completed in this plan, used
+  // by the credit gates above. Department electives are a pick-N pool, so only
+  // the required number of completed picks (largest first) count — the same
+  // rule the progress bar and audit already use, so the gate agrees with the
+  // "X / 134 credit hours completed" figure shown in My Progress.
+  function completedCredits(prefix){
+    var page = document.getElementById('page-' + prefix);
+    var planData = window.__PLAN_DATA && window.__PLAN_DATA[prefix];
+    var info = (planData && planData.courseInfo) || {};
+    if(!page) return 0;
+    var required = DEPT_REQUIRED[prefix];
+    var sum = 0, deptDone = [];
+    page.querySelectorAll('.course[id]').forEach(function(el){
+      if(!progress[el.id]) return;
+      var parts = splitCourseId(el.id);
+      var meta = parts && info[parts.slug];
+      var cr = meta ? (parseFloat(meta.cr) || 0) : 0;
+      if(el.classList.contains('dept')){ deptDone.push(cr); }
+      else { sum += cr; }
+    });
+    deptDone.sort(function(a, b){ return b - a; });
+    var cap = (typeof required === 'number') ? required : deptDone.length;
+    for(var i = 0; i < Math.min(cap, deptDone.length); i++){ sum += deptDone[i]; }
+    return sum;
+  }
+
   // reflects the current progress.
   function computeAvailability(prefix){
     var page = document.getElementById('page-' + prefix);
@@ -6628,6 +6677,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var planData = window.__PLAN_DATA && window.__PLAN_DATA[prefix];
     var needsMap = (planData && planData.needsMap) || {};
     var rtl = isRtl(prefix);
+    var gates = CREDIT_GATES[prefix] || {};
+    var doneCredits = null; // computed lazily, only if a gate needs it
     var courses = page.querySelectorAll('.course[id]');
     courses.forEach(function(el){
       var isDone = !!progress[el.id];
@@ -6638,6 +6689,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         available = needs.every(function(reqSlug){
           return !!progress[prefix + '-c-' + reqSlug];
         });
+        // Credit-hour gate (e.g. Senior Project I needs 90 completed hours):
+        // even with every course prerequisite met, stay locked until enough
+        // total credit-hours are done.
+        if(available && parts && gates[parts.slug]){
+          if(doneCredits === null){ doneCredits = completedCredits(prefix); }
+          if(doneCredits < gates[parts.slug]){ available = false; }
+        }
       }
       el.classList.toggle('available', available);
       updateCourseBadge(el, rtl);
@@ -6718,8 +6776,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       ar: 'اختر 3 مساقات من أصل 10 اختياريات معروضة (9 من 30 ساعة).'
     },
     cs: {
-      en: 'Choose 3 of the 14 electives offered (9 of 42H).',
-      ar: 'اختر 3 مساقات من أصل 14 اختياريًا معروضًا (9 من 42 ساعة).'
+      en: 'Choose 3 of the 13 electives offered (9 of 39H).',
+      ar: 'اختر 3 مساقات من أصل 13 اختياريًا معروضًا (9 من 39 ساعة).'
     }
   };
 
