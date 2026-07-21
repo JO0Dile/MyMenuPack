@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.53';
+window.APP_VERSION = '3.54';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -4652,11 +4652,33 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       clearHoverSequence();
       var id = el.id;
       var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      // Trace the WHOLE chain, not just the direct neighbours: everything
+      // this course transitively needs (upstream) and everything it
+      // transitively unlocks (downstream). Hovering "Intro to CS" lights
+      // the path through Programming Fundamentals and onward into every
+      // later course that depends on it — a course with only one direct
+      // edge previously drew a single short line and looked like the trace
+      // wasn't working at all.
       var incoming = [], outgoing = [];
-      paths.forEach(function(p){
-        if(p.getAttribute('data-to') === id){ incoming.push(p); }
-        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-      });
+      function walkChain(dirAttr, otherAttr, bucket){
+        var frontier = [id], seen = {};
+        seen[id] = true;
+        while(frontier.length){
+          var next = [];
+          frontier.forEach(function(nodeId){
+            paths.forEach(function(p){
+              if(p.getAttribute(dirAttr) !== nodeId) return;
+              if(bucket.indexOf(p) !== -1) return;
+              bucket.push(p);
+              var other = p.getAttribute(otherAttr);
+              if(!seen[other]){ seen[other] = true; next.push(other); }
+            });
+          });
+          frontier = next;
+        }
+      }
+      walkChain('data-to', 'data-from', incoming);   // upstream: what this needs, all the way back
+      walkChain('data-from', 'data-to', outgoing);   // downstream: what this unlocks, all the way forward
       if(incoming.length === 0 && outgoing.length === 0) return;
 
       // Order: every prerequisite feeding INTO the hovered course first,
@@ -4705,7 +4727,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         // pause). Reduced-motion users get every related line at once
         // instead, matching how the draw-in itself is already skipped.
         var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var STEP_MS = reducedMotion ? 0 : 650;
+        // Bound the whole draw-in to ~1.4s no matter how long the chain is.
+        // A full prerequisite chain can be 30+ edges, and a fixed 650ms-per-
+        // edge stagger meant the reveal took 15+ seconds — fine when a phone
+        // user holds a finger down and waits, but a desktop mouse hover is
+        // transient, so the pointer moved off (clearing the trace) long before
+        // most lines ever drew, and it looked like no lines showed at all.
+        var STEP_MS = reducedMotion ? 0 : Math.min(650, Math.round(1400 / Math.max(sequence.length, 1)));
         sequence.forEach(function(p, i){
           var t = setTimeout(function(){
             // The actual animated value has to be set inline too, not
@@ -5043,11 +5071,33 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       clearHoverSequence();
       var id = el.id;
       var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      // Trace the WHOLE chain, not just the direct neighbours: everything
+      // this course transitively needs (upstream) and everything it
+      // transitively unlocks (downstream). Hovering "Intro to CS" lights
+      // the path through Programming Fundamentals and onward into every
+      // later course that depends on it — a course with only one direct
+      // edge previously drew a single short line and looked like the trace
+      // wasn't working at all.
       var incoming = [], outgoing = [];
-      paths.forEach(function(p){
-        if(p.getAttribute('data-to') === id){ incoming.push(p); }
-        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-      });
+      function walkChain(dirAttr, otherAttr, bucket){
+        var frontier = [id], seen = {};
+        seen[id] = true;
+        while(frontier.length){
+          var next = [];
+          frontier.forEach(function(nodeId){
+            paths.forEach(function(p){
+              if(p.getAttribute(dirAttr) !== nodeId) return;
+              if(bucket.indexOf(p) !== -1) return;
+              bucket.push(p);
+              var other = p.getAttribute(otherAttr);
+              if(!seen[other]){ seen[other] = true; next.push(other); }
+            });
+          });
+          frontier = next;
+        }
+      }
+      walkChain('data-to', 'data-from', incoming);   // upstream: what this needs, all the way back
+      walkChain('data-from', 'data-to', outgoing);   // downstream: what this unlocks, all the way forward
       if(incoming.length === 0 && outgoing.length === 0) return;
 
       // Order: every prerequisite feeding INTO the hovered course first,
@@ -5096,7 +5146,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         // pause). Reduced-motion users get every related line at once
         // instead, matching how the draw-in itself is already skipped.
         var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var STEP_MS = reducedMotion ? 0 : 650;
+        // Bound the whole draw-in to ~1.4s no matter how long the chain is.
+        // A full prerequisite chain can be 30+ edges, and a fixed 650ms-per-
+        // edge stagger meant the reveal took 15+ seconds — fine when a phone
+        // user holds a finger down and waits, but a desktop mouse hover is
+        // transient, so the pointer moved off (clearing the trace) long before
+        // most lines ever drew, and it looked like no lines showed at all.
+        var STEP_MS = reducedMotion ? 0 : Math.min(650, Math.round(1400 / Math.max(sequence.length, 1)));
         sequence.forEach(function(p, i){
           var t = setTimeout(function(){
             // The actual animated value has to be set inline too, not
@@ -5455,11 +5511,33 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       clearHoverSequence();
       var id = el.id;
       var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      // Trace the WHOLE chain, not just the direct neighbours: everything
+      // this course transitively needs (upstream) and everything it
+      // transitively unlocks (downstream). Hovering "Intro to CS" lights
+      // the path through Programming Fundamentals and onward into every
+      // later course that depends on it — a course with only one direct
+      // edge previously drew a single short line and looked like the trace
+      // wasn't working at all.
       var incoming = [], outgoing = [];
-      paths.forEach(function(p){
-        if(p.getAttribute('data-to') === id){ incoming.push(p); }
-        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-      });
+      function walkChain(dirAttr, otherAttr, bucket){
+        var frontier = [id], seen = {};
+        seen[id] = true;
+        while(frontier.length){
+          var next = [];
+          frontier.forEach(function(nodeId){
+            paths.forEach(function(p){
+              if(p.getAttribute(dirAttr) !== nodeId) return;
+              if(bucket.indexOf(p) !== -1) return;
+              bucket.push(p);
+              var other = p.getAttribute(otherAttr);
+              if(!seen[other]){ seen[other] = true; next.push(other); }
+            });
+          });
+          frontier = next;
+        }
+      }
+      walkChain('data-to', 'data-from', incoming);   // upstream: what this needs, all the way back
+      walkChain('data-from', 'data-to', outgoing);   // downstream: what this unlocks, all the way forward
       if(incoming.length === 0 && outgoing.length === 0) return;
 
       // Order: every prerequisite feeding INTO the hovered course first,
@@ -5508,7 +5586,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         // pause). Reduced-motion users get every related line at once
         // instead, matching how the draw-in itself is already skipped.
         var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var STEP_MS = reducedMotion ? 0 : 650;
+        // Bound the whole draw-in to ~1.4s no matter how long the chain is.
+        // A full prerequisite chain can be 30+ edges, and a fixed 650ms-per-
+        // edge stagger meant the reveal took 15+ seconds — fine when a phone
+        // user holds a finger down and waits, but a desktop mouse hover is
+        // transient, so the pointer moved off (clearing the trace) long before
+        // most lines ever drew, and it looked like no lines showed at all.
+        var STEP_MS = reducedMotion ? 0 : Math.min(650, Math.round(1400 / Math.max(sequence.length, 1)));
         sequence.forEach(function(p, i){
           var t = setTimeout(function(){
             // The actual animated value has to be set inline too, not
@@ -5879,11 +5963,33 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       clearHoverSequence();
       var id = el.id;
       var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+      // Trace the WHOLE chain, not just the direct neighbours: everything
+      // this course transitively needs (upstream) and everything it
+      // transitively unlocks (downstream). Hovering "Intro to CS" lights
+      // the path through Programming Fundamentals and onward into every
+      // later course that depends on it — a course with only one direct
+      // edge previously drew a single short line and looked like the trace
+      // wasn't working at all.
       var incoming = [], outgoing = [];
-      paths.forEach(function(p){
-        if(p.getAttribute('data-to') === id){ incoming.push(p); }
-        else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-      });
+      function walkChain(dirAttr, otherAttr, bucket){
+        var frontier = [id], seen = {};
+        seen[id] = true;
+        while(frontier.length){
+          var next = [];
+          frontier.forEach(function(nodeId){
+            paths.forEach(function(p){
+              if(p.getAttribute(dirAttr) !== nodeId) return;
+              if(bucket.indexOf(p) !== -1) return;
+              bucket.push(p);
+              var other = p.getAttribute(otherAttr);
+              if(!seen[other]){ seen[other] = true; next.push(other); }
+            });
+          });
+          frontier = next;
+        }
+      }
+      walkChain('data-to', 'data-from', incoming);   // upstream: what this needs, all the way back
+      walkChain('data-from', 'data-to', outgoing);   // downstream: what this unlocks, all the way forward
       if(incoming.length === 0 && outgoing.length === 0) return;
 
       // Order: every prerequisite feeding INTO the hovered course first,
@@ -5932,7 +6038,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         // pause). Reduced-motion users get every related line at once
         // instead, matching how the draw-in itself is already skipped.
         var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var STEP_MS = reducedMotion ? 0 : 650;
+        // Bound the whole draw-in to ~1.4s no matter how long the chain is.
+        // A full prerequisite chain can be 30+ edges, and a fixed 650ms-per-
+        // edge stagger meant the reveal took 15+ seconds — fine when a phone
+        // user holds a finger down and waits, but a desktop mouse hover is
+        // transient, so the pointer moved off (clearing the trace) long before
+        // most lines ever drew, and it looked like no lines showed at all.
+        var STEP_MS = reducedMotion ? 0 : Math.min(650, Math.round(1400 / Math.max(sequence.length, 1)));
         sequence.forEach(function(p, i){
           var t = setTimeout(function(){
             // The actual animated value has to be set inline too, not
@@ -10134,11 +10246,30 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
     var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
+    // Same whole-chain walk the built-in majors use: everything this course
+    // transitively needs (upstream) and unlocks (downstream), not just its
+    // direct neighbours — one-hop-only made a course with a single direct
+    // edge look like the trace wasn't working at all.
     var incoming = [], outgoing = [];
-    paths.forEach(function(p){
-      if(p.getAttribute('data-to') === id){ incoming.push(p); }
-      else if(p.getAttribute('data-from') === id){ outgoing.push(p); }
-    });
+    function walkChain(dirAttr, otherAttr, bucket){
+      var frontier = [id], seen = {};
+      seen[id] = true;
+      while(frontier.length){
+        var next = [];
+        frontier.forEach(function(nodeId){
+          paths.forEach(function(p){
+            if(p.getAttribute(dirAttr) !== nodeId) return;
+            if(bucket.indexOf(p) !== -1) return;
+            bucket.push(p);
+            var other = p.getAttribute(otherAttr);
+            if(!seen[other]){ seen[other] = true; next.push(other); }
+          });
+        });
+        frontier = next;
+      }
+    }
+    walkChain('data-to', 'data-from', incoming);
+    walkChain('data-from', 'data-to', outgoing);
     if(incoming.length === 0 && outgoing.length === 0) return;
 
     var hoveredOrder = importedSemesterOrder(id);
@@ -10164,7 +10295,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         else { p.classList.add('dim'); }
       });
       var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var STEP_MS = reducedMotion ? 0 : 650;
+      // Bound the whole draw-in to ~1.4s no matter how long the chain is.
+      // A full prerequisite chain can be 30+ edges, and a fixed 650ms-per-
+      // edge stagger meant the reveal took 15+ seconds — fine when a phone
+      // user holds a finger down and waits, but a desktop mouse hover is
+      // transient, so the pointer moved off (clearing the trace) long before
+      // most lines ever drew, and it looked like no lines showed at all.
+      var STEP_MS = reducedMotion ? 0 : Math.min(650, Math.round(1400 / Math.max(sequence.length, 1)));
       sequence.forEach(function(p, i){
         var t = setTimeout(function(){
           p.style.strokeDashoffset = 0;
