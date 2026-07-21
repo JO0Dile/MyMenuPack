@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.55';
+window.APP_VERSION = '3.56';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1010,13 +1010,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 
   .connector-layer path.edge.search-active{
-    stroke-width:3.2;
+    stroke-width:3.4;
     opacity:1;
     stroke:#ff6fb8;
-    filter:
-      drop-shadow(0 0 2px #fff)
-      drop-shadow(0 0 6px var(--prereq))
-      drop-shadow(0 0 14px rgba(224,83,140,.7));
+    /* Single glow, not a stack of three — see path.edge.active above for
+       why (stacked drop-shadows go invisible on some PC GPUs). */
+    filter: drop-shadow(0 0 5px rgba(224,83,140,.85));
     transition:
       opacity .3s cubic-bezier(.4,0,.2,1),
       stroke-width .3s cubic-bezier(.4,0,.2,1),
@@ -1093,13 +1092,17 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .connector-layer path.edge.dim{opacity:.04;}
 
   .connector-layer path.edge.active{
-    stroke-width:3.2;
+    stroke-width:3.4;
     opacity:1;
     stroke:#ff6fb8;
-    filter:
-      drop-shadow(0 0 2px #fff)
-      drop-shadow(0 0 6px var(--prereq))
-      drop-shadow(0 0 14px rgba(224,83,140,.7));
+    /* A single drop-shadow, not a stack of three. Stacked drop-shadow
+       filters on an SVG stroke render the whole path INVISIBLE on some
+       PC GPUs/drivers (the line animates but paints nothing), while
+       phones show it fine — which is exactly the "lines move but are
+       invisible on PC" report. One light glow keeps the look and is far
+       less likely to trip that compositing bug; the bright thick stroke
+       itself stays visible even if the glow is dropped entirely. */
+    filter: drop-shadow(0 0 5px rgba(224,83,140,.85));
     transition:
       opacity .3s cubic-bezier(.4,0,.2,1),
       stroke-width .3s cubic-bezier(.4,0,.2,1),
