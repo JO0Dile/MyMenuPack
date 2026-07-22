@@ -83,7 +83,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Study Plans — By Students, For Students</title>
+<title>University Easy Plans</title>
 <script>
 // ============================================================================
 // UNIVERSITIES REGISTRY — deliberately open for extension.
@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.70';
+window.APP_VERSION = '3.73';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2612,7 +2612,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       </svg>
     </div>
     <div>
-      <h1>Student Study Plans</h1>
+      <h1>University Easy Plans</h1>
       <p>By students, for students — plan your degree, track your progress</p>
     </div>
     <div class="ar">
@@ -4588,9 +4588,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   };
   if(window.__registerPlanData){ window.__registerPlanData('robotics', COURSE_INFO, PREREQS); }
 
-  function pathBetween(fromEl, toEl, cRect){
-    var f = fromEl.getBoundingClientRect();
-    var t = toEl.getBoundingClientRect();
+  // Takes already-measured rects (f, t) rather than reading them itself, so
+  // draw() can batch every getBoundingClientRect read up front instead of
+  // interleaving a read with a DOM write on every prerequisite pair (that
+  // read-after-write layout thrash is what made opening a plan lag on phones).
+  function pathBetween(f, t, cRect){
     var x1 = f.left - cRect.left + f.width/2;
     var y1 = f.top - cRect.top + f.height;
     var x2 = t.left - cRect.left + t.width/2;
@@ -4603,27 +4605,38 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   function draw(){
+    // Batch every read first, then every write — never interleave a
+    // getBoundingClientRect with a DOM mutation (that forces a synchronous
+    // re-layout per prerequisite pair, the main cause of plan-open lag).
     var cRect = container.getBoundingClientRect();
-    svg.setAttribute('width', container.scrollWidth);
-    svg.setAttribute('height', container.scrollHeight);
-    svg.style.width = container.scrollWidth + 'px';
-    svg.style.height = container.scrollHeight + 'px';
+    var w = container.scrollWidth, h = container.scrollHeight;
+    var rects = {};
+    PREREQS.forEach(function(pair){
+      var a = 'robotics-c-'+pair[0], b = 'robotics-c-'+pair[1];
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+    });
 
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.style.width = w + 'px';
+    svg.style.height = h + 'px';
     var old = svg.querySelectorAll('path.edge');
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
+    var frag = document.createDocumentFragment();
     PREREQS.forEach(function(pair){
-      var fromEl = document.getElementById('robotics-c-'+pair[0]);
-      var toEl = document.getElementById('robotics-c-'+pair[1]);
-      if(!fromEl || !toEl) return;
+      var fa = rects['robotics-c-'+pair[0]], tb = rects['robotics-c-'+pair[1]];
+      if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
-      p.setAttribute('d', pathBetween(fromEl, toEl, cRect));
+      p.setAttribute('d', pathBetween(fa, tb, cRect));
       p.setAttribute('class','edge');
       p.setAttribute('data-from','robotics-c-'+pair[0]);
       p.setAttribute('data-to','robotics-c-'+pair[1]);
       p.setAttribute('marker-end','url(#robotics-prereqArrow)');
-      svg.appendChild(p);
+      frag.appendChild(p);
     });
+    svg.appendChild(frag);
   }
 
   var MODAL_LABELS = {
@@ -4979,9 +4992,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   };
   if(window.__registerPlanData){ window.__registerPlanData('cybersecurity', COURSE_INFO, PREREQS); }
 
-  function pathBetween(fromEl, toEl, cRect){
-    var f = fromEl.getBoundingClientRect();
-    var t = toEl.getBoundingClientRect();
+  // Takes already-measured rects (f, t) rather than reading them itself, so
+  // draw() can batch every getBoundingClientRect read up front instead of
+  // interleaving a read with a DOM write on every prerequisite pair (that
+  // read-after-write layout thrash is what made opening a plan lag on phones).
+  function pathBetween(f, t, cRect){
     var x1 = f.left - cRect.left + f.width/2;
     var y1 = f.top - cRect.top + f.height;
     var x2 = t.left - cRect.left + t.width/2;
@@ -4994,27 +5009,38 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   function draw(){
+    // Batch every read first, then every write — never interleave a
+    // getBoundingClientRect with a DOM mutation (that forces a synchronous
+    // re-layout per prerequisite pair, the main cause of plan-open lag).
     var cRect = container.getBoundingClientRect();
-    svg.setAttribute('width', container.scrollWidth);
-    svg.setAttribute('height', container.scrollHeight);
-    svg.style.width = container.scrollWidth + 'px';
-    svg.style.height = container.scrollHeight + 'px';
+    var w = container.scrollWidth, h = container.scrollHeight;
+    var rects = {};
+    PREREQS.forEach(function(pair){
+      var a = 'cybersecurity-c-'+pair[0], b = 'cybersecurity-c-'+pair[1];
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+    });
 
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.style.width = w + 'px';
+    svg.style.height = h + 'px';
     var old = svg.querySelectorAll('path.edge');
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
+    var frag = document.createDocumentFragment();
     PREREQS.forEach(function(pair){
-      var fromEl = document.getElementById('cybersecurity-c-'+pair[0]);
-      var toEl = document.getElementById('cybersecurity-c-'+pair[1]);
-      if(!fromEl || !toEl) return;
+      var fa = rects['cybersecurity-c-'+pair[0]], tb = rects['cybersecurity-c-'+pair[1]];
+      if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
-      p.setAttribute('d', pathBetween(fromEl, toEl, cRect));
+      p.setAttribute('d', pathBetween(fa, tb, cRect));
       p.setAttribute('class','edge');
       p.setAttribute('data-from','cybersecurity-c-'+pair[0]);
       p.setAttribute('data-to','cybersecurity-c-'+pair[1]);
       p.setAttribute('marker-end','url(#cybersecurity-prereqArrow)');
-      svg.appendChild(p);
+      frag.appendChild(p);
     });
+    svg.appendChild(frag);
   }
 
   var MODAL_LABELS = {
@@ -5452,9 +5478,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     });
   }
 
-  function pathBetween(fromEl, toEl, cRect){
-    var f = fromEl.getBoundingClientRect();
-    var t = toEl.getBoundingClientRect();
+  // Takes already-measured rects (f, t) rather than reading them itself, so
+  // draw() can batch every getBoundingClientRect read up front instead of
+  // interleaving a read with a DOM write on every prerequisite pair (that
+  // read-after-write layout thrash is what made opening a plan lag on phones).
+  function pathBetween(f, t, cRect){
     var x1 = f.left - cRect.left + f.width/2;
     var y1 = f.top - cRect.top + f.height;
     var x2 = t.left - cRect.left + t.width/2;
@@ -5467,27 +5495,38 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   function draw(){
+    // Batch every read first, then every write — never interleave a
+    // getBoundingClientRect with a DOM mutation (that forces a synchronous
+    // re-layout per prerequisite pair, the main cause of plan-open lag).
     var cRect = container.getBoundingClientRect();
-    svg.setAttribute('width', container.scrollWidth);
-    svg.setAttribute('height', container.scrollHeight);
-    svg.style.width = container.scrollWidth + 'px';
-    svg.style.height = container.scrollHeight + 'px';
+    var w = container.scrollWidth, h = container.scrollHeight;
+    var rects = {};
+    PREREQS.forEach(function(pair){
+      var a = 'medical-c-'+pair[0], b = 'medical-c-'+pair[1];
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+    });
 
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.style.width = w + 'px';
+    svg.style.height = h + 'px';
     var old = svg.querySelectorAll('path.edge');
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
+    var frag = document.createDocumentFragment();
     PREREQS.forEach(function(pair){
-      var fromEl = document.getElementById('medical-c-'+pair[0]);
-      var toEl = document.getElementById('medical-c-'+pair[1]);
-      if(!fromEl || !toEl) return;
+      var fa = rects['medical-c-'+pair[0]], tb = rects['medical-c-'+pair[1]];
+      if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
-      p.setAttribute('d', pathBetween(fromEl, toEl, cRect));
+      p.setAttribute('d', pathBetween(fa, tb, cRect));
       p.setAttribute('class','edge');
       p.setAttribute('data-from','medical-c-'+pair[0]);
       p.setAttribute('data-to','medical-c-'+pair[1]);
       p.setAttribute('marker-end','url(#medical-prereqArrow)');
-      svg.appendChild(p);
+      frag.appendChild(p);
     });
+    svg.appendChild(frag);
   }
 
   function bindHover(){
@@ -5814,9 +5853,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   };
   if(window.__registerPlanData){ window.__registerPlanData('cs', COURSE_INFO, PREREQS); }
 
-  function pathBetween(fromEl, toEl, cRect){
-    var f = fromEl.getBoundingClientRect();
-    var t = toEl.getBoundingClientRect();
+  // Takes already-measured rects (f, t) rather than reading them itself, so
+  // draw() can batch every getBoundingClientRect read up front instead of
+  // interleaving a read with a DOM write on every prerequisite pair (that
+  // read-after-write layout thrash is what made opening a plan lag on phones).
+  function pathBetween(f, t, cRect){
     var x1 = f.left - cRect.left + f.width/2;
     var y1 = f.top - cRect.top + f.height;
     var x2 = t.left - cRect.left + t.width/2;
@@ -5829,27 +5870,38 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   function draw(){
+    // Batch every read first, then every write — never interleave a
+    // getBoundingClientRect with a DOM mutation (that forces a synchronous
+    // re-layout per prerequisite pair, the main cause of plan-open lag).
     var cRect = container.getBoundingClientRect();
-    svg.setAttribute('width', container.scrollWidth);
-    svg.setAttribute('height', container.scrollHeight);
-    svg.style.width = container.scrollWidth + 'px';
-    svg.style.height = container.scrollHeight + 'px';
+    var w = container.scrollWidth, h = container.scrollHeight;
+    var rects = {};
+    PREREQS.forEach(function(pair){
+      var a = 'cs-c-'+pair[0], b = 'cs-c-'+pair[1];
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+    });
 
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.style.width = w + 'px';
+    svg.style.height = h + 'px';
     var old = svg.querySelectorAll('path.edge');
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
+    var frag = document.createDocumentFragment();
     PREREQS.forEach(function(pair){
-      var fromEl = document.getElementById('cs-c-'+pair[0]);
-      var toEl = document.getElementById('cs-c-'+pair[1]);
-      if(!fromEl || !toEl) return;
+      var fa = rects['cs-c-'+pair[0]], tb = rects['cs-c-'+pair[1]];
+      if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
-      p.setAttribute('d', pathBetween(fromEl, toEl, cRect));
+      p.setAttribute('d', pathBetween(fa, tb, cRect));
       p.setAttribute('class','edge');
       p.setAttribute('data-from','cs-c-'+pair[0]);
       p.setAttribute('data-to','cs-c-'+pair[1]);
       p.setAttribute('marker-end','url(#cs-prereqArrow)');
-      svg.appendChild(p);
+      frag.appendChild(p);
     });
+    svg.appendChild(frag);
   }
 
   var MODAL_LABELS = {
@@ -8989,8 +9041,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
   window.__yearCelebration = showYearCelebration;
 
+  // The first time this runs for a plan (page load, or the first load after
+  // new achievements shipped) it must SEED silently — record whatever is
+  // already complete without celebrating it. Otherwise a returning student is
+  // ambushed on load by toasts, confetti and a full-screen typewriter popup
+  // for years they finished sessions ago; stacked across several completed
+  // years/plans those opaque overlays covered the entire app and it looked
+  // like a blank page. Only genuinely-live completions (a later pass, after a
+  // checkbox is ticked) celebrate.
+  var _achSeeded = {};
   function refreshUnlocks(prefix){
     var unlocked = loadUnlocked();
+    var firstPass = !_achSeeded[prefix];
+    _achSeeded[prefix] = true;
     var newly = [];
     ACHIEVEMENTS.forEach(function(a){
       var key = a.global ? a.id : (prefix + ':' + a.id);
@@ -9003,6 +9066,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     });
     if(newly.length){
       saveUnlocked(unlocked);
+      // Seed pass: persist the unlocks above, but celebrate nothing.
+      if(firstPass){ return unlocked; }
       var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
       var gender = studentGender();
       newly.forEach(function(a){
@@ -9127,7 +9192,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         icon: btn.getAttribute('data-ach-icon'),
         title: btn.getAttribute('data-ach-title'),
         subtitle: btn.getAttribute('data-ach-sub'),
-        footer: 'Student Study Plans'
+        footer: 'University Easy Plans'
       });
     });
   }
@@ -10348,9 +10413,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // arbitrarily many of them, so this one has to be a real parameterized
   // function rather than a copy-pasted block per plan. ----------
   var NS = 'http://www.w3.org/2000/svg';
-  function pathBetweenGeneric(fromEl, toEl, cRect){
-    var f = fromEl.getBoundingClientRect();
-    var t = toEl.getBoundingClientRect();
+  // Takes already-measured rects (see drawConnectors), so all the reads can
+  // be batched before any DOM write instead of thrashing layout per pair.
+  function pathBetweenGeneric(f, t, cRect){
     var x1 = f.left - cRect.left + f.width / 2;
     var y1 = f.top - cRect.top + f.height;
     var x2 = t.left - cRect.left + t.width / 2;
@@ -10385,27 +10450,39 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var container = svg && svg.parentNode; // the .years wrapper
     var data = window.__PLAN_DATA[planId];
     if(!svg || !container || !data) return;
+    // Batch reads, then writes — same layout-thrash fix the built-in majors
+    // use. Feed plans can be the biggest (Pharmacy is 86 cards), so this is
+    // where it matters most.
     var cRect = container.getBoundingClientRect();
-    svg.setAttribute('width', container.scrollWidth);
-    svg.setAttribute('height', container.scrollHeight);
-    svg.style.width = container.scrollWidth + 'px';
-    svg.style.height = container.scrollHeight + 'px';
+    var w = container.scrollWidth, h = container.scrollHeight;
+    var prereqs = data.prereqs || [];
+    var rects = {};
+    prereqs.forEach(function(pair){
+      var a = planId + '-c-' + pair[0], b = planId + '-c-' + pair[1];
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+    });
 
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.style.width = w + 'px';
+    svg.style.height = h + 'px';
     var old = svg.querySelectorAll('path.edge');
     for(var i = 0; i < old.length; i++){ old[i].parentNode.removeChild(old[i]); }
 
-    (data.prereqs || []).forEach(function(pair){
-      var fromEl = document.getElementById(planId + '-c-' + pair[0]);
-      var toEl = document.getElementById(planId + '-c-' + pair[1]);
-      if(!fromEl || !toEl) return; // one end may be in a collapsed/removed part of the plan
+    var frag = document.createDocumentFragment();
+    prereqs.forEach(function(pair){
+      var fa = rects[planId + '-c-' + pair[0]], tb = rects[planId + '-c-' + pair[1]];
+      if(!fa || !tb) return; // one end may be in a collapsed/removed part of the plan
       var p = document.createElementNS(NS, 'path');
-      p.setAttribute('d', pathBetweenGeneric(fromEl, toEl, cRect));
+      p.setAttribute('d', pathBetweenGeneric(fa, tb, cRect));
       p.setAttribute('class', 'edge');
       p.setAttribute('data-from', planId + '-c-' + pair[0]);
       p.setAttribute('data-to', planId + '-c-' + pair[1]);
       p.setAttribute('marker-end', 'url(#' + planId + '-prereqArrow)');
-      svg.appendChild(p);
+      frag.appendChild(p);
     });
+    svg.appendChild(frag);
 
     bindImportedHover(planId);
   }
