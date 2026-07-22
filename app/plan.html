@@ -268,7 +268,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.80';
+window.APP_VERSION = '3.81';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -8221,7 +8221,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // Checked "done" tracks whether it was taken — an F grade means it
       // wasn't passed, so it shouldn't count as a satisfied requirement
       // even if the box is ticked.
-      var isDone = !!progress[pid] && !isNonPassing(grades[pid]);
+      var isDone = !!progress[pid] && !window.AAUP_GPA.isNonPassing(grades[pid]);
       var status = statuses[pid];
 
       byCat[cat].total += cr;
@@ -8241,7 +8241,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(!meta) return;
       if(window.__isSupersededByRetake && parts && window.__isSupersededByRetake(prefix, parts.slug)) return;
       var pidHere = window.AAUP_GPA.primaryId(prefix, parts.slug);
-      if(isNonPassing(grades[pidHere])) return; // F/FA/W — taken but not passed, doesn't satisfy the requirement
+      if(window.AAUP_GPA.isNonPassing(grades[pidHere])) return; // F/FA/W — taken but not passed, doesn't satisfy the requirement
       deptCompletedCount++;
       deptCompletedCredits += parseFloat(meta.cr) || 0;
     });
