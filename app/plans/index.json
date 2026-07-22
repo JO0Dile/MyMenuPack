@@ -7015,6 +7015,312 @@
           "courseNumber": "CULS332"
         }
       ]
+    },
+    {
+      "id": "birzeit-computer-science",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Computer Science",
+          "small": "🚧 Study plan coming soon · 129 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💻",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "Provides students with up-to-date knowledge, skills and abilities in computer science and information technology, through comprehensive and continuously reviewed programs, research projects, and new tracks. 129 credit hours: University Req. 19-20, Faculty Req. 32, Program Req. 72 (49 compulsory + 23 elective across General/Serious-Gaming/Health-Informatics concentration tracks), Free Electives 5-6. 🚧 The department published course lists and prerequisites but not per-course credit hours or semester placement, so the interactive study plan isn't available yet — coming soon once that detail is confirmed.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-cs-minor",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Minor in Computer Science",
+          "small": "🚧 Study plan coming soon · 22 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💻",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "22 credit hours: 16 CH compulsory (Object-Oriented Programming, Data Structures, Database Management Systems, Web Application and Technology, Software Engineering) plus 6 CH of third/fourth-year Computer Science electives. 🚧 Per-course credit hours weren't given, so the interactive plan isn't available yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-ai-data-science",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "AI and Data Science",
+          "small": "🚧 Study plan coming soon · 124 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🤖",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "Prepares graduates to analyze data and design AI models and algorithms across domains, with an emphasis on ethics and social responsibility in AI. 124 credit hours: University Req. 19-20, Faculty Req. 16, Program Req. 85 (70 core + 15 elective, max 6 CH from 3rd/4th-year CS electives), Free Electives 3-4. 🚧 Course list and prerequisites were given but not per-course credit hours or semester placement, so the interactive study plan isn't available yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-cs-minor-entrepreneurship",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Major Computer Science / Minor Entrepreneurship and Society",
+          "small": "🚧 Study plan coming soon · 131 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💻",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "Combines a Computer Science major with an Entrepreneurship and Society minor. 131 credit hours: University Req. 19-20, Faculty Req. 18, Program Req. 93, Electives 1. 🚧 Course list and prerequisites were given but not per-course credit hours or semester placement, so the interactive study plan isn't available yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-cs-minor-mathematics",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Major Computer Science / Minor Mathematics",
+          "small": "🚧 Study plan coming soon · 131 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💻",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "Combines a Computer Science major with a Mathematics minor. 131 credit hours: University Req. 19-20, Faculty Req. 18, Program Req. 94. 🚧 Course list and prerequisites were given but not per-course credit hours or semester placement, so the interactive study plan isn't available yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-cybersecurity-minor-business",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Major Cyber Security / Minor Business Administration",
+          "small": "🚧 Program details coming soon"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🔐",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "🚧 Program mission, study plan and course details are not yet available from the department.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-cybersecurity-minor-business-digital",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Major Cyber Security / Minor Business Administration and Digital Transformation",
+          "small": "🚧 Program details coming soon"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🔐",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "🚧 Program mission, study plan and course details are not yet available from the department.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-cybersecurity-minor",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Cyber Security minor",
+          "small": "🚧 Program details coming soon"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🔐",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "🚧 Program mission, study plan and course details are not yet available from the department.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "birzeit-swe-masters",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Software Engineering (MScSE)",
+          "small": "🚧 Study plan coming soon · 36 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💻",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "Master's program preparing professional software engineers, entrepreneurs and leaders able to develop competitive, reliable solutions and contribute to the software industry in Palestine. 36 credit hours: 18 CH compulsory courses, 12 CH electives, plus 6 CH either Thesis (Path A) or two Seminars (Path B). Up to 9 CH of remedial courses (Statistics, Advanced Programming, Data Structure, Database Management Systems) may also apply. 🚧 Per-course credit hours and semester placement weren't given, so the interactive study plan isn't available yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
     }
   ]
 }
