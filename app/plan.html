@@ -280,7 +280,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.0';
+window.APP_VERSION = '4.1';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1853,7 +1853,19 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .pm-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
 
   .assessment-breakdown{margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--search-bg);}
-  .assessment-rows{display:flex;flex-direction:column;gap:6px;}
+  /* Caps the row list's height instead of letting the whole course modal
+     grow without bound once several assessments are added — scrolls
+     internally with a slim visible thumb (like a native scrollbar, just
+     thin) rather than hiding the overflow. */
+  .assessment-rows{
+    display:flex;flex-direction:column;gap:6px;
+    max-height:190px;overflow-y:auto;padding-right:6px;
+    scrollbar-width:thin;scrollbar-color:var(--line) transparent;
+  }
+  .assessment-rows::-webkit-scrollbar{width:5px;}
+  .assessment-rows::-webkit-scrollbar-track{background:transparent;}
+  .assessment-rows::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+  .assessment-rows::-webkit-scrollbar-thumb:hover{background:var(--text-dim);}
   .assessment-row{display:flex;align-items:center;gap:6px;}
   .assessment-row .ar-label{flex:1 1 auto;min-width:0;}
   .assessment-row .ar-score,.assessment-row .ar-max{width:64px;flex:0 0 64px;}
@@ -1877,8 +1889,17 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   }
   .aq-btn:hover{border-color:var(--accent);color:var(--text);}
 
-  .assessment-total-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
-  .assessment-total{margin:0;font-size:12px;font-weight:700;color:var(--text-dim);}
+  .assessment-summary{margin-top:10px;}
+  .assessment-total{margin:0 0 6px;font-size:12px;font-weight:700;color:var(--text-dim);}
+  .assessment-empty-total{margin:10px 0 0;font-size:12px;}
+  .assessment-need-list{
+    list-style:none;margin:6px 0 0;padding:0;
+    display:flex;flex-wrap:wrap;gap:5px 10px;font-size:11.5px;color:var(--text-dim);
+  }
+  .assessment-need-list li{white-space:nowrap;}
+  .assessment-need-list li b{color:var(--text);}
+  .assessment-reverse{margin:8px 0 0;font-size:11.5px;color:var(--unlock);}
+  .assessment-total-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px;flex-wrap:wrap;}
   .aq-apply-btn{
     background:var(--unlock);border:none;border-radius:8px;padding:6px 12px;
     color:var(--navy-900);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;
@@ -4711,8 +4732,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var rects = {};
     PREREQS.forEach(function(pair){
       var a = 'robotics-c-'+pair[0], b = 'robotics-c-'+pair[1];
-      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
-      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+      // A removed course stays in the DOM (display:none, so its edges can
+      // come back if it's restored) but its bounding rect collapses to
+      // 0,0,0,0 rather than becoming null — treating that as a real
+      // position drew a stray line from the top-left corner of the page to
+      // whatever it was still connected to. Skip it the same way a missing
+      // element already was.
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = (ea && !ea.classList.contains('course-removed')) ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = (eb && !eb.classList.contains('course-removed')) ? eb.getBoundingClientRect() : null; }
     });
 
     svg.setAttribute('width', w);
@@ -5115,8 +5142,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var rects = {};
     PREREQS.forEach(function(pair){
       var a = 'cybersecurity-c-'+pair[0], b = 'cybersecurity-c-'+pair[1];
-      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
-      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+      // A removed course stays in the DOM (display:none, so its edges can
+      // come back if it's restored) but its bounding rect collapses to
+      // 0,0,0,0 rather than becoming null — treating that as a real
+      // position drew a stray line from the top-left corner of the page to
+      // whatever it was still connected to. Skip it the same way a missing
+      // element already was.
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = (ea && !ea.classList.contains('course-removed')) ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = (eb && !eb.classList.contains('course-removed')) ? eb.getBoundingClientRect() : null; }
     });
 
     svg.setAttribute('width', w);
@@ -5601,8 +5634,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var rects = {};
     PREREQS.forEach(function(pair){
       var a = 'medical-c-'+pair[0], b = 'medical-c-'+pair[1];
-      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
-      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+      // A removed course stays in the DOM (display:none, so its edges can
+      // come back if it's restored) but its bounding rect collapses to
+      // 0,0,0,0 rather than becoming null — treating that as a real
+      // position drew a stray line from the top-left corner of the page to
+      // whatever it was still connected to. Skip it the same way a missing
+      // element already was.
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = (ea && !ea.classList.contains('course-removed')) ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = (eb && !eb.classList.contains('course-removed')) ? eb.getBoundingClientRect() : null; }
     });
 
     svg.setAttribute('width', w);
@@ -5976,8 +6015,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var rects = {};
     PREREQS.forEach(function(pair){
       var a = 'cs-c-'+pair[0], b = 'cs-c-'+pair[1];
-      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
-      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+      // A removed course stays in the DOM (display:none, so its edges can
+      // come back if it's restored) but its bounding rect collapses to
+      // 0,0,0,0 rather than becoming null — treating that as a real
+      // position drew a stray line from the top-left corner of the page to
+      // whatever it was still connected to. Skip it the same way a missing
+      // element already was.
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = (ea && !ea.classList.contains('course-removed')) ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = (eb && !eb.classList.contains('course-removed')) ? eb.getBoundingClientRect() : null; }
     });
 
     svg.setAttribute('width', w);
@@ -7521,6 +7566,16 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     save(m);
     apply(prefix);
     if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
+    // Removing/restoring a course changes the grid layout (the card
+    // disappears, its pair-group wrapper collapses to pg-empty/pg-single)
+    // but the prerequisite connector lines are absolute-positioned SVG
+    // paths computed once at draw time and never redrawn on their own —
+    // left alone they go stale and point at wherever the old layout used
+    // to be. Same redraw hook "Collapse finished years" already uses when
+    // it changes the layout the same way.
+    var isImportedPlan = window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.isImportedPlan && window.AAUP_DASHBOARD.isImportedPlan(prefix);
+    if(isImportedPlan && window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
+    else if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
   }
 
   window.__applyRemovedCourses = apply;
@@ -8664,8 +8719,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // single 0-100 figure: an open-ended list of {label, score, max} rows the
   // student builds up as their own results come in, summed into a running
   // percentage that resolves to a letter the same way a single score would.
-  var ASSESSMENT_PRESETS_EN = ['Mid Term', 'Lab', 'Quiz', 'Assignment', 'Final Exam'];
-  var ASSESSMENT_PRESETS_AR = { 'Mid Term': 'نصفي', 'Lab': 'مختبر', 'Quiz': 'كويز', 'Assignment': 'واجب', 'Final Exam': 'نهائي' };
+  // Final Exam is deliberately NOT a preset here — AAUP never shows that
+  // mark (uni rules), so a student normally can't know it to type it in.
+  // The remaining share of the 100-point total is worked out automatically
+  // instead (see assessmentTotals/assessmentSummaryHtml below). A student
+  // who genuinely does know it (asked the instructor directly) can still
+  // add it as a plain "Other" row with their own label — nothing blocks
+  // that — it's just not offered as a quick-add suggestion.
+  var ASSESSMENT_PRESETS_EN = ['Mid Term', 'Lab', 'Quiz', 'Assignment'];
+  var ASSESSMENT_PRESETS_AR = { 'Mid Term': 'نصفي', 'Lab': 'مختبر', 'Quiz': 'كويز', 'Assignment': 'واجب' };
 
   function assessmentRowHtml(row, idx, rtl){
     var esc = window.__escapeHtml;
@@ -8688,9 +8750,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     return rows.map(function(row, idx){ return assessmentRowHtml(row, idx, rtl); }).join('');
   }
 
-  // Sums whatever rows have both a score and a max entered (partial rows are
-  // silently skipped rather than treated as zero, so an in-progress entry
-  // doesn't tank the running total).
+  // Every component's max is already expressed as its own share of the
+  // course's 100-point total (Mid Term /35, Quiz /20 — not each out of a
+  // separate 100), so the running total is simply the earned points so far
+  // (sumScore), out of however much of the 100 has been accounted for
+  // (sumMax) — the rest (100 - sumMax) is implicitly whatever the final
+  // exam is worth, which this never asks the student to type in directly.
+  // Partial rows (missing score or max) are silently skipped rather than
+  // treated as zero, so an in-progress entry doesn't tank the total.
   function assessmentTotals(rows){
     var sumScore = 0, sumMax = 0, any = false;
     rows.forEach(function(row){
@@ -8698,25 +8765,84 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(isNaN(s) || isNaN(m) || m <= 0) return;
       sumScore += s; sumMax += m; any = true;
     });
-    return { sumScore: sumScore, sumMax: sumMax, pct: any ? (sumScore / sumMax * 100) : null };
+    var remaining = Math.max(0, Math.round((100 - sumMax) * 10) / 10);
+    return { sumScore: sumScore, sumMax: sumMax, any: any, remaining: remaining, complete: any && sumMax >= 100 };
   }
 
-  // Note: the running total from whatever rows have been entered so far is
-  // NOT automatically written to the official grade — a mid-term-only total
-  // isn't the final grade, and AAUP itself never shows the final exam mark
-  // (uni rules), so this is a preview the student can apply manually once
-  // they're confident it reflects their real final total (e.g. after adding
-  // every component including the final exam themselves).
-  function assessmentTotalHtml(rows, prefix, pid, rtl){
+  function rangesFor(prefix, pid){
+    var scale = window.AAUP_GPA.numericScaleFor(prefix, pid);
+    return scale === 'ai' ? window.AAUP_GPA.AI_NUMERIC_GRADE_RANGES : window.AAUP_GPA.ENGINEERING_NUMERIC_GRADE_RANGES;
+  }
+
+  // Ascending real-letter tiers (D up to A) for whichever pass-mark scale
+  // this course uses — F is excluded, it's never a "goal" to project toward.
+  function gradeTiersAscending(prefix, pid){
+    return rangesFor(prefix, pid).filter(function(r){ return r.grade !== 'F'; }).slice().reverse();
+  }
+
+  function round1(n){ return Math.round(n * 10) / 10; }
+
+  // The running total is NEVER auto-applied to the official grade — a
+  // mid-term-only total isn't the final grade, and AAUP itself never shows
+  // the final exam mark (uni rules). While incomplete (remaining > 0) this
+  // instead shows: current points, what's left for the final, and — the
+  // AAUP-style projection — what score is needed on that remaining share to
+  // reach each grade tier ("secured" if already guaranteed regardless of the
+  // final, "not reachable" if even a perfect final can't get there). Once
+  // every component including the final is entered (sumMax >= 100) it
+  // resolves to a real letter the student can apply. currentLetter (from the
+  // grade dropdown) additionally powers a reverse lookup: if the student
+  // already knows their official letter grade but not their raw final exam
+  // mark, this works out the range that final must have fallen in.
+  function assessmentSummaryHtml(rows, prefix, pid, rtl, currentLetter){
+    var esc = window.__escapeHtml;
     var t = assessmentTotals(rows);
-    if(t.pct === null){
-      return { text: (rtl ? 'أضف علامة وحدًا أقصى لحساب مجموعك الحالي.' : 'Add a score and a max to calculate your running total.'), letter: null };
+    if(!t.any){
+      return { html: '<p class="ex-note assessment-empty-total">' + (rtl
+        ? 'أضف علامة وحدًا أقصى لحساب مجموعك الحالي.'
+        : 'Add a score and a max to calculate your running total.') + '</p>', letter: null };
     }
-    var pctRounded = Math.round(t.pct * 10) / 10;
-    var letter = window.AAUP_GPA.letterForScore(t.pct, prefix, pid);
-    var soFar = rtl ? 'حتى الآن: ' : 'So far: ';
-    var arrow = letter ? (' → ' + letter) : '';
-    return { text: soFar + t.sumScore + '/' + t.sumMax + ' = ' + pctRounded + '%' + arrow, letter: letter };
+
+    if(t.complete){
+      var letter = window.AAUP_GPA.letterForScore(t.sumScore, prefix, pid);
+      var totalText = (rtl ? 'المجموع: ' : 'Total: ') + round1(t.sumScore) + '/100' + (letter ? (' → ' + letter) : '');
+      return { html: '<p class="assessment-total">' + esc(totalText) + '</p>', letter: letter };
+    }
+
+    var soFarText = (rtl
+      ? 'حتى الآن: ' + t.sumScore + '/100 — تبقّى ' + t.remaining + ' للنهائي'
+      : 'So far: ' + t.sumScore + '/100 — ' + t.remaining + ' left for the final');
+
+    var needItems = gradeTiersAscending(prefix, pid).map(function(tier){
+      var needed = tier.min - t.sumScore;
+      var status;
+      if(needed <= 0){ status = rtl ? 'مضمونة ✓' : 'secured ✓'; }
+      else if(needed > t.remaining + 1e-9){ status = rtl ? 'غير ممكنة' : 'not reachable'; }
+      else { status = (rtl ? 'تحتاج ' : 'need ') + round1(needed) + '/' + t.remaining; }
+      return '<li><b>' + esc(tier.grade) + '</b>: ' + esc(status) + '</li>';
+    }).join('');
+
+    var reverseHtml = '';
+    if(currentLetter && t.remaining > 0){
+      var tierMatch = rangesFor(prefix, pid).filter(function(r){ return r.grade === currentLetter; })[0];
+      if(tierMatch){
+        var lo = Math.max(0, tierMatch.min - t.sumScore);
+        var hi = Math.min(t.remaining, tierMatch.max - t.sumScore);
+        if(hi >= 0 && lo <= t.remaining && lo <= hi){
+          var reverseText = rtl
+            ? 'بناءً على علامتك الرسمية (' + currentLetter + ')، كانت علامة النهائي بين ' + round1(lo) + '/' + t.remaining + ' و' + round1(hi) + '/' + t.remaining + '.'
+            : 'Based on your official grade (' + currentLetter + '), your final exam was between ' + round1(lo) + '/' + t.remaining + ' and ' + round1(hi) + '/' + t.remaining + '.';
+          reverseHtml = '<p class="assessment-reverse">' + esc(reverseText) + '</p>';
+        }
+      }
+    }
+
+    return {
+      html: '<p class="assessment-total">' + esc(soFarText) + '</p>' +
+        '<ul class="assessment-need-list">' + needItems + '</ul>' +
+        reverseHtml,
+      letter: null
+    };
   }
 
   function render(prefix, slug){
@@ -8808,6 +8934,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var scale = window.AAUP_GPA.numericScaleFor(prefix, pid);
       var breakdownAll = window.AAUP_GPA.loadAssessmentBreakdown();
       var rows = breakdownAll[pid] || [];
+      var summary = assessmentSummaryHtml(rows, prefix, pid, rtl, currentGrade || null);
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
         '<select class="grade-select" id="courseGradeSelect">' + opts + '</select>' +
         '<div class="pass-mark-toggle" id="passMarkToggle">' +
@@ -8823,9 +8950,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
             }).join('') +
             '<button type="button" class="aq-btn" data-preset="">+ ' + (rtl ? 'آخر' : 'Other') + '</button>' +
           '</div>' +
+          '<div class="assessment-summary" id="assessmentSummary">' + summary.html + '</div>' +
           '<div class="assessment-total-row">' +
-            '<p class="assessment-total" id="assessmentTotal">' + assessmentTotalHtml(rows, prefix, pid, rtl).text + '</p>' +
-            '<button type="button" class="aq-apply-btn" id="assessmentApplyBtn" style="display:' + (assessmentTotalHtml(rows, prefix, pid, rtl).letter ? 'inline-block' : 'none') + ';">' +
+            '<button type="button" class="aq-apply-btn" id="assessmentApplyBtn" style="display:' + (summary.letter ? 'inline-block' : 'none') + ';">' +
               (rtl ? 'استخدمها كعلامتي ↑' : 'Use as my grade ↑') +
             '</button>' +
           '</div>' +
@@ -8971,6 +9098,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(gradeSelect){
       gradeSelect.addEventListener('change', function(){
         if(window.__applyGradeChange){ window.__applyGradeChange(prefix, pid, gradeSelect.value); }
+        // Picking a letter directly (e.g. copying it from an official
+        // transcript) also feeds the reverse final-exam-range lookup below.
+        if(typeof refreshAssessmentTotal === 'function'){ refreshAssessmentTotal(); }
       });
     }
 
@@ -9001,7 +9131,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     // final grade) — the student applies it explicitly once confident it's
     // complete, via the "Use as my grade" button.
     var assessRowsEl = container.querySelector('#assessmentRows');
-    var assessTotalEl = container.querySelector('#assessmentTotal');
+    var assessSummaryEl = container.querySelector('#assessmentSummary');
     var assessApplyBtn = container.querySelector('#assessmentApplyBtn');
     var rtlBind = window.__isRtl ? window.__isRtl(prefix) : false;
     var pendingLetter = null;
@@ -9017,8 +9147,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     }
     function refreshAssessmentTotal(){
       var rows = currentRows();
-      var result = assessmentTotalHtml(rows, prefix, pid, rtlBind);
-      if(assessTotalEl){ assessTotalEl.textContent = result.text; }
+      var currentLetter = gradeSelect ? (gradeSelect.value || null) : null;
+      var result = assessmentSummaryHtml(rows, prefix, pid, rtlBind, currentLetter);
+      if(assessSummaryEl){ assessSummaryEl.innerHTML = result.html; }
       pendingLetter = result.letter;
       if(assessApplyBtn){ assessApplyBtn.style.display = pendingLetter ? 'inline-block' : 'none'; }
     }
@@ -11004,8 +11135,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var rects = {};
     prereqs.forEach(function(pair){
       var a = planId + '-c-' + pair[0], b = planId + '-c-' + pair[1];
-      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = ea ? ea.getBoundingClientRect() : null; }
-      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = eb ? eb.getBoundingClientRect() : null; }
+      // A removed course stays in the DOM (display:none, so its edges can
+      // come back if it's restored) but its bounding rect collapses to
+      // 0,0,0,0 rather than becoming null — treating that as a real
+      // position drew a stray line from the top-left corner of the page to
+      // whatever it was still connected to. Skip it the same way a missing
+      // element already was.
+      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = (ea && !ea.classList.contains('course-removed')) ? ea.getBoundingClientRect() : null; }
+      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = (eb && !eb.classList.contains('course-removed')) ? eb.getBoundingClientRect() : null; }
     });
 
     svg.setAttribute('width', w);
