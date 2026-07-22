@@ -7321,6 +7321,1696 @@
       },
       "courses": [],
       "prerequisites": []
+    },
+    {
+      "id": "aaup-ai-innovation",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Artificial Intelligence and Innovation",
+          "small": "B.Sc. · 129 CH · Program 29112"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🤖",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Combines a strong computer science foundation with AI, machine learning and digital-transformation specialization, emphasizing the strategic and ethical side of applying AI to real organizations. 129 credit hours: University Req. 14, University Elec. 8, College Req. 56, Specialization Req. 39, Specialization Elec. 6 (pick 2 of 4 courses), Free Elective 6. Course list, credit hours and prerequisites are exactly as published; no official semester order was published, so the semester placement shown here is a suggested prerequisite-valid sequence (same approach used for AASU's Robotics & Mechatronics plan) — confirm the official order with your academic advisor.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": false
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "010610014",
+          "name": "Beginning English",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610014"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "uni-elective-1"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "uni-elective-2"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-3"
+        },
+        {
+          "id": "uni-elective-4",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-4"
+        },
+        {
+          "id": "100411010",
+          "name": "Calculus I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100411010"
+        },
+        {
+          "id": "100411020",
+          "name": "Calculus II",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411020"
+        },
+        {
+          "id": "100413750",
+          "name": "Discrete Mathematics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100413750"
+        },
+        {
+          "id": "250111040",
+          "name": "Elementary Probability & Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "250111040"
+        },
+        {
+          "id": "250223010",
+          "name": "Linear Algebra I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250223010"
+        },
+        {
+          "id": "290311110",
+          "name": "Introduction to Computer Science",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "290311110"
+        },
+        {
+          "id": "290311210",
+          "name": "Programming Fundamentals",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "290311210"
+        },
+        {
+          "id": "290312120",
+          "name": "Fundamentals of Artificial Intelligence",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312120"
+        },
+        {
+          "id": "290312130",
+          "name": "Computer Architecture",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312130"
+        },
+        {
+          "id": "290312140",
+          "name": "Data Structure and Algorithms",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312140"
+        },
+        {
+          "id": "290312210",
+          "name": "Data Science and Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312210"
+        },
+        {
+          "id": "290312220",
+          "name": "Introduction to Operating Systems",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290312220"
+        },
+        {
+          "id": "290312230",
+          "name": "Machine Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290312230"
+        },
+        {
+          "id": "290312240",
+          "name": "Differential Equations",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290312240"
+        },
+        {
+          "id": "290312250",
+          "name": "Fundamentals of Software Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290312250"
+        },
+        {
+          "id": "290313120",
+          "name": "Natural Language Processing",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313120"
+        },
+        {
+          "id": "290313240",
+          "name": "Deep Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313240"
+        },
+        {
+          "id": "290314110",
+          "name": "Ethics in AI",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290314110"
+        },
+        {
+          "id": "290312110",
+          "name": "Fundamentals of Databases",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312110"
+        },
+        {
+          "id": "290313110",
+          "name": "Robotics Foundation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290313110"
+        },
+        {
+          "id": "290313100",
+          "name": "Robotics and Automation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313100"
+        },
+        {
+          "id": "290313130",
+          "name": "Fundamental of AI Programming with Python",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290313130"
+        },
+        {
+          "id": "290313250",
+          "name": "Internship",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "290313250"
+        },
+        {
+          "id": "290354230",
+          "name": "Capstone Project",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "290354230"
+        },
+        {
+          "id": "291123110",
+          "name": "Innovation Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "291123110"
+        },
+        {
+          "id": "291123210",
+          "name": "Technology Entrepreneurship",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "291123210"
+        },
+        {
+          "id": "291123240",
+          "name": "Digital Transformation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "291123240"
+        },
+        {
+          "id": "291123250",
+          "name": "Innovative Product Design",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "291123250"
+        },
+        {
+          "id": "291124110",
+          "name": "Strategic Management of Technology and Innovation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "291124110"
+        },
+        {
+          "id": "291124210",
+          "name": "Artificial Intelligence Theories and Applications",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "291124210"
+        },
+        {
+          "id": "291124220",
+          "name": "Advanced Ethics in AI",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "291124220"
+        },
+        {
+          "id": "290313190",
+          "name": "Cognitive Systems",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313190"
+        },
+        {
+          "id": "290313210",
+          "name": "Computer Vision",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313210"
+        },
+        {
+          "id": "291123220",
+          "name": "Advanced Machine Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "291123220"
+        },
+        {
+          "id": "291123230",
+          "name": "AI in Healthcare",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "291123230"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "free-elective-1"
+        },
+        {
+          "id": "free-elective-2",
+          "name": "Free Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "free-elective-2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "010610014",
+          "010610025"
+        ],
+        [
+          "010610014",
+          "010610026"
+        ],
+        [
+          "010610025",
+          "010610035"
+        ],
+        [
+          "010610026",
+          "010610035"
+        ],
+        [
+          "010610025",
+          "010610036"
+        ],
+        [
+          "010610026",
+          "010610036"
+        ],
+        [
+          "010610035",
+          "040521301"
+        ],
+        [
+          "010610036",
+          "040521301"
+        ],
+        [
+          "100411010",
+          "100411020"
+        ],
+        [
+          "100411010",
+          "250111040"
+        ],
+        [
+          "100411020",
+          "250223010"
+        ],
+        [
+          "290311110",
+          "290311210"
+        ],
+        [
+          "290311210",
+          "290312120"
+        ],
+        [
+          "290311210",
+          "290312130"
+        ],
+        [
+          "290311210",
+          "290312140"
+        ],
+        [
+          "250111040",
+          "290312210"
+        ],
+        [
+          "290312130",
+          "290312220"
+        ],
+        [
+          "290312120",
+          "290312230"
+        ],
+        [
+          "100411020",
+          "290312240"
+        ],
+        [
+          "290311210",
+          "290312250"
+        ],
+        [
+          "290312230",
+          "290313120"
+        ],
+        [
+          "290312230",
+          "290313240"
+        ],
+        [
+          "290312120",
+          "290314110"
+        ],
+        [
+          "290311210",
+          "290312110"
+        ],
+        [
+          "290311210",
+          "290313110"
+        ],
+        [
+          "290313110",
+          "290313100"
+        ],
+        [
+          "290311210",
+          "290313130"
+        ],
+        [
+          "290314110",
+          "291124220"
+        ],
+        [
+          "290312230",
+          "290313190"
+        ],
+        [
+          "290312230",
+          "290313210"
+        ],
+        [
+          "290312230",
+          "291123220"
+        ],
+        [
+          "290312120",
+          "291123230"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-statistics-data-science",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Statistics and Data Science",
+          "small": "B.Sc. · 127 CH · Program 29011"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "📊",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "A joint program with the Palestinian Central Bureau of Statistics, preparing statisticians with practical skills in statistics and data analysis for governmental and private institutions — the first program of its kind in the West Bank. 127 credit hours: University Req. 14, University Elec. 8, College Req. 12, Specialization Req. 75 (including two 8-credit-hour training courses), Specialization Elec. 12 (pick 4 of 13 courses), Free Elective 6. Course list, credit hours and prerequisites are exactly as published; no official semester order was published, so the semester placement shown here is a suggested prerequisite-valid sequence — confirm the official order with your academic advisor.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": false
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "010610014",
+          "name": "Beginning English",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610014"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-1"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "uni-elective-2"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "uni-elective-3"
+        },
+        {
+          "id": "uni-elective-4",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "uni-elective-4"
+        },
+        {
+          "id": "250111010",
+          "name": "Principles and Practices of Data Science",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "250111010"
+        },
+        {
+          "id": "250111020",
+          "name": "Mathematics for Data Science",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "250111020"
+        },
+        {
+          "id": "250111030",
+          "name": "Programming Fundamentals (Java)",
+          "ar": "",
+          "creditHours": 5,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "250111030"
+        },
+        {
+          "id": "250111040",
+          "name": "Elementary Probability & Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250111040"
+        },
+        {
+          "id": "250111050",
+          "name": "Programming in Python",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "250111050"
+        },
+        {
+          "id": "250111060",
+          "name": "Statistical Methods",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250111060"
+        },
+        {
+          "id": "250111070",
+          "name": "Data Visualization",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "250111070"
+        },
+        {
+          "id": "250112010",
+          "name": "Fundamentals of Databases",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112010"
+        },
+        {
+          "id": "250112020",
+          "name": "Linear Algebra I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112020"
+        },
+        {
+          "id": "250112030",
+          "name": "Fundamentals of Artificial Intelligence",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112030"
+        },
+        {
+          "id": "250112040",
+          "name": "Applied Regression Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250112040"
+        },
+        {
+          "id": "250112050",
+          "name": "Fundamentals of Software Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112050"
+        },
+        {
+          "id": "250112060",
+          "name": "GUI Programming",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112060"
+        },
+        {
+          "id": "250112070",
+          "name": "R-Programming",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250112070"
+        },
+        {
+          "id": "250113010",
+          "name": "Data Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250113010"
+        },
+        {
+          "id": "250113020",
+          "name": "Multivariate Data Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250113020"
+        },
+        {
+          "id": "250113030",
+          "name": "Design of Experiments",
+          "ar": "",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250113030"
+        },
+        {
+          "id": "250113040",
+          "name": "Knowledge and Feature Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250113040"
+        },
+        {
+          "id": "250113050",
+          "name": "Algorithms and Data Structures",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250113050"
+        },
+        {
+          "id": "250113060",
+          "name": "Applied Machine Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250113060"
+        },
+        {
+          "id": "250113070",
+          "name": "Probability Theory",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250113070"
+        },
+        {
+          "id": "250113080",
+          "name": "Graduation Project",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250113080"
+        },
+        {
+          "id": "250113090",
+          "name": "Time Series",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250113090"
+        },
+        {
+          "id": "250114010",
+          "name": "Training Course - Phase 1",
+          "ar": "",
+          "creditHours": 8,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "250114010"
+        },
+        {
+          "id": "250114020",
+          "name": "Training Course - Phase 2",
+          "ar": "",
+          "creditHours": 8,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "250114020"
+        },
+        {
+          "id": "250112080",
+          "name": "Statistical Process Control",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250112080"
+        },
+        {
+          "id": "250112090",
+          "name": "Categorical Experiments",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250112090"
+        },
+        {
+          "id": "250112100",
+          "name": "Applied Probability & Stochastic Processes",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250112100"
+        },
+        {
+          "id": "250112110",
+          "name": "Operations Research I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250112110"
+        },
+        {
+          "id": "250112120",
+          "name": "Operations Research II",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250112120"
+        },
+        {
+          "id": "250112130",
+          "name": "Special Topics in Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250112130"
+        },
+        {
+          "id": "250112140",
+          "name": "Numerical Analysis I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250112140"
+        },
+        {
+          "id": "250112150",
+          "name": "Data Mining",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250112150"
+        },
+        {
+          "id": "250112160",
+          "name": "Applied Non-Parametric Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250112160"
+        },
+        {
+          "id": "250112170",
+          "name": "Survival Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250112170"
+        },
+        {
+          "id": "250112190",
+          "name": "Neural Networks and Deep Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250112190"
+        },
+        {
+          "id": "250112200",
+          "name": "Big Data",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250112200"
+        },
+        {
+          "id": "250112210",
+          "name": "Special Topics in Data Science",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250112210"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "free-elective-1"
+        },
+        {
+          "id": "free-elective-2",
+          "name": "Free Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "free-elective-2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "010610014",
+          "010610025"
+        ],
+        [
+          "010610014",
+          "010610026"
+        ],
+        [
+          "010610025",
+          "010610035"
+        ],
+        [
+          "010610026",
+          "010610035"
+        ],
+        [
+          "010610025",
+          "010610036"
+        ],
+        [
+          "010610026",
+          "010610036"
+        ],
+        [
+          "010610035",
+          "040521301"
+        ],
+        [
+          "010610036",
+          "040521301"
+        ],
+        [
+          "250111020",
+          "250111040"
+        ],
+        [
+          "250111030",
+          "250111050"
+        ],
+        [
+          "250111040",
+          "250111060"
+        ],
+        [
+          "250111010",
+          "250111070"
+        ],
+        [
+          "250111020",
+          "250112020"
+        ],
+        [
+          "250111010",
+          "250112030"
+        ],
+        [
+          "250111060",
+          "250112040"
+        ],
+        [
+          "250112010",
+          "250113010"
+        ],
+        [
+          "250111040",
+          "250113020"
+        ],
+        [
+          "250111060",
+          "250113030"
+        ],
+        [
+          "250112030",
+          "250113060"
+        ],
+        [
+          "250111040",
+          "250113070"
+        ],
+        [
+          "250111040",
+          "250113090"
+        ],
+        [
+          "250114010",
+          "250114020"
+        ],
+        [
+          "250111060",
+          "250112080"
+        ],
+        [
+          "250111060",
+          "250112090"
+        ],
+        [
+          "250111040",
+          "250112100"
+        ],
+        [
+          "250112020",
+          "250112110"
+        ],
+        [
+          "250111040",
+          "250112120"
+        ],
+        [
+          "250112110",
+          "250112120"
+        ],
+        [
+          "250112020",
+          "250112140"
+        ],
+        [
+          "250112030",
+          "250112150"
+        ],
+        [
+          "250111060",
+          "250112160"
+        ],
+        [
+          "250111040",
+          "250112170"
+        ],
+        [
+          "250113060",
+          "250112190"
+        ],
+        [
+          "250113060",
+          "250112200"
+        ]
+      ]
+    },
+    {
+      "id": "aaup-ai-education-tech",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "AI and Education Technology",
+          "small": "🚧 No Academic Plan available yet"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🎓",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Interdisciplinary program blending AI (machine learning, natural language processing, data analytics) with educational theory and instructional design, preparing educators and technologists who can use AI to enhance learning experiences and digital learning environments. 🚧 The department has not published an academic plan for this program yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-ai-public-relations",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "AI and Public Relations",
+          "small": "🚧 No Academic Plan available yet"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🎓",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Applies AI advances (machine learning, natural language processing, data analytics) to Public Relations — building effective PR strategies, managing media relations, and engaging audiences with AI-driven insights. 🚧 The department has not published an academic plan for this program yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-data-science-ml",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Data Science and Machine Learning",
+          "small": "🚧 No Academic Plan available yet"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🎓",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Interdisciplinary program in data science, AI and machine learning, combining mathematics, statistics, computer science and ML algorithms — covering data preprocessing, visualization, statistical inference, predictive modeling and tools like TensorFlow and PyTorch. 🚧 The department has not published an academic plan for this program yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-virtual-reality",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Virtual Reality Science",
+          "small": "🚧 No Academic Plan available yet"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🥽",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Covers Virtual Reality, Augmented Reality and Mixed Reality — the technological devices used to create interactive environments, plus UI/UX design, 3D modeling and animation, and applying AI/ML methods within AR/VR. 🚧 The department has not published an academic plan for this program yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-ai-digital-media",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "AI and Digital Media",
+          "small": "🚧 No Academic Plan available yet"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🎓",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Merges AI (machine learning, computer vision, natural language processing) with digital media — graphic design, digital storytelling and multimedia production — to build AI-driven recommendation systems, interactive media content, and consumption-pattern analytics. 🚧 The department has not published an academic plan for this program yet.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-ai-fintech",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "AI and Financial Technology",
+          "small": "🚧 Study plan coming soon · 121 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💰",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Blends AI/ML with financial services — blockchain, digital payments, algorithmic trading — for the growing FinTech sector. Stated total: 121 credit hours. 🚧 The source lists University Req. (14), University Elec. (8), College Req. (47), Specialization Req. (42) and Specialization Elec. (6) — summing to 117H, 4H short of the stated 121H total. The Free Elective section (present for every other program in this data) appears to be missing from what was captured, so the interactive plan isn't available yet until that's confirmed.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-financial-engineering",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Financial Engineering",
+          "small": "🚧 Study plan coming soon · 133 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💰",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Uses mathematical and computer-engineering techniques to solve financial problems and devise new financial products, for banks, investment houses, insurers and hedge funds. Stated total: 133 credit hours. 🚧 The source lists University Req. (14), University Elec. (8), College Req. (24), Specialization Req. (69) and Specialization Elec. (12) — summing to 127H, 6H short of the stated 133H total. The Free Elective section appears to be missing from what was captured, so the interactive plan isn't available yet until that's confirmed.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
+    },
+    {
+      "id": "aaup-finance-data-science",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Finance and Data Science",
+          "small": "🚧 Study plan coming soon · 127 CH"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "💰",
+      "university": "aaup",
+      "college": {
+        "en": "Faculty of Artificial Intelligence and Data Science",
+        "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
+      },
+      "bio": {
+        "en": "Applies data science and machine learning to finance — customer data management, fraud detection, risk analytics and algorithmic trading. Stated total: 127 credit hours. 🚧 The source lists University Req. (14), University Elec. (8), College Req. (42), Specialization Req. (51) and Specialization Elec. (6) — summing to 121H, 6H short of the stated 127H total. The Free Elective section appears to be missing from what was captured, so the interactive plan isn't available yet until that's confirmed.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          }
+        ]
+      },
+      "courses": [],
+      "prerequisites": []
     }
   ]
 }
