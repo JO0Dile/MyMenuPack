@@ -268,7 +268,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.79';
+window.APP_VERSION = '3.80';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1266,6 +1266,30 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     flex:0 0 auto;
     padding:0 2px;
   }
+
+  /* The connect-glyph is now a real toggle button (was a static span) —
+     strip default button chrome and add hover/press feedback so it reads
+     as clickable without disturbing its original inline placement between
+     the two paired cards. */
+  button.connect-glyph{
+    background:none; border:none; cursor:pointer; font-size:15px;
+    border-radius:6px; transition:background .15s ease, transform .1s ease;
+  }
+  button.connect-glyph:hover{background:rgba(224,168,63,.18);}
+  button.connect-glyph:active{transform:scale(0.92);}
+
+  /* Removing a course can leave its pair-group wrapper (the dashed
+     "course + lab" box) with fewer than 2 courses left inside — an empty
+     or near-empty dashed box otherwise sits there with nothing useful in
+     it. __applyRemovedCourses toggles these based on how many of a
+     wrapper's courses are still visible: 0 left -> hide the wrapper
+     entirely; exactly 1 left -> keep that course but drop the box/border
+     styling so it renders like an ordinary standalone card. */
+  .pair-group.pg-empty{display:none !important;}
+  .pair-group.pg-single{
+    border:none; background:none; padding:0; gap:0;
+  }
+  .pair-group.pg-single .connect-glyph{display:none;}
   /* colors */
 
   .core{background:var(--core);color:var(--core-tx);}
@@ -1795,6 +1819,15 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   }
 
   .grade-select:focus{outline:none;border-color:var(--accent);}
+
+  .numeric-grade-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+  .numeric-grade-input{
+    background:var(--search-bg);border:1px solid var(--line);border-radius:7px;
+    padding:6px 9px;color:var(--text);font-size:12.5px;font-family:inherit;width:100%;max-width:180px;
+  }
+  .numeric-grade-input:focus{outline:none;border-color:var(--accent);}
+  .numeric-grade-result{font-size:12px;font-weight:700;color:var(--text-dim);white-space:nowrap;}
+  .numeric-grade-result.ngr-active{color:var(--unlock);}
   /* ================= RATING CONTROLS (in course modal) ================= */
 
   .star-rating{display:flex;gap:3px;font-size:20px;line-height:1;cursor:pointer;}
@@ -7414,6 +7447,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var pid = keyFor(prefix, parts.slug);
       el.classList.toggle('course-removed', !!removed[pid]);
     });
+    // A pair-group (course + lab, dashed box) that just lost a member to
+    // removal shouldn't keep showing an empty or half-empty box. Recompute
+    // every wrapper's state from how many of its courses are still visible.
+    page.querySelectorAll('.pair-group').forEach(function(group){
+      var visible = group.querySelectorAll('.course[id]:not(.course-removed)').length;
+      group.classList.toggle('pg-empty', visible === 0);
+      group.classList.toggle('pg-single', visible === 1);
+    });
   }
 
   function setRemoved(prefix, slug, removed){
@@ -7427,6 +7468,85 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   window.__applyRemovedCourses = apply;
   window.AAUP_REMOVED = { isRemoved: isRemoved, setRemoved: setRemoved, apply: apply };
+})();
+
+// ==========================
+// PAIR MODE TOGGLE — a small "connect" button on every lecture+lab
+// pair-group letting a student flip whether the two share one grade
+// ("Same grade") or are graded independently ("Every course has its own
+// grade"), overriding the catalog-number-based default per pair. Built-in
+// majors only: pair-group is a hand-authored HTML wrapper that doesn't
+// exist in the generic imported-plan renderer.
+// ==========================
+(function(){
+  function effectiveMode(prefix, baseSlug, wrapperEl){
+    var override = window.AAUP_GPA.loadPairModeOverrides()[window.AAUP_GPA.pairOverrideKey(prefix, baseSlug)];
+    if(override) return override;
+    return wrapperEl.classList.contains('independent-grades') ? 'independent' : 'same';
+  }
+  function applyMode(wrapperEl, mode){
+    wrapperEl.classList.toggle('independent-grades', mode === 'independent');
+  }
+  function labelFor(mode, rtl){
+    if(mode === 'independent'){
+      return rtl ? 'مستقل — لكل مساق علامته الخاصة' : 'Independent — every course has its own grade';
+    }
+    return rtl ? 'مرتبط — علامة واحدة للمساقين' : 'Connected — same grade for both';
+  }
+  function glyphFor(mode){ return mode === 'independent' ? '⛓️‍💥' : '🔗'; }
+
+  function injectButtons(prefix){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return;
+    var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+    page.querySelectorAll('.pair-group').forEach(function(group){
+      if(group.querySelector('.pair-mode-btn')) return; // already wired
+      var courseEls = group.querySelectorAll('.course[id]');
+      if(courseEls.length < 2) return;
+      var parts = window.__splitCourseId ? window.__splitCourseId(courseEls[0].id) : null;
+      if(!parts) return;
+      // The base (non-"-lab") slug is what primaryId()/overrides key off of.
+      var baseSlug = parts.slug.slice(-4) === '-lab' ? null : parts.slug;
+      if(!baseSlug){
+        var other = window.__splitCourseId(courseEls[1].id);
+        baseSlug = other && other.slug.slice(-4) !== '-lab' ? other.slug : null;
+      }
+      if(!baseSlug) return;
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'connect-glyph pair-mode-btn';
+      function refresh(){
+        var mode = effectiveMode(prefix, baseSlug, group);
+        applyMode(group, mode);
+        btn.textContent = glyphFor(mode);
+        btn.title = labelFor(mode, rtl);
+      }
+      refresh();
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var current = effectiveMode(prefix, baseSlug, group);
+        var next = current === 'independent' ? 'same' : 'independent';
+        var overrides = window.AAUP_GPA.loadPairModeOverrides();
+        overrides[window.AAUP_GPA.pairOverrideKey(prefix, baseSlug)] = next;
+        window.AAUP_GPA.savePairModeOverrides(overrides);
+        refresh();
+        if(window.__showToast){ window.__showToast((glyphFor(next)) + ' ' + labelFor(next, rtl)); }
+        if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
+      });
+      // Placed between the two course cards, matching where the (previously
+      // unused) .connect-glyph styling already expected a middle element.
+      var secondCourse = group.querySelectorAll('.course[id]')[1];
+      group.insertBefore(btn, secondCourse);
+    });
+  }
+
+  function init(){
+    ['robotics', 'cybersecurity', 'medical', 'cs'].forEach(injectButtons);
+  }
+  if(document.readyState === 'complete'){ init(); }
+  else { window.addEventListener('load', init); }
+  window.__injectPairModeButtons = injectButtons;
 })();
 
 // ==========================
@@ -7801,7 +7921,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // scale, with one AAUP-specific twist: F is worth 0.35, not 0. That's
   // provable, not just read off the page: with F = 0, no combination of
   // credit hours can reproduce that transcript's semester GPA; with
-  // F = 0.35, it reproduces exactly.
+  // F = 0.35, it reproduces exactly. Since confirmed directly against
+  // AAUP's own official grade-scale table (every value below matches it
+  // exactly, including F/FA at 0.35 and the 90-100/87-89/... numeric
+  // ranges now encoded in NUMERIC_GRADE_RANGES below).
   // FA (failed for absence — a doctor withdrew the student) counts exactly
   // like F: 0.35, and it drags the GPA down the same way. W (withdrew) does
   // NOT count at all — it's excluded from the GPA entirely and just marks the
@@ -7811,6 +7934,36 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'C+': 2.33, 'C': 2.00, 'C-': 1.67, 'D+': 1.33, 'D': 1.00, 'F': 0.35, 'FA': 0.35
   };
   var GRADE_ORDER = ['A','A-','B+','B','B-','C+','C','C-','D+','D','F','FA','W'];
+  // Official numeric-score -> letter-grade ranges (AAUP's own published
+  // table). Used only for the optional "enter your numeric score" input in
+  // the grade UI — a student who knows their exact percentage (e.g. their
+  // own lecture/lab-weighted total, which this app doesn't know the split
+  // for on every course) can type the number instead of picking a letter,
+  // and it resolves to the correct letter automatically. Ordered highest
+  // floor first so the first match wins.
+  var NUMERIC_GRADE_RANGES = [
+    { min: 90, max: 100, grade: 'A' },
+    { min: 87, max: 89,  grade: 'A-' },
+    { min: 84, max: 86,  grade: 'B+' },
+    { min: 80, max: 83,  grade: 'B' },
+    { min: 76, max: 79,  grade: 'B-' },
+    { min: 72, max: 75,  grade: 'C+' },
+    { min: 69, max: 71,  grade: 'C' },
+    { min: 66, max: 68,  grade: 'C-' },
+    { min: 63, max: 65,  grade: 'D+' },
+    { min: 60, max: 62,  grade: 'D' },
+    { min: 0,  max: 59,  grade: 'F' }
+  ];
+  function letterForScore(score){
+    var n = parseFloat(score);
+    if(isNaN(n)) return null;
+    n = Math.max(0, Math.min(100, n));
+    for(var i = 0; i < NUMERIC_GRADE_RANGES.length; i++){
+      var r = NUMERIC_GRADE_RANGES[i];
+      if(n >= r.min && n <= r.max) return r.grade;
+    }
+    return null;
+  }
   // Grades that mean the course was NOT passed and needs a retake (it doesn't
   // satisfy its requirement and doesn't count toward completion).
   var NON_PASSING = { 'F': true, 'FA': true, 'W': true };
@@ -7834,16 +7987,29 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     window.AAUP_STORAGE.setJSON(key, obj);
   }
 
+  // Whether a lecture and its lab share one grade defaults to whether they
+  // share one real catalog number (the AAUP course list already encodes
+  // that as courseInfo.num). A student can override that default per pair
+  // via the "connect course" toggle on the card — e.g. their own transcript
+  // grades a pair independently even though the catalog number matches, or
+  // vice versa — without needing that toggle to know anything about num
+  // matching itself; it just flips this stored map and both primaryId() and
+  // the checkbox-completion cascade (getPairSibling, which reads the same
+  // .independent-grades class this map is kept in sync with) follow it.
+  function loadPairModeOverrides(){ return loadMap('aaup_pairModeOverride'); }
+  function savePairModeOverrides(m){ saveMap('aaup_pairModeOverride', m); }
+  function pairOverrideKey(prefix, baseSlug){ return prefix + '|' + baseSlug; }
+
   // A lecture+lab pair is one real course — grade/status/credit accounting
-  // always resolves to the non-"-lab" half so the two checkboxes never end
-  // up disagreeing about a single course's grade.
+  // resolves to the non-"-lab" half by default (when the catalog numbers
+  // match), unless a stored override says otherwise for this specific pair.
   function primaryId(prefix, slug){
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
-    if(slug.slice(-4) === '-lab'){
-      var base = slug.slice(0, -4);
-      if(info[base] && info[slug] && info[base].num === info[slug].num){
-        return prefix + '-c-' + base;
-      }
+    var base = slug.slice(-4) === '-lab' ? slug.slice(0, -4) : null;
+    if(base && info[base] && info[slug]){
+      var override = loadPairModeOverrides()[pairOverrideKey(prefix, base)];
+      var merge = override ? (override === 'same') : (info[base].num === info[slug].num);
+      if(merge){ return prefix + '-c-' + base; }
     }
     return prefix + '-c-' + slug;
   }
@@ -7957,6 +8123,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   window.AAUP_GPA = {
     GRADE_POINTS: GRADE_POINTS, GRADE_ORDER: GRADE_ORDER,
     isNonPassing: isNonPassing, isFailGrade: isFailGrade, gradeLabel: gradeLabel,
+    letterForScore: letterForScore, NUMERIC_GRADE_RANGES: NUMERIC_GRADE_RANGES,
     loadGrades: function(){ return loadMap('aaup_grades'); },
     saveGrades: function(m){ saveMap('aaup_grades', m); },
     loadStatuses: function(){ return loadMap('aaup_courseStatus'); },
@@ -7964,7 +8131,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     primaryId: primaryId,
     gpaFor: gpaFor,
     semesterGpas: semesterGpas,
-    standingFor: standingFor
+    standingFor: standingFor,
+    loadPairModeOverrides: loadPairModeOverrides,
+    savePairModeOverrides: savePairModeOverrides,
+    pairOverrideKey: pairOverrideKey
   };
 })();
 
@@ -8427,8 +8597,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var opts = '<option value="">—</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
         return '<option value="' + g + '"' + (g === currentGrade ? ' selected' : '') + '>' + window.AAUP_GPA.gradeLabel(g) + '</option>';
       }).join('');
+      // Optional alternate entry: type the exact numeric score (your own
+      // lecture+lab weighted total, however this specific course splits
+      // that — this app doesn't know a per-course split) and it resolves
+      // to the correct official letter automatically, rather than having
+      // to work the letter out by hand first.
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
-        '<select class="grade-select" id="courseGradeSelect">' + opts + '</select></div>';
+        '<select class="grade-select" id="courseGradeSelect">' + opts + '</select>' +
+        '<div class="numeric-grade-row">' +
+          '<input type="number" min="0" max="100" step="0.1" class="numeric-grade-input" id="courseNumericGradeInput" placeholder="' +
+          (rtl ? 'أو أدخل العلامة الرقمية (اختياري)' : 'or enter numeric score (optional)') + '">' +
+          '<span class="numeric-grade-result" id="courseNumericGradeResult"></span>' +
+        '</div>' +
+        '</div>';
     } else {
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
         '<p class="ex-note">' + (rtl ? 'أكمل هذا المساق أولًا لإدخال علامة.' : 'Mark this course complete to enter a grade.') + '</p></div>';
@@ -8569,6 +8750,32 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(gradeSelect){
       gradeSelect.addEventListener('change', function(){
         if(window.__applyGradeChange){ window.__applyGradeChange(prefix, pid, gradeSelect.value); }
+      });
+    }
+
+    // Optional numeric-score entry: type e.g. 91.5 and it resolves to the
+    // matching official letter, updates the dropdown to match, and applies
+    // it exactly like picking the letter directly would have.
+    var numericInput = container.querySelector('#courseNumericGradeInput');
+    var numericResult = container.querySelector('#courseNumericGradeResult');
+    if(numericInput && gradeSelect){
+      numericInput.addEventListener('input', function(){
+        var raw = numericInput.value;
+        if(raw === ''){
+          if(numericResult){ numericResult.textContent = ''; numericResult.classList.remove('ngr-active'); }
+          return;
+        }
+        var letter = window.AAUP_GPA.letterForScore(raw);
+        if(!letter){
+          if(numericResult){ numericResult.textContent = ''; numericResult.classList.remove('ngr-active'); }
+          return;
+        }
+        if(numericResult){
+          numericResult.textContent = '→ ' + letter;
+          numericResult.classList.add('ngr-active');
+        }
+        gradeSelect.value = letter;
+        if(window.__applyGradeChange){ window.__applyGradeChange(prefix, pid, letter); }
       });
     }
 
@@ -10707,7 +10914,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
       '<h2 style="margin-top:0;">📊 ' + (rtl ? 'العلامة \u2014 ' : 'Grade \u2014 ') + window.__escapeHtml(dispName) + '</h2>' +
-      '<div class="form-field"><label for="impGradeSelect">' + (rtl ? 'العلامة' : 'Grade') + '</label><select id="impGradeSelect">' + opts + '</select></div>' +
+      '<div class="form-field"><label for="impGradeSelect">' + (rtl ? 'العلامة' : 'Grade') + '</label><select id="impGradeSelect">' + opts + '</select>' +
+      '<div class="numeric-grade-row">' +
+        '<input type="number" min="0" max="100" step="0.1" class="numeric-grade-input" id="impNumericGradeInput" placeholder="' +
+        (rtl ? 'أو أدخل العلامة الرقمية (اختياري)' : 'or enter numeric score (optional)') + '">' +
+        '<span class="numeric-grade-result" id="impNumericGradeResult"></span>' +
+      '</div></div>' +
       '<p class="form-note">' + (rtl ? 'اختيار F يجدول إعادة المساق تلقائيًا في الفصل التالي.' : 'Setting F automatically schedules a retake in the next semester.') + '</p>' +
       '<div class="form-actions"><button type="button" class="home-btn" id="impGradeClose">' + (rtl ? 'إغلاق' : 'Close') + '</button></div>';
     overlay.classList.add('open');
@@ -10716,6 +10928,21 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(window.__applyGradeChange){ window.__applyGradeChange(planId, pid, e.target.value); }
       render(planId);
     });
+    var impNumericInput = document.getElementById('impNumericGradeInput');
+    var impNumericResult = document.getElementById('impNumericGradeResult');
+    var impGradeSelect = document.getElementById('impGradeSelect');
+    if(impNumericInput){
+      impNumericInput.addEventListener('input', function(){
+        var raw = impNumericInput.value;
+        var letter = raw === '' ? null : window.AAUP_GPA.letterForScore(raw);
+        if(!letter){ impNumericResult.textContent = ''; impNumericResult.classList.remove('ngr-active'); return; }
+        impNumericResult.textContent = '→ ' + letter;
+        impNumericResult.classList.add('ngr-active');
+        impGradeSelect.value = letter;
+        if(window.__applyGradeChange){ window.__applyGradeChange(planId, pid, letter); }
+        render(planId);
+      });
+    }
   }
 
   var IMP_MODAL_LABELS = {
