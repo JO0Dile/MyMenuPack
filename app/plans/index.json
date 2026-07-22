@@ -8916,7 +8916,7 @@
       "majorName": {
         "en": {
           "big": "AI and Financial Technology",
-          "small": "🚧 Study plan coming soon · 121 CH"
+          "small": "B.Sc. · 121 CH (as stated) · Program 29033"
         },
         "ar": {
           "big": "",
@@ -8930,7 +8930,7 @@
         "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
       },
       "bio": {
-        "en": "Blends AI/ML with financial services — blockchain, digital payments, algorithmic trading — for the growing FinTech sector. Stated total: 121 credit hours. 🚧 The source lists University Req. (14), University Elec. (8), College Req. (47), Specialization Req. (42) and Specialization Elec. (6) — summing to 117H, 4H short of the stated 121H total. The Free Elective section (present for every other program in this data) appears to be missing from what was captured, so the interactive plan isn't available yet until that's confirmed.",
+        "en": "Equips students with AI and machine learning skills applied to modern financial markets — blockchain, digital payments, algorithmic trading — for the FinTech sector. University Req. 14 + University Elec. 8 + College Req. 47 + Specialization Req. 42 + Specialization Elec. 6 (pick 2 of 5 courses) + Free Elective 6 = 123H, 2H over the program's own stated total of 121H — a small inconsistency in the source that couldn't be resolved from what was provided, flagged here rather than silently dropped. No official semester order was published; the placement shown is a prerequisite-valid suggested sequence — confirm both details with your academic advisor.",
         "ar": ""
       },
       "structure": {
@@ -8938,11 +8938,653 @@
           {
             "id": "y1",
             "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": false
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
           }
         ]
       },
-      "courses": [],
-      "prerequisites": []
+      "courses": [
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "010610014",
+          "name": "Beginning English",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610014"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s2",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "uni-elective-1"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "uni-elective-2"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "uni-elective-3"
+        },
+        {
+          "id": "uni-elective-4",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "uni-elective-4"
+        },
+        {
+          "id": "100411010",
+          "name": "Calculus I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100411010"
+        },
+        {
+          "id": "100411020",
+          "name": "Calculus II",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411020"
+        },
+        {
+          "id": "100413750",
+          "name": "Discrete Mathematics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "100413750"
+        },
+        {
+          "id": "250111040",
+          "name": "Elementary Probability & Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "250111040"
+        },
+        {
+          "id": "250223010",
+          "name": "Linear Algebra I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250223010"
+        },
+        {
+          "id": "290311110",
+          "name": "Introduction to Computer Science",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "290311110"
+        },
+        {
+          "id": "290311210",
+          "name": "Programming Fundamentals",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "290311210"
+        },
+        {
+          "id": "290312120",
+          "name": "Fundamentals of Artificial Intelligence",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312120"
+        },
+        {
+          "id": "290312140",
+          "name": "Data Structure and Algorithms",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312140"
+        },
+        {
+          "id": "290312210",
+          "name": "Data Science and Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312210"
+        },
+        {
+          "id": "290312230",
+          "name": "Machine Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290312230"
+        },
+        {
+          "id": "290312250",
+          "name": "Fundamentals of Software Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312250"
+        },
+        {
+          "id": "290313210",
+          "name": "Computer Vision",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313210"
+        },
+        {
+          "id": "290313240",
+          "name": "Deep Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290313240"
+        },
+        {
+          "id": "290314110",
+          "name": "Ethics in AI",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290314110"
+        },
+        {
+          "id": "290312110",
+          "name": "Fundamentals of Databases",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "290312110"
+        },
+        {
+          "id": "290313250",
+          "name": "Internship",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "290313250"
+        },
+        {
+          "id": "290332210",
+          "name": "Principles of Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "290332210"
+        },
+        {
+          "id": "290332220",
+          "name": "Microeconomics and Macroeconomics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "290332220"
+        },
+        {
+          "id": "290333110",
+          "name": "Financial Markets and Institutions",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "290333110"
+        },
+        {
+          "id": "290333120",
+          "name": "Object-Oriented Programming",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290333120"
+        },
+        {
+          "id": "290333130",
+          "name": "Financial Accounting and Reporting",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290333130"
+        },
+        {
+          "id": "290333210",
+          "name": "Blockchain and Cryptocurrency",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290333210"
+        },
+        {
+          "id": "290333220",
+          "name": "Artificial Intelligence in Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "290333220"
+        },
+        {
+          "id": "290333230",
+          "name": "Regtech (Regulatory Technology) and Compliance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "290333230"
+        },
+        {
+          "id": "290334110",
+          "name": "Digital Payments and Remittances",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "290334110"
+        },
+        {
+          "id": "290334120",
+          "name": "Financial Modeling and Simulation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "290334120"
+        },
+        {
+          "id": "290334210",
+          "name": "Ethics in AI and Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "290334210"
+        },
+        {
+          "id": "290354230",
+          "name": "Capstone Project",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "290354230"
+        },
+        {
+          "id": "290333140",
+          "name": "Advanced Machine Learning and Data Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290333140"
+        },
+        {
+          "id": "290333150",
+          "name": "Quantitative Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290333150"
+        },
+        {
+          "id": "290333160",
+          "name": "User Experience Design in FinTech",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "290333160"
+        },
+        {
+          "id": "290333170",
+          "name": "Entrepreneurship in FinTech",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290333170"
+        },
+        {
+          "id": "290333180",
+          "name": "Robotic Process Automation in Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "290333180"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "free-elective-1"
+        },
+        {
+          "id": "free-elective-2",
+          "name": "Free Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "free-elective-2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "010610014",
+          "010610025"
+        ],
+        [
+          "010610014",
+          "010610026"
+        ],
+        [
+          "010610025",
+          "010610035"
+        ],
+        [
+          "010610026",
+          "010610035"
+        ],
+        [
+          "010610025",
+          "010610036"
+        ],
+        [
+          "010610026",
+          "010610036"
+        ],
+        [
+          "010610035",
+          "040521301"
+        ],
+        [
+          "010610036",
+          "040521301"
+        ],
+        [
+          "100411010",
+          "100411020"
+        ],
+        [
+          "100411010",
+          "250111040"
+        ],
+        [
+          "100411020",
+          "250223010"
+        ],
+        [
+          "290311110",
+          "290311210"
+        ],
+        [
+          "290311210",
+          "290312120"
+        ],
+        [
+          "290311210",
+          "290312140"
+        ],
+        [
+          "250111040",
+          "290312210"
+        ],
+        [
+          "290312120",
+          "290312230"
+        ],
+        [
+          "290311210",
+          "290312250"
+        ],
+        [
+          "290312230",
+          "290313210"
+        ],
+        [
+          "290312230",
+          "290313240"
+        ],
+        [
+          "290312120",
+          "290314110"
+        ],
+        [
+          "290311210",
+          "290312110"
+        ],
+        [
+          "290311210",
+          "290333120"
+        ],
+        [
+          "290332210",
+          "290333130"
+        ],
+        [
+          "290312120",
+          "290333220"
+        ],
+        [
+          "290332210",
+          "290334120"
+        ],
+        [
+          "290314110",
+          "290334210"
+        ],
+        [
+          "290312230",
+          "290333140"
+        ],
+        [
+          "290332210",
+          "290333150"
+        ],
+        [
+          "290332210",
+          "290333160"
+        ],
+        [
+          "290332210",
+          "290333170"
+        ],
+        [
+          "290312230",
+          "290333180"
+        ]
+      ]
     },
     {
       "id": "aaup-financial-engineering",
@@ -8950,7 +9592,7 @@
       "majorName": {
         "en": {
           "big": "Financial Engineering",
-          "small": "🚧 Study plan coming soon · 133 CH"
+          "small": "B.Sc. · 133 CH · Program 29022"
         },
         "ar": {
           "big": "",
@@ -8964,7 +9606,7 @@
         "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
       },
       "bio": {
-        "en": "Uses mathematical and computer-engineering techniques to solve financial problems and devise new financial products, for banks, investment houses, insurers and hedge funds. Stated total: 133 credit hours. 🚧 The source lists University Req. (14), University Elec. (8), College Req. (24), Specialization Req. (69) and Specialization Elec. (12) — summing to 127H, 6H short of the stated 133H total. The Free Elective section appears to be missing from what was captured, so the interactive plan isn't available yet until that's confirmed.",
+        "en": "Uses mathematical and computer-engineering techniques to solve financial problems and devise new financial products and trading tools, for banks, investment houses, insurers and hedge funds. 133 credit hours: University Req. 14, University Elec. 8, College Req. 24, Specialization Req. 69, Specialization Elec. 12 (pick 4 of 16 courses), Free Elective 6. Course list, credit hours and prerequisites are exactly as published; no official semester order was published, so the placement shown here is a suggested prerequisite-valid sequence — confirm the official order with your academic advisor.",
         "ar": ""
       },
       "structure": {
@@ -8972,11 +9614,797 @@
           {
             "id": "y1",
             "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": false
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
+          },
+          {
+            "id": "y6",
+            "hasSummer": false
           }
         ]
       },
-      "courses": [],
-      "prerequisites": []
+      "courses": [
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "010610014",
+          "name": "Beginning English",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610014"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s2",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s2",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y6",
+          "semester": "s1",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "uni-elective-1"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "uni-elective-2"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "uni-elective-3"
+        },
+        {
+          "id": "uni-elective-4",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y5",
+          "semester": "s2",
+          "courseNumber": "uni-elective-4"
+        },
+        {
+          "id": "020211010",
+          "name": "Introduction to Business Administration",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020211010"
+        },
+        {
+          "id": "020312100",
+          "name": "Financial Management I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020312100"
+        },
+        {
+          "id": "250111010",
+          "name": "Principles and Practices of Data Science",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "250111010"
+        },
+        {
+          "id": "250111030",
+          "name": "Programming Fundamentals (Java)",
+          "ar": "",
+          "creditHours": 5,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "250111030"
+        },
+        {
+          "id": "250221020",
+          "name": "Economic Principles",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250221020"
+        },
+        {
+          "id": "250221040",
+          "name": "Mathematics for Data Science",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250221040"
+        },
+        {
+          "id": "250221060",
+          "name": "Financial Accounting",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250221060"
+        },
+        {
+          "id": "020213110",
+          "name": "Business Ethics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020213110"
+        },
+        {
+          "id": "250222010",
+          "name": "Elementary Probability & Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250222010"
+        },
+        {
+          "id": "250222020",
+          "name": "Financial Risk Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250222020"
+        },
+        {
+          "id": "250222030",
+          "name": "Programming in Python",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250222030"
+        },
+        {
+          "id": "250222040",
+          "name": "Options, Futures, and Derivatives",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "250222040"
+        },
+        {
+          "id": "250222050",
+          "name": "Financial Economics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250222050"
+        },
+        {
+          "id": "250222060",
+          "name": "Capital Markets",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250222060"
+        },
+        {
+          "id": "250222070",
+          "name": "Credit Risk Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250222070"
+        },
+        {
+          "id": "250223010",
+          "name": "Linear Algebra I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250223010"
+        },
+        {
+          "id": "250223020",
+          "name": "Fixed Income Securities",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250223020"
+        },
+        {
+          "id": "250223030",
+          "name": "Principles of Financial Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250223030"
+        },
+        {
+          "id": "250223040",
+          "name": "Fundamentals of Software Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "250223040"
+        },
+        {
+          "id": "250223050",
+          "name": "Essentials of Investment",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250223050"
+        },
+        {
+          "id": "250223060",
+          "name": "Financial Statement Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250223060"
+        },
+        {
+          "id": "250223070",
+          "name": "Financial Technology",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250223070"
+        },
+        {
+          "id": "250223080",
+          "name": "Fundamentals of Databases",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250223080"
+        },
+        {
+          "id": "250223090",
+          "name": "Applied Regression Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250223090"
+        },
+        {
+          "id": "250224010",
+          "name": "Data Visualization",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250224010"
+        },
+        {
+          "id": "250224030",
+          "name": "Quantitative Methods in Financial Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "250224030"
+        },
+        {
+          "id": "250224040",
+          "name": "Probability Theory",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250224040"
+        },
+        {
+          "id": "250224050",
+          "name": "Data Analytics for Business",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250224050"
+        },
+        {
+          "id": "250224060",
+          "name": "Essentials of Econometrics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250224060"
+        },
+        {
+          "id": "250224070",
+          "name": "Graduation Project for Financial Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "250224070"
+        },
+        {
+          "id": "020214110",
+          "name": "Decision Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020214110"
+        },
+        {
+          "id": "020214150",
+          "name": "Strategic Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020214150"
+        },
+        {
+          "id": "020253110",
+          "name": "Managing Innovation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020253110"
+        },
+        {
+          "id": "020313701",
+          "name": "International Financial Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020313701"
+        },
+        {
+          "id": "020333120",
+          "name": "Data Mining",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020333120"
+        },
+        {
+          "id": "020334110",
+          "name": "Valuation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "020334110"
+        },
+        {
+          "id": "020411010",
+          "name": "Principles of Marketing",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020411010"
+        },
+        {
+          "id": "210312150",
+          "name": "Business Law",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "210312150"
+        },
+        {
+          "id": "240114320",
+          "name": "Entrepreneurship",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "240114320"
+        },
+        {
+          "id": "250112030",
+          "name": "Fundamentals of Artificial Intelligence",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112030"
+        },
+        {
+          "id": "250112200",
+          "name": "Big Data",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112200"
+        },
+        {
+          "id": "250112210",
+          "name": "Special Topics in Data Science",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250112210"
+        },
+        {
+          "id": "250113010",
+          "name": "Data Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250113010"
+        },
+        {
+          "id": "250113020",
+          "name": "Multivariate Data Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250113020"
+        },
+        {
+          "id": "250113060",
+          "name": "Applied Machine Learning",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "250113060"
+        },
+        {
+          "id": "250113090",
+          "name": "Time Series",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "250113090"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "free-elective-1"
+        },
+        {
+          "id": "free-elective-2",
+          "name": "Free Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "free-elective-2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "010610014",
+          "010610025"
+        ],
+        [
+          "010610014",
+          "010610026"
+        ],
+        [
+          "010610025",
+          "010610035"
+        ],
+        [
+          "010610026",
+          "010610035"
+        ],
+        [
+          "010610025",
+          "010610036"
+        ],
+        [
+          "010610026",
+          "010610036"
+        ],
+        [
+          "010610035",
+          "040521301"
+        ],
+        [
+          "010610036",
+          "040521301"
+        ],
+        [
+          "020211010",
+          "020213110"
+        ],
+        [
+          "250221040",
+          "250222010"
+        ],
+        [
+          "020312100",
+          "250222020"
+        ],
+        [
+          "250111010",
+          "250222030"
+        ],
+        [
+          "020312100",
+          "250222040"
+        ],
+        [
+          "250221020",
+          "250222050"
+        ],
+        [
+          "250222010",
+          "250222050"
+        ],
+        [
+          "020312100",
+          "250222060"
+        ],
+        [
+          "020312100",
+          "250222070"
+        ],
+        [
+          "250221040",
+          "250223010"
+        ],
+        [
+          "020312100",
+          "250223020"
+        ],
+        [
+          "250222010",
+          "250223030"
+        ],
+        [
+          "250222040",
+          "250223030"
+        ],
+        [
+          "250222060",
+          "250223050"
+        ],
+        [
+          "020312100",
+          "250223060"
+        ],
+        [
+          "250221060",
+          "250223060"
+        ],
+        [
+          "020312100",
+          "250223070"
+        ],
+        [
+          "250222010",
+          "250223090"
+        ],
+        [
+          "250222030",
+          "250224010"
+        ],
+        [
+          "250223030",
+          "250224030"
+        ],
+        [
+          "250222010",
+          "250224040"
+        ],
+        [
+          "250222010",
+          "250224060"
+        ],
+        [
+          "020312100",
+          "020313701"
+        ],
+        [
+          "250222060",
+          "020313701"
+        ],
+        [
+          "020312100",
+          "020334110"
+        ],
+        [
+          "250223060",
+          "020334110"
+        ],
+        [
+          "250222010",
+          "250113020"
+        ],
+        [
+          "250222010",
+          "250113090"
+        ]
+      ]
     },
     {
       "id": "aaup-finance-data-science",
@@ -8984,7 +10412,7 @@
       "majorName": {
         "en": {
           "big": "Finance and Data Science",
-          "small": "🚧 Study plan coming soon · 127 CH"
+          "small": "B.Sc. · 127 CH · Program 29021"
         },
         "ar": {
           "big": "",
@@ -8998,7 +10426,7 @@
         "ar": "كلية الذكاء الاصطناعي وعلوم البيانات"
       },
       "bio": {
-        "en": "Applies data science and machine learning to finance — customer data management, fraud detection, risk analytics and algorithmic trading. Stated total: 127 credit hours. 🚧 The source lists University Req. (14), University Elec. (8), College Req. (42), Specialization Req. (51) and Specialization Elec. (6) — summing to 121H, 6H short of the stated 127H total. The Free Elective section appears to be missing from what was captured, so the interactive plan isn't available yet until that's confirmed.",
+        "en": "Applies data science and machine learning to modern finance — customer data management, fraud detection, risk analytics and algorithmic trading. 127 credit hours: University Req. 14, University Elec. 8, College Req. 42, Specialization Req. 51 (including four 0-credit-hour training courses and two internships), Specialization Elec. 6 (pick 2 of 8 courses), Free Elective 6. Course list, credit hours and prerequisites are exactly as published; no official semester order was published, so the placement shown here is a suggested prerequisite-valid sequence — confirm the official order with your academic advisor.",
         "ar": ""
       },
       "structure": {
@@ -9006,11 +10434,819 @@
           {
             "id": "y1",
             "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": false
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          },
+          {
+            "id": "y5",
+            "hasSummer": false
           }
         ]
       },
-      "courses": [],
-      "prerequisites": []
+      "courses": [
+        {
+          "id": "000011110",
+          "name": "Community Service",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "000011110"
+        },
+        {
+          "id": "010610014",
+          "name": "Beginning English",
+          "ar": "",
+          "creditHours": 0,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "010610014"
+        },
+        {
+          "id": "010610025",
+          "name": "Intermediate English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "010610025"
+        },
+        {
+          "id": "010610026",
+          "name": "Intermediate English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "010610026"
+        },
+        {
+          "id": "010610035",
+          "name": "Advanced English",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "010610035"
+        },
+        {
+          "id": "010610036",
+          "name": "Advanced English Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "010610036"
+        },
+        {
+          "id": "040111001",
+          "name": "Arabic Language",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "040111001"
+        },
+        {
+          "id": "040511011",
+          "name": "Palestinian Studies",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "040511011"
+        },
+        {
+          "id": "040521301",
+          "name": "Fundamentals of Research Methods",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "040521301"
+        },
+        {
+          "id": "110411000",
+          "name": "Computer Skills",
+          "ar": "",
+          "creditHours": 2,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "110411000"
+        },
+        {
+          "id": "uni-elective-1",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-1"
+        },
+        {
+          "id": "uni-elective-2",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-2"
+        },
+        {
+          "id": "uni-elective-3",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-3"
+        },
+        {
+          "id": "uni-elective-4",
+          "name": "University Elective",
+          "ar": "",
+          "creditHours": 2,
+          "category": "uni",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "uni-elective-4"
+        },
+        {
+          "id": "020111011",
+          "name": "Accounting Principles I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020111011"
+        },
+        {
+          "id": "020111021",
+          "name": "Accounting Principles II",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020111021"
+        },
+        {
+          "id": "020211010",
+          "name": "Introduction to Business Administration",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020211010"
+        },
+        {
+          "id": "020211020",
+          "name": "Principles of Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020211020"
+        },
+        {
+          "id": "020211050",
+          "name": "English for Business",
+          "ar": "",
+          "creditHours": 3,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020211050"
+        },
+        {
+          "id": "020212100",
+          "name": "Commercial Law",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "020212100"
+        },
+        {
+          "id": "020311010",
+          "name": "Macroeconomics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020311010"
+        },
+        {
+          "id": "020311020",
+          "name": "Microeconomics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020311020"
+        },
+        {
+          "id": "020312100",
+          "name": "Financial Management I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "020312100"
+        },
+        {
+          "id": "020411010",
+          "name": "Principles of Marketing",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020411010"
+        },
+        {
+          "id": "020732010",
+          "name": "Advanced Computer Applications",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020732010"
+        },
+        {
+          "id": "020732100",
+          "name": "Introduction to MIS",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "020732100"
+        },
+        {
+          "id": "100411050",
+          "name": "Business Mathematics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "100411050"
+        },
+        {
+          "id": "100411810",
+          "name": "Business Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "100411810"
+        },
+        {
+          "id": "020114110",
+          "name": "Financial Statement Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "020114110"
+        },
+        {
+          "id": "020214110",
+          "name": "Decision Analysis",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "020214110"
+        },
+        {
+          "id": "020313701",
+          "name": "International Financial Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "020313701"
+        },
+        {
+          "id": "020314650",
+          "name": "Banks Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020314650"
+        },
+        {
+          "id": "020332210",
+          "name": "Principles of Corporate Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "020332210"
+        },
+        {
+          "id": "020332220",
+          "name": "Introduction to Data Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "020332220"
+        },
+        {
+          "id": "020333110",
+          "name": "Capital Markets",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "020333110"
+        },
+        {
+          "id": "020333120",
+          "name": "Data Mining",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "020333120"
+        },
+        {
+          "id": "020333150",
+          "name": "Training Course I in Finance and Data Science",
+          "ar": "",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020333150"
+        },
+        {
+          "id": "020333210",
+          "name": "Financial Technology",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020333210"
+        },
+        {
+          "id": "020333220",
+          "name": "Essentials of Investments",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020333220"
+        },
+        {
+          "id": "020333240",
+          "name": "Financial Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020333240"
+        },
+        {
+          "id": "020333250",
+          "name": "Training Course II in Finance and Data Science",
+          "ar": "",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020333250"
+        },
+        {
+          "id": "020334110",
+          "name": "Valuation",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020334110"
+        },
+        {
+          "id": "020334120",
+          "name": "Programing Languages",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020334120"
+        },
+        {
+          "id": "020334150",
+          "name": "Training Course III in Finance and Data Science",
+          "ar": "",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020334150"
+        },
+        {
+          "id": "020334210",
+          "name": "Data Analytics for Business",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "020334210"
+        },
+        {
+          "id": "020334220",
+          "name": "Graduation Project for Finance and Data Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "020334220"
+        },
+        {
+          "id": "020334250",
+          "name": "Training Course IV in Finance and Data Science",
+          "ar": "",
+          "creditHours": 0,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "020334250"
+        },
+        {
+          "id": "020334261",
+          "name": "Internship in Finance and Data Science I",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "020334261"
+        },
+        {
+          "id": "020334262",
+          "name": "Internship in Finance and Data Science II",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y5",
+          "semester": "s1",
+          "courseNumber": "020334262"
+        },
+        {
+          "id": "020114000",
+          "name": "Managerial Accounting",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "020114000"
+        },
+        {
+          "id": "020213110",
+          "name": "Business Ethics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "020213110"
+        },
+        {
+          "id": "020213210",
+          "name": "Leadership",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "020213210"
+        },
+        {
+          "id": "020332230",
+          "name": "Real Estate Finance",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "020332230"
+        },
+        {
+          "id": "020333130",
+          "name": "Fixed Income Securities",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "020333130"
+        },
+        {
+          "id": "020333140",
+          "name": "Data Analytics for Accounting",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "020333140"
+        },
+        {
+          "id": "020333160",
+          "name": "Marketing Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "020333160"
+        },
+        {
+          "id": "020334230",
+          "name": "Digital Analytics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "020334230"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "free-elective-1"
+        },
+        {
+          "id": "free-elective-2",
+          "name": "Free Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "free-elective-2"
+        }
+      ],
+      "prerequisites": [
+        [
+          "010610014",
+          "010610025"
+        ],
+        [
+          "010610014",
+          "010610026"
+        ],
+        [
+          "010610025",
+          "010610035"
+        ],
+        [
+          "010610026",
+          "010610035"
+        ],
+        [
+          "010610025",
+          "010610036"
+        ],
+        [
+          "010610026",
+          "010610036"
+        ],
+        [
+          "010610035",
+          "040521301"
+        ],
+        [
+          "010610036",
+          "040521301"
+        ],
+        [
+          "020111011",
+          "020111021"
+        ],
+        [
+          "020211010",
+          "020211020"
+        ],
+        [
+          "020211020",
+          "020212100"
+        ],
+        [
+          "020311010",
+          "020311020"
+        ],
+        [
+          "020111021",
+          "020312100"
+        ],
+        [
+          "100411050",
+          "100411810"
+        ],
+        [
+          "020312100",
+          "020114110"
+        ],
+        [
+          "020211020",
+          "020214110"
+        ],
+        [
+          "020332220",
+          "020214110"
+        ],
+        [
+          "020312100",
+          "020313701"
+        ],
+        [
+          "020312100",
+          "020314650"
+        ],
+        [
+          "020333110",
+          "020314650"
+        ],
+        [
+          "020312100",
+          "020332210"
+        ],
+        [
+          "020312100",
+          "020332220"
+        ],
+        [
+          "020312100",
+          "020333110"
+        ],
+        [
+          "020332220",
+          "020333120"
+        ],
+        [
+          "020312100",
+          "020333210"
+        ],
+        [
+          "020332210",
+          "020333220"
+        ],
+        [
+          "020333110",
+          "020333220"
+        ],
+        [
+          "020332220",
+          "020333240"
+        ],
+        [
+          "100411810",
+          "020333240"
+        ],
+        [
+          "020114110",
+          "020334110"
+        ],
+        [
+          "020332210",
+          "020334110"
+        ],
+        [
+          "020333120",
+          "020334210"
+        ],
+        [
+          "020333240",
+          "020334210"
+        ],
+        [
+          "020332220",
+          "020334220"
+        ],
+        [
+          "020333240",
+          "020334220"
+        ],
+        [
+          "020314650",
+          "020334261"
+        ],
+        [
+          "020334210",
+          "020334261"
+        ],
+        [
+          "020334261",
+          "020334262"
+        ],
+        [
+          "020111021",
+          "020114000"
+        ],
+        [
+          "020212100",
+          "020213110"
+        ],
+        [
+          "020211020",
+          "020213210"
+        ],
+        [
+          "020212100",
+          "020213210"
+        ],
+        [
+          "020312100",
+          "020332230"
+        ],
+        [
+          "020333220",
+          "020333130"
+        ],
+        [
+          "020312100",
+          "020333140"
+        ],
+        [
+          "020332220",
+          "020333140"
+        ],
+        [
+          "020332220",
+          "020333160"
+        ],
+        [
+          "020411010",
+          "020333160"
+        ],
+        [
+          "020332220",
+          "020334230"
+        ],
+        [
+          "020411010",
+          "020334230"
+        ]
+      ]
     }
   ]
 }
