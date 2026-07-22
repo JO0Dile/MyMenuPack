@@ -145,6 +145,14 @@ window.APP_COLLEGES = {
     // name.en must match the plan's college.en exactly (case-insensitive) so
     // feed plans (ingested by AAUP_SYNC) group under this college in the picker.
     name: { en: 'College of Engineering and Energy', ar: 'كلية الهندسة والطاقة' }
+  },
+  'birzeit-cs': {
+    university: 'birzeit', icon: '💻',
+    // No official faculty/department name was given in the source material for
+    // these Birzeit programs (only the program-level content was provided), so
+    // this is a plain functional label, not an asserted official title — swap
+    // it for the real one if it differs.
+    name: { en: 'Computer Science Programs', ar: '' }
   }
   // next: 'aaup-xxx': { university: 'aaup', icon: '...', name: { en: '...', ar: '...' } }
 };
@@ -260,7 +268,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.75';
+window.APP_VERSION = '3.76';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -6670,7 +6678,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     robotics: 6,       // 6 of 7 department electives
     cybersecurity: 3,  // 3 department elective slots, chosen from the pool of 8
     medical: 3,        // students select 3 of the 10 offered
-    cs: 3               // students select 3 of the 13 offered
+    cs: 3,              // students select 3 of the 13 offered
+    // Feed/imported plans can add their own entry here too — needed whenever
+    // a plan has more than one dept-tagged elective slot at the SAME credit
+    // value: the audit's fallback heuristic (Object.keys(deptCrCounts).length)
+    // counts DISTINCT credit-hour VALUES as a stand-in for distinct required
+    // courses, which silently collapses to 1 when every slot costs the same
+    // (e.g. 5 "Specialized Elective" slots all worth 3H look like just one).
+    // Birzeit Cyber Security: 5 "SP. Elective" slots placed in the grid, all
+    // individually required (not a bigger pool to pick from) — 5 x 3H = 15H,
+    // matching the source's stated "Program Elective Courses: 15 credit hours".
+    'birzeit-cyber-security': 5
   };
   window.__DEPT_REQUIRED = DEPT_REQUIRED;
 
