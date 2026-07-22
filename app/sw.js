@@ -4,7 +4,7 @@
 // the standalone file — and quietly picks up new versions when online,
 // which is the whole reason the hosted version exists (shipping updated
 // and newly-contributed study plans to everyone automatically).
-var CACHE = 'student-study-plans-v27';
+var CACHE = 'student-study-plans-v28';
 var CORE = [
   './plan.html', './manifest.json',
   './icons/icon-any.svg',
