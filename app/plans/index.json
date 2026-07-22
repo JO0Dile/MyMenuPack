@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-20T00:00:00Z",
+  "updatedAt": "2026-07-22T00:00:00Z",
   "plans": [
     {
       "id": "example-demo-plan",
@@ -6402,6 +6402,618 @@
           "070115160",
           "170112160"
         ]
+      ]
+    },
+    {
+      "id": "birzeit-cyber-security",
+      "version": 1,
+      "majorName": {
+        "en": {
+          "big": "Cyber Security",
+          "small": "B.Sc. · 4 years · Program plan 125 CH (as stated)"
+        },
+        "ar": {
+          "big": "",
+          "small": ""
+        }
+      },
+      "icon": "🔐",
+      "university": "birzeit",
+      "college": {
+        "en": "Computer Science Programs",
+        "ar": ""
+      },
+      "bio": {
+        "en": "Prepares professional cybersecurity developers and leaders able to protect and build secure software systems. Recommended full-time sequence as published by the department, totalling 125 credit hours over 4 years. IMPORTANT: the source material never gave course titles for ENGC2201-2204, ARAB135-136, or CULS331-332 (only their codes and credit hours) — those 8 courses show their raw course code as a placeholder name until their real titles are confirmed and added. Confirm the exact order and any electives with your academic advisor.",
+        "ar": ""
+      },
+      "structure": {
+        "years": [
+          {
+            "id": "y1",
+            "hasSummer": false
+          },
+          {
+            "id": "y2",
+            "hasSummer": false
+          },
+          {
+            "id": "y3",
+            "hasSummer": true
+          },
+          {
+            "id": "y4",
+            "hasSummer": false
+          }
+        ]
+      },
+      "prerequisites": [
+        [
+          "comp1310",
+          "comp1331"
+        ],
+        [
+          "math1411",
+          "comp233"
+        ],
+        [
+          "math1411",
+          "math1321"
+        ],
+        [
+          "csec1310",
+          "csec1320"
+        ],
+        [
+          "engc2201",
+          "engc2202"
+        ],
+        [
+          "arab135",
+          "arab136"
+        ],
+        [
+          "comp1331",
+          "comp2311"
+        ],
+        [
+          "comp1331",
+          "comp311"
+        ],
+        [
+          "comp1331",
+          "encs3320"
+        ],
+        [
+          "comp1331",
+          "encs2340"
+        ],
+        [
+          "comp233",
+          "csec2320"
+        ],
+        [
+          "engc2202",
+          "engc2203"
+        ],
+        [
+          "comp2311",
+          "comp242"
+        ],
+        [
+          "encs3320",
+          "encs4130"
+        ],
+        [
+          "csec2320",
+          "csec2350"
+        ],
+        [
+          "engc2203",
+          "engc2204"
+        ],
+        [
+          "math1321",
+          "enee2307"
+        ],
+        [
+          "comp242",
+          "comp3330"
+        ],
+        [
+          "comp242",
+          "comp336"
+        ],
+        [
+          "comp311",
+          "comp431"
+        ],
+        [
+          "comp242",
+          "comp431"
+        ],
+        [
+          "csec1310",
+          "csec3310"
+        ],
+        [
+          "csec2350",
+          "csec3310"
+        ],
+        [
+          "csec1320",
+          "csec3340"
+        ],
+        [
+          "comp3330",
+          "comp3340"
+        ],
+        [
+          "comp3330",
+          "comp433"
+        ],
+        [
+          "comp431",
+          "csec3350"
+        ],
+        [
+          "csec4310",
+          "csec4200"
+        ],
+        [
+          "comp433",
+          "csec4310"
+        ],
+        [
+          "csec4200",
+          "csec4300"
+        ],
+        [
+          "csec2350",
+          "csec4320"
+        ]
+      ],
+      "courses": [
+        {
+          "id": "comp1310",
+          "name": "Introduction to Computers and Computing Ethics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "COMP1310"
+        },
+        {
+          "id": "math1411",
+          "name": "Calculus and Analytical Geometry 1",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "MATH1411"
+        },
+        {
+          "id": "csec1310",
+          "name": "Introduction to Cyber Security and Professional Ethics",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "CSEC1310"
+        },
+        {
+          "id": "engc2201",
+          "name": "ENGC2201",
+          "ar": "",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "ENGC2201"
+        },
+        {
+          "id": "arab135",
+          "name": "ARAB135",
+          "ar": "",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s1",
+          "courseNumber": "ARAB135"
+        },
+        {
+          "id": "comp1331",
+          "name": "Computer and Programming",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "COMP1331"
+        },
+        {
+          "id": "comp233",
+          "name": "Discrete Mathematics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "COMP233"
+        },
+        {
+          "id": "math1321",
+          "name": "Calculus and Analytical Geometry 2",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "MATH1321"
+        },
+        {
+          "id": "csec1320",
+          "name": "Authentication and Access Control",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "CSEC1320"
+        },
+        {
+          "id": "engc2202",
+          "name": "ENGC2202",
+          "ar": "",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "ENGC2202"
+        },
+        {
+          "id": "arab136",
+          "name": "ARAB136",
+          "ar": "",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y1",
+          "semester": "s2",
+          "courseNumber": "ARAB136"
+        },
+        {
+          "id": "comp2311",
+          "name": "Object-Oriented Programming",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "COMP2311"
+        },
+        {
+          "id": "comp311",
+          "name": "Linux Operating Systems Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "COMP311"
+        },
+        {
+          "id": "encs3320",
+          "name": "Computer Networks",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "ENCS3320"
+        },
+        {
+          "id": "encs2340",
+          "name": "Digital Systems",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "ENCS2340"
+        },
+        {
+          "id": "csec2320",
+          "name": "Mathematics for Security",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "CSEC2320"
+        },
+        {
+          "id": "engc2203",
+          "name": "ENGC2203",
+          "ar": "",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s1",
+          "courseNumber": "ENGC2203"
+        },
+        {
+          "id": "comp242",
+          "name": "Data Structures",
+          "ar": "",
+          "creditHours": 4,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "COMP242"
+        },
+        {
+          "id": "encs4130",
+          "name": "Computer Networks Lab",
+          "ar": "",
+          "creditHours": 1,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENCS4130"
+        },
+        {
+          "id": "csec2350",
+          "name": "Cryptography",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "CSEC2350"
+        },
+        {
+          "id": "engc2204",
+          "name": "ENGC2204",
+          "ar": "",
+          "creditHours": 2,
+          "category": "eng",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENGC2204"
+        },
+        {
+          "id": "enee2307",
+          "name": "Probability and Statistics",
+          "ar": "",
+          "creditHours": 3,
+          "category": "math",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "ENEE2307"
+        },
+        {
+          "id": "free-elective-1",
+          "name": "Free Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y2",
+          "semester": "s2",
+          "courseNumber": "-"
+        },
+        {
+          "id": "comp3330",
+          "name": "Database Management Systems",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "COMP3330"
+        },
+        {
+          "id": "comp336",
+          "name": "Analysis of Algorithms",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "COMP336"
+        },
+        {
+          "id": "comp431",
+          "name": "Operating Systems",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "COMP431"
+        },
+        {
+          "id": "csec3310",
+          "name": "Network Security",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "CSEC3310"
+        },
+        {
+          "id": "csec3340",
+          "name": "Security Risk Management",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s1",
+          "courseNumber": "CSEC3340"
+        },
+        {
+          "id": "comp3340",
+          "name": "Web Application and Technology",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "COMP3340"
+        },
+        {
+          "id": "comp433",
+          "name": "Software Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "COMP433"
+        },
+        {
+          "id": "csec3350",
+          "name": "Operating System Security",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "CSEC3350"
+        },
+        {
+          "id": "sp-elective-1",
+          "name": "Specialized Elective (1)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "-"
+        },
+        {
+          "id": "free-elective-2",
+          "name": "Free Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "free",
+          "yearId": "y3",
+          "semester": "s2",
+          "courseNumber": "-"
+        },
+        {
+          "id": "csec3300",
+          "name": "Practical Training",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y3",
+          "semester": "s3",
+          "courseNumber": "CSEC3300"
+        },
+        {
+          "id": "csec4200",
+          "name": "Introduction to Graduation Project",
+          "ar": "",
+          "creditHours": 2,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "CSEC4200"
+        },
+        {
+          "id": "csec4310",
+          "name": "Secure Software Engineering",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "CSEC4310"
+        },
+        {
+          "id": "sp-elective-2",
+          "name": "Specialized Elective (2)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "-"
+        },
+        {
+          "id": "sp-elective-3",
+          "name": "Specialized Elective (3)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "-"
+        },
+        {
+          "id": "culs331",
+          "name": "CULS331",
+          "ar": "",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s1",
+          "courseNumber": "CULS331"
+        },
+        {
+          "id": "csec4300",
+          "name": "Graduation Project",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "CSEC4300"
+        },
+        {
+          "id": "csec4320",
+          "name": "Ethical Hacking",
+          "ar": "",
+          "creditHours": 3,
+          "category": "core",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "CSEC4320"
+        },
+        {
+          "id": "sp-elective-4",
+          "name": "Specialized Elective (4)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "-"
+        },
+        {
+          "id": "sp-elective-5",
+          "name": "Specialized Elective (5)",
+          "ar": "",
+          "creditHours": 3,
+          "category": "dept",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "-"
+        },
+        {
+          "id": "culs332",
+          "name": "CULS332",
+          "ar": "",
+          "creditHours": 3,
+          "category": "skills",
+          "yearId": "y4",
+          "semester": "s2",
+          "courseNumber": "CULS332"
+        }
       ]
     }
   ]

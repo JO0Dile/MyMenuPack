@@ -145,6 +145,14 @@ window.APP_COLLEGES = {
     // name.en must match the plan's college.en exactly (case-insensitive) so
     // feed plans (ingested by AAUP_SYNC) group under this college in the picker.
     name: { en: 'College of Engineering and Energy', ar: 'كلية الهندسة والطاقة' }
+  },
+  'birzeit-cs': {
+    university: 'birzeit', icon: '💻',
+    // No official faculty/department name was given in the source material for
+    // these Birzeit programs (only the program-level content was provided), so
+    // this is a plain functional label, not an asserted official title — swap
+    // it for the real one if it differs.
+    name: { en: 'Computer Science Programs', ar: '' }
   }
   // next: 'aaup-xxx': { university: 'aaup', icon: '...', name: { en: '...', ar: '...' } }
 };
@@ -260,7 +268,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.74';
+window.APP_VERSION = '3.76';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -6670,7 +6678,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     robotics: 6,       // 6 of 7 department electives
     cybersecurity: 3,  // 3 department elective slots, chosen from the pool of 8
     medical: 3,        // students select 3 of the 10 offered
-    cs: 3               // students select 3 of the 13 offered
+    cs: 3,              // students select 3 of the 13 offered
+    // Feed/imported plans can add their own entry here too — needed whenever
+    // a plan has more than one dept-tagged elective slot at the SAME credit
+    // value: the audit's fallback heuristic (Object.keys(deptCrCounts).length)
+    // counts DISTINCT credit-hour VALUES as a stand-in for distinct required
+    // courses, which silently collapses to 1 when every slot costs the same
+    // (e.g. 5 "Specialized Elective" slots all worth 3H look like just one).
+    // Birzeit Cyber Security: 5 "SP. Elective" slots placed in the grid, all
+    // individually required (not a bigger pool to pick from) — 5 x 3H = 15H,
+    // matching the source's stated "Program Elective Courses: 15 credit hours".
+    'birzeit-cyber-security': 5
   };
   window.__DEPT_REQUIRED = DEPT_REQUIRED;
 
@@ -9856,10 +9874,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     });
     if(ids.length === 0){ container.innerHTML = ''; if(window.AAUP_HOME){ window.AAUP_HOME.refreshPlanEmptyState(); window.AAUP_HOME.refreshCounts(); } return; }
     container.innerHTML = '<div class="plan-grid" style="margin-top:14px;">' + ids.map(function(id){
+     try {
       var p = plans[id];
+      // A malformed/half-created plan (no name or no course list) must never
+      // throw here \u2014 one bad card would abort the whole home render and blank
+      // the app. Skip it instead.
+      if(!p || !p.majorName || (!p.majorName.en && !p.majorName.ar)) return '';
       var en = nameParts(p.majorName.en);
       var ar = nameParts(p.majorName.ar);
-      var bio = (p.bio && p.bio.en) || (p.courses.length + ' courses \u00b7 community-imported major');
+      var bio = (p.bio && p.bio.en) || ((Array.isArray(p.courses) ? p.courses.length : 0) + ' courses \u00b7 community-imported major');
       var uni = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'];
       var badge = (uni ? uni.icon + ' ' + uni.shortName + ' \u00b7 ' : '') + (p.official ? (p.wasEdited ? '✏️ Official (Edited)' : '✅ Official') : (p.wasEdited ? '✏️ User Edited' : '👤 User Made'));
       // Reuses the exact .plan-card class the four built-in majors use —
@@ -9873,6 +9896,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         '<h2>' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</h2>' +
         '<p>' + bio + '</p>' +
         '<div class="pc-cta">View plan →</div></div>';
+     } catch(e){ return ''; }
     }).join('') + '</div>';
     if(window.AAUP_HOME){ window.AAUP_HOME.refreshPlanEmptyState(); window.AAUP_HOME.refreshCounts(); }
   }
@@ -12899,29 +12923,44 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
 
   function open(prefix){
-    // Reuse the Imported Plans module's own open() to guarantee full
-    // registration/rendering for a custom plan (same code path as
-    // actually viewing it), then hide it again immediately — cheaper and
-    // far less error-prone than duplicating that registration logic here.
-    if(isImportedPlan(prefix)){
-      window.AAUP_IMPORTED.open(prefix);
-      var importedHost = document.getElementById('importedPlanView');
-      if(importedHost) importedHost.style.display = 'none';
-    } else {
-      var homeEl = document.getElementById('home');
-      if(homeEl) homeEl.style.display = 'none';
-      ['robotics', 'cybersecurity', 'medical', 'cs'].forEach(function(p){
-        var el = document.getElementById('page-' + p);
-        if(el) el.style.display = 'none';
-      });
+    try {
+      // Reuse the Imported Plans module's own open() to guarantee full
+      // registration/rendering for a custom plan (same code path as
+      // actually viewing it), then hide it again immediately — cheaper and
+      // far less error-prone than duplicating that registration logic here.
+      if(isImportedPlan(prefix)){
+        window.AAUP_IMPORTED.open(prefix);
+        var importedHost = document.getElementById('importedPlanView');
+        if(importedHost) importedHost.style.display = 'none';
+      } else if(document.getElementById('page-' + prefix)){
+        var homeEl = document.getElementById('home');
+        if(homeEl) homeEl.style.display = 'none';
+        ['robotics', 'cybersecurity', 'medical', 'cs'].forEach(function(p){
+          var el = document.getElementById('page-' + p);
+          if(el) el.style.display = 'none';
+        });
+      } else {
+        // Selected plan isn't available right now — a feed plan the sync
+        // hasn't loaded yet, or one that was deleted. Never hide Home for
+        // something we can't render; just show the picker instead.
+        choosePlan();
+        return;
+      }
+      var dash = document.getElementById('dashboard');
+      dash.style.display = 'block';
+      setSelected(prefix);
+      render(prefix);
+      if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'dashboard'); }
+      window.scrollTo(0, 0);
+      if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('dashboard'); }
+    } catch(e){
+      // A malformed/half-loaded plan must NEVER strand the student on a blank
+      // screen (Home was already hidden). Fall back to the picker. This is the
+      // root fix for the "home flashes then goes blank on load" report — the
+      // saved selected plan auto-opened and its render threw.
+      if(window.console && console.error){ console.error('Could not open plan "' + prefix + '":', e); }
+      try { choosePlan(); } catch(e2){}
     }
-    var dash = document.getElementById('dashboard');
-    dash.style.display = 'block';
-    setSelected(prefix);
-    render(prefix);
-    if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'dashboard'); }
-    window.scrollTo(0, 0);
-    if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('dashboard'); }
   }
 
   function openStudyPlan(prefix){
