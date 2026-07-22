@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.61';
+window.APP_VERSION = '3.62';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -13767,10 +13767,23 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     }
     var start = null;
     var DURATION = 2200;
+    // Clear in DEVICE pixels: the drawing transform below scales everything
+    // by dpr, so clearing with the transform still active (clearRect(0,0,
+    // canvas.width, canvas.height)) is off by a factor of dpr — harmless when
+    // dpr >= 1 (it just over-clears), but at dpr < 1 (browser zoomed out, or
+    // fractional Windows display scaling) it clears only part of the canvas
+    // and every un-cleared frame stacks up into diagonal dotted "trails"
+    // instead of a clean burst. Reset the transform, clear the whole canvas,
+    // then restore the dpr transform for drawing.
+    function clearAll(){
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
     function frame(ts){
       if(!start) start = ts;
       var elapsed = ts - start;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      clearAll();
       particles.forEach(function(p){
         p.vy += 0.16;      // gravity
         p.vx *= 0.99;
@@ -13789,7 +13802,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(elapsed < DURATION){
         requestAnimationFrame(frame);
       } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        clearAll();
       }
     }
     requestAnimationFrame(frame);
