@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.73';
+window.APP_VERSION = '3.74';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -9000,6 +9000,14 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // grandpa/granny by gender.
   function showYearCelebration(prefix, yearNum){
     if(typeof document === 'undefined') return;
+    // Belt-and-suspenders with the seed guard: a full-screen year overlay must
+    // NEVER cover the Home screen or the dashboard (that's what made the app
+    // look blank on load). Only celebrate while the student is actually on the
+    // plan page they just finished a year in.
+    var homeEl = document.getElementById('home');
+    if(homeEl && getComputedStyle(homeEl).display !== 'none') return;
+    var dashEl = document.getElementById('dashboard');
+    if(dashEl && getComputedStyle(dashEl).display !== 'none') return;
     var gender = studentGender();
     var MESSAGES = {
       1: 'Welcome to university.\nCongrats — you are not a smurf anymore.',
@@ -9068,21 +9076,25 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       saveUnlocked(unlocked);
       // Seed pass: persist the unlocks above, but celebrate nothing.
       if(firstPass){ return unlocked; }
-      var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
-      var gender = studentGender();
-      newly.forEach(function(a){
-        var t = resolveTitle(a, gender);
-        if(window.__showToast){ window.__showToast('🏆 ' + (rtl ? 'إنجاز جديد: ' : 'Achievement unlocked: ') + (rtl ? t.ar : t.en)); }
-      });
-      // A real "you earned something" moment deserves a little burst.
-      if(window.__confetti){ window.__confetti(); }
-      // If a whole YEAR just got completed, add the themed typewriter popup
-      // on top — for the highest year finished, so multiple newly-detected
-      // years (e.g. first load after this update) show only one.
-      var YEAR_OF = { year1: 1, year2: 2, year3: 3, year4: 4, year5: 5 };
-      var topYear = 0;
-      newly.forEach(function(a){ var y = YEAR_OF[a.id] || 0; if(y > topYear) topYear = y; });
-      if(topYear){ showYearCelebration(prefix, topYear); }
+      // Never let a celebration throw and take the whole app (load) down with
+      // it — the unlocks are already saved above regardless.
+      try {
+        var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+        var gender = studentGender();
+        newly.forEach(function(a){
+          var t = resolveTitle(a, gender);
+          if(window.__showToast){ window.__showToast('🏆 ' + (rtl ? 'إنجاز جديد: ' : 'Achievement unlocked: ') + (rtl ? t.ar : t.en)); }
+        });
+        // A real "you earned something" moment deserves a little burst.
+        if(window.__confetti){ window.__confetti(); }
+        // If a whole YEAR just got completed, add the themed typewriter popup
+        // on top — for the highest year finished, so multiple newly-detected
+        // years (e.g. first load after this update) show only one.
+        var YEAR_OF = { year1: 1, year2: 2, year3: 3, year4: 4, year5: 5 };
+        var topYear = 0;
+        newly.forEach(function(a){ var y = YEAR_OF[a.id] || 0; if(y > topYear) topYear = y; });
+        if(topYear){ showYearCelebration(prefix, topYear); }
+      } catch(e){ /* celebration is cosmetic; never break the app over it */ }
     }
     return unlocked;
   }
