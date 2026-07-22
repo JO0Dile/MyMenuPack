@@ -268,7 +268,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.78';
+window.APP_VERSION = '3.79';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -6691,8 +6691,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     'birzeit-cyber-security': 5,
     // AAUP AI & Data Science: real "pick N of M named electives" pools —
     // this is the mechanism's original use case (same shape as the CS plan).
-    'aaup-ai-innovation': 2,             // pick 2 of 4 Specialization Electives (6H)
-    'aaup-statistics-data-science': 4    // pick 4 of 13 Specialization Electives (12H)
+    'aaup-ai-innovation': 2,               // pick 2 of 4 Specialization Electives (6H)
+    'aaup-statistics-data-science': 4,     // pick 4 of 13 Specialization Electives (12H)
+    'aaup-ai-fintech': 2,                  // pick 2 of 5 Specialization Electives (6H)
+    'aaup-financial-engineering': 4,       // pick 4 of 16 Specialization Electives (12H)
+    'aaup-finance-data-science': 2         // pick 2 of 8 Specialization Electives (6H)
   };
   window.__DEPT_REQUIRED = DEPT_REQUIRED;
 
@@ -12179,6 +12182,11 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
+        // Re-check: two frames is enough time for finish() to have run (e.g.
+        // a rapid plan switch) and cleared `active` out from under this
+        // already-scheduled callback — without this guard the stale closure
+        // crashes reading .steps/.index off a null `active`.
+        if(!active) return;
         var r = el.getBoundingClientRect();
         var pad = 6;
         var spot = document.getElementById('tutSpotlight');
