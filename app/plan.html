@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.60';
+window.APP_VERSION = '3.61';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -317,13 +317,18 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     --text-dim:#9aa3cf;
     --accent:#5db8ff;
 
-    --core:#a8611e;      --core-tx:#ffe9d1;
-    --skills:#1f7a4d;    --skills-tx:#d7f4e3;
-    --math:#2a63a8;      --math-tx:#dcebfb;
-    --dept:#7a3f9d;      --dept-tx:#f0e0fb;
-    --eng:#3f9e6b;       --eng-tx:#e2f7ec;
-    --uni:#8a7a1f;       --uni-tx:#f7f0cf;
-    --free:#a3312f;      --free-tx:#fbdcdb;
+    /* Official AAUP requirement-category palette, applied to every plan:
+       green University Req., gold University Elec., blue College Req.,
+       amber Specialization Req., pink Specialization Elec., red Free Elec.
+       (--eng is folded into the University-Req green since English courses
+       are university requirements — the "English" category is retired.) */
+    --core:#b06e2a;      --core-tx:#ffeed8;
+    --skills:#2f8f57;    --skills-tx:#e7f7ee;
+    --math:#2f6bb0;      --math-tx:#e2effb;
+    --dept:#bd5f96;      --dept-tx:#fbe6f2;
+    --eng:#2f8f57;       --eng-tx:#e7f7ee;
+    --uni:#a8901f;       --uni-tx:#f9f2cf;
+    --free:#b03a38;      --free-tx:#fbdedd;
     --misc:#1f7a8c;      --misc-tx:#d8f3f7;
     --intern:#2e8fae;    --intern-tx:#dbf1f8;
     --summer:#7a2b46;    --summer-tx:#f8dce8;
@@ -1270,21 +1275,6 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .free{background:var(--free);color:var(--free-tx);}
 
   .misc{background:var(--misc);color:var(--misc-tx);}
-
-  /* Computer Science uses the official AAUP requirement-category palette so
-     the plan reads like the program-tree sheet: green University Req.,
-     gold University Elec., blue College Req., amber Specialization Req.,
-     pink Specialization Elec., red Free Elec. Scoped to #page-cs so the
-     three other majors keep their own (subject-based) colors untouched.
-     The category CSS *keys* are reused (skills=Univ Req, math=College Req,
-     core=Spec Req, dept=Spec Elec, uni=Univ Elec, free=Free) and relabeled
-     in this plan's legend. */
-  #page-cs .course.skills,#page-cs .chip.skills{background:#2f8f57;color:#e7f7ee;}
-  #page-cs .course.uni,#page-cs .chip.uni{background:#a8901f;color:#f9f2cf;}
-  #page-cs .course.math,#page-cs .chip.math{background:#2f6bb0;color:#e2effb;}
-  #page-cs .course.core,#page-cs .chip.core{background:#b06e2a;color:#ffeed8;}
-  #page-cs .course.dept,#page-cs .chip.dept{background:#bd5f96;color:#fbe6f2;}
-  #page-cs .course.free,#page-cs .chip.free{background:#b03a38;color:#fbdedd;}
 
   .course.jump-highlight{animation:jumpPulse 1s ease-in-out 2;}
   /* ================= COLLAPSIBLE LEGEND (mobile-friendly) ================= */
@@ -2845,13 +2835,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <span class="lt-arrow">▶</span><span class="i18n" data-ar="الدليل">Legend</span>
     </button>
     <div class="legend-items">
-    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي إجباري">University requirement</span></span>
-    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="مساقات إجبارية">Core courses</span></span>
-    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="الرياضيات والإحصاء">Math &amp; statistics</span></span>
-    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصصي">Department elective</span></span>
-    <span class="item"><span class="chip eng"></span><span class="i18n" data-ar="مساقات اللغة الإنجليزية">English courses</span></span>
-    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University elective</span></span>
-    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free elective</span></span>
+    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي">University Req.</span></span>
+    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University Elec.</span></span>
+    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="متطلب كلية">College Req.</span></span>
+    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="متطلب تخصص">Specialization Req.</span></span>
+    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصص">Specialization Elec.</span></span>
+    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free Elec.</span></span>
     <span class="arrow-sample"><span class="ln"></span><span class="i18n" data-ar="متطلب سابق (مرر المؤشر فوق المساق لتتبعه)">Prerequisite (hover a course to trace it)</span></span>
     <span class="item"><span class="chip pair-chip"></span><span class="i18n" data-ar="مرتبط — مثل المساق ومختبره">Connected — e.g. a course and its lab</span></span>
     </div>
@@ -2908,8 +2897,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="robotics-c-calc-1"><div class="name" data-ar="التفاضل والتكامل (1)">Calculus I</div></div>
               <div class="course math" id="robotics-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete math</div></div>
               <div class="pair-group independent-grades">
-                <div class="course eng" id="robotics-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
-                <div class="course eng" id="robotics-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+                <div class="course skills" id="robotics-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course skills" id="robotics-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
               </div>
             </div>
           </div>
@@ -2924,8 +2913,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="robotics-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="robotics-c-prob-stats"><div class="name" data-ar="مبادئ الاحتمالات والإحصاء">Elementary probability &amp; statistics</div></div>
               <div class="pair-group independent-grades">
-                <div class="course eng" id="robotics-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
-                <div class="course eng" id="robotics-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+                <div class="course skills" id="robotics-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course skills" id="robotics-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
               </div>
               <div class="course uni" id="robotics-c-uni-elective-2"><div class="name" data-ar="مادة اختيارية جامعية (2)">University elective (2)</div></div>
             </div>
@@ -2961,7 +2950,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course core" id="robotics-c-ai-python"><div class="name" data-ar="أساسيات برمجة الذكاء الاصطناعي بلغة بايثون">Fundamentals of AI programming with Python</div></div>
               <div class="course math" id="robotics-c-diff-eq"><div class="name" data-ar="المعادلات التفاضلية">Differential equations</div></div>
               <div class="course core" id="robotics-c-data-sci-analytics"><div class="name" data-ar="علم البيانات والتحليلات">Data science and analytics</div></div>
-              <div class="course eng" id="robotics-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fund. of research methods</div></div>
+              <div class="course skills" id="robotics-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fund. of research methods</div></div>
               <div class="course uni" id="robotics-c-uni-elective-3"><div class="name" data-ar="مادة اختيارية جامعية (3)">University elective (3)</div></div>
             </div>
           </div>
@@ -3186,13 +3175,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <span class="lt-arrow">▶</span><span class="i18n" data-ar="الدليل">Legend</span>
     </button>
     <div class="legend-items">
-    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي إجباري">University requirement</span></span>
-    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="مساقات إجبارية">Core courses</span></span>
-    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="الرياضيات والإحصاء">Math &amp; statistics</span></span>
-    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصصي">Department elective</span></span>
-    <span class="item"><span class="chip eng"></span><span class="i18n" data-ar="مساقات اللغة الإنجليزية">English courses</span></span>
-    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University elective</span></span>
-    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free elective</span></span>
+    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي">University Req.</span></span>
+    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University Elec.</span></span>
+    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="متطلب كلية">College Req.</span></span>
+    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="متطلب تخصص">Specialization Req.</span></span>
+    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصص">Specialization Elec.</span></span>
+    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free Elec.</span></span>
     <span class="arrow-sample"><span class="ln"></span><span class="i18n" data-ar="متطلب سابق (مرر المؤشر فوق المساق لتتبعه)">Prerequisite (hover a course to trace it)</span></span>
     <span class="item"><span class="chip pair-chip"></span><span class="i18n" data-ar="مرتبط — مثل المساق ومختبره">Connected — e.g. a course and its lab</span></span>
     </div>
@@ -3249,8 +3237,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="cybersecurity-c-calc-1"><div class="name" data-ar="التفاضل والتكامل (1)">Calculus I</div></div>
               <div class="course math" id="cybersecurity-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete math</div></div>
               <div class="pair-group independent-grades">
-                <div class="course eng" id="cybersecurity-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
-                <div class="course eng" id="cybersecurity-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+                <div class="course skills" id="cybersecurity-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course skills" id="cybersecurity-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
               </div>
             </div>
           </div>
@@ -3265,8 +3253,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="cybersecurity-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="cybersecurity-c-prob-stats"><div class="name" data-ar="مبادئ الاحتمالات والإحصاء">Elementary probability &amp; statistics</div></div>
               <div class="pair-group independent-grades">
-                <div class="course eng" id="cybersecurity-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
-                <div class="course eng" id="cybersecurity-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+                <div class="course skills" id="cybersecurity-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course skills" id="cybersecurity-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
               </div>
               <div class="course uni" id="cybersecurity-c-uni-elective-2"><div class="name" data-ar="مادة اختيارية جامعية (2)">University elective (2)</div></div>
             </div>
@@ -3302,7 +3290,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="cybersecurity-c-diff-eq"><div class="name" data-ar="المعادلات التفاضلية">Differential equations</div></div>
               <div class="course core" id="cybersecurity-c-data-sci-analytics"><div class="name" data-ar="علم البيانات والتحليلات">Data science and analytics</div></div>
               <div class="course core" id="cybersecurity-c-computer-networks"><div class="name" data-ar="شبكات الحاسوب">Computer networks</div></div>
-              <div class="course eng" id="cybersecurity-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fund. of research methods</div></div>
+              <div class="course skills" id="cybersecurity-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fund. of research methods</div></div>
               <div class="course uni" id="cybersecurity-c-uni-elective-3"><div class="name" data-ar="مادة اختيارية جامعية (3)">University elective (3)</div></div>
             </div>
           </div>
@@ -3539,13 +3527,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
       <span class="lt-arrow">▶</span><span class="i18n" data-ar="الدليل">Legend</span>
     </button>
     <div class="legend-items">
-    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي إجباري">University requirement</span></span>
-    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="مساقات إجبارية">Core courses</span></span>
-    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="الرياضيات والإحصاء">Math &amp; statistics</span></span>
-    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصصي">Department elective</span></span>
-    <span class="item"><span class="chip eng"></span><span class="i18n" data-ar="مساقات اللغة الإنجليزية">English courses</span></span>
-    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University elective</span></span>
-    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free elective</span></span>
+    <span class="item"><span class="chip skills"></span><span class="i18n" data-ar="متطلب جامعي">University Req.</span></span>
+    <span class="item"><span class="chip uni"></span><span class="i18n" data-ar="اختياري جامعي">University Elec.</span></span>
+    <span class="item"><span class="chip math"></span><span class="i18n" data-ar="متطلب كلية">College Req.</span></span>
+    <span class="item"><span class="chip core"></span><span class="i18n" data-ar="متطلب تخصص">Specialization Req.</span></span>
+    <span class="item"><span class="chip dept"></span><span class="i18n" data-ar="اختياري تخصص">Specialization Elec.</span></span>
+    <span class="item"><span class="chip free"></span><span class="i18n" data-ar="اختياري حر">Free Elec.</span></span>
     <span class="arrow-sample"><span class="ln"></span><span class="i18n" data-ar="متطلب سابق (مرر المؤشر فوق المساق لتتبعه)">Prerequisite (hover a course to trace it)</span></span>
     <span class="item"><span class="chip pair-chip"></span><span class="i18n" data-ar="مرتبط — مثل المساق ومختبره">Connected — e.g. a course and its lab</span></span>
     </div>
@@ -3603,8 +3590,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="medical-c-calc-1"><div class="name" data-ar="التفاضل والتكامل (1)">Calculus I</div></div>
               <div class="course math" id="medical-c-discrete-math"><div class="name" data-ar="الرياضيات المتقطعة">Discrete math</div></div>
               <div class="pair-group independent-grades">
-                <div class="course eng" id="medical-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
-                <div class="course eng" id="medical-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
+                <div class="course skills" id="medical-c-intermediate-english"><div class="name" data-ar="اللغة الإنجليزية المتوسطة">Intermediate English</div></div>
+                <div class="course skills" id="medical-c-intermediate-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتوسطة">Intermediate English Lab</div></div>
               </div>
             </div>
           </div>
@@ -3627,8 +3614,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course math" id="medical-c-calc-2"><div class="name" data-ar="التفاضل والتكامل (2)">Calculus II</div></div>
               <div class="course math" id="medical-c-prob-stats"><div class="name" data-ar="مبادئ الاحتمالات والإحصاء">Elementary probability &amp; statistics</div></div>
               <div class="pair-group independent-grades">
-                <div class="course eng" id="medical-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
-                <div class="course eng" id="medical-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
+                <div class="course skills" id="medical-c-advanced-english"><div class="name" data-ar="اللغة الإنجليزية المتقدمة">Advanced English</div></div>
+                <div class="course skills" id="medical-c-advanced-english-lab"><div class="name" data-ar="مختبر اللغة الإنجليزية المتقدمة">Advanced English Lab</div></div>
               </div>
             </div>
           </div>
@@ -3666,7 +3653,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
               <div class="course core" id="medical-c-fund-se"><div class="name" data-ar="أساسيات هندسة البرمجيات">Fundamentals of software eng.</div></div>
               <div class="course math" id="medical-c-diff-eq"><div class="name" data-ar="المعادلات التفاضلية">Differential equations</div></div>
               <div class="course core" id="medical-c-data-sci-analytics"><div class="name" data-ar="علم البيانات والتحليلات">Data science and analytics</div></div>
-              <div class="course eng" id="medical-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fund. of research methods</div></div>
+              <div class="course skills" id="medical-c-research-methods"><div class="name" data-ar="أساسيات مناهج البحث">Fund. of research methods</div></div>
               <div class="course uni" id="medical-c-uni-elective-2"><div class="name" data-ar="مادة اختيارية جامعية (2)">University elective (2)</div></div>
             </div>
           </div>
@@ -7782,13 +7769,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 // ==========================
 (function(){
   var CATEGORY_FALLBACK = {
-    skills: { en: 'University Requirement', ar: 'متطلب جامعي إجباري' },
-    core:   { en: 'Core Courses', ar: 'مساقات إجبارية' },
-    math:   { en: 'Math & Statistics', ar: 'الرياضيات والإحصاء' },
-    dept:   { en: 'Department Elective', ar: 'اختياري تخصصي' },
-    eng:    { en: 'English Courses', ar: 'مساقات اللغة الإنجليزية' },
-    uni:    { en: 'University Elective', ar: 'اختياري جامعي' },
-    free:   { en: 'Free Elective', ar: 'اختياري حر' }
+    skills: { en: 'University Req.', ar: 'متطلب جامعي' },
+    core:   { en: 'Specialization Req.', ar: 'متطلب تخصص' },
+    math:   { en: 'College Req.', ar: 'متطلب كلية' },
+    dept:   { en: 'Specialization Elec.', ar: 'اختياري تخصص' },
+    eng:    { en: 'University Req.', ar: 'متطلب جامعي' },
+    uni:    { en: 'University Elec.', ar: 'اختياري جامعي' },
+    free:   { en: 'Free Elec.', ar: 'اختياري حر' }
   };
   var CATEGORY_ORDER = ['skills','core','math','dept','eng','uni','free'];
 
@@ -10465,10 +10452,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
     var CATS = ['skills','core','math','dept','eng','uni','free'];
     var CAT_LABELS = {
-      skills: ['University requirement','متطلب جامعي إجباري'], core: ['Core courses','مساقات إجبارية'],
-      math: ['Math & statistics','الرياضيات والإحصاء'], dept: ['Department elective','اختياري تخصصي'],
-      eng: ['English courses','مساقات اللغة الإنجليزية'], uni: ['University elective','اختياري جامعي'],
-      free: ['Free elective','اختياري حر']
+      skills: ['University Req.','متطلب جامعي'], core: ['Specialization Req.','متطلب تخصص'],
+      math: ['College Req.','متطلب كلية'], dept: ['Specialization Elec.','اختياري تخصص'],
+      eng: ['University Req.','متطلب جامعي'], uni: ['University Elec.','اختياري جامعي'],
+      free: ['Free Elec.','اختياري حر']
     };
 
     // Same header structure every built-in major uses (brand block, center
