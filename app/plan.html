@@ -211,6 +211,18 @@ window.APP_UNIV_ELECTIVES = {
   ]
   // next: xxx: [ { code: '...', en: '...' }, ... ]
 };
+// Free electives (unlike University Electives above) aren't drawn from one
+// fixed university-wide catalog — they can be almost any course from any
+// department, so there's no real "full list" to offer. This only holds
+// specific electives a student has actually reported taking, keyed by plan
+// prefix, purely as autocomplete SUGGESTIONS on top of the existing
+// free-text field (which always stays — see isGenericElectiveSlot's field
+// in the course modal). No course code is given here because none was
+// provided as source material (see RULE ONE — not guessing one).
+window.APP_FREE_ELECTIVE_SUGGESTIONS = {
+  robotics: ['Basic Physics']
+  // next: prefix: ['Course Name', ...]
+};
 // Where "Share this plan with the app maintainer" sends people. Leave ''
 // to fall back to opening a pre-filled GitHub issue on the app's repo (see
 // AAUP_IMPORTED.submitPlan) — no account setup needed. Once you have a
@@ -268,7 +280,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.81';
+window.APP_VERSION = '4.0';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1828,6 +1840,51 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .numeric-grade-input:focus{outline:none;border-color:var(--accent);}
   .numeric-grade-result{font-size:12px;font-weight:700;color:var(--text-dim);white-space:nowrap;}
   .numeric-grade-result.ngr-active{color:var(--unlock);}
+
+  /* ================= PASS-MARK TOGGLE + ASSESSMENT BREAKDOWN ================= */
+  .pass-mark-toggle{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .pass-mark-toggle .pm-label{font-size:11.5px;color:var(--text-dim);}
+  .pm-btn{
+    background:var(--search-bg);border:1px solid var(--line);border-radius:20px;
+    padding:4px 10px;color:var(--text-dim);font-size:11.5px;font-family:inherit;cursor:pointer;
+    transition:background .12s ease,border-color .12s ease,color .12s ease;
+  }
+  .pm-btn:hover{border-color:var(--accent);}
+  .pm-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+
+  .assessment-breakdown{margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--search-bg);}
+  .assessment-rows{display:flex;flex-direction:column;gap:6px;}
+  .assessment-row{display:flex;align-items:center;gap:6px;}
+  .assessment-row .ar-label{flex:1 1 auto;min-width:0;}
+  .assessment-row .ar-score,.assessment-row .ar-max{width:64px;flex:0 0 64px;}
+  .assessment-row input{
+    background:var(--card-bg);border:1px solid var(--line);border-radius:7px;
+    padding:6px 8px;color:var(--text);font-size:12.5px;font-family:inherit;
+  }
+  .assessment-row input:focus{outline:none;border-color:var(--accent);}
+  .assessment-row .ar-sep{color:var(--text-dim);font-size:12px;}
+  .ar-remove{
+    background:none;border:none;color:var(--text-dim);font-size:16px;line-height:1;
+    cursor:pointer;padding:2px 4px;border-radius:6px;flex:0 0 auto;
+  }
+  .ar-remove:hover{color:#ff5d5d;background:rgba(255,93,93,.12);}
+  .assessment-empty{margin:0 0 8px;font-size:12px;}
+
+  .assessment-quick-add{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .aq-btn{
+    background:var(--card-bg);border:1px dashed var(--line);border-radius:16px;
+    padding:4px 10px;color:var(--text-dim);font-size:11.5px;font-family:inherit;cursor:pointer;
+  }
+  .aq-btn:hover{border-color:var(--accent);color:var(--text);}
+
+  .assessment-total-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .assessment-total{margin:0;font-size:12px;font-weight:700;color:var(--text-dim);}
+  .aq-apply-btn{
+    background:var(--unlock);border:none;border-radius:8px;padding:6px 12px;
+    color:var(--navy-900);font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;
+  }
+  .aq-apply-btn:hover{filter:brightness(1.06);}
+
   /* ================= RATING CONTROLS (in course modal) ================= */
 
   .star-rating{display:flex;gap:3px;font-size:20px;line-height:1;cursor:pointer;}
@@ -7941,7 +7998,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // for on every course) can type the number instead of picking a letter,
   // and it resolves to the correct letter automatically. Ordered highest
   // floor first so the first match wins.
-  var NUMERIC_GRADE_RANGES = [
+  //
+  // AAUP actually runs TWO different numeric scales depending on the
+  // course's college — Engineering programs pass D at 60, while the
+  // Faculty of Artificial Intelligence and Data Science's own scale passes
+  // D at 50 (confirmed against an official AAUP grade-scale screenshot for
+  // each). Every other tier shifts down to match. Which table applies is a
+  // per-course choice (see numericScaleFor / PASS_MARK_OVERRIDE below) —
+  // it defaults by plan but a student can flip any individual course.
+  var ENGINEERING_NUMERIC_GRADE_RANGES = [
     { min: 90, max: 100, grade: 'A' },
     { min: 87, max: 89,  grade: 'A-' },
     { min: 84, max: 86,  grade: 'B+' },
@@ -7954,12 +8019,63 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     { min: 60, max: 62,  grade: 'D' },
     { min: 0,  max: 59,  grade: 'F' }
   ];
-  function letterForScore(score){
+  var AI_NUMERIC_GRADE_RANGES = [
+    { min: 90, max: 100, grade: 'A' },
+    { min: 86, max: 89,  grade: 'A-' },
+    { min: 80, max: 85,  grade: 'B+' },
+    { min: 76, max: 79,  grade: 'B' },
+    { min: 72, max: 75,  grade: 'B-' },
+    { min: 68, max: 71,  grade: 'C+' },
+    { min: 64, max: 67,  grade: 'C' },
+    { min: 59, max: 63,  grade: 'C-' },
+    { min: 54, max: 58,  grade: 'D+' },
+    { min: 50, max: 53,  grade: 'D' },
+    { min: 0,  max: 49,  grade: 'F' }
+  ];
+  // Kept for backward compatibility — the Engineering table was the only
+  // one that existed before, so anything still reading NUMERIC_GRADE_RANGES
+  // directly (rather than going through letterForScore/numericScaleFor)
+  // keeps working exactly as before.
+  var NUMERIC_GRADE_RANGES = ENGINEERING_NUMERIC_GRADE_RANGES;
+
+  // Which plans default to the AI college's numeric scale. Only robotics
+  // (Artificial Intelligence and Robotics) is directly confirmed via a
+  // student's own AAUP course-result screenshot; the other AI-branded
+  // plans built alongside it live in the same Faculty of Artificial
+  // Intelligence and Data Science, so they share the default too — but
+  // it's only ever a default, never asserted as verified per-plan, and
+  // every single course can be flipped to the other scale regardless.
+  var AI_SCALE_DEFAULT_PLANS = {
+    'robotics': 1,
+    'aaup-ai-innovation': 1,
+    'aaup-statistics-data-science': 1,
+    'aaup-ai-fintech': 1,
+    'aaup-financial-engineering': 1,
+    'aaup-finance-data-science': 1
+  };
+  // Per-course override of which numeric scale to use — independent for
+  // every course, exactly like the pair-mode override above, because in
+  // practice the pass mark isn't uniform even within one plan (a shared
+  // English course might pass at 50 while a major course passes at 60).
+  function loadPassMarkOverrides(){ return loadMap('aaup_passMarkOverride'); }
+  function savePassMarkOverrides(m){ saveMap('aaup_passMarkOverride', m); }
+  function numericScaleFor(prefix, pid){
+    var override = loadPassMarkOverrides()[pid];
+    if(override === 'ai' || override === 'engineering') return override;
+    return AI_SCALE_DEFAULT_PLANS[prefix] ? 'ai' : 'engineering';
+  }
+  function rangesForScale(scale){
+    return scale === 'ai' ? AI_NUMERIC_GRADE_RANGES : ENGINEERING_NUMERIC_GRADE_RANGES;
+  }
+  // prefix/pid are optional — omitting them keeps the old Engineering-only
+  // behavior for any caller that hasn't been updated to pass them.
+  function letterForScore(score, prefix, pid){
     var n = parseFloat(score);
     if(isNaN(n)) return null;
     n = Math.max(0, Math.min(100, n));
-    for(var i = 0; i < NUMERIC_GRADE_RANGES.length; i++){
-      var r = NUMERIC_GRADE_RANGES[i];
+    var ranges = (prefix && pid) ? rangesForScale(numericScaleFor(prefix, pid)) : ENGINEERING_NUMERIC_GRADE_RANGES;
+    for(var i = 0; i < ranges.length; i++){
+      var r = ranges[i];
       if(n >= r.min && n <= r.max) return r.grade;
     }
     return null;
@@ -8124,8 +8240,20 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     GRADE_POINTS: GRADE_POINTS, GRADE_ORDER: GRADE_ORDER,
     isNonPassing: isNonPassing, isFailGrade: isFailGrade, gradeLabel: gradeLabel,
     letterForScore: letterForScore, NUMERIC_GRADE_RANGES: NUMERIC_GRADE_RANGES,
+    ENGINEERING_NUMERIC_GRADE_RANGES: ENGINEERING_NUMERIC_GRADE_RANGES,
+    AI_NUMERIC_GRADE_RANGES: AI_NUMERIC_GRADE_RANGES,
+    numericScaleFor: numericScaleFor,
+    loadPassMarkOverrides: loadPassMarkOverrides,
+    savePassMarkOverrides: savePassMarkOverrides,
     loadGrades: function(){ return loadMap('aaup_grades'); },
     saveGrades: function(m){ saveMap('aaup_grades', m); },
+    // Per-course assessment breakdown ({[pid]: [{label, score, max}, ...]}) —
+    // AAUP shows a course's mid-term/lab/quiz/assignment marks separately
+    // (with the max for each set by the individual instructor, never fixed),
+    // never the final exam mark itself, so this mirrors that: whatever
+    // components the student adds, summed for a running percentage.
+    loadAssessmentBreakdown: function(){ return loadMap('aaup_assessmentBreakdown'); },
+    saveAssessmentBreakdown: function(m){ saveMap('aaup_assessmentBreakdown', m); },
     loadStatuses: function(){ return loadMap('aaup_courseStatus'); },
     saveStatuses: function(m){ saveMap('aaup_courseStatus', m); },
     primaryId: primaryId,
@@ -8529,6 +8657,68 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<p class="ex-note" id="electivePickerEmpty" style="display:none;">' + (rtl ? 'لا توجد نتائج' : 'No matching courses') + '</p>';
   }
 
+  // AAUP's own portal shows a course's mark broken into whatever components
+  // the instructor set (mid-term, lab, quiz, assignment...), each out of a
+  // teacher-chosen max — never one flat "your score is X" number, and never
+  // the final exam mark itself. This mirrors that instead of asking for a
+  // single 0-100 figure: an open-ended list of {label, score, max} rows the
+  // student builds up as their own results come in, summed into a running
+  // percentage that resolves to a letter the same way a single score would.
+  var ASSESSMENT_PRESETS_EN = ['Mid Term', 'Lab', 'Quiz', 'Assignment', 'Final Exam'];
+  var ASSESSMENT_PRESETS_AR = { 'Mid Term': 'نصفي', 'Lab': 'مختبر', 'Quiz': 'كويز', 'Assignment': 'واجب', 'Final Exam': 'نهائي' };
+
+  function assessmentRowHtml(row, idx, rtl){
+    var esc = window.__escapeHtml;
+    return '<div class="assessment-row" data-idx="' + idx + '">' +
+      '<input type="text" class="ar-label" data-idx="' + idx + '" maxlength="40" value="' + esc(row.label || '') + '" placeholder="' +
+        (rtl ? 'اسم التقييم' : 'Label') + '">' +
+      '<input type="number" class="ar-score" data-idx="' + idx + '" min="0" step="0.1" value="' + (row.score === '' || row.score == null ? '' : esc(String(row.score))) + '" placeholder="' + (rtl ? 'علامتك' : 'Score') + '">' +
+      '<span class="ar-sep">/</span>' +
+      '<input type="number" class="ar-max" data-idx="' + idx + '" min="0" step="0.1" value="' + (row.max === '' || row.max == null ? '' : esc(String(row.max))) + '" placeholder="' + (rtl ? 'من' : 'Max') + '">' +
+      '<button type="button" class="ar-remove" data-idx="' + idx + '" aria-label="' + (rtl ? 'حذف' : 'Remove') + '">×</button>' +
+      '</div>';
+  }
+
+  function assessmentRowsHtml(rows, rtl){
+    if(!rows.length){
+      return '<p class="ex-note assessment-empty">' + (rtl
+        ? 'لا توجد تفاصيل تقييم بعد — أضف نصفي، مختبر، كويز، واجب... حسب ما يضعه أستاذ المساق.'
+        : 'No assessment details yet — add Mid Term, Lab, Quiz, Assignment... whatever your instructor actually uses.') + '</p>';
+    }
+    return rows.map(function(row, idx){ return assessmentRowHtml(row, idx, rtl); }).join('');
+  }
+
+  // Sums whatever rows have both a score and a max entered (partial rows are
+  // silently skipped rather than treated as zero, so an in-progress entry
+  // doesn't tank the running total).
+  function assessmentTotals(rows){
+    var sumScore = 0, sumMax = 0, any = false;
+    rows.forEach(function(row){
+      var s = parseFloat(row.score), m = parseFloat(row.max);
+      if(isNaN(s) || isNaN(m) || m <= 0) return;
+      sumScore += s; sumMax += m; any = true;
+    });
+    return { sumScore: sumScore, sumMax: sumMax, pct: any ? (sumScore / sumMax * 100) : null };
+  }
+
+  // Note: the running total from whatever rows have been entered so far is
+  // NOT automatically written to the official grade — a mid-term-only total
+  // isn't the final grade, and AAUP itself never shows the final exam mark
+  // (uni rules), so this is a preview the student can apply manually once
+  // they're confident it reflects their real final total (e.g. after adding
+  // every component including the final exam themselves).
+  function assessmentTotalHtml(rows, prefix, pid, rtl){
+    var t = assessmentTotals(rows);
+    if(t.pct === null){
+      return { text: (rtl ? 'أضف علامة وحدًا أقصى لحساب مجموعك الحالي.' : 'Add a score and a max to calculate your running total.'), letter: null };
+    }
+    var pctRounded = Math.round(t.pct * 10) / 10;
+    var letter = window.AAUP_GPA.letterForScore(t.pct, prefix, pid);
+    var soFar = rtl ? 'حتى الآن: ' : 'So far: ';
+    var arrow = letter ? (' → ' + letter) : '';
+    return { text: soFar + t.sumScore + '/' + t.sumMax + ' = ' + pctRounded + '%' + arrow, letter: letter };
+  }
+
   function render(prefix, slug){
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var meta = info[slug];
@@ -8565,10 +8755,22 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     } else if(window.AAUP_PERSONAL.isGenericElectiveSlot(slug)){
       var customNames = window.AAUP_PERSONAL.loadCustomNames();
       var currentName = customNames[pid] || '';
+      // Free electives can be almost any course from any department, so
+      // there's no full catalog to offer — this is just a handful of
+      // reported ones as autocomplete suggestions on top of the free-text
+      // field, which stays exactly as it was either way.
+      var isFreeElective = /^free-elective-\d+$/.test(slug);
+      var freeElectiveSuggestions = (isFreeElective && window.APP_FREE_ELECTIVE_SUGGESTIONS) ? (window.APP_FREE_ELECTIVE_SUGGESTIONS[prefix] || []) : [];
+      var suggestionsListId = 'freeElectiveSuggestions-' + pid.replace(/[^a-zA-Z0-9_-]/g, '');
+      var datalistHtml = freeElectiveSuggestions.length
+        ? '<datalist id="' + suggestionsListId + '">' + freeElectiveSuggestions.map(function(s){ return '<option value="' + window.__escapeHtml(s) + '">'; }).join('') + '</datalist>'
+        : '';
       nameFieldHtml = '<div class="form-field" style="margin-bottom:14px;">' +
         '<label for="electiveNameInput">' + (rtl ? 'ما هو المساق الذي أخذته فعليًا؟' : 'What course did you actually take?') + '</label>' +
         '<input type="text" id="electiveNameInput" maxlength="120" value="' + currentName.replace(/"/g, '&quot;') + '" placeholder="' +
-        (rtl ? 'مثال: مقدمة في الفلسفة' : 'e.g. Introduction to Philosophy') + '">' +
+        (rtl ? 'مثال: مقدمة في الفلسفة' : 'e.g. Introduction to Philosophy') + '"' +
+        (freeElectiveSuggestions.length ? ' list="' + suggestionsListId + '"' : '') + '>' +
+        datalistHtml +
         '</div>';
     }
 
@@ -8597,17 +8799,36 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var opts = '<option value="">—</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
         return '<option value="' + g + '"' + (g === currentGrade ? ' selected' : '') + '>' + window.AAUP_GPA.gradeLabel(g) + '</option>';
       }).join('');
-      // Optional alternate entry: type the exact numeric score (your own
-      // lecture+lab weighted total, however this specific course splits
-      // that — this app doesn't know a per-course split) and it resolves
-      // to the correct official letter automatically, rather than having
-      // to work the letter out by hand first.
+      // Optional alternate entry: build up the same assessment breakdown
+      // AAUP's own portal shows (mid-term / lab / quiz / assignment, each
+      // out of whatever max the instructor set) and it resolves to the
+      // correct official letter automatically, rather than working the
+      // letter out by hand. The pass-mark scale (Engineering = 60, AI
+      // college = 50) is a per-course toggle, not tied to any other course.
+      var scale = window.AAUP_GPA.numericScaleFor(prefix, pid);
+      var breakdownAll = window.AAUP_GPA.loadAssessmentBreakdown();
+      var rows = breakdownAll[pid] || [];
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
         '<select class="grade-select" id="courseGradeSelect">' + opts + '</select>' +
-        '<div class="numeric-grade-row">' +
-          '<input type="number" min="0" max="100" step="0.1" class="numeric-grade-input" id="courseNumericGradeInput" placeholder="' +
-          (rtl ? 'أو أدخل العلامة الرقمية (اختياري)' : 'or enter numeric score (optional)') + '">' +
-          '<span class="numeric-grade-result" id="courseNumericGradeResult"></span>' +
+        '<div class="pass-mark-toggle" id="passMarkToggle">' +
+          '<span class="pm-label">' + (rtl ? 'علامة النجاح' : 'Pass mark') + '</span>' +
+          '<button type="button" class="pm-btn' + (scale === 'engineering' ? ' active' : '') + '" data-scale="engineering">60 (' + (rtl ? 'هندسة' : 'Engineering') + ')</button>' +
+          '<button type="button" class="pm-btn' + (scale === 'ai' ? ' active' : '') + '" data-scale="ai">50 (' + (rtl ? 'ذكاء اصطناعي' : 'AI') + ')</button>' +
+        '</div>' +
+        '<div class="assessment-breakdown" id="assessmentBreakdown">' +
+          '<div class="assessment-rows" id="assessmentRows">' + assessmentRowsHtml(rows, rtl) + '</div>' +
+          '<div class="assessment-quick-add" id="assessmentQuickAdd">' +
+            ASSESSMENT_PRESETS_EN.map(function(p){
+              return '<button type="button" class="aq-btn" data-preset="' + p + '">+ ' + (rtl ? ASSESSMENT_PRESETS_AR[p] : p) + '</button>';
+            }).join('') +
+            '<button type="button" class="aq-btn" data-preset="">+ ' + (rtl ? 'آخر' : 'Other') + '</button>' +
+          '</div>' +
+          '<div class="assessment-total-row">' +
+            '<p class="assessment-total" id="assessmentTotal">' + assessmentTotalHtml(rows, prefix, pid, rtl).text + '</p>' +
+            '<button type="button" class="aq-apply-btn" id="assessmentApplyBtn" style="display:' + (assessmentTotalHtml(rows, prefix, pid, rtl).letter ? 'inline-block' : 'none') + ';">' +
+              (rtl ? 'استخدمها كعلامتي ↑' : 'Use as my grade ↑') +
+            '</button>' +
+          '</div>' +
         '</div>' +
         '</div>';
     } else {
@@ -8753,29 +8974,103 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       });
     }
 
-    // Optional numeric-score entry: type e.g. 91.5 and it resolves to the
-    // matching official letter, updates the dropdown to match, and applies
-    // it exactly like picking the letter directly would have.
-    var numericInput = container.querySelector('#courseNumericGradeInput');
-    var numericResult = container.querySelector('#courseNumericGradeResult');
-    if(numericInput && gradeSelect){
-      numericInput.addEventListener('input', function(){
-        var raw = numericInput.value;
-        if(raw === ''){
-          if(numericResult){ numericResult.textContent = ''; numericResult.classList.remove('ngr-active'); }
-          return;
-        }
-        var letter = window.AAUP_GPA.letterForScore(raw);
-        if(!letter){
-          if(numericResult){ numericResult.textContent = ''; numericResult.classList.remove('ngr-active'); }
-          return;
-        }
-        if(numericResult){
-          numericResult.textContent = '→ ' + letter;
-          numericResult.classList.add('ngr-active');
-        }
-        gradeSelect.value = letter;
-        if(window.__applyGradeChange){ window.__applyGradeChange(prefix, pid, letter); }
+    // Pass-mark scale toggle (Engineering 60 / AI college 50) — independent
+    // per course, flips which numeric table the assessment total below (and
+    // the shared numeric input in the legacy imported-plan prompt) resolves
+    // against.
+    var passMarkToggle = container.querySelector('#passMarkToggle');
+    if(passMarkToggle){
+      passMarkToggle.querySelectorAll('.pm-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var overrides = window.AAUP_GPA.loadPassMarkOverrides();
+          overrides[pid] = btn.getAttribute('data-scale');
+          window.AAUP_GPA.savePassMarkOverrides(overrides);
+          passMarkToggle.querySelectorAll('.pm-btn').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          refreshAssessmentTotal();
+        });
+      });
+    }
+
+    // Assessment breakdown: an open-ended list of {label, score, max} rows
+    // building up a running total, rather than one flat numeric score —
+    // matches how AAUP's own portal actually shows a course's marks
+    // (mid-term/lab/quiz/assignment, each out of an instructor-chosen max,
+    // final exam never shown). The total is a PREVIEW only; it's never
+    // auto-applied to the official grade (a mid-term-only total isn't the
+    // final grade) — the student applies it explicitly once confident it's
+    // complete, via the "Use as my grade" button.
+    var assessRowsEl = container.querySelector('#assessmentRows');
+    var assessTotalEl = container.querySelector('#assessmentTotal');
+    var assessApplyBtn = container.querySelector('#assessmentApplyBtn');
+    var rtlBind = window.__isRtl ? window.__isRtl(prefix) : false;
+    var pendingLetter = null;
+
+    function currentRows(){
+      var all = window.AAUP_GPA.loadAssessmentBreakdown();
+      return all[pid] || [];
+    }
+    function saveRows(rows){
+      var all = window.AAUP_GPA.loadAssessmentBreakdown();
+      if(rows.length){ all[pid] = rows; } else { delete all[pid]; }
+      window.AAUP_GPA.saveAssessmentBreakdown(all);
+    }
+    function refreshAssessmentTotal(){
+      var rows = currentRows();
+      var result = assessmentTotalHtml(rows, prefix, pid, rtlBind);
+      if(assessTotalEl){ assessTotalEl.textContent = result.text; }
+      pendingLetter = result.letter;
+      if(assessApplyBtn){ assessApplyBtn.style.display = pendingLetter ? 'inline-block' : 'none'; }
+    }
+    function bindRowInputs(){
+      if(!assessRowsEl) return;
+      assessRowsEl.querySelectorAll('.ar-label, .ar-score, .ar-max').forEach(function(inp){
+        inp.addEventListener('input', function(){
+          var idx = parseInt(inp.getAttribute('data-idx'), 10);
+          var rows = currentRows();
+          if(!rows[idx]) return;
+          if(inp.classList.contains('ar-label')){ rows[idx].label = inp.value; }
+          else if(inp.classList.contains('ar-score')){ rows[idx].score = inp.value; }
+          else if(inp.classList.contains('ar-max')){ rows[idx].max = inp.value; }
+          saveRows(rows);
+          refreshAssessmentTotal();
+        });
+      });
+      assessRowsEl.querySelectorAll('.ar-remove').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var idx = parseInt(btn.getAttribute('data-idx'), 10);
+          var rows = currentRows();
+          rows.splice(idx, 1);
+          saveRows(rows);
+          assessRowsEl.innerHTML = assessmentRowsHtml(rows, rtlBind);
+          bindRowInputs();
+          refreshAssessmentTotal();
+        });
+      });
+    }
+    bindRowInputs();
+
+    var quickAddEl = container.querySelector('#assessmentQuickAdd');
+    if(quickAddEl){
+      quickAddEl.querySelectorAll('.aq-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var rows = currentRows();
+          rows.push({ label: btn.getAttribute('data-preset') || '', score: '', max: '' });
+          saveRows(rows);
+          assessRowsEl.innerHTML = assessmentRowsHtml(rows, rtlBind);
+          bindRowInputs();
+          refreshAssessmentTotal();
+          var newScoreInput = assessRowsEl.querySelector('.assessment-row[data-idx="' + (rows.length - 1) + '"] .ar-score');
+          if(newScoreInput){ newScoreInput.focus(); }
+        });
+      });
+    }
+
+    if(assessApplyBtn && gradeSelect){
+      assessApplyBtn.addEventListener('click', function(){
+        if(!pendingLetter) return;
+        gradeSelect.value = pendingLetter;
+        if(window.__applyGradeChange){ window.__applyGradeChange(prefix, pid, pendingLetter); }
       });
     }
 
@@ -10934,7 +11229,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(impNumericInput){
       impNumericInput.addEventListener('input', function(){
         var raw = impNumericInput.value;
-        var letter = raw === '' ? null : window.AAUP_GPA.letterForScore(raw);
+        var letter = raw === '' ? null : window.AAUP_GPA.letterForScore(raw, planId, pid);
         if(!letter){ impNumericResult.textContent = ''; impNumericResult.classList.remove('ngr-active'); return; }
         impNumericResult.textContent = '→ ' + letter;
         impNumericResult.classList.add('ngr-active');
