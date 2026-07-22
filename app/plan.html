@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.71';
+window.APP_VERSION = '3.72';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -8989,8 +8989,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   }
   window.__yearCelebration = showYearCelebration;
 
+  // The first time this runs for a plan (page load, or the first load after
+  // new achievements shipped) it must SEED silently — record whatever is
+  // already complete without celebrating it. Otherwise a returning student is
+  // ambushed on load by toasts, confetti and a full-screen typewriter popup
+  // for years they finished sessions ago; stacked across several completed
+  // years/plans those opaque overlays covered the entire app and it looked
+  // like a blank page. Only genuinely-live completions (a later pass, after a
+  // checkbox is ticked) celebrate.
+  var _achSeeded = {};
   function refreshUnlocks(prefix){
     var unlocked = loadUnlocked();
+    var firstPass = !_achSeeded[prefix];
+    _achSeeded[prefix] = true;
     var newly = [];
     ACHIEVEMENTS.forEach(function(a){
       var key = a.global ? a.id : (prefix + ':' + a.id);
@@ -9003,6 +9014,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     });
     if(newly.length){
       saveUnlocked(unlocked);
+      // Seed pass: persist the unlocks above, but celebrate nothing.
+      if(firstPass){ return unlocked; }
       var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
       var gender = studentGender();
       newly.forEach(function(a){
