@@ -260,7 +260,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '3.62';
+window.APP_VERSION = '3.70';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -1276,6 +1276,23 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .misc{background:var(--misc);color:var(--misc-tx);}
 
+  /* A course the student removed from their own plan (e.g. tested out of
+     Intermediate English, or placed straight into Advanced). Hidden from the
+     grid and skipped by every count via .course[id]:not(.course-removed). */
+  .course.course-removed{display:none !important;}
+
+  .modal-remove-block{margin-top:6px;border-top:1px dashed var(--line);padding-top:12px;}
+  .course-remove-btn{
+    width:100%;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;
+    background:rgba(224,83,140,.12);color:#ff9ecb;border:1px solid var(--prereq);
+    transition:background .15s ease;
+  }
+  .course-remove-btn:hover{background:var(--prereq);color:#fff;}
+  .course-remove-btn.is-restore{
+    background:rgba(47,191,113,.14);color:#8ff0bd;border-color:var(--unlock);
+  }
+  .course-remove-btn.is-restore:hover{background:var(--unlock);color:#04150c;}
+
   .course.jump-highlight{animation:jumpPulse 1s ease-in-out 2;}
   /* ================= COLLAPSIBLE LEGEND (mobile-friendly) ================= */
 
@@ -2039,6 +2056,39 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      next semester" recommendation cards
      ========================================================================== */
   /* ================= ACHIEVEMENTS ================= */
+
+  /* Year-completion "terminal" celebration popup (typewriter). */
+  .year-cel-overlay{
+    position:fixed;inset:0;z-index:4000;display:flex;align-items:center;justify-content:center;
+    background:rgba(6,10,26,.72);backdrop-filter:blur(3px);opacity:0;transition:opacity .3s ease;padding:20px;
+  }
+  .year-cel-overlay.open{opacity:1;}
+  .year-cel-card{
+    width:min(520px,100%);background:#0b1020;border:1px solid #26305a;border-radius:12px;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);overflow:hidden;transform:translateY(10px) scale(.98);
+    transition:transform .3s cubic-bezier(.2,.8,.2,1);
+  }
+  .year-cel-overlay.open .year-cel-card{transform:none;}
+  .year-cel-bar{
+    display:flex;align-items:center;gap:7px;padding:9px 13px;background:#141c34;border-bottom:1px solid #26305a;
+  }
+  .ycb-dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  .ycb-dot.r{background:#ff5f56;} .ycb-dot.y{background:#ffbd2e;} .ycb-dot.g{background:#27c93f;}
+  .ycb-title{margin-left:8px;font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#8b9ad1;}
+  .year-cel-body{
+    margin:0;padding:20px 18px 8px;font:600 15px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:#4ade80;white-space:pre-wrap;word-break:break-word;min-height:96px;
+  }
+  .ycb-run{color:#5db8ff;}
+  .year-cel-cursor{color:#4ade80;animation:ycb-blink 1s steps(1) infinite;}
+  @keyframes ycb-blink{50%{opacity:0;}}
+  .year-cel-close{
+    display:block;margin:6px 18px 16px auto;background:#1b2b4a;color:#cfe0ff;
+    border:1px solid #2f3f6a;border-radius:7px;padding:6px 16px;cursor:pointer;
+    font:600 12px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  .year-cel-close:hover{background:#243662;}
+  @media (prefers-reduced-motion:reduce){ .year-cel-cursor{animation:none;} }
 
   .achievements-summary{font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;}
 
@@ -4329,6 +4379,7 @@ function showPage(id){
   if(id !== 'home' && window.__redraw && window.__redraw[id]){
     window.__redraw[id]();
   }
+  if(id !== 'home' && window.__applyRemovedCourses){ window.__applyRemovedCourses(id); }
   if(id !== 'home' && window.__refreshCollapse){ window.__refreshCollapse(id); }
   if(id !== 'home' && window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
   // Seed the semester-completion celebration set for this plan so opening it
@@ -6643,7 +6694,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(!page) return 0;
     var required = DEPT_REQUIRED[prefix];
     var sum = 0, deptDone = [];
-    page.querySelectorAll('.course[id]').forEach(function(el){
+    page.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
       if(!progress[el.id]) return;
       var parts = splitCourseId(el.id);
       var meta = parts && info[parts.slug];
@@ -6666,7 +6717,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var rtl = isRtl(prefix);
     var gates = CREDIT_GATES[prefix] || {};
     var doneCredits = null; // computed lazily, only if a gate needs it
-    var courses = page.querySelectorAll('.course[id]');
+    var courses = page.querySelectorAll('.course[id]:not(.course-removed)');
     courses.forEach(function(el){
       var isDone = !!progress[el.id];
       var available = false;
@@ -6694,7 +6745,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   function updateWidget(prefix){
     var page = document.getElementById('page-' + prefix);
     if(!page) return;
-    var courses = page.querySelectorAll('.course[id]');
+    var courses = page.querySelectorAll('.course[id]:not(.course-removed)');
 
     // Department electives are a pool to choose from, not a checklist every
     // single item must be marked off. Only DEPT_REQUIRED[prefix] of them
@@ -6775,7 +6826,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var page = document.getElementById('page-' + prefix);
     var data = window.__PLAN_DATA[prefix] || {};
     var info = data.courseInfo || {};
-    var courses = page ? Array.prototype.slice.call(page.querySelectorAll('.course[id]')) : [];
+    var courses = page ? Array.prototype.slice.call(page.querySelectorAll('.course[id]:not(.course-removed)')) : [];
     var required = DEPT_REQUIRED[prefix];
 
     var seenNum = {};
@@ -6798,7 +6849,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // means it was taken but not passed, so it still shouldn't count
       // toward completed credit hours even though the box may be ticked.
       var pidHere = window.AAUP_GPA ? window.AAUP_GPA.primaryId(prefix, parts.slug) : el.id;
-      var isDone = !!progress[el.id] && grades[pidHere] !== 'F';
+      var notPassed = window.AAUP_GPA && window.AAUP_GPA.isNonPassing;
+      var isDone = !!progress[el.id] && !(notPassed && notPassed(grades[pidHere]));
 
       if(el.classList.contains('dept')){
         deptCount++;
@@ -6820,7 +6872,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       coreCoursesTotal++;
       coreCreditsTotal += cr;
       var altSlug = parts.slug.slice(-4) === '-lab' ? parts.slug.slice(0, -4) : parts.slug + '-lab';
-      var doneHere = isDone || (!!progress[prefix + '-c-' + altSlug] && grades[pidHere] !== 'F');
+      var doneHere = isDone || (!!progress[prefix + '-c-' + altSlug] && !(notPassed && notPassed(grades[pidHere])));
       if(doneHere){ coreCoursesDone++; coreCreditsDone += cr; }
     });
 
@@ -7020,7 +7072,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   function getPairSibling(el){
     var group = el.closest ? el.closest('.pair-group') : null;
     if(!group || group.classList.contains('independent-grades')) return null;
-    var courses = group.querySelectorAll('.course[id]');
+    var courses = group.querySelectorAll('.course[id]:not(.course-removed)');
     for(var i = 0; i < courses.length; i++){
       if(courses[i] !== el) return courses[i];
     }
@@ -7094,7 +7146,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   // ---------- initial render (checkbox injection into static markup) ----------
   function injectCheckboxes(){
-    document.querySelectorAll('.course[id]').forEach(function(el){
+    document.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
       if(el.querySelector('.course-check')) return;
       var box = document.createElement('span');
       box.className = 'course-check';
@@ -7213,7 +7265,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
           ? 'هل تريد مسح كل التقدم المحفوظ لهذه الخطة؟'
           : 'Clear all saved progress for this plan?';
         showConfirmDialog(msg, function(){
-          var courses = page ? page.querySelectorAll('.course[id]') : [];
+          var courses = page ? page.querySelectorAll('.course[id]:not(.course-removed)') : [];
           courses.forEach(function(el){
             delete progress[el.id];
             setCourseState(el, false);
@@ -7243,6 +7295,61 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       updateWidget(prefix);
     };
   }
+
+  // Exposed so other modules (removing/restoring a course from the plan)
+  // can recompute the whole progress / availability / panel / achievement
+  // UI exactly the way ticking a checkbox already does.
+  window.__refreshPlanUI = function(prefix){
+    updateWidget(prefix);
+    if(window.__refreshCollapse){ window.__refreshCollapse(prefix); }
+    if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(prefix); }
+  };
+})();
+
+// ==========================
+// REMOVED COURSES — a student can drop a course out of their own plan when
+// it doesn't apply to them (tested out of Intermediate English, placed
+// straight into Advanced, etc.). Removed courses are hidden from the grid
+// and, via the .course[id]:not(.course-removed) selector used everywhere,
+// excluded from every credit-hour total, requirement count, availability
+// check and achievement — as if they were never part of the plan.
+// ==========================
+(function(){
+  var KEY = 'aaup_removedCourses';
+  function load(){ return window.AAUP_STORAGE.getJSON(KEY, {}); }
+  function save(m){ window.AAUP_STORAGE.setJSON(KEY, m); }
+  function keyFor(prefix, slug){
+    return window.AAUP_GPA ? window.AAUP_GPA.primaryId(prefix, slug) : (prefix + '-c-' + slug);
+  }
+  function isRemoved(prefix, slug){ return !!load()[keyFor(prefix, slug)]; }
+
+  // Paint the removed set onto a plan's cards. Uses a plain .course[id]
+  // selector (NOT the :not(.course-removed) one) so it can also find and
+  // UN-hide a card when restoring. A lecture and its lab share one primary
+  // id, so both halves hide/show together.
+  function apply(prefix){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return;
+    var removed = load();
+    page.querySelectorAll('.course[id]').forEach(function(el){
+      var parts = window.__splitCourseId ? window.__splitCourseId(el.id) : null;
+      if(!parts){ return; }
+      var pid = keyFor(prefix, parts.slug);
+      el.classList.toggle('course-removed', !!removed[pid]);
+    });
+  }
+
+  function setRemoved(prefix, slug, removed){
+    var pid = keyFor(prefix, slug);
+    var m = load();
+    if(removed){ m[pid] = true; } else { delete m[pid]; }
+    save(m);
+    apply(prefix);
+    if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
+  }
+
+  window.__applyRemovedCourses = apply;
+  window.AAUP_REMOVED = { isRemoved: isRemoved, setRemoved: setRemoved, apply: apply };
 })();
 
 // ==========================
@@ -7618,11 +7725,30 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // provable, not just read off the page: with F = 0, no combination of
   // credit hours can reproduce that transcript's semester GPA; with
   // F = 0.35, it reproduces exactly.
+  // FA (failed for absence — a doctor withdrew the student) counts exactly
+  // like F: 0.35, and it drags the GPA down the same way. W (withdrew) does
+  // NOT count at all — it's excluded from the GPA entirely and just marks the
+  // course for a clean retake, so it is deliberately absent from GRADE_POINTS.
   var GRADE_POINTS = {
     'A': 4.00, 'A-': 3.67, 'B+': 3.33, 'B': 3.00, 'B-': 2.67,
-    'C+': 2.33, 'C': 2.00, 'C-': 1.67, 'D+': 1.33, 'D': 1.00, 'F': 0.35
+    'C+': 2.33, 'C': 2.00, 'C-': 1.67, 'D+': 1.33, 'D': 1.00, 'F': 0.35, 'FA': 0.35
   };
-  var GRADE_ORDER = ['A','A-','B+','B','B-','C+','C','C-','D+','D','F'];
+  var GRADE_ORDER = ['A','A-','B+','B','B-','C+','C','C-','D+','D','F','FA','W'];
+  // Grades that mean the course was NOT passed and needs a retake (it doesn't
+  // satisfy its requirement and doesn't count toward completion).
+  var NON_PASSING = { 'F': true, 'FA': true, 'W': true };
+  // Grades that count as a failure against academic standing (F and FA hit the
+  // GPA; W is a clean withdrawal, so it isn't a "fail").
+  var FAIL_GRADES = { 'F': true, 'FA': true };
+  function isNonPassing(g){ return !!NON_PASSING[g]; }
+  function isFailGrade(g){ return !!FAIL_GRADES[g]; }
+  // Dropdown label: the two special grades get a short descriptor so students
+  // know what they mean; ordinary letter grades show as-is.
+  function gradeLabel(g){
+    if(g === 'W') return 'W — Withdrawn (not counted)';
+    if(g === 'FA') return 'FA — Absence fail (counts as F)';
+    return g;
+  }
 
   function loadMap(key){
     return window.AAUP_STORAGE.getJSON(key, {});
@@ -7651,7 +7777,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var progress = window.__getProgress ? window.__getProgress() : {};
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var page = document.getElementById('page-' + prefix);
-    var courses = page ? Array.prototype.slice.call(page.querySelectorAll('.course[id]')) : [];
+    var courses = page ? Array.prototype.slice.call(page.querySelectorAll('.course[id]:not(.course-removed)')) : [];
     var seenNum = {};
     var points = 0, credits = 0;
 
@@ -7714,7 +7840,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var m = /-y(\d+)-s(\d+)$/.exec(row.id);
       if(!m) return;
       var points = 0, credits = 0, seenNum = {};
-      row.querySelectorAll('.course[id]').forEach(function(el){
+      row.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
         var parts = window.__splitCourseId(el.id);
         if(!parts) return;
         var meta = info[parts.slug];
@@ -7753,6 +7879,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   window.AAUP_GPA = {
     GRADE_POINTS: GRADE_POINTS, GRADE_ORDER: GRADE_ORDER,
+    isNonPassing: isNonPassing, isFailGrade: isFailGrade, gradeLabel: gradeLabel,
     loadGrades: function(){ return loadMap('aaup_grades'); },
     saveGrades: function(m){ saveMap('aaup_grades', m); },
     loadStatuses: function(){ return loadMap('aaup_courseStatus'); },
@@ -7798,7 +7925,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var grades = window.AAUP_GPA.loadGrades();
     var required = window.__DEPT_REQUIRED ? window.__DEPT_REQUIRED[prefix] : null;
     var page = document.getElementById('page-' + prefix);
-    var courses = page ? Array.prototype.slice.call(page.querySelectorAll('.course[id]')) : [];
+    var courses = page ? Array.prototype.slice.call(page.querySelectorAll('.course[id]:not(.course-removed)')) : [];
 
     var byCat = {};
     CATEGORY_ORDER.forEach(function(c){ byCat[c] = { total: 0, completed: 0, inProgress: 0, planned: 0 }; });
@@ -7847,7 +7974,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       // Checked "done" tracks whether it was taken — an F grade means it
       // wasn't passed, so it shouldn't count as a satisfied requirement
       // even if the box is ticked.
-      var isDone = !!progress[pid] && grades[pid] !== 'F';
+      var isDone = !!progress[pid] && !isNonPassing(grades[pid]);
       var status = statuses[pid];
 
       byCat[cat].total += cr;
@@ -7867,7 +7994,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(!meta) return;
       if(window.__isSupersededByRetake && parts && window.__isSupersededByRetake(prefix, parts.slug)) return;
       var pidHere = window.AAUP_GPA.primaryId(prefix, parts.slug);
-      if(grades[pidHere] === 'F') return; // taken, but not passed — doesn't satisfy the requirement
+      if(isNonPassing(grades[pidHere])) return; // F/FA/W — taken but not passed, doesn't satisfy the requirement
       deptCompletedCount++;
       deptCompletedCredits += parseFloat(meta.cr) || 0;
     });
@@ -8221,7 +8348,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       var grades = window.AAUP_GPA.loadGrades();
       var currentGrade = grades[pid] || '';
       var opts = '<option value="">—</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
-        return '<option value="' + g + '"' + (g === currentGrade ? ' selected' : '') + '>' + g + '</option>';
+        return '<option value="' + g + '"' + (g === currentGrade ? ' selected' : '') + '>' + window.AAUP_GPA.gradeLabel(g) + '</option>';
       }).join('');
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
         '<select class="grade-select" id="courseGradeSelect">' + opts + '</select></div>';
@@ -8250,7 +8377,19 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var notes = window.AAUP_PERSONAL.loadNotes();
     var noteText = notes[pid] || '';
 
-    return '<div class="modal-extras" data-pid="' + pid + '">' +
+    var removed = window.AAUP_REMOVED && window.AAUP_REMOVED.isRemoved(prefix, slug);
+    var removeHtml = '<div class="modal-row-block modal-remove-block">' +
+      '<button type="button" class="course-remove-btn' + (removed ? ' is-restore' : '') + '" id="courseRemoveBtn">' +
+        (removed
+          ? (rtl ? '↩︎ إعادة المساق إلى خطتي' : '↩︎ Restore to my plan')
+          : (rtl ? '🗑 إزالة المساق من خطتي' : '🗑 Remove from my plan')) +
+      '</button>' +
+      '<p class="ex-note">' + (removed
+        ? (rtl ? 'هذا المساق مُزال حاليًا ولا يُحتسب ضمن متطلباتك.' : "This course is currently removed and isn't counted toward your requirements.")
+        : (rtl ? 'أزِله إن كنت قد تجاوزته أو لم تأخذه (مثل الإنجليزية المتوسطة) — لن يُحتسب ضمن متطلباتك.' : "Remove it if you tested out of it or never took it (e.g. Intermediate English) — it won't count toward your requirements.")) +
+      '</p></div>';
+
+    return '<div class="modal-extras" data-pid="' + pid + '" data-slug="' + slug + '">' +
       nameFieldHtml +
       '<div class="modal-row-block"><span class="k">' + (rtl ? 'حالة التخطيط' : 'Planning status') + '</span>' +
       '<div class="status-btn-group">' + statusHtml + '</div></div>' +
@@ -8262,6 +8401,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<div class="modal-row-block"><span class="k">📝 ' + (rtl ? 'ملاحظاتي' : 'My notes') + '</span>' +
       '<textarea class="notes-textarea" id="courseNotesTextarea" maxlength="2000" rows="3" placeholder="' +
       (rtl ? 'ملاحظات شخصية عن هذا المساق…' : 'Personal notes about this course…') + '">' + noteText + '</textarea></div>' +
+      removeHtml +
       '</div>';
   }
 
@@ -8397,6 +8537,22 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         window.AAUP_PERSONAL.refreshCard(prefix, slug);
       });
     }
+
+    var removeBtn = container.querySelector('#courseRemoveBtn');
+    if(removeBtn && window.AAUP_REMOVED){
+      removeBtn.addEventListener('click', function(){
+        var slugForRemove = container.getAttribute('data-slug') || slug;
+        var currentlyRemoved = window.AAUP_REMOVED.isRemoved(prefix, slugForRemove);
+        window.AAUP_REMOVED.setRemoved(prefix, slugForRemove, !currentlyRemoved);
+        // Close the popup — the card it described is now hidden (or back).
+        var ov = container.closest('.modal-overlay');
+        if(ov){ ov.classList.remove('open'); }
+        else {
+          var openOv = document.querySelector('.modal-overlay.open, #impCourseModalOverlay.open');
+          if(openOv){ openOv.classList.remove('open'); }
+        }
+      });
+    }
   }
 
   window.__renderCourseModalExtras = render;
@@ -8494,7 +8650,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var page = document.getElementById('page-' + prefix);
     if(!page) return false;
     var progress = window.__getProgress();
-    var yearCourses = Array.prototype.slice.call(page.querySelectorAll('.course[id]'))
+    var yearCourses = Array.prototype.slice.call(page.querySelectorAll('.course[id]:not(.course-removed)'))
       .filter(function(el){ return yearOf(el) === String(yearNum); });
     if(yearCourses.length === 0) return false;
     return yearCourses.every(function(el){ return !!progress[el.id]; });
@@ -8560,7 +8716,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var grades = window.AAUP_GPA.loadGrades();
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var seenNum = {}, doneCount = 0, hasFail = false;
-    page.querySelectorAll('.course[id]').forEach(function(el){
+    page.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
       var parts = window.__splitCourseId(el.id);
       if(!parts) return;
       var meta = info[parts.slug];
@@ -8570,7 +8726,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(!progress[el.id]) return;
       doneCount++;
       var pid = window.AAUP_GPA.primaryId(prefix, parts.slug);
-      if(grades[pid] === 'F') hasFail = true;
+      if(window.AAUP_GPA.isFailGrade(grades[pid])) hasFail = true;
     });
     return doneCount >= 10 && !hasFail;
   }
@@ -8602,7 +8758,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var page = document.getElementById('page-' + prefix);
     if(!page) return null;
     var progress = window.__getProgress();
-    var els = Array.prototype.slice.call(page.querySelectorAll('.course[id]'))
+    var els = Array.prototype.slice.call(page.querySelectorAll('.course[id]:not(.course-removed)'))
       .filter(function(el){ return yearOf(el) === String(yearNum); });
     if(!els.length) return null;
     var done = els.filter(function(el){ return !!progress[el.id]; }).length;
@@ -8632,11 +8788,46 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   var ACHIEVEMENTS = [
     {
-      id: 'year1', icon: '🥇',
-      title: { en: 'Finished Year 1', ar: 'أنهيت السنة الأولى' },
-      desc: { en: 'Complete every course in Year 1.', ar: 'أكمل جميع مساقات السنة الأولى.' },
+      id: 'year1', icon: '🍄',
+      title: { en: 'No Longer a Smurf', ar: 'لم أعد سنفورًا' },
+      desc: { en: 'Finish every Year 1 course — welcome to university!', ar: 'أكمل جميع مساقات السنة الأولى — أهلاً بك في الجامعة!' },
       check: function(prefix){ return allYearCompleted(prefix, 1); },
       prog: function(prefix){ return countYearCourses(prefix, 1); }
+    },
+    {
+      id: 'year2', icon: '🥈',
+      appliesTo: function(prefix){ return countYearCourses(prefix, 2) !== null; },
+      title: { en: 'Sophomore Survivor', ar: 'ناجٍ من السنة الثانية' },
+      desc: { en: 'Complete every course in Year 2.', ar: 'أكمل جميع مساقات السنة الثانية.' },
+      check: function(prefix){ return allYearCompleted(prefix, 2); },
+      prog: function(prefix){ return countYearCourses(prefix, 2); }
+    },
+    {
+      id: 'year3', icon: '🥉',
+      appliesTo: function(prefix){ return countYearCourses(prefix, 3) !== null; },
+      title: { en: 'Junior Legend', ar: 'أسطورة السنة الثالثة' },
+      desc: { en: 'Complete every course in Year 3.', ar: 'أكمل جميع مساقات السنة الثالثة.' },
+      check: function(prefix){ return allYearCompleted(prefix, 3); },
+      prog: function(prefix){ return countYearCourses(prefix, 3); }
+    },
+    {
+      id: 'year4', icon: '🎓',
+      appliesTo: function(prefix){ return countYearCourses(prefix, 4) !== null; },
+      title: { en: 'Senior at Last', ar: 'أوشكت على التخرّج' },
+      desc: { en: 'Complete every course in Year 4.', ar: 'أكمل جميع مساقات السنة الرابعة.' },
+      check: function(prefix){ return allYearCompleted(prefix, 4); },
+      prog: function(prefix){ return countYearCourses(prefix, 4); }
+    },
+    {
+      id: 'year5', icon: '🧓',
+      appliesTo: function(prefix){ return countYearCourses(prefix, 5) !== null; },
+      title: function(gender){
+        if(gender === 'Female') return { en: 'Hello Granny', ar: 'أهلاً تيتا' };
+        return { en: 'Hello Grandpa', ar: 'أهلاً جدّو' };
+      },
+      desc: { en: 'Five years in — complete every course in Year 5.', ar: 'خمس سنوات — أكمل جميع مساقات السنة الخامسة.' },
+      check: function(prefix){ return allYearCompleted(prefix, 5); },
+      prog: function(prefix){ return countYearCourses(prefix, 5); }
     },
     {
       id: 'allmath', icon: '📐',
@@ -8684,7 +8875,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         var progress = window.__getProgress();
         var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
         var seen = {}, done = 0;
-        page.querySelectorAll('.course[id]').forEach(function(el){
+        page.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
           var parts = window.__splitCourseId(el.id);
           if(!parts) return;
           var meta = info[parts.slug];
@@ -8750,6 +8941,54 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // Checks every achievement against current data; anything newly true gets
   // permanently recorded (achievements don't get revoked if progress is
   // later undone — that's the normal, expected way gamified badges work).
+  // A themed "you finished a whole year" popup that types its message out
+  // character-by-character, terminal/code style (per the request: the text
+  // appears in a code-writing way). Year 1 is the smurf graduation; later
+  // years get their own line, and Year 5 greets the long-hauler as
+  // grandpa/granny by gender.
+  function showYearCelebration(prefix, yearNum){
+    if(typeof document === 'undefined') return;
+    var gender = studentGender();
+    var MESSAGES = {
+      1: 'Welcome to university.\nCongrats — you are not a smurf anymore.',
+      2: 'Second year cleared.\nHalfway to legend — keep pushing.',
+      3: 'Third year done.\nThe finish line is in sight.',
+      4: 'Senior year complete.\nThe tassel is almost yours.',
+      5: 'Five years and still standing.\nHello ' + (gender === 'Female' ? 'granny' : 'grandpa') + ' — respect.'
+    };
+    var msg = MESSAGES[yearNum];
+    if(!msg) return;
+    var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+    var ov = document.createElement('div');
+    ov.className = 'year-cel-overlay';
+    ov.innerHTML =
+      '<div class="year-cel-card" role="dialog" aria-modal="true">' +
+        '<div class="year-cel-bar"><span class="ycb-dot r"></span><span class="ycb-dot y"></span>' +
+          '<span class="ycb-dot g"></span><span class="ycb-title">student@aaup: ~/year-' + yearNum + '</span></div>' +
+        '<pre class="year-cel-body"><span class="ycb-run">$ ./finish_year ' + yearNum + '\n</span>' +
+          '<span class="year-cel-text"></span><span class="year-cel-cursor">&#9611;</span></pre>' +
+        '<button type="button" class="year-cel-close">' + (rtl ? 'إغلاق' : 'close') + '</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){ ov.classList.add('open'); });
+    var textEl = ov.querySelector('.year-cel-text');
+    var btn = ov.querySelector('.year-cel-close');
+    function done(){ ov.classList.remove('open'); setTimeout(function(){ if(ov.parentNode) ov.parentNode.removeChild(ov); }, 300); }
+    btn.addEventListener('click', done);
+    ov.addEventListener('click', function(e){ if(e.target === ov) done(); });
+    document.addEventListener('keydown', function esc(e){ if(e.key === 'Escape'){ done(); document.removeEventListener('keydown', esc); } });
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduced){ textEl.textContent = msg; return; }
+    var i = 0;
+    (function type(){
+      if(i >= msg.length){ return; }
+      var ch = msg.charAt(i); i++;
+      textEl.textContent += ch;
+      setTimeout(type, ch === '\n' ? 240 : (26 + Math.random() * 42));
+    })();
+  }
+  window.__yearCelebration = showYearCelebration;
+
   function refreshUnlocks(prefix){
     var unlocked = loadUnlocked();
     var newly = [];
@@ -8772,6 +9011,13 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       });
       // A real "you earned something" moment deserves a little burst.
       if(window.__confetti){ window.__confetti(); }
+      // If a whole YEAR just got completed, add the themed typewriter popup
+      // on top — for the highest year finished, so multiple newly-detected
+      // years (e.g. first load after this update) show only one.
+      var YEAR_OF = { year1: 1, year2: 2, year3: 3, year4: 4, year5: 5 };
+      var topYear = 0;
+      newly.forEach(function(a){ var y = YEAR_OF[a.id] || 0; if(y > topYear) topYear = y; });
+      if(topYear){ showYearCelebration(prefix, topYear); }
     }
     return unlocked;
   }
@@ -8948,7 +9194,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var progress = window.__getProgress();
     var categoryHardness = {};
     if(page){
-      page.querySelectorAll('.course[id]').forEach(function(el){
+      page.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
         if(!progress[el.id]) return;
         var cat = categoryOf(el);
         if(!cat) return;
@@ -10334,7 +10580,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var grades = window.AAUP_GPA.loadGrades();
     var current = grades[pid] || '';
     var opts = '<option value="">\u2014</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
-      return '<option value="' + g + '"' + (g === current ? ' selected' : '') + '>' + g + '</option>';
+      return '<option value="' + g + '"' + (g === current ? ' selected' : '') + '>' + window.AAUP_GPA.gradeLabel(g) + '</option>';
     }).join('');
     var rtl = !!rtlState[planId];
     var dispName = rtl && course.ar ? course.ar : course.name;
@@ -13333,9 +13579,12 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(newGrade){ grades[pid] = newGrade; } else { delete grades[pid]; }
     window.AAUP_GPA.saveGrades(grades);
     var primarySlug = window.__splitCourseId ? window.__splitCourseId(pid).slug : pid;
-    if(newGrade === 'F' && previousGrade !== 'F'){
+    // F, FA and W all mean the course must be retaken. Trigger (or clear) the
+    // retake slot on any transition into/out of that non-passing set.
+    var nonPass = window.AAUP_GPA.isNonPassing;
+    if(nonPass(newGrade) && !nonPass(previousGrade)){
       createRetake(prefix, primarySlug);
-    } else if(previousGrade === 'F' && newGrade !== 'F'){
+    } else if(nonPass(previousGrade) && !nonPass(newGrade)){
       removeRetakeIfUntouched(prefix, primarySlug);
     }
   }
@@ -13382,7 +13631,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     return Array.prototype.slice.call(root.querySelectorAll('.imp-year-block'));
   }
   function yearIsFinished(yearEl){
-    var courses = yearEl.querySelectorAll('.course[id]');
+    var courses = yearEl.querySelectorAll('.course[id]:not(.course-removed)');
     if(!courses.length) return false;
     for(var i = 0; i < courses.length; i++){
       if(!courses[i].classList.contains('completed')) return false;
@@ -13526,7 +13775,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(!label) return;
       var counts = { Hard: 0, Medium: 0, Easy: 0 };
       var seen = {};
-      entry.block.querySelectorAll('.course[id]').forEach(function(course){
+      entry.block.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(course){
         var parts = window.__splitCourseId(course.id);
         if(!parts) return;
         // A lecture + its lab share one rating (same primaryId) — count once.
@@ -13613,7 +13862,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 
   function collectCourses(container, info, grades, progress, prefix, rtl){
     var out = [];
-    container.querySelectorAll('.course[id]').forEach(function(el){
+    container.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
       var parts = splitId(el.id);
       if(!parts) return;
       var nameEl = el.querySelector('.name');
@@ -13821,7 +14070,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var progress = window.__getProgress ? window.__getProgress() : {};
     var rows = root.querySelectorAll('.course-row[id]');
     Array.prototype.slice.call(rows).forEach(function(row){
-      var courses = row.querySelectorAll('.course[id]');
+      var courses = row.querySelectorAll('.course[id]:not(.course-removed)');
       if(!courses.length){ delete celebrated[row.id]; return; }
       var allDone = Array.prototype.slice.call(courses).every(function(c){ return !!progress[c.id]; });
       if(allDone){
@@ -13846,7 +14095,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       if(root){
         var progress = window.__getProgress ? window.__getProgress() : {};
         root.querySelectorAll('.course-row[id]').forEach(function(row){
-          var courses = row.querySelectorAll('.course[id]');
+          var courses = row.querySelectorAll('.course[id]:not(.course-removed)');
           if(courses.length && Array.prototype.slice.call(courses).every(function(c){ return !!progress[c.id]; })){
             celebrated[row.id] = true;
           }
