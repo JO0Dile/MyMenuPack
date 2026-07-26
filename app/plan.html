@@ -280,7 +280,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.3';
+window.APP_VERSION = '4.4';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2533,6 +2533,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   .orphan-keep,.orphan-remove{font-size:11.5px;padding:4px 12px;flex:0 0 auto;}
   .orphan-remove{border-color:#ff5d5d;color:#ff8f8f;}
   .orphan-remove:hover{background:rgba(255,93,93,.12);}
+
+  .acct-row{display:inline-flex;align-items:stretch;gap:4px;}
+  .acct-delete-btn{padding:6px 10px;border-color:#ff5d5d;color:#ff8f8f;flex:0 0 auto;}
+  .acct-delete-btn:hover{background:rgba(255,93,93,.12);}
 
 
   .editing .course[id]{
@@ -14633,7 +14637,10 @@ window.__livePrereqs = function(prefix, fallback){
       (others.length
         ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
           others.map(function(a){
-            return '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>';
+            return '<span class="acct-row">' +
+              '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>' +
+              '<button type="button" class="home-btn acct-delete-btn" data-acct="' + window.__escapeHtml(a) + '" aria-label="' + (r ? 'حذف الحساب' : 'Delete account') + '">🗑</button>' +
+              '</span>';
           }).join('') + '</div>'
         : '') +
       '<div class="form-field-row">' +
@@ -14723,6 +14730,25 @@ window.__livePrereqs = function(prefix, fallback){
         // On success, switchTo() reloads the page — nothing further to do here.
       });
     });
+    document.querySelectorAll('.acct-delete-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!window.AAUP_ACCOUNTS) return;
+        var acct = btn.getAttribute('data-acct');
+        var msg = document.getElementById('acctMsg');
+        // Deleting an account throws away everything it holds and there is no
+        // undo, so the warning names the account and points at the export
+        // first — the same escape hatch the switch failure suggests.
+        var warn = r
+          ? ('حذف الحساب «' + acct + '» نهائيًا؟ سيُحذف كل تقدّمه وعلاماته وخططه، ولا يمكن التراجع. صدّر نسخة احتياطية أولًا إن كنت غير متأكد.')
+          : ('Permanently delete the account “' + acct + '”? All of its progress, grades and plans go with it, and this cannot be undone. Export a backup first if you’re unsure.');
+        window.__showConfirmDialog(warn, function(){
+          var result = window.AAUP_ACCOUNTS.deleteAccount(acct);
+          if(!result.ok){ msg.innerHTML = '<p class="dev-error-msg">' + result.error + '</p>'; return; }
+          renderSettingsBody(body);
+          if(window.__showToast){ window.__showToast(r ? '🗑 تم حذف الحساب.' : '🗑 Account deleted.'); }
+        }, r);
+      });
+    });
     document.getElementById('newAcctBtn').addEventListener('click', function(){
       if(!window.AAUP_ACCOUNTS) return;
       var name = document.getElementById('newAcctName').value;
@@ -14801,22 +14827,45 @@ window.__livePrereqs = function(prefix, fallback){
     return keys;
   }
 
+  // Returns whether the snapshot is genuinely on disk. Writing it is not
+  // enough to know that: a device at its storage quota throws, and some
+  // browsers evict or truncate instead, so the value is read back and
+  // compared. switchTo() wipes live storage immediately after this, so a
+  // snapshot that only LOOKED saved would take the account's whole history
+  // with it \u2014 this boolean is the one thing standing between a full
+  // device and permanent data loss.
   function snapshotCurrent(name){
     var keys = relevantKeys();
     var data = {};
     keys.forEach(function(k){ data[k] = localStorage.getItem(k); });
-    try{ localStorage.setItem(SNAPSHOT_PREFIX + name, JSON.stringify(data)); }catch(e){}
+    var payload = JSON.stringify(data);
+    try{
+      localStorage.setItem(SNAPSHOT_PREFIX + name, payload);
+      return localStorage.getItem(SNAPSHOT_PREFIX + name) === payload;
+    }catch(e){ return false; }
   }
   function clearLiveKeys(){
     relevantKeys().forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
   }
+  // true = this account's data is now live. A brand-new account legitimately
+  // has no snapshot and a clean slate is the correct result, so that counts
+  // as success; only an unreadable or malformed one is a failure worth
+  // rolling back for.
   function restoreSnapshot(name){
+    var raw;
+    try{ raw = localStorage.getItem(SNAPSHOT_PREFIX + name); }
+    catch(e){ return false; }
+    if(raw === null || raw === '') return true;
+    var data;
+    try{ data = JSON.parse(raw); }
+    catch(e){ return false; }
+    if(!data || typeof data !== 'object') return false;
     try{
-      var raw = localStorage.getItem(SNAPSHOT_PREFIX + name);
-      if(!raw) return; // brand new account — nothing to restore, stays a clean slate
-      var data = JSON.parse(raw);
-      Object.keys(data).forEach(function(k){ localStorage.setItem(k, data[k]); });
-    }catch(e){}
+      Object.keys(data).forEach(function(k){
+        if(data[k] !== null && data[k] !== undefined){ localStorage.setItem(k, data[k]); }
+      });
+    }catch(e){ return false; }
+    return true;
   }
 
   function switchTo(name){
@@ -14824,10 +14873,21 @@ window.__livePrereqs = function(prefix, fallback){
     if(!name) return { ok: false, error: 'Please enter a name.' };
     var current = currentAccount();
     if(name === current) return { ok: false, error: 'That\u2019s already the current account.' };
-    snapshotCurrent(current);
+    // Save the account being left, and confirm it stuck, BEFORE touching
+    // anything. Nothing has been modified at this point, so bailing out here
+    // is completely safe \u2014 unlike bailing out after the wipe below.
+    if(!snapshotCurrent(current)){
+      return { ok: false, error: 'Couldn\u2019t save \u201c' + current + '\u201d before switching, so nothing was changed and your progress is exactly as it was. This device\u2019s storage is most likely full \u2014 export a backup from Settings, free some space, then try again.' };
+    }
     markAccountExists(current);
     clearLiveKeys();
-    restoreSnapshot(name);
+    if(!restoreSnapshot(name)){
+      // The target's saved data is damaged. Live storage is empty right now,
+      // so put back the account we just left rather than stranding them in
+      // an empty app with everything apparently gone.
+      restoreSnapshot(current);
+      return { ok: false, error: 'Couldn\u2019t open \u201c' + name + '\u201d \u2014 its saved data looks damaged, so you\u2019ve been left on \u201c' + current + '\u201d with everything intact.' };
+    }
     markAccountExists(name);
     try{ localStorage.setItem(CURRENT_KEY, name); }catch(e){}
     location.reload();
