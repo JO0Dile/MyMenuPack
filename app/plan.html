@@ -280,7 +280,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.2';
+window.APP_VERSION = '4.3';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2515,6 +2515,24 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     font-size:15px; line-height:1; cursor:pointer; padding:2px 5px; border-radius:6px;
   }
   .line-remove:hover{color:#ff5d5d;background:rgba(255,93,93,.12);}
+
+  /* ---- leftover data after a plan update ---- */
+  .orphan-plan{
+    border:1px solid var(--line); border-radius:10px; padding:10px;
+    margin-bottom:10px; background:var(--search-bg);
+  }
+  .orphan-plan-name{font-size:11.5px;font-weight:800;color:var(--text-dim);margin-bottom:8px;}
+  .orphan-item{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:7px 0; border-top:1px solid var(--line);
+  }
+  .orphan-plan .orphan-item:first-of-type{border-top:none;}
+  .orphan-text{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .orphan-text b{font-size:12.5px;color:var(--text);word-break:break-word;}
+  .orphan-kinds{font-size:11px;color:var(--text-dim);}
+  .orphan-keep,.orphan-remove{font-size:11.5px;padding:4px 12px;flex:0 0 auto;}
+  .orphan-remove{border-color:#ff5d5d;color:#ff8f8f;}
+  .orphan-remove:hover{background:rgba(255,93,93,.12);}
 
 
   .editing .course[id]{
@@ -14608,6 +14626,7 @@ window.__livePrereqs = function(prefix, fallback){
       (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
       (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
       '</div>' +
+      (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '') +
       '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'الحسابات' : 'Accounts') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + (r ? '\u0643\u0644 \u062d\u0633\u0627\u0628 \u064a\u062d\u062a\u0641\u0638 \u0628\u062e\u0637\u0637\u0647 \u0648\u062a\u0642\u062f\u0651\u0645\u0647 \u0648\u0645\u0639\u062f\u0651\u0644\u0647 \u0628\u0634\u0643\u0644 \u0645\u0646\u0641\u0635\u0644 \u2014 \u0645\u0641\u064a\u062f \u0625\u0630\u0627 \u0643\u0627\u0646 \u0623\u0643\u062b\u0631 \u0645\u0646 \u0634\u062e\u0635 \u064a\u0634\u0627\u0631\u0643 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u060c \u0623\u0648 \u0623\u0631\u062f\u062a \u0645\u0644\u0641\u064b\u0627 \u0634\u062e\u0635\u064a\u064b\u0627 \u062b\u0627\u0646\u064a\u064b\u0627.' : 'Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.') + '</p>' +
       '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
@@ -14626,6 +14645,9 @@ window.__livePrereqs = function(prefix, fallback){
       '<p class="form-note" style="text-align:center;opacity:.6;">v' + (window.APP_VERSION || '?') + ' \u00b7 ' + (r ? '\u0645\u0634\u0631\u0648\u0639 \u0637\u0644\u0627\u0628\u064a \u0645\u0641\u062a\u0648\u062d' : 'an open student project') + '</p>';
 
     document.getElementById('setClose').addEventListener('click', function(){ document.getElementById('devModalOverlay').classList.remove('open'); });
+    if(window.AAUP_ORPHANS){
+      window.AAUP_ORPHANS.bindSection(body, function(){ renderSettingsBody(body); });
+    }
     document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
     if(document.getElementById('setLangBtn')){
       document.getElementById('setLangBtn').addEventListener('click', function(){
@@ -14835,6 +14857,230 @@ window.__livePrereqs = function(prefix, fallback){
     listAccounts: listAccounts, currentAccount: currentAccount,
     switchTo: switchTo, createAccount: createAccount, deleteAccount: deleteAccount
   };
+})();
+
+// ==========================
+// LEFTOVER DATA AFTER A PLAN UPDATE
+// ==========================
+// Plans get corrected over time — a course is renamed, re-coded, split, or
+// dropped. When that happens, anything the student already recorded against
+// the OLD course (a grade, a note, assessment marks, a named elective) would
+// otherwise point at a course that no longer exists.
+//
+// The rule here is: never delete it silently. It stays in storage exactly as
+// they left it, and instead they get told — what it was, which plan it
+// belonged to, and that it's theirs to keep, remove, or re-enter against
+// whatever replaced it. Deleting a student's own record because the app
+// changed underneath them is the one outcome this must never produce.
+(function(){
+  var DISMISS_KEY = 'aaup_orphanDismissed';
+
+  // Every store keyed by a full course id (prefix-c-slug). Kept as data so a
+  // future per-course store is one line, not a new code path to remember.
+  function pidStores(){
+    var stores = [
+      { key: 'aaup_grades',              en: 'grade',                  ar: 'علامة' },
+      { key: 'aaup_courseStatus',        en: 'planning status',        ar: 'حالة تخطيط' },
+      { key: 'aaup_ratings',             en: 'difficulty/workload',    ar: 'تقييم الصعوبة' },
+      { key: 'aaup_notes',               en: 'personal note',          ar: 'ملاحظة شخصية' },
+      { key: 'aaup_customNames',         en: 'elective you named',     ar: 'اسم مادة اختيارية' },
+      { key: 'aaup_removedCourses',      en: 'removed-from-plan mark', ar: 'مساق مُزال' },
+      { key: 'aaup_assessmentBreakdown', en: 'assessment marks',       ar: 'علامات التقييم' },
+      { key: 'aaup_passMarkOverride',    en: 'pass-mark setting',      ar: 'إعداد علامة النجاح' }
+    ];
+    if(window.__PROGRESS_STORAGE_KEY){
+      stores.unshift({ key: window.__PROGRESS_STORAGE_KEY, en: 'completed tick', ar: 'إشارة الإكمال' });
+    }
+    return stores;
+  }
+
+  function readMap(key){
+    try{ return JSON.parse(localStorage.getItem(key) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function writeMap(key, m){
+    try{ localStorage.setItem(key, JSON.stringify(m)); }catch(e){}
+  }
+
+  // A plan only gets judged once it has actually registered its courses.
+  // A feed plan that simply hasn't synced yet must never have its data
+  // called "leftover" — that's the false positive that would cause exactly
+  // the data loss this module exists to prevent.
+  function knownPlans(){
+    var out = {};
+    Object.keys(window.__PLAN_DATA || {}).forEach(function(prefix){
+      var info = (window.__PLAN_DATA[prefix] || {}).courseInfo;
+      if(info && Object.keys(info).length){ out[prefix] = info; }
+    });
+    return out;
+  }
+
+  function loadDismissed(){ return readMap(DISMISS_KEY); }
+  function saveDismissed(m){ writeMap(DISMISS_KEY, m); }
+
+  // Groups every orphaned entry by the course it belonged to, so the student
+  // sees "Calculus I — grade, note, assessment marks" rather than eight
+  // separate rows for one course.
+  function scan(){
+    var plans = knownPlans();
+    var byPid = {};
+    pidStores().forEach(function(store){
+      var m = readMap(store.key);
+      Object.keys(m).forEach(function(pid){
+        var parts = window.__splitCourseId ? window.__splitCourseId(pid) : null;
+        if(!parts) return;
+        var info = plans[parts.prefix];
+        if(!info) return;              // plan not loaded — say nothing
+        if(info[parts.slug]) return;   // course still exists — fine
+        if(!byPid[pid]){
+          byPid[pid] = { pid: pid, prefix: parts.prefix, slug: parts.slug, kinds: [], values: {} };
+        }
+        byPid[pid].kinds.push(store);
+        byPid[pid].values[store.key] = m[pid];
+      });
+    });
+    var dismissed = loadDismissed();
+    return Object.keys(byPid).map(function(pid){
+      var o = byPid[pid];
+      o.dismissed = !!dismissed[pid];
+      return o;
+    }).sort(function(a, b){ return a.pid.localeCompare(b.pid); });
+  }
+
+  function activeCount(){
+    return scan().filter(function(o){ return !o.dismissed; }).length;
+  }
+
+  // "Keep" — stop nagging about it, but change nothing in storage. The data
+  // stays exactly where it was and still exports with everything else.
+  function keep(pid){
+    var d = loadDismissed();
+    d[pid] = true;
+    saveDismissed(d);
+  }
+  function keepAll(){
+    var d = loadDismissed();
+    scan().forEach(function(o){ d[o.pid] = true; });
+    saveDismissed(d);
+  }
+
+  // "Remove" — only ever on an explicit click, and only for this one course.
+  function remove(pid){
+    pidStores().forEach(function(store){
+      var m = readMap(store.key);
+      if(pid in m){ delete m[pid]; writeMap(store.key, m); }
+    });
+    var d = loadDismissed();
+    delete d[pid];
+    saveDismissed(d);
+  }
+
+  // A human label for something the app no longer has a course record for.
+  // The student's own name for it is the best hint available; otherwise the
+  // slug is shown, since that's all that's left of it.
+  function labelFor(o){
+    var names = readMap('aaup_customNames');
+    if(names[o.pid] && String(names[o.pid]).trim()) return String(names[o.pid]);
+    return o.slug;
+  }
+
+  function planLabel(prefix){
+    if(window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.planDisplayInfo){
+      try{ return window.AAUP_DASHBOARD.planDisplayInfo(prefix).name || prefix; }catch(e){}
+    }
+    return prefix;
+  }
+
+  // ---- Settings section ----
+  function sectionHtml(r){
+    var items = scan().filter(function(o){ return !o.dismissed; });
+    if(!items.length) return '';
+    var esc = window.__escapeHtml;
+    var byPlan = {};
+    items.forEach(function(o){ (byPlan[o.prefix] = byPlan[o.prefix] || []).push(o); });
+
+    return '<h3 style="margin-bottom:6px;">⚠️ ' + (r ? 'بيانات من نسخة أقدم من الخطة' : 'Data from an older version of your plan') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + (r
+        ? 'حدّثنا هذه الخطط، وبعض المساقات التي سجّلت عليها بيانات لم تعد موجودة فيها. لم نحذف شيئًا — بياناتك ما زالت محفوظة كما تركتها. راجعها: إمّا أن تبقيها، أو تزيلها، أو تُدخلها من جديد على المساق الذي حلّ محلّها.'
+        : 'These plans were updated, and some courses you recorded data against are no longer in them. Nothing was deleted — your data is still saved exactly as you left it. Review it: keep it, remove it, or re-enter it on whatever course replaced it.') + '</p>' +
+      Object.keys(byPlan).map(function(prefix){
+        return '<div class="orphan-plan">' +
+          '<div class="orphan-plan-name">' + esc(planLabel(prefix)) + '</div>' +
+          byPlan[prefix].map(function(o){
+            var kinds = o.kinds.map(function(k){ return r ? k.ar : k.en; }).join(r ? '، ' : ', ');
+            return '<div class="orphan-item">' +
+              '<div class="orphan-text">' +
+                '<b>' + esc(labelFor(o)) + '</b>' +
+                '<span class="orphan-kinds">' + esc(kinds) + '</span>' +
+              '</div>' +
+              '<button type="button" class="home-btn orphan-keep" data-pid="' + esc(o.pid) + '">' + (r ? 'إبقاء' : 'Keep') + '</button>' +
+              '<button type="button" class="home-btn orphan-remove" data-pid="' + esc(o.pid) + '">' + (r ? 'إزالة' : 'Remove') + '</button>' +
+              '</div>';
+          }).join('') +
+          '</div>';
+      }).join('') +
+      '<div class="form-actions" style="justify-content:flex-start;">' +
+        '<button type="button" class="home-btn" id="orphanKeepAll">' + (r ? 'إبقاء الكل وعدم التذكير' : 'Keep all, stop reminding me') + '</button>' +
+      '</div>';
+  }
+
+  // onChange re-renders the settings body so the list reflects the click.
+  function bindSection(root, onChange){
+    if(!root) return;
+    root.querySelectorAll('.orphan-keep').forEach(function(btn){
+      btn.addEventListener('click', function(){ keep(btn.getAttribute('data-pid')); onChange(); });
+    });
+    root.querySelectorAll('.orphan-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var pid = btn.getAttribute('data-pid');
+        var rtl = document.body.classList.contains('rtl-mode');
+        var msg = rtl
+          ? 'إزالة بياناتك المحفوظة لهذا المساق نهائيًا؟ لا يمكن التراجع عن هذا.'
+          : 'Permanently remove your saved data for this course? This can’t be undone.';
+        var doIt = function(){ remove(pid); onChange(); };
+        if(window.__showConfirmDialog){ window.__showConfirmDialog(msg, doIt, rtl); }
+        else { doIt(); }
+      });
+    });
+    var all = root.querySelector('#orphanKeepAll');
+    if(all){ all.addEventListener('click', function(){ keepAll(); onChange(); }); }
+  }
+
+  // Sitting quietly in Settings isn't enough — a student who doesn't go
+  // looking would never learn their old records are stranded. One toast per
+  // session (not per page view), offering the way straight to the review.
+  var announced = false;
+  function announce(){
+    if(announced) return;
+    var n = activeCount();
+    if(!n) return;
+    announced = true;
+    var rtl = document.body.classList.contains('rtl-mode');
+    var msg = rtl
+      ? ('⚠️ لديك بيانات على ' + n + ' مساق لم تعد موجودة في خطتك المحدّثة — لم نحذف شيئًا.')
+      : ('⚠️ You have saved data on ' + n + ' course' + (n === 1 ? '' : 's') + ' that your updated plan no longer has — nothing was deleted.');
+    var label = rtl ? 'مراجعة' : 'Review';
+    var openSettings = function(){
+      if(window.AAUP_SIDEBAR && window.AAUP_SIDEBAR.openSettings){ window.AAUP_SIDEBAR.openSettings(); }
+    };
+    if(window.__showActionToast){ window.__showActionToast(msg, label, openSettings); }
+    else if(window.__showToast){ window.__showToast(msg); }
+  }
+
+  window.AAUP_ORPHANS = {
+    scan: scan, activeCount: activeCount,
+    keep: keep, keepAll: keepAll, remove: remove,
+    labelFor: labelFor, planLabel: planLabel,
+    sectionHtml: sectionHtml, bindSection: bindSection,
+    announce: announce
+  };
+
+  // Deferred: plans register their courses during load, and retakes replay
+  // after that — scanning too early would flag courses that are about to
+  // exist.
+  function init(){ setTimeout(announce, 2500); }
+  if(document.readyState === 'complete'){ init(); }
+  else { window.addEventListener('load', init); }
 })();
 
 // ==========================
