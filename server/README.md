@@ -5,15 +5,16 @@ prerequisites, student progress, and developer imports.
 
 ## Status
 
-Skeleton. The HTTP layer, config validation, and error handling are in place
-and tested; feature modules land next in this order:
-
 - [x] Database schema (`prisma/schema.prisma`)
 - [x] Folder structure + bootable Express app
+- [x] University + major + course read APIs (`web/` runs on these alone —
+      no hardcoded plan data anywhere in the frontend)
 - [ ] Authentication (register / login / refresh / roles)
-- [ ] University + major + course APIs
 - [ ] Import system (validate / apply, versioned)
-- [ ] Progress + prerequisite engine
+- [ ] Progress + prerequisite write APIs (student-side edit-mode corrections
+      currently live client-side only, in `web/src/js/editmode.js`, the same
+      way the old `app/plan.html` kept them — this becomes a real sync
+      endpoint once auth exists)
 
 ## Running it
 
