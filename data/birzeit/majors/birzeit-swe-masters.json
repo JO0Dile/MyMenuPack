@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "birzeit-swe-masters",
+  "name": "Software Engineering (MScSE)",
+  "nameAr": null,
+  "subtitle": "🚧 Study plan coming soon · 36 CH",
+  "subtitleAr": null,
+  "icon": "💻",
+  "bio": "Master's program preparing professional software engineers, entrepreneurs and leaders able to develop competitive, reliable solutions and contribute to the software industry in Palestine. 36 credit hours: 18 CH compulsory courses, 12 CH electives, plus 6 CH either Thesis (Path A) or two Seminars (Path B). Up to 9 CH of remedial courses (Statistics, Advanced Programming, Data Structure, Database Management Systems) may also apply. 🚧 Per-course credit hours and semester placement weren't given, so the interactive study plan isn't available yet.",
+  "bioAr": null,
+  "university": "birzeit",
+  "college": "birzeit-cs",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}

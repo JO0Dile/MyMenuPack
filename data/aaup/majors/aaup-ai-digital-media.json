@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "aaup-ai-digital-media",
+  "name": "AI and Digital Media",
+  "nameAr": null,
+  "subtitle": "🚧 No Academic Plan available yet",
+  "subtitleAr": null,
+  "icon": "🎓",
+  "bio": "Merges AI (machine learning, computer vision, natural language processing) with digital media — graphic design, digital storytelling and multimedia production — to build AI-driven recommendation systems, interactive media content, and consumption-pattern analytics. 🚧 The department has not published an academic plan for this program yet.",
+  "bioAr": null,
+  "university": "aaup",
+  "college": "aaup-ai-ds",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}

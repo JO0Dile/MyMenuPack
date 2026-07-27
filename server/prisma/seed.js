@@ -30,6 +30,8 @@ async function seedUniversity(slug) {
       slug: uni.slug,
       name: uni.name,
       nameAr: uni.nameAr ?? null,
+      shortName: uni.shortName ?? null,
+      icon: uni.icon ?? null,
       // The extractor deliberately left these null rather than guessing them;
       // '' would be a fabricated value, so null is carried through as-is.
       country: uni.country ?? 'Unknown',
@@ -40,9 +42,28 @@ async function seedUniversity(slug) {
     update: {
       name: uni.name,
       nameAr: uni.nameAr ?? null,
+      shortName: uni.shortName ?? null,
+      icon: uni.icon ?? null,
       website: uni.website ?? null,
     },
   });
+
+  // ---- colleges ----
+  const collegeIdBySlug = new Map();
+  for (const c of uni.colleges ?? []) {
+    const college = await prisma.college.upsert({
+      where: { universityId_slug: { universityId: university.id, slug: c.slug } },
+      create: {
+        universityId: university.id,
+        slug: c.slug,
+        name: c.name,
+        nameAr: c.nameAr ?? null,
+        icon: c.icon ?? null,
+      },
+      update: { name: c.name, nameAr: c.nameAr ?? null, icon: c.icon ?? null },
+    });
+    collegeIdBySlug.set(c.slug, college.id);
+  }
 
   // ---- grading scales ----
   let rules = { gradingScales: [] };
@@ -91,20 +112,32 @@ async function seedUniversity(slug) {
       where: { universityId_slug: { universityId: university.id, slug: m.slug } },
       create: {
         universityId: university.id,
+        collegeId: collegeIdBySlug.get(m.college) ?? null,
         slug: m.slug,
         name: m.name,
         nameAr: m.nameAr ?? null,
+        subtitle: m.subtitle ?? null,
+        subtitleAr: m.subtitleAr ?? null,
+        icon: m.icon ?? null,
+        bio: m.bio ?? null,
+        bioAr: m.bioAr ?? null,
         department: m.college ?? null,
-        // degreeHours is null in the extract on purpose (the credit sum counts
-        // pool electives a student never all takes). 0 marks "not yet known"
-        // rather than inventing a requirement.
-        degreeHours: m.degreeHours ?? 0,
+        // Stays null until the real total is read off the official PDF — the
+        // credit sum here counts pool electives no student takes all of.
+        degreeHours: m.degreeHours ?? null,
         gradingScaleId: scaleId,
       },
       update: {
+        collegeId: collegeIdBySlug.get(m.college) ?? null,
         name: m.name,
         nameAr: m.nameAr ?? null,
+        subtitle: m.subtitle ?? null,
+        subtitleAr: m.subtitleAr ?? null,
+        icon: m.icon ?? null,
+        bio: m.bio ?? null,
+        bioAr: m.bioAr ?? null,
         department: m.college ?? null,
+        degreeHours: m.degreeHours ?? null,
         gradingScaleId: scaleId,
       },
     });
