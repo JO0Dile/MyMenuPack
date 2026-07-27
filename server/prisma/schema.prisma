@@ -92,9 +92,14 @@ enum CourseCategory {
 }
 
 model Course {
-  id             String         @id @default(cuid())
-  majorId        String
-  code           String // official catalog number, e.g. "290311110"
+  id      String @id @default(cuid())
+  majorId String
+  // Identity WITHIN the plan. This is the unique one, not `code`: a lecture
+  // and its lab are two separate rows of the study plan that share a single
+  // catalog number (Introduction to CS and its lab are both 290311110), so
+  // keying on code alone silently collapses them into one course.
+  slug    String
+  code    String? // official catalog number; null for generic elective slots
   name           String
   nameAr         String?
   credits        Decimal        @db.Decimal(4, 2)
@@ -117,7 +122,9 @@ model Course {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([majorId, code])
+  @@unique([majorId, slug])
+  // Non-unique on purpose — see the note on `slug` above.
+  @@index([majorId, code])
   @@index([majorId, year, semester])
 }
 

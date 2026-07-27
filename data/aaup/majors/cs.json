@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "slug": "cs",
-  "name": "Computer ScienceDepartment",
-  "nameAr": null,
+  "name": "Computer Science Department",
+  "nameAr": "قسم علم الحاسوب",
   "university": "aaup",
   "college": "aaup-it",
   "degreeHours": null,

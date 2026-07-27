@@ -77,14 +77,22 @@ EXTRACT_JS = r"""
     };
   });
 
+  // The second line of a title is an <em> that CSS renders as display:block
+  // ("Artificial Intelligence and<em>Robotics</em>"), so it is a visual line
+  // break with no whitespace in the markup. textContent would concatenate it
+  // into "...andRobotics". Every tag becomes a space before stripping.
+  const readTitle = (el) => el
+    ? el.innerHTML.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+    : null;
   const titleEl = page.querySelector('.title-block .en');
-  const titleAr = page.querySelector('.title-block .ar');
   const card = document.querySelector('.plan-card[data-page="' + prefix + '"]');
 
   return {
     prefix,
-    name: titleEl ? titleEl.textContent.trim() : prefix,
-    nameAr: titleAr ? titleAr.textContent.trim() : null,
+    name: readTitle(titleEl) || prefix,
+    // The plan page renders only the English title; the Arabic one lives on
+    // the Home plan card, which is the sole place it exists in the source.
+    nameAr: card ? card.getAttribute('data-search-ar') : null,
     university: card ? card.getAttribute('data-university') : null,
     college: card ? card.getAttribute('data-college') : null,
     courseInfo: info,

@@ -7,6 +7,10 @@ import rateLimit from 'express-rate-limit';
 import config from './config/env.js';
 import AppError from './lib/AppError.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+import universityRoutes from './modules/universities/university.routes.js';
+import majorRoutes from './modules/majors/major.routes.js';
+import { byUniversity } from './modules/majors/major.controller.js';
+import asyncRoute from './middleware/asyncRoute.js';
 
 export function createApp() {
   const app = express();
@@ -54,10 +58,14 @@ export function createApp() {
     res.json({ status: 'ok', uptime: process.uptime(), env: config.nodeEnv });
   });
 
-  // Feature modules mount here as they are built:
+  app.use('/api/universities', universityRoutes);
+  // Nested read: a university's majors. Mounted here rather than inside the
+  // universities module so the majors module keeps sole ownership of its shape.
+  app.get('/api/universities/:slug/majors', asyncRoute(byUniversity));
+  app.use('/api/majors', majorRoutes);
+
+  // Still to come:
   //   app.use('/api/auth', authRoutes);
-  //   app.use('/api/universities', universityRoutes);
-  //   app.use('/api/majors', majorRoutes);
   //   app.use('/api/me/progress', progressRoutes);
   //   app.use('/api/import', importRoutes);
 
