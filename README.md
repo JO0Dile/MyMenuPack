@@ -98,6 +98,15 @@ roadmap below; until then, this is the path.
 
 ---
 
+## 🌐 Hosting it online
+
+Running it locally is for development. To put it on the internet — so
+people don't need to clone the repo and start two servers themselves — see
+**[DEPLOY.md](DEPLOY.md)**: a free stack (Neon for Postgres, Render for the
+API, GitHub Pages for the frontend), no credit card required.
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] University, major, course, and prerequisite data in PostgreSQL —
