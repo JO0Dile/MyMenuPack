@@ -56,6 +56,20 @@ model University {
   @@index([slug])
 }
 
+// Fingerprint of the last successful seed.
+//
+// The seed used to run on every deploy. Render keeps the previous container
+// serving while the new one boots, so that rewrote the shared database
+// underneath a running server built against the OLD schema — which is how a
+// nullable degreeHours turned into 500s on /majors and half-seeded counts on
+// the home screen. Seeding now only happens when data/ has actually changed,
+// so an ordinary redeploy touches nothing.
+model SeedState {
+  id          String   @id @default("singleton")
+  fingerprint String
+  seededAt    DateTime @updatedAt
+}
+
 // The University -> College -> Plan layer the home screen drills through.
 // A college with no plans yet is still a real college and still renders, so
 // the full shape of a university can exist before every plan has been

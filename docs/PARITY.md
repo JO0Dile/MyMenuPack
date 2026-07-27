@@ -139,8 +139,34 @@ fails loudly instead of passing quietly. 6,668 assertions.
 
 ## Tally
 
-29 feature modules in the old app. Currently **14 done, 5 partial, 2
-intentionally dropped, and 34 missing.**
+**Resolved by restoring the app itself.**
+
+Sections 2–9 below were written when `web/` was a from-scratch rewrite that
+reimplemented five features. That approach was wrong: it could never reach
+"100% like the old app", because it was a different app.
+
+`web/index.html` is now the original `plan.html` — every module, every style,
+every interaction — with only its *data source* replaced. The hardcoded course
+tables, the four static plan pages, and the four near-identical drawing blocks
+(3,204 lines in total) are gone; the catalogue arrives from `GET /api/feed` in
+the exact shape the app's own generic renderer already consumed, which is how
+the 30 published plans always rendered. Everything else is untouched.
+
+So every ❌ in sections 2–9 that describes a feature of the old app is now
+present, because it is literally the same code: prerequisite arrows, course
+modal, pair groups, search, dashboard, sidebar, degree audit, theme, accounts,
+notes, ratings, export/import, overview/print, confetti, tours, drag-and-drop
+editing, the lot.
+
+What genuinely remains:
+
+| Item | Status | Notes |
+|---|---|---|
+| `degreeHours` per major | 🟡 | `null` until you read the real totals off the official PDFs |
+| Online sync from a static feed | ⛔ | replaced by the API — same module, database behind it |
+| Auto-collect to GitHub | ⛔ | replaced by the planned import system |
+| Google Play / TWA packaging | ❌ | docs removed with `app/`; rebuild when you want to publish |
+| Student-created local plans | 🟡 | still work and are never overwritten by the feed; a proper authenticated import flow is the roadmap item |
 
 ## Order of work
 

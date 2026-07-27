@@ -10,6 +10,7 @@
 // so incremental reconciliation would leak orphaned groups over time; deleting
 // a major's groups and re-creating them is both simpler and exactly correct.
 import { readFile, readdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PrismaClient } from '@prisma/client';
@@ -217,7 +218,33 @@ async function seedUniversity(slug) {
   return counts;
 }
 
+// Hash of every file under data/. If it matches the last successful seed,
+// there is nothing to do — see the SeedState model for why that matters.
+async function fingerprintData() {
+  const hash = createHash('sha256');
+  const walk = async (dir) => {
+    for (const entry of (await readdir(dir, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else if (entry.name.endsWith('.json')) {
+        hash.update(entry.name);
+        hash.update(await readFile(full));
+      }
+    }
+  };
+  await walk(DATA);
+  return hash.digest('hex');
+}
+
 async function main() {
+  const fingerprint = await fingerprintData();
+  const previous = await prisma.seedState.findUnique({ where: { id: 'singleton' } });
+  if (previous?.fingerprint === fingerprint && !process.env.FORCE_SEED) {
+    console.log(`data/ unchanged since ${previous.seededAt.toISOString()} — nothing to seed.`);
+    console.log('Set FORCE_SEED=1 to re-seed anyway.');
+    return;
+  }
+
   const index = await readJson(path.join(DATA, 'universities.json'));
   const totals = { universities: 0, majors: 0, courses: 0, prereqs: 0 };
 
@@ -229,6 +256,12 @@ async function main() {
     totals.courses += c.courses;
     totals.prereqs += c.prereqs;
   }
+
+  await prisma.seedState.upsert({
+    where: { id: 'singleton' },
+    create: { id: 'singleton', fingerprint },
+    update: { fingerprint },
+  });
 
   console.log(
     `\nSeeded ${totals.universities} universities, ${totals.majors} majors, ` +

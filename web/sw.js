@@ -1,16 +1,15 @@
-// Service worker for the hosted app shell only. Deliberately does NOT cache
-// anything under /api/ — course, prerequisite, and grading data must always
-// come from the database live; caching it here would silently reintroduce
-// the "stale hardcoded data" problem this whole migration exists to remove.
-var CACHE = 'studyplan-shell-v1';
+// Service worker for the hosted app.
+//
+// The app itself is one self-contained file, so the shell is just that plus
+// the icons. Deliberately does NOT cache anything under /api/ — the catalogue
+// must always come from the database live; caching it here would reintroduce
+// exactly the stale-embedded-data problem this architecture removes.
+var CACHE = 'studyplan-shell-v2';
 var CORE = [
-  './index.html', './manifest.json', './src/css/style.css', './src/js/config.js',
-  './src/js/app.js', './src/js/api.js', './src/js/store.js',
-  './src/js/prerequisites.js', './src/js/gpa.js', './src/js/assessment.js',
-  './src/js/i18n.js', './src/js/achievements.js', './src/js/editmode.js',
+  './index.html', './manifest.json',
   './assets/icons/icon-any.svg',
   './assets/icons/icon-any-192.png', './assets/icons/icon-any-384.png', './assets/icons/icon-any-512.png',
-  './assets/icons/icon-maskable-192.png', './assets/icons/icon-maskable-384.png', './assets/icons/icon-maskable-512.png',
+  './assets/icons/icon-maskable-192.png', './assets/icons/icon-maskable-384.png', './assets/icons/icon-maskable-512.png'
 ];
 
 self.addEventListener('install', function (e) {
@@ -25,12 +24,9 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-// Stale-while-revalidate for the shell; the API is never intercepted here.
 self.addEventListener('fetch', function (e) {
   if (e.request.method !== 'GET') return;
-  var url = new URL(e.request.url);
-  if (url.pathname.includes('/api/')) return;
-
+  if (new URL(e.request.url).pathname.indexOf('/api/') !== -1) return;
   e.respondWith(
     caches.match(e.request).then(function (cached) {
       var fetched = fetch(e.request, { cache: 'no-store' }).then(function (resp) {
