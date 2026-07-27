@@ -79,3 +79,15 @@ main{padding:20px;max-width:1200px;margin:0 auto}
 .a-rev{margin:6px 0 0;font-size:10px;color:var(--ok)}
 .a-apply{margin-top:6px;background:var(--ok);border:none;border-radius:6px;
   padding:4px 8px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* Direction comes from dir="rtl" on <html>; these are logical properties so
+   the whole layout mirrors without a parallel RTL stylesheet. */
+.lang{margin-inline-start:auto;background:none;border:1px solid var(--line);
+  color:var(--dim);border-radius:999px;padding:4px 12px;font-size:12px;
+  cursor:pointer;font-family:inherit}
+.lang:hover{border-color:var(--accent);color:var(--text)}
+[dir="rtl"] .a-proj,[dir="rtl"] .a-add{direction:rtl}
+/* Marks stay left-to-right even in Arabic: "35/100" reversed reads as a
+   different number. */
+[dir="rtl"] .a-total,[dir="rtl"] .a-rev,[dir="rtl"] .course-meta,
+[dir="rtl"] .summary{unicode-bidi:plaintext}

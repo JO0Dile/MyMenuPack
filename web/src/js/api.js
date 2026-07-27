@@ -3,6 +3,8 @@
 // Everything the UI renders comes from here — there is no course, major, or
 // prerequisite data anywhere else in this frontend. That is the whole point of
 // the refactor: adding a university must never mean editing JavaScript.
+import { i18n } from './i18n.js';
+
 const BASE = window.__API_BASE__ || 'http://localhost:4010/api';
 
 class ApiError extends Error {
@@ -23,7 +25,7 @@ async function request(path, options = {}) {
   } catch (cause) {
     // fetch only rejects on a genuine network failure, which is a different
     // problem from a 4xx and deserves a different message to the student.
-    throw new ApiError(0, 'Could not reach the server. Check your connection.', { cause });
+    throw new ApiError(0, i18n.t.netError, { cause });
   }
 
   const body = await res.json().catch(() => null);

@@ -26,6 +26,9 @@ function shapeCourse(c) {
         slug: o.requiredCourse.slug,
         code: o.requiredCourse.code,
         name: o.requiredCourse.name,
+        // Required for an Arabic UI to name the blocking course in Arabic.
+        // Without it "Needs: ..." silently falls back to English mid-sentence.
+        nameAr: o.requiredCourse.nameAr,
       })),
     })),
   };
