@@ -9,6 +9,7 @@ import AppError from './lib/AppError.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 import universityRoutes from './modules/universities/university.routes.js';
 import majorRoutes from './modules/majors/major.routes.js';
+import feedRoutes from './modules/feed/feed.routes.js';
 import { byUniversity } from './modules/majors/major.controller.js';
 import asyncRoute from './middleware/asyncRoute.js';
 
@@ -63,6 +64,9 @@ export function createApp() {
   // universities module so the majors module keeps sole ownership of its shape.
   app.get('/api/universities/:slug/majors', asyncRoute(byUniversity));
   app.use('/api/majors', majorRoutes);
+
+  // The entire catalogue in the shape the app's own renderer consumes.
+  app.use('/api/feed', feedRoutes);
 
   // Still to come:
   //   app.use('/api/auth', authRoutes);
