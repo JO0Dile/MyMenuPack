@@ -4,6 +4,7 @@ import { isAvailable, missingFor, summarise } from './prerequisites.js';
 import { makeScale, computeGpa, earnedCredits, formatGpa } from './gpa.js';
 import * as assess from './assessment.js';
 import { i18n } from './i18n.js';
+import * as ach from './achievements.js';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -131,6 +132,8 @@ function renderPlan() {
     groups.get(key).push(c);
   }
 
+  renderAchievements(records);
+
   const grid = $('#grid');
   grid.replaceChildren();
   const keys = [...groups.keys()].sort((a, b) => {
@@ -204,6 +207,43 @@ function courseCard(c, done) {
     card.appendChild(breakdown(c, sel.value));
   }
   return card;
+}
+
+// ---------- achievements ----------
+// Collapsed by default: a student opening their plan wants the plan, not a
+// trophy cabinet. The header count is enough to draw them in.
+function renderAchievements(records) {
+  const list = ach.compute(state.courses, records, state.scale, i18n.t);
+  const { unlocked, total } = ach.summary(list);
+
+  const host = $('#achievements');
+  host.replaceChildren();
+  const box = el('details', 'ach-box');
+  const sum = el('summary', null,
+    `${i18n.t.achievements} — ${i18n.t.achCount(unlocked, total)}`);
+  box.appendChild(sum);
+
+  const wrap = el('div', 'ach-grid');
+  // Unlocked first, then the closest to completion — so the next realistic
+  // goal is visible rather than buried among ones barely started.
+  const ordered = [...list].sort((a, b) =>
+    (b.done - a.done) || (b.progress - a.progress));
+  for (const a of ordered) {
+    const card = el('div', 'ach' + (a.done ? ' unlocked' : ''));
+    card.appendChild(el('span', 'ach-icon', a.icon));
+    const body = el('div', 'ach-body');
+    body.appendChild(el('div', 'ach-title', a.title));
+    const barTrack = el('div', 'ach-bar');
+    const barFill = el('div', 'ach-bar-fill');
+    barFill.style.width = `${Math.round(a.progress * 100)}%`;
+    barTrack.appendChild(barFill);
+    body.appendChild(barTrack);
+    body.appendChild(el('div', 'ach-detail', a.detail));
+    card.appendChild(body);
+    wrap.appendChild(card);
+  }
+  box.appendChild(wrap);
+  host.appendChild(box);
 }
 
 // ---------- assessment breakdown ----------
