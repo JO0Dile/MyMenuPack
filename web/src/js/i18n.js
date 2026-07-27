@@ -53,6 +53,22 @@ const STRINGS = {
     langButton: 'العربية',
     netError: 'Could not reach the server. Check your connection.',
     genericError: 'Something went wrong.',
+    achievements: 'Achievements',
+    achCount: (u, t) => `${u} of ${t} unlocked`,
+    categories: {
+      CORE: 'Core', MATH: 'Math', DEPARTMENT_ELECTIVE: 'Department electives',
+      UNIVERSITY_ELECTIVE: 'University electives', FREE_ELECTIVE: 'Free electives',
+      UNIVERSITY_REQUIREMENT: 'University requirements', ENGLISH: 'English',
+    },
+    ach: {
+      firstCourse: 'First course passed',
+      creditShare: (p) => `${p}% of credit hours`,
+      allSemesters: 'Every semester complete',
+      allYears: 'Every year complete',
+      category: (name) => `All ${name} complete`,
+      gpaAtLeast: (v) => `GPA ${v} or above`,
+      topGrades: (letter, n) => `${n} courses at ${letter}`,
+    },
   },
   ar: {
     brand: 'خطتي الدراسية',
@@ -91,6 +107,23 @@ const STRINGS = {
     langButton: 'English',
     netError: 'تعذّر الوصول إلى الخادم. تحقّق من اتصالك.',
     genericError: 'حدث خطأ ما.',
+    achievements: 'الإنجازات',
+    achCount: (u, t) => `${u} من ${t}`,
+    categories: {
+      CORE: 'متطلبات التخصص', MATH: 'الرياضيات',
+      DEPARTMENT_ELECTIVE: 'اختياري التخصص', UNIVERSITY_ELECTIVE: 'اختياري جامعي',
+      FREE_ELECTIVE: 'اختياري حر', UNIVERSITY_REQUIREMENT: 'متطلبات الجامعة',
+      ENGLISH: 'اللغة الإنجليزية',
+    },
+    ach: {
+      firstCourse: 'أول مساق ناجح',
+      creditShare: (p) => `${p}٪ من الساعات المعتمدة`,
+      allSemesters: 'إتمام كل الفصول',
+      allYears: 'إتمام كل السنوات',
+      category: (name) => `إتمام ${name}`,
+      gpaAtLeast: (v) => `معدل ${v} فأعلى`,
+      topGrades: (letter, n) => `${n} مساقات بعلامة ${letter}`,
+    },
   },
 };
 
