@@ -3,6 +3,7 @@ import { store } from './store.js';
 import { isAvailable, missingFor, summarise } from './prerequisites.js';
 import { makeScale, computeGpa, earnedCredits, formatGpa } from './gpa.js';
 import * as assess from './assessment.js';
+import { i18n } from './i18n.js';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -23,11 +24,11 @@ function setStatus(msg, kind = 'info') {
 
 async function guard(fn) {
   try {
-    setStatus('Loading…');
+    setStatus(i18n.t.loading);
     await fn();
     setStatus('');
   } catch (e) {
-    const msg = e instanceof ApiError ? e.message : 'Something went wrong.';
+    const msg = e instanceof ApiError ? e.message : i18n.t.genericError;
     setStatus(msg, 'error');
     console.error(e);
   }
@@ -40,16 +41,18 @@ async function showUniversities() {
     state.universities = await api.universities();
     const list = $('#list');
     list.replaceChildren();
-    $('#crumb').textContent = 'Universities';
+    $('#crumb').textContent = i18n.t.universities;
     $('#plan').hidden = true;
     list.hidden = false;
 
     for (const u of state.universities) {
       const card = el('button', 'card');
-      card.appendChild(el('div', 'card-title', u.name));
-      if (u.nameAr) card.appendChild(el('div', 'card-sub', u.nameAr));
-      card.appendChild(el('div', 'card-meta',
-        `${u._count.majors} major${u._count.majors === 1 ? '' : 's'}`));
+      card.appendChild(el('div', 'card-title', i18n.name(u)));
+      // The other language's name as a subtitle — useful when a student knows
+      // the institution by only one of them.
+      const alt = i18n.isRtl ? u.name : u.nameAr;
+      if (alt && alt !== i18n.name(u)) card.appendChild(el('div', 'card-sub', alt));
+      card.appendChild(el('div', 'card-meta', i18n.t.majorCount(u._count.majors)));
       card.addEventListener('click', () => showMajors(u));
       list.appendChild(card);
     }
@@ -61,17 +64,18 @@ async function showMajors(uni) {
     state.majors = await api.majors(uni.slug);
     const list = $('#list');
     list.replaceChildren();
-    $('#crumb').textContent = `Universities / ${uni.name}`;
+    $('#crumb').textContent = `${i18n.t.universities} / ${i18n.name(uni)}`;
 
     if (!state.majors.length) {
-      list.appendChild(el('p', 'empty', 'No majors published for this university yet.'));
+      list.appendChild(el('p', 'empty', i18n.t.noMajors));
       return;
     }
     for (const m of state.majors) {
       const card = el('button', 'card');
-      card.appendChild(el('div', 'card-title', m.name));
-      if (m.nameAr) card.appendChild(el('div', 'card-sub', m.nameAr));
-      card.appendChild(el('div', 'card-meta', `${m._count.courses} courses`));
+      card.appendChild(el('div', 'card-title', i18n.name(m)));
+      const altM = i18n.isRtl ? m.name : m.nameAr;
+      if (altM && altM !== i18n.name(m)) card.appendChild(el('div', 'card-sub', altM));
+      card.appendChild(el('div', 'card-meta', i18n.t.courseCount(m._count.courses)));
       card.addEventListener('click', () => showPlan(uni, m));
       list.appendChild(card);
     }
@@ -85,7 +89,8 @@ async function showPlan(uni, major) {
     state.major = full;
     state.scale = makeScale(full.gradingScale);
     state.courses = await api.courses(major.id);
-    $('#crumb').textContent = `Universities / ${uni.name} / ${major.name}`;
+    $('#crumb').textContent =
+      `${i18n.t.universities} / ${i18n.name(uni)} / ${i18n.name(major)}`;
     $('#list').hidden = true;
     $('#plan').hidden = false;
     renderPlan();
@@ -103,12 +108,11 @@ function renderPlan() {
 
   const head = $('#planHead');
   head.replaceChildren();
-  head.appendChild(el('h2', null, state.major.name));
-  head.appendChild(el('p', 'summary',
-    `${s.done}/${s.total} courses · ${earned}/${s.totalCredits} credit hours earned · ` +
-    `${s.percent}% · ${s.available} available now`));
+  head.appendChild(el('h2', null, i18n.name(state.major)));
+  head.appendChild(el('p', 'summary', i18n.t.summary(
+    s.done, s.total, earned, s.totalCredits, s.percent, s.available)));
   head.appendChild(el('p', 'summary gpa',
-    `GPA ${formatGpa(gpa)}` + (state.scale ? `  ·  ${state.scale.name}` : '')));
+    i18n.t.gpa(formatGpa(gpa)) + (state.scale ? `  ·  ${state.scale.name}` : '')));
   const bar = el('div', 'bar');
   const fill = el('div', 'bar-fill');
   fill.style.width = `${s.percent}%`;
@@ -133,13 +137,12 @@ function renderPlan() {
     const [ay, as] = a.split('-').map(Number), [by, bs] = b.split('-').map(Number);
     return ay - by || as - bs;
   });
-  const semName = { 1: 'First semester', 2: 'Second semester', 3: 'Summer' };
   for (const k of keys) {
     const [y, sem] = k.split('-').map(Number);
-    grid.appendChild(sectionFor(`Year ${y} — ${semName[sem] || 'Semester ' + sem}`,
-      groups.get(k), done));
+    grid.appendChild(sectionFor(
+      `${i18n.t.year(y)} — ${i18n.t.sem[sem] || i18n.t.semN(sem)}`, groups.get(k), done));
   }
-  if (pool.length) grid.appendChild(sectionFor('Elective pool', pool, done));
+  if (pool.length) grid.appendChild(sectionFor(i18n.t.electivePool, pool, done));
 }
 
 function sectionFor(title, courses, done) {
@@ -158,7 +161,7 @@ function courseCard(c, done) {
     `course cat-${c.category.toLowerCase()}` +
     (isDone ? ' done' : '') + (!isDone && !avail ? ' locked' : ''));
 
-  card.appendChild(el('div', 'course-name', c.name));
+  card.appendChild(el('div', 'course-name', i18n.name(c)));
   const meta = el('div', 'course-meta');
   if (c.code) meta.appendChild(el('span', 'code', c.code));
   meta.appendChild(el('span', 'cr', `${c.credits}H`));
@@ -167,13 +170,13 @@ function courseCard(c, done) {
   if (!isDone && !avail) {
     const blocked = missingFor(c, done);
     const note = el('div', 'blocked');
-    note.textContent = 'Needs: ' + blocked
-      .map((g) => g.anyOf.map((o) => o.name).join(' or '))
-      .join(' + ');
+    note.textContent = i18n.t.needs + blocked
+      .map((g) => g.anyOf.map((o) => i18n.name(o)).join(i18n.t.or))
+      .join(i18n.t.and);
     card.appendChild(note);
   }
 
-  const btn = el('button', 'tick', isDone ? '✓ Completed' : 'Mark complete');
+  const btn = el('button', 'tick', isDone ? i18n.t.completed : i18n.t.markComplete);
   btn.addEventListener('click', () => {
     store.toggle(c.id);
     renderPlan();   // availability cascades, so the whole plan re-renders
@@ -184,7 +187,7 @@ function courseCard(c, done) {
   // the major's own scale rather than a fixed list in this file.
   if (isDone && state.scale) {
     const sel = el('select', 'grade');
-    const blank = el('option', null, 'grade —');
+    const blank = el('option', null, i18n.t.gradeBlank);
     blank.value = '';
     sel.appendChild(blank);
     for (const letter of [...state.scale.letters, 'FA', 'W']) {
@@ -211,7 +214,7 @@ function breakdown(course, currentLetter) {
   const rows = store.rowsFor(course.id);
   const wrap = el('details', 'breakdown');
   const sum = el('summary', null,
-    rows.length ? `Marks (${assess.totals(rows).score}/100)` : 'Marks');
+    rows.length ? i18n.t.marksWith(assess.totals(rows).score) : i18n.t.marks);
   wrap.appendChild(sum);
 
   const list = el('div', 'rows');
@@ -219,11 +222,11 @@ function breakdown(course, currentLetter) {
     const line = el('div', 'arow');
     const label = el('input', 'a-label');
     label.value = r.label || '';
-    label.placeholder = 'Label';
+    label.placeholder = i18n.t.label;
     const score = el('input', 'a-num');
-    score.type = 'number'; score.value = r.score ?? ''; score.placeholder = 'got';
+    score.type = 'number'; score.value = r.score ?? ''; score.placeholder = i18n.t.got;
     const max = el('input', 'a-num');
-    max.type = 'number'; max.value = r.max ?? ''; max.placeholder = 'of';
+    max.type = 'number'; max.value = r.max ?? ''; max.placeholder = i18n.t.outOf;
     const del = el('button', 'a-del', '\u00d7');
 
     const save = () => {
@@ -249,7 +252,7 @@ function breakdown(course, currentLetter) {
 
   const add = el('div', 'a-add');
   for (const preset of [...assess.PRESETS, '']) {
-    const b = el('button', 'a-chip', '+ ' + (preset || 'Other'));
+    const b = el('button', 'a-chip', '+ ' + (i18n.t.presets[preset] ?? preset));
     b.addEventListener('click', () => {
       store.setRows(course.id, [...store.rowsFor(course.id), { label: preset, score: '', max: '' }]);
       renderPlan();
@@ -262,17 +265,16 @@ function breakdown(course, currentLetter) {
   if (t.any) {
     const done = assess.resolvedLetter(rows, state.scale);
     if (done) {
-      wrap.appendChild(el('p', 'a-total', `Total ${t.score}/100 \u2192 ${done}`));
-      const apply = el('button', 'a-apply', 'Use as my grade');
+      wrap.appendChild(el('p', 'a-total', i18n.t.totalIs(t.score, done)));
+      const apply = el('button', 'a-apply', i18n.t.useAsGrade);
       apply.addEventListener('click', () => { store.setGrade(course.id, done); renderPlan(); });
       wrap.appendChild(apply);
     } else {
-      wrap.appendChild(el('p', 'a-total',
-        `So far ${t.score}/100 \u2014 ${t.remaining} left for the final`));
+      wrap.appendChild(el('p', 'a-total', i18n.t.soFar(t.score, t.remaining)));
       const ul = el('ul', 'a-proj');
       for (const p of assess.projections(rows, state.scale)) {
-        const text = p.status === 'needs' ? `need ${p.needed}/${p.outOf}`
-          : p.status === 'secured' ? 'secured' : 'not reachable';
+        const text = p.status === 'needs' ? i18n.t.need(p.needed, p.outOf)
+          : p.status === 'secured' ? i18n.t.secured : i18n.t.unreachable;
         ul.appendChild(el('li', null, `${p.letter}: ${text}`));
       }
       wrap.appendChild(ul);
@@ -280,13 +282,28 @@ function breakdown(course, currentLetter) {
       const rev = assess.finalExamRange(rows, state.scale, currentLetter);
       if (rev) {
         wrap.appendChild(el('p', 'a-rev',
-          `With grade ${currentLetter}, your final was between ` +
-          `${rev.low}/${rev.outOf} and ${rev.high}/${rev.outOf}.`));
+          i18n.t.finalRange(currentLetter, rev.low, rev.high, rev.outOf)));
       }
     }
   }
   return wrap;
 }
 
+// Re-render in place on a language switch rather than reloading, so the
+// student stays exactly where they were in the plan.
+function applyLang() {
+  $('#brandText').textContent = i18n.t.brand;
+  $('#lang').textContent = i18n.t.langButton;
+}
+
 $('#home').addEventListener('click', showUniversities);
+$('#lang').addEventListener('click', () => {
+  i18n.toggle();
+  applyLang();
+  if (!$('#plan').hidden) renderPlan();
+  else if (state.majors.length && $('#crumb').textContent.includes('/')) showUniversities();
+  else showUniversities();
+});
+
+applyLang();
 showUniversities();
