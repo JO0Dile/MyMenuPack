@@ -38,12 +38,15 @@ model University {
   slug        String  @unique // stable public identifier used in URLs: "aaup"
   name        String
   nameAr      String?
+  shortName   String? // "AAUP" — what students actually call it
+  icon        String? // emoji shown on the picker; deliberately not a country flag
   country     String
   logoUrl     String?
   website     String?
   description String?
 
   majors        Major[]
+  colleges      College[]
   gradingScales GradingScale[]
   imports       ImportBatch[]
 
@@ -53,18 +56,50 @@ model University {
   @@index([slug])
 }
 
+// The University -> College -> Plan layer the home screen drills through.
+// A college with no plans yet is still a real college and still renders, so
+// the full shape of a university can exist before every plan has been
+// transcribed — that emptiness is information, not an error.
+model College {
+  id           String  @id @default(cuid())
+  universityId String
+  slug         String // unique per university: "aaup-ai-ds"
+  name         String
+  nameAr       String?
+  icon         String?
+
+  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  majors     Major[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([universityId, slug])
+  @@index([universityId])
+}
+
 model Major {
   id             String  @id @default(cuid())
   universityId   String
+  collegeId      String?
   slug           String // unique per university, not globally: "robotics"
   name           String
   nameAr         String?
+  subtitle       String? // the smaller second line under the name on a plan card
+  subtitleAr     String?
+  icon           String?
+  bio            String? // short description shown on the plan card
+  bioAr          String?
   department     String?
-  degreeHours    Int
+  // Nullable because "not yet confirmed from the official PDF" is the honest
+  // state for most plans. 0 would read as a real degree requiring no hours,
+  // and any progress percentage built on it would be quietly wrong.
+  degreeHours    Int?
   description    String?
   gradingScaleId String?
 
   university   University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  college      College?      @relation(fields: [collegeId], references: [id], onDelete: SetNull)
   gradingScale GradingScale? @relation(fields: [gradingScaleId], references: [id], onDelete: SetNull)
   courses      Course[]
   enrollments  Enrollment[]

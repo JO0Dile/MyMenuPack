@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "birzeit-computer-science",
+  "name": "Computer Science",
+  "nameAr": null,
+  "subtitle": "🚧 Study plan coming soon · 129 CH",
+  "subtitleAr": null,
+  "icon": "💻",
+  "bio": "Provides students with up-to-date knowledge, skills and abilities in computer science and information technology, through comprehensive and continuously reviewed programs, research projects, and new tracks. 129 credit hours: University Req. 19-20, Faculty Req. 32, Program Req. 72 (49 compulsory + 23 elective across General/Serious-Gaming/Health-Informatics concentration tracks), Free Electives 5-6. 🚧 The department published course lists and prerequisites but not per-course credit hours or semester placement, so the interactive study plan isn't available yet — coming soon once that detail is confirmed.",
+  "bioAr": null,
+  "university": "birzeit",
+  "college": "birzeit-cs",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}

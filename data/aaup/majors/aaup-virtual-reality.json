@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "aaup-virtual-reality",
+  "name": "Virtual Reality Science",
+  "nameAr": null,
+  "subtitle": "🚧 No Academic Plan available yet",
+  "subtitleAr": null,
+  "icon": "🥽",
+  "bio": "Covers Virtual Reality, Augmented Reality and Mixed Reality — the technological devices used to create interactive environments, plus UI/UX design, 3D modeling and animation, and applying AI/ML methods within AR/VR. 🚧 The department has not published an academic plan for this program yet.",
+  "bioAr": null,
+  "university": "aaup",
+  "college": "aaup-ai-ds",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}

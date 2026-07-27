@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "aaup-respiratory",
+  "name": "Respiratory Therapy",
+  "nameAr": "العلاج التنفسي",
+  "subtitle": "🚧 Study plan coming soon",
+  "subtitleAr": "🚧 الخطة الدراسية قريبًا",
+  "icon": "🫁",
+  "bio": "B.Sc. in Respiratory Therapy (Jenin & Ramallah) — proposed to be the first respiratory therapy program in Palestine. Prepares practitioners to provide diagnostic, therapy, and rehabilitation services for clients with cardio-pulmonary disorders. 🚧 The study plan is not available yet — coming soon.",
+  "bioAr": "بكالوريوس في العلاج التنفسي (حرم جنين ورام الله) — يُقترح أن يكون أول برنامج علاج تنفسي في فلسطين. يُعِدّ ممارسين لتقديم خدمات التشخيص والعلاج وإعادة التأهيل لمرضى اضطرابات القلب والرئة. 🚧 الخطة الدراسية غير متوفرة بعد — قريبًا.",
+  "university": "aaup",
+  "college": "aaup-nursing",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}

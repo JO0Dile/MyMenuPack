@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "birzeit-cs-minor",
+  "name": "Minor in Computer Science",
+  "nameAr": null,
+  "subtitle": "🚧 Study plan coming soon · 22 CH",
+  "subtitleAr": null,
+  "icon": "💻",
+  "bio": "22 credit hours: 16 CH compulsory (Object-Oriented Programming, Data Structures, Database Management Systems, Web Application and Technology, Software Engineering) plus 6 CH of third/fourth-year Computer Science electives. 🚧 Per-course credit hours weren't given, so the interactive plan isn't available yet.",
+  "bioAr": null,
+  "university": "birzeit",
+  "college": "birzeit-cs",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}

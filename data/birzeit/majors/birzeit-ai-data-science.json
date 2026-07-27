@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "slug": "birzeit-ai-data-science",
+  "name": "AI and Data Science",
+  "nameAr": null,
+  "subtitle": "🚧 Study plan coming soon · 124 CH",
+  "subtitleAr": null,
+  "icon": "🤖",
+  "bio": "Prepares graduates to analyze data and design AI models and algorithms across domains, with an emphasis on ethics and social responsibility in AI. 124 credit hours: University Req. 19-20, Faculty Req. 16, Program Req. 85 (70 core + 15 elective, max 6 CH from 3rd/4th-year CS electives), Free Electives 3-4. 🚧 Course list and prerequisites were given but not per-course credit hours or semester placement, so the interactive study plan isn't available yet.",
+  "bioAr": null,
+  "university": "birzeit",
+  "college": "birzeit-cs",
+  "degreeHours": null,
+  "sourceVersion": 1,
+  "courses": [],
+  "prerequisites": []
+}
