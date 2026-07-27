@@ -107,3 +107,39 @@ main{padding:20px;max-width:1200px;margin:0 auto}
 .ach-bar-fill{height:100%;background:var(--accent);transition:width .25s}
 .ach.unlocked .ach-bar-fill{background:var(--ok)}
 .ach-detail{font-size:10px;color:var(--dim);unicode-bidi:plaintext}
+
+.edit-toggle-row{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+.edit-toggle{background:none;border:1px solid var(--accent);color:var(--accent);
+  border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit}
+.edit-toggle:hover{background:rgba(91,140,255,.12)}
+
+.move-label{display:block;margin-top:6px;font-size:10px;color:var(--dim)}
+.move-select{width:100%;margin-top:3px;background:rgba(0,0,0,.28);
+  border:1px solid var(--line);color:inherit;border-radius:6px;padding:4px;
+  font-size:11px;font-family:inherit}
+
+.edit-panel,.links-box{border:1px solid var(--line);border-radius:10px;
+  background:var(--panel);padding:10px 12px;margin-top:16px}
+.links-box summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--dim)}
+.edit-panel-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.edit-panel-label{font-size:12px;font-weight:700;min-width:64px}
+.edit-panel-note{font-size:10.5px;color:var(--dim);margin:8px 0 0}
+.edit-btn{background:none;border:1px dashed var(--line);color:var(--dim);
+  border-radius:8px;padding:4px 9px;font-size:11px;cursor:pointer;font-family:inherit}
+.edit-btn:hover{border-color:var(--accent);color:var(--text)}
+
+.links-add-row{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.links-add-row select{background:rgba(0,0,0,.28);border:1px solid var(--line);
+  color:inherit;border-radius:6px;padding:4px;font-size:11px;font-family:inherit;
+  flex:1 1 160px;min-width:0}
+.links-arrow{color:var(--dim);font-size:13px}
+.links-list-head{display:flex;justify-content:space-between;align-items:center;
+  gap:8px;margin-top:12px;font-size:11px;color:var(--dim)}
+.links-list{display:flex;flex-direction:column;gap:5px;margin-top:6px;
+  max-height:220px;overflow-y:auto;scrollbar-width:thin}
+.line-item{display:flex;align-items:center;gap:6px;font-size:11px;
+  background:rgba(0,0,0,.18);border-radius:6px;padding:5px 7px}
+.line-text{flex:1 1 auto;min-width:0;unicode-bidi:plaintext}
+.line-badge{font-size:9.5px;color:var(--ok);border:1px solid var(--ok);
+  border-radius:99px;padding:1px 6px;flex:0 0 auto}
