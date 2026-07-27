@@ -1,0 +1,32 @@
+# Render Blueprint — deploys the API as a free web service.
+# The database is NOT defined here: Render's free Postgres expires after 30
+# days, so DEPLOY.md points at Neon instead (its free tier doesn't expire).
+# Paste Neon's connection string into DATABASE_URL by hand after this deploys.
+#
+# Migrating and seeding on every boot (rather than a one-off shell command)
+# is deliberate: the free instance type has no shell access, and both
+# `prisma migrate deploy` and `node prisma/seed.js` are safe to re-run — the
+# migration is a no-op once applied, and the seed upserts on natural keys.
+services:
+  - type: web
+    name: studyplan-api
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx prisma migrate deploy && node prisma/seed.js && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_TTL
+        value: 15m
+      - key: JWT_REFRESH_TTL
+        value: 30d
+      - key: CORS_ORIGINS
+        sync: false

@@ -4,7 +4,7 @@
 // the "stale hardcoded data" problem this whole migration exists to remove.
 var CACHE = 'studyplan-shell-v1';
 var CORE = [
-  './index.html', './manifest.json', './src/css/style.css',
+  './index.html', './manifest.json', './src/css/style.css', './src/js/config.js',
   './src/js/app.js', './src/js/api.js', './src/js/store.js',
   './src/js/prerequisites.js', './src/js/gpa.js', './src/js/assessment.js',
   './src/js/i18n.js', './src/js/achievements.js', './src/js/editmode.js',

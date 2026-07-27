@@ -1,0 +1,52 @@
+name: Deploy web/ to GitHub Pages
+
+# Publishes the web/ folder (index.html, manifest.json, sw.js, src/, assets/)
+# as a static site. It's a plain client with no build step — it just needs to
+# be served over HTTPS and pointed at the live API (see web/src/js/config.js
+# and DEPLOY.md).
+#
+# configure-pages' `enablement: true` below makes it create the Pages site
+# itself on first run (its default is to error out instead, expecting a
+# manual "Settings -> Pages -> Source -> GitHub Actions" click first) — so
+# there's no manual repo-settings step needed before this works.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload web/ as the Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
