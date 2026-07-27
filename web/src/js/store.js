@@ -38,5 +38,19 @@ export const store = {
     write(m);
   },
 
+  // Assessment rows per course: [{label, score, max}]. Kept beside the grade
+  // rather than inside it because they are the student's own working, not an
+  // official mark, and survive independently of whatever letter is recorded.
+  rowsFor(courseId) {
+    return read()[courseId]?.assessment || [];
+  },
+  setRows(courseId, rows) {
+    const m = read();
+    if (!m[courseId]) m[courseId] = { completedAt: new Date().toISOString() };
+    if (rows && rows.length) m[courseId].assessment = rows;
+    else delete m[courseId].assessment;
+    write(m);
+  },
+
   clear: () => write({}),
 };

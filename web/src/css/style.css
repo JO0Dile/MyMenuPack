@@ -58,3 +58,24 @@ main{padding:20px;max-width:1200px;margin:0 auto}
 .grade{background:rgba(0,0,0,.25);border:1px solid var(--line);color:inherit;
   border-radius:7px;padding:4px;font-size:11.5px;font-family:inherit}
 .grade:focus{outline:none;border-color:var(--accent)}
+.breakdown{border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+.breakdown summary{font-size:11px;color:var(--dim);cursor:pointer}
+.rows{display:flex;flex-direction:column;gap:4px;margin-top:6px;
+  max-height:150px;overflow-y:auto;scrollbar-width:thin}
+.arow{display:flex;align-items:center;gap:3px}
+.arow input{background:rgba(0,0,0,.28);border:1px solid var(--line);color:inherit;
+  border-radius:5px;padding:3px 4px;font-size:10.5px;font-family:inherit;min-width:0}
+.a-label{flex:1 1 auto} .a-num{width:38px;flex:0 0 38px}
+.a-sep{color:var(--dim);font-size:10px}
+.a-del{background:none;border:none;color:var(--dim);cursor:pointer;font-size:13px;padding:0 3px}
+.a-del:hover{color:#ff8f8f}
+.a-add{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.a-chip{background:none;border:1px dashed var(--line);color:var(--dim);border-radius:12px;
+  padding:2px 7px;font-size:10px;cursor:pointer;font-family:inherit}
+.a-chip:hover{border-color:var(--accent);color:var(--text)}
+.a-total{margin:7px 0 0;font-size:10.5px;font-weight:700;color:var(--dim)}
+.a-proj{list-style:none;margin:5px 0 0;padding:0;display:flex;flex-wrap:wrap;
+  gap:2px 8px;font-size:10px;color:var(--dim)}
+.a-rev{margin:6px 0 0;font-size:10px;color:var(--ok)}
+.a-apply{margin-top:6px;background:var(--ok);border:none;border-radius:6px;
+  padding:4px 8px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit}

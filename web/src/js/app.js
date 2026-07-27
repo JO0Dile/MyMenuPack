@@ -2,6 +2,7 @@ import { api, ApiError } from './api.js';
 import { store } from './store.js';
 import { isAvailable, missingFor, summarise } from './prerequisites.js';
 import { makeScale, computeGpa, earnedCredits, formatGpa } from './gpa.js';
+import * as assess from './assessment.js';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -197,8 +198,94 @@ function courseCard(c, done) {
       renderPlan();
     });
     card.appendChild(sel);
+    card.appendChild(breakdown(c, sel.value));
   }
   return card;
+}
+
+// ---------- assessment breakdown ----------
+// Deliberately no "Final Exam" preset: AAUP never publishes that mark, so it
+// is derived as the leftover share instead of asked for. A student who does
+// know it (asked the instructor) can still add it as a custom row.
+function breakdown(course, currentLetter) {
+  const rows = store.rowsFor(course.id);
+  const wrap = el('details', 'breakdown');
+  const sum = el('summary', null,
+    rows.length ? `Marks (${assess.totals(rows).score}/100)` : 'Marks');
+  wrap.appendChild(sum);
+
+  const list = el('div', 'rows');
+  rows.forEach((r, i) => {
+    const line = el('div', 'arow');
+    const label = el('input', 'a-label');
+    label.value = r.label || '';
+    label.placeholder = 'Label';
+    const score = el('input', 'a-num');
+    score.type = 'number'; score.value = r.score ?? ''; score.placeholder = 'got';
+    const max = el('input', 'a-num');
+    max.type = 'number'; max.value = r.max ?? ''; max.placeholder = 'of';
+    const del = el('button', 'a-del', '\u00d7');
+
+    const save = () => {
+      const next = store.rowsFor(course.id).slice();
+      next[i] = { label: label.value, score: score.value, max: max.value };
+      store.setRows(course.id, next);
+      renderPlan();
+    };
+    label.addEventListener('change', save);
+    score.addEventListener('change', save);
+    max.addEventListener('change', save);
+    del.addEventListener('click', () => {
+      const next = store.rowsFor(course.id).slice();
+      next.splice(i, 1);
+      store.setRows(course.id, next);
+      renderPlan();
+    });
+
+    line.append(label, score, el('span', 'a-sep', '/'), max, del);
+    list.appendChild(line);
+  });
+  wrap.appendChild(list);
+
+  const add = el('div', 'a-add');
+  for (const preset of [...assess.PRESETS, '']) {
+    const b = el('button', 'a-chip', '+ ' + (preset || 'Other'));
+    b.addEventListener('click', () => {
+      store.setRows(course.id, [...store.rowsFor(course.id), { label: preset, score: '', max: '' }]);
+      renderPlan();
+    });
+    add.appendChild(b);
+  }
+  wrap.appendChild(add);
+
+  const t = assess.totals(rows);
+  if (t.any) {
+    const done = assess.resolvedLetter(rows, state.scale);
+    if (done) {
+      wrap.appendChild(el('p', 'a-total', `Total ${t.score}/100 \u2192 ${done}`));
+      const apply = el('button', 'a-apply', 'Use as my grade');
+      apply.addEventListener('click', () => { store.setGrade(course.id, done); renderPlan(); });
+      wrap.appendChild(apply);
+    } else {
+      wrap.appendChild(el('p', 'a-total',
+        `So far ${t.score}/100 \u2014 ${t.remaining} left for the final`));
+      const ul = el('ul', 'a-proj');
+      for (const p of assess.projections(rows, state.scale)) {
+        const text = p.status === 'needs' ? `need ${p.needed}/${p.outOf}`
+          : p.status === 'secured' ? 'secured' : 'not reachable';
+        ul.appendChild(el('li', null, `${p.letter}: ${text}`));
+      }
+      wrap.appendChild(ul);
+
+      const rev = assess.finalExamRange(rows, state.scale, currentLetter);
+      if (rev) {
+        wrap.appendChild(el('p', 'a-rev',
+          `With grade ${currentLetter}, your final was between ` +
+          `${rev.low}/${rev.outOf} and ${rev.high}/${rev.outOf}.`));
+      }
+    }
+  }
+  return wrap;
 }
 
 $('#home').addEventListener('click', showUniversities);
