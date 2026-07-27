@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "gradingScales": [
+    {
+      "slug": "engineering",
+      "name": "Engineering (D at 60)",
+      "passMark": 60,
+      "bands": [
+        {
+          "letter": "A",
+          "min": 90,
+          "max": 100,
+          "points": 4
+        },
+        {
+          "letter": "A-",
+          "min": 87,
+          "max": 89,
+          "points": 3.67
+        },
+        {
+          "letter": "B+",
+          "min": 84,
+          "max": 86,
+          "points": 3.33
+        },
+        {
+          "letter": "B",
+          "min": 80,
+          "max": 83,
+          "points": 3
+        },
+        {
+          "letter": "B-",
+          "min": 76,
+          "max": 79,
+          "points": 2.67
+        },
+        {
+          "letter": "C+",
+          "min": 72,
+          "max": 75,
+          "points": 2.33
+        },
+        {
+          "letter": "C",
+          "min": 69,
+          "max": 71,
+          "points": 2
+        },
+        {
+          "letter": "C-",
+          "min": 66,
+          "max": 68,
+          "points": 1.67
+        },
+        {
+          "letter": "D+",
+          "min": 63,
+          "max": 65,
+          "points": 1.33
+        },
+        {
+          "letter": "D",
+          "min": 60,
+          "max": 62,
+          "points": 1
+        },
+        {
+          "letter": "F",
+          "min": 0,
+          "max": 59,
+          "points": 0.35
+        }
+      ]
+    },
+    {
+      "slug": "ai",
+      "name": "Faculty of AI & Data Science (D at 50)",
+      "passMark": 50,
+      "bands": [
+        {
+          "letter": "A",
+          "min": 90,
+          "max": 100,
+          "points": 4
+        },
+        {
+          "letter": "A-",
+          "min": 86,
+          "max": 89,
+          "points": 3.67
+        },
+        {
+          "letter": "B+",
+          "min": 80,
+          "max": 85,
+          "points": 3.33
+        },
+        {
+          "letter": "B",
+          "min": 76,
+          "max": 79,
+          "points": 3
+        },
+        {
+          "letter": "B-",
+          "min": 72,
+          "max": 75,
+          "points": 2.67
+        },
+        {
+          "letter": "C+",
+          "min": 68,
+          "max": 71,
+          "points": 2.33
+        },
+        {
+          "letter": "C",
+          "min": 64,
+          "max": 67,
+          "points": 2
+        },
+        {
+          "letter": "C-",
+          "min": 59,
+          "max": 63,
+          "points": 1.67
+        },
+        {
+          "letter": "D+",
+          "min": 54,
+          "max": 58,
+          "points": 1.33
+        },
+        {
+          "letter": "D",
+          "min": 50,
+          "max": 53,
+          "points": 1
+        },
+        {
+          "letter": "F",
+          "min": 0,
+          "max": 49,
+          "points": 0.35
+        }
+      ]
+    }
+  ],
+  "universityElectives": [
+    {
+      "code": "040511052",
+      "en": "Israeli & Zionism Studies I"
+    },
+    {
+      "code": "040511053",
+      "en": "Jerusalem: Civilization and History"
+    },
+    {
+      "code": "040511061",
+      "en": "Israeli & Zionism Studies II"
+    },
+    {
+      "code": "040511071",
+      "en": "Development Management"
+    },
+    {
+      "code": "040511081",
+      "en": "Home Gardening"
+    },
+    {
+      "code": "040511091",
+      "en": "Fine Arts"
+    },
+    {
+      "code": "040511101",
+      "en": "Current World Issues"
+    },
+    {
+      "code": "040511121",
+      "en": "Physical Education"
+    },
+    {
+      "code": "040511132",
+      "en": "Election and Political Participation"
+    },
+    {
+      "code": "040511133",
+      "en": "The Palestinian Prisoners Movement"
+    },
+    {
+      "code": "040511140",
+      "en": "Law in Our Life"
+    },
+    {
+      "code": "040511150",
+      "en": "Islamic Culture"
+    },
+    {
+      "code": "040511160",
+      "en": "Democracy and Human Rights"
+    },
+    {
+      "code": "040511170",
+      "en": "Technology in Our Life"
+    },
+    {
+      "code": "040511180",
+      "en": "Introduction to Astronomy Science"
+    },
+    {
+      "code": "040511200",
+      "en": "Introduction to Economics"
+    },
+    {
+      "code": "040511211",
+      "en": "Anthropology"
+    },
+    {
+      "code": "040511220",
+      "en": "Anti-Corruption Challenges and Solution"
+    },
+    {
+      "code": "040511230",
+      "en": "French Language"
+    },
+    {
+      "code": "040511240",
+      "en": "German Language"
+    },
+    {
+      "code": "040511260",
+      "en": "Introduction to Psychology"
+    },
+    {
+      "code": "040511270",
+      "en": "Introduction to Sociology"
+    },
+    {
+      "code": "040511280",
+      "en": "Human & Environment"
+    },
+    {
+      "code": "040511290",
+      "en": "History of Science"
+    },
+    {
+      "code": "040511311",
+      "en": "International Relations"
+    },
+    {
+      "code": "040511321",
+      "en": "Science, Technology and Society"
+    },
+    {
+      "code": "040511400",
+      "en": "Turkish Language"
+    },
+    {
+      "code": "040511411",
+      "en": "Political Sciences"
+    },
+    {
+      "code": "040511421",
+      "en": "Critical Thinking"
+    },
+    {
+      "code": "040511470",
+      "en": "Medical Terminology in Hebrew"
+    },
+    {
+      "code": "040511490",
+      "en": "Human Rights and Gender"
+    },
+    {
+      "code": "040511500",
+      "en": "The Palestinian Cinema: An Alternative Narrative"
+    },
+    {
+      "code": "040511511",
+      "en": "Modern Arab Thought"
+    },
+    {
+      "code": "040511521",
+      "en": "Archeology"
+    },
+    {
+      "code": "040511611",
+      "en": "Hebrew Language"
+    },
+    {
+      "code": "040511621",
+      "en": "Civil Society Organizations"
+    },
+    {
+      "code": "040511990",
+      "en": "Effective Communication"
+    },
+    {
+      "code": "060411001",
+      "en": "Nutrition & Food Security"
+    },
+    {
+      "code": "280311100",
+      "en": "Financial Literacy"
+    },
+    {
+      "code": "280311110",
+      "en": "Introduction to Sign Language"
+    }
+  ]
+}

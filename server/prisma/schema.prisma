@@ -1,0 +1,289 @@
+// StudyPlan — database schema
+//
+// Design notes that aren't obvious from the field lists:
+//
+// * Prerequisites are GROUPS, not pairs. Courses inside a PrerequisiteGroup are
+//   OR'd; the groups on a course are AND'd. A plain "needs A and B" is two
+//   single-member groups. Real Palestinian plans contain both shapes ("one of
+//   Calc II or Statistics" alongside "Advanced English needs Intermediate
+//   English AND its lab"), and a flat courseId->requiredCourseId table cannot
+//   express OR without misrepresenting the plan.
+//
+// * Corequisites (متطلب متزامن — take-alongside) are a `kind` on the group
+//   rather than a second table. Lecture/lab pairs are exactly this.
+//
+// * Grading scales are DATA, not constants. AAUP alone runs two: Engineering
+//   passes D at 60, the Faculty of AI & Data Science at 50. The scale attaches
+//   to a university, is selected per major, and can be overridden per course.
+//
+// * Money-like quantities (credits, marks) are Decimal, never Float. Repeated
+//   float arithmetic on credit hours drifts, and GPA is the one number a
+//   student will check against their own transcript.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Institutions
+// ============================================================
+
+model University {
+  id          String  @id @default(cuid())
+  slug        String  @unique // stable public identifier used in URLs: "aaup"
+  name        String
+  nameAr      String?
+  country     String
+  logoUrl     String?
+  website     String?
+  description String?
+
+  majors        Major[]
+  gradingScales GradingScale[]
+  imports       ImportBatch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model Major {
+  id             String  @id @default(cuid())
+  universityId   String
+  slug           String // unique per university, not globally: "robotics"
+  name           String
+  nameAr         String?
+  department     String?
+  degreeHours    Int
+  description    String?
+  gradingScaleId String?
+
+  university   University    @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  gradingScale GradingScale? @relation(fields: [gradingScaleId], references: [id], onDelete: SetNull)
+  courses      Course[]
+  enrollments  Enrollment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Two universities may both have a "cs" major; the pair is what's unique.
+  @@unique([universityId, slug])
+  @@index([universityId])
+}
+
+// ============================================================
+// Curriculum
+// ============================================================
+
+enum CourseCategory {
+  CORE
+  MATH
+  DEPARTMENT_ELECTIVE
+  UNIVERSITY_ELECTIVE
+  FREE_ELECTIVE
+  UNIVERSITY_REQUIREMENT
+  ENGLISH
+}
+
+model Course {
+  id      String @id @default(cuid())
+  majorId String
+  // Identity WITHIN the plan. This is the unique one, not `code`: a lecture
+  // and its lab are two separate rows of the study plan that share a single
+  // catalog number (Introduction to CS and its lab are both 290311110), so
+  // keying on code alone silently collapses them into one course.
+  slug    String
+  code    String? // official catalog number; null for generic elective slots
+  name           String
+  nameAr         String?
+  credits        Decimal        @db.Decimal(4, 2)
+  // Nullable on purpose: pool electives ("pick 6 of these 7") belong to no
+  // fixed year or semester, and forcing a placeholder would misstate the plan.
+  year           Int?
+  semester       Int? // 1, 2, or 3 = summer
+  category       CourseCategory @default(CORE)
+  isElective     Boolean        @default(false)
+  description    String?
+  gradingScaleId String?
+
+  major        Major         @relation(fields: [majorId], references: [id], onDelete: Cascade)
+  gradingScale GradingScale? @relation(fields: [gradingScaleId], references: [id], onDelete: SetNull)
+
+  prerequisiteGroups PrerequisiteGroup[]  @relation("CourseRequires")
+  requiredBy         PrerequisiteOption[] @relation("CourseRequiredBy")
+  completions        CourseCompletion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([majorId, slug])
+  // Non-unique on purpose — see the note on `slug` above.
+  @@index([majorId, code])
+  @@index([majorId, year, semester])
+}
+
+enum PrerequisiteKind {
+  PREREQUISITE // must be completed in an earlier semester
+  COREQUISITE // may be taken in the same semester
+}
+
+model PrerequisiteGroup {
+  id       String           @id @default(cuid())
+  courseId String
+  kind     PrerequisiteKind @default(PREREQUISITE)
+  label    String? // optional human label, e.g. "one of the math tracks"
+
+  course  Course               @relation("CourseRequires", fields: [courseId], references: [id], onDelete: Cascade)
+  options PrerequisiteOption[] // satisfying ANY option satisfies the group
+
+  @@index([courseId])
+}
+
+model PrerequisiteOption {
+  id               String @id @default(cuid())
+  groupId          String
+  requiredCourseId String
+
+  group          PrerequisiteGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  requiredCourse Course            @relation("CourseRequiredBy", fields: [requiredCourseId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, requiredCourseId])
+  @@index([requiredCourseId])
+}
+
+model GradingScale {
+  id           String  @id @default(cuid())
+  universityId String
+  name         String // "Faculty of AI & Data Science (D at 50)"
+  passMark     Decimal @db.Decimal(5, 2)
+  // [{ min, max, letter, points }] — kept as JSON because the band count and
+  // shape differ per institution and a rigid table would need migrating for
+  // every university added.
+  bands        Json
+
+  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  majors     Major[]
+  courses    Course[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([universityId, name])
+}
+
+// ============================================================
+// People
+// ============================================================
+
+enum Role {
+  STUDENT
+  ADMIN
+  DEVELOPER
+}
+
+model User {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+  name         String
+  role         Role   @default(STUDENT)
+
+  enrollments   Enrollment[]
+  completions   CourseCompletion[]
+  refreshTokens RefreshToken[]
+  imports       ImportBatch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model RefreshToken {
+  id String @id @default(cuid())
+
+  userId String
+  // Hashed, never stored raw: a database leak must not hand an attacker a set
+  // of live sessions. Compared by hash on refresh, same as a password.
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  majorId   String
+  startedAt DateTime @default(now())
+  isActive  Boolean  @default(true)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  major Major @relation(fields: [majorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, majorId])
+  @@index([userId])
+}
+
+model CourseCompletion {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  grade       String? // "A", "B+", "F", "W", "FA"
+  numericMark Decimal? @db.Decimal(5, 2)
+  completedAt DateTime @default(now())
+  // Drives last-write-wins when an offline client flushes its queue.
+  updatedAt   DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // The pair being unique is what makes /progress/sync an idempotent upsert:
+  // a retried flush after a dropped connection cannot double-apply.
+  @@unique([userId, courseId])
+  @@index([userId])
+}
+
+// ============================================================
+// Import audit
+// ============================================================
+
+enum ImportStatus {
+  PENDING
+  VALIDATED
+  APPLIED
+  FAILED
+}
+
+model ImportBatch {
+  id            String       @id @default(cuid())
+  universityId  String?
+  importedById  String
+  schemaVersion Int
+  status        ImportStatus @default(PENDING)
+  report        Json // counts, errors, warnings from validation
+  // The raw upload is retained so any import can be audited or replayed after
+  // the fact — without it, a bad package that already applied is unexplainable.
+  payload       Json
+
+  // SetNull, not Cascade: deleting a university must not erase the record of
+  // how it got there.
+  university University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  importedBy User        @relation(fields: [importedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([universityId])
+  @@index([importedById])
+}

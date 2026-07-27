@@ -280,7 +280,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.1';
+window.APP_VERSION = '4.4';
 </script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -2452,6 +2452,92 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   .edit-mode-banner .emb-exit:hover{background:rgba(255,158,203,.15);}
 
+  .edit-mode-banner .emb-links{
+    background:rgba(255,158,203,.14); border:1px solid #ff9ecb; color:#ff9ecb;
+    border-radius:999px; padding:5px 14px; font-size:11.5px; font-weight:800;
+    cursor:pointer; font-family:inherit; margin-inline-start:auto;
+  }
+  .edit-mode-banner .emb-links:hover{background:rgba(255,158,203,.28);}
+
+  /* ---- structure editing on the built-in majors (edit mode only) ---- */
+  .bi-year-actions,.bi-structure-actions{display:none;}
+  .plan-page.editing .bi-year-actions{
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+    flex-basis:100%; margin-top:8px; padding-inline-start:2px;
+  }
+  .plan-page.editing .bi-structure-actions{
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:16px 32px;
+  }
+  .bi-structure-note{font-size:11.5px;color:var(--text-dim);font-weight:600;}
+
+  /* ---- prerequisite line editor ---- */
+  .line-add-row{
+    display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;
+    margin:14px 0; padding:12px; border:1px solid var(--line);
+    border-radius:10px; background:var(--search-bg);
+  }
+  .line-add-row label{
+    display:flex; flex-direction:column; gap:4px; flex:1 1 200px; min-width:0;
+    font-size:11.5px; color:var(--text-dim); font-weight:700;
+  }
+  .line-add-row select{
+    background:var(--card-bg); border:1px solid var(--line); border-radius:7px;
+    padding:7px 9px; color:var(--text); font-size:12.5px; font-family:inherit; max-width:100%;
+  }
+  .line-add-row select:focus{outline:none;border-color:var(--accent);}
+  .line-arrow{color:var(--text-dim);font-size:16px;padding-bottom:8px;}
+
+  .line-list-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    flex-wrap:wrap; margin-top:16px; font-size:12px; font-weight:800; color:var(--text-dim);
+  }
+  .line-reset-btn{font-size:11.5px;padding:4px 10px;}
+  .line-list{
+    max-height:300px; overflow-y:auto; margin-top:8px; padding-inline-end:6px;
+    display:flex; flex-direction:column; gap:5px;
+    scrollbar-width:thin; scrollbar-color:var(--line) transparent;
+  }
+  .line-list::-webkit-scrollbar{width:5px;}
+  .line-list::-webkit-scrollbar-track{background:transparent;}
+  .line-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+  .line-item{
+    display:flex; align-items:center; gap:8px; padding:7px 10px;
+    border:1px solid var(--line); border-radius:8px; background:var(--card-bg);
+  }
+  .line-text{flex:1 1 auto;min-width:0;font-size:12px;color:var(--text);}
+  .line-text b{color:var(--prereq);padding:0 2px;}
+  .line-badge{
+    flex:0 0 auto; font-size:10px; font-weight:800; color:var(--unlock);
+    border:1px solid var(--unlock); border-radius:999px; padding:2px 7px; white-space:nowrap;
+  }
+  .line-remove{
+    flex:0 0 auto; background:none; border:none; color:var(--text-dim);
+    font-size:15px; line-height:1; cursor:pointer; padding:2px 5px; border-radius:6px;
+  }
+  .line-remove:hover{color:#ff5d5d;background:rgba(255,93,93,.12);}
+
+  /* ---- leftover data after a plan update ---- */
+  .orphan-plan{
+    border:1px solid var(--line); border-radius:10px; padding:10px;
+    margin-bottom:10px; background:var(--search-bg);
+  }
+  .orphan-plan-name{font-size:11.5px;font-weight:800;color:var(--text-dim);margin-bottom:8px;}
+  .orphan-item{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding:7px 0; border-top:1px solid var(--line);
+  }
+  .orphan-plan .orphan-item:first-of-type{border-top:none;}
+  .orphan-text{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .orphan-text b{font-size:12.5px;color:var(--text);word-break:break-word;}
+  .orphan-kinds{font-size:11px;color:var(--text-dim);}
+  .orphan-keep,.orphan-remove{font-size:11.5px;padding:4px 12px;flex:0 0 auto;}
+  .orphan-remove{border-color:#ff5d5d;color:#ff8f8f;}
+  .orphan-remove:hover{background:rgba(255,93,93,.12);}
+
+  .acct-row{display:inline-flex;align-items:stretch;gap:4px;}
+  .acct-delete-btn{padding:6px 10px;border-color:#ff5d5d;color:#ff8f8f;flex:0 0 auto;}
+  .acct-delete-btn:hover{background:rgba(255,93,93,.12);}
+
 
   .editing .course[id]{
     cursor:grab;
@@ -4537,19 +4623,80 @@ window.toggleLang = toggleLang;
    The main search/highlight/popup logic (added later in the document) reads
    this once everything has registered. */
 window.__PLAN_DATA = window.__PLAN_DATA || {};
+
+/* ---- Student corrections to the prerequisite arrows ----------------------
+   The published plans are transcribed by hand from university PDFs, so a line
+   can be missed or read wrong. Rather than making a student wait for a new app
+   release, this overlay lets them add a missing arrow or remove a wrong one —
+   on the OFFICIAL built-in plans too, not just their own imported ones. It is
+   stored separately from the plan itself and applied on top at registration
+   time, so the shipped data stays untouched and every edit is individually
+   reversible (and survives an app update that rewrites the base plan).
+   Read with raw localStorage on purpose: plan scripts register long before
+   AAUP_STORAGE is defined further down the file. */
+window.__PREREQ_EDITS_KEY = 'aaup_prereqEdits';
+window.__prereqPairKey = function(a, b){ return a + '|' + b; };
+window.__loadPrereqEdits = function(){
+  try{ return JSON.parse(localStorage.getItem(window.__PREREQ_EDITS_KEY) || '{}') || {}; }
+  catch(e){ return {}; }
+};
+window.__savePrereqEdits = function(m){
+  try{ localStorage.setItem(window.__PREREQ_EDITS_KEY, JSON.stringify(m)); }catch(e){}
+};
+window.__applyPrereqEdits = function(prefix, basePrereqs){
+  var edits = window.__loadPrereqEdits()[prefix];
+  if(!edits) return basePrereqs.slice();
+  var removed = {};
+  (edits.removed || []).forEach(function(k){ removed[k] = true; });
+  var out = basePrereqs.filter(function(pair){
+    return !removed[window.__prereqPairKey(pair[0], pair[1])];
+  });
+  var seen = {};
+  out.forEach(function(pair){ seen[window.__prereqPairKey(pair[0], pair[1])] = true; });
+  (edits.added || []).forEach(function(pair){
+    if(!pair || !pair[0] || !pair[1]) return;
+    var k = window.__prereqPairKey(pair[0], pair[1]);
+    if(seen[k]) return;
+    seen[k] = true;
+    out.push([pair[0], pair[1]]);
+  });
+  return out;
+};
+
 window.__registerPlanData = function(prefix, courseInfo, prereqs){
+  var base = prereqs || [];
+  var effective = window.__applyPrereqEdits(prefix, base);
   var needsMap = {}, unlocksMap = {};
-  prereqs.forEach(function(pair){
+  effective.forEach(function(pair){
     var a = pair[0], b = pair[1];
     (unlocksMap[a] = unlocksMap[a] || []).push(b);
     (needsMap[b] = needsMap[b] || []).push(a);
   });
   window.__PLAN_DATA[prefix] = {
     courseInfo: courseInfo,
-    prereqs: prereqs,
+    prereqs: effective,
+    // The plan exactly as shipped/imported, kept so a student's overlay can be
+    // recomputed (or cleared back to official) without a page reload.
+    basePrereqs: base,
     needsMap: needsMap,
     unlocksMap: unlocksMap
   };
+};
+
+// Re-applies the overlay onto the untouched base data and repaints the arrows.
+window.__rebuildPlanData = function(prefix){
+  var d = window.__PLAN_DATA[prefix];
+  if(!d) return;
+  window.__registerPlanData(prefix, d.courseInfo, d.basePrereqs || d.prereqs);
+  if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
+  else if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
+};
+
+// What the arrow-drawing code should iterate. Falls back to the plan's own
+// hard-coded list if registration hasn't happened yet for any reason.
+window.__livePrereqs = function(prefix, fallback){
+  var d = window.__PLAN_DATA[prefix];
+  return (d && d.prereqs) || fallback || [];
 };
 
 </script>
@@ -4730,7 +4877,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var cRect = container.getBoundingClientRect();
     var w = container.scrollWidth, h = container.scrollHeight;
     var rects = {};
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('robotics', PREREQS).forEach(function(pair){
       var a = 'robotics-c-'+pair[0], b = 'robotics-c-'+pair[1];
       // A removed course stays in the DOM (display:none, so its edges can
       // come back if it's restored) but its bounding rect collapses to
@@ -4750,7 +4897,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
     var frag = document.createDocumentFragment();
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('robotics', PREREQS).forEach(function(pair){
       var fa = rects['robotics-c-'+pair[0]], tb = rects['robotics-c-'+pair[1]];
       if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
@@ -5140,7 +5287,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var cRect = container.getBoundingClientRect();
     var w = container.scrollWidth, h = container.scrollHeight;
     var rects = {};
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('cybersecurity', PREREQS).forEach(function(pair){
       var a = 'cybersecurity-c-'+pair[0], b = 'cybersecurity-c-'+pair[1];
       // A removed course stays in the DOM (display:none, so its edges can
       // come back if it's restored) but its bounding rect collapses to
@@ -5160,7 +5307,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
     var frag = document.createDocumentFragment();
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('cybersecurity', PREREQS).forEach(function(pair){
       var fa = rects['cybersecurity-c-'+pair[0]], tb = rects['cybersecurity-c-'+pair[1]];
       if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
@@ -5632,7 +5779,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var cRect = container.getBoundingClientRect();
     var w = container.scrollWidth, h = container.scrollHeight;
     var rects = {};
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('medical', PREREQS).forEach(function(pair){
       var a = 'medical-c-'+pair[0], b = 'medical-c-'+pair[1];
       // A removed course stays in the DOM (display:none, so its edges can
       // come back if it's restored) but its bounding rect collapses to
@@ -5652,7 +5799,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
     var frag = document.createDocumentFragment();
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('medical', PREREQS).forEach(function(pair){
       var fa = rects['medical-c-'+pair[0]], tb = rects['medical-c-'+pair[1]];
       if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
@@ -6013,7 +6160,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     var cRect = container.getBoundingClientRect();
     var w = container.scrollWidth, h = container.scrollHeight;
     var rects = {};
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('cs', PREREQS).forEach(function(pair){
       var a = 'cs-c-'+pair[0], b = 'cs-c-'+pair[1];
       // A removed course stays in the DOM (display:none, so its edges can
       // come back if it's restored) but its bounding rect collapses to
@@ -6033,7 +6180,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     for(var i=0;i<old.length;i++){ old[i].parentNode.removeChild(old[i]); }
 
     var frag = document.createDocumentFragment();
-    PREREQS.forEach(function(pair){
+    window.__livePrereqs('cs', PREREQS).forEach(function(pair){
       var fa = rects['cs-c-'+pair[0]], tb = rects['cs-c-'+pair[1]];
       if(!fa || !tb) return;
       var p = document.createElementNS(NS,'path');
@@ -11549,7 +11696,10 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     });
 
     if(editing){
-      html += '<div class="imp-structure-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.addYear(\'' + id + '\')">➕ ' + (rtl ? 'إضافة سنة' : 'Add Year') + '</button></div>';
+      html += '<div class="imp-structure-actions">' +
+        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.addYear(\'' + id + '\')">➕ ' + (rtl ? 'إضافة سنة' : 'Add Year') + '</button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_LINKS.open(\'' + id + '\')">🔗 ' + (rtl ? 'خطوط المتطلبات' : 'Prerequisite lines') + '</button>' +
+        '</div>';
     }
     html += '</div>'; // closes .years
 
@@ -13042,10 +13192,15 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   // ---------- semester ordering ----------
   // Container ids look like "robotics-y2-s1" — parse the year/semester and
   // turn it into one comparable integer (y1s1=1, y1s2=2, y2s1=3, ... y4s2=8).
+  // Three slots per year, not two: s3 is the summer semester. With the old
+  // *2 formula a year's summer (y1s3) scored the same as the NEXT year's
+  // first semester (y2s1), so the prerequisite check silently treated them
+  // as the same point in time — a course could be dragged ahead of its own
+  // prerequisite without complaint. Year is \d+ so plans can pass year 10.
   function orderOfContainerId(id){
-    var m = /-y(\d)-s(\d)$/.exec(id || '');
+    var m = /-y(\d+)-s(\d)$/.exec(id || '');
     if(!m) return null;
-    return (parseInt(m[1], 10) - 1) * 2 + parseInt(m[2], 10);
+    return (parseInt(m[1], 10) - 1) * 3 + parseInt(m[2], 10);
   }
   function containerOf(el){
     var row = el.closest('.course-row');
@@ -13547,11 +13702,535 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     clearDropHighlights: clearDropHighlights
   };
 
+  // The four built-in pages carry a static edit-mode banner; the line editor
+  // button is injected rather than hand-added to each one's HTML.
+  function addLinkButton(prefix){
+    var page = document.getElementById('page-' + prefix);
+    var banner = page && page.querySelector('.edit-mode-banner');
+    if(!banner || banner.querySelector('.emb-links')) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'emb-links';
+    btn.textContent = '🔗 Prerequisite lines';
+    btn.addEventListener('click', function(){
+      if(window.AAUP_LINKS){ window.AAUP_LINKS.open(prefix); }
+    });
+    var exit = banner.querySelector('.emb-exit');
+    if(exit){ banner.insertBefore(btn, exit); }
+    else { banner.appendChild(btn); }
+  }
+
   function init(){
-    ['robotics', 'cybersecurity', 'medical', 'cs'].forEach(bindDraggable);
+    ['robotics', 'cybersecurity', 'medical', 'cs'].forEach(function(prefix){
+      bindDraggable(prefix);
+      addLinkButton(prefix);
+    });
   }
   if(document.readyState === 'complete'){ init(); }
   else { window.addEventListener('load', init); }
+})();
+
+// ==========================
+// PLAN STRUCTURE EDITING FOR THE BUILT-IN MAJORS (extra years + summer
+// semesters). An imported plan is re-rendered from its own JSON on every
+// interaction, so AAUP_IMPORTED.addYear/addSummer just edit that JSON. The
+// four built-in majors are static HTML instead, so their extra rows are
+// recorded here and re-injected into the DOM on every load — same student-
+// owned overlay idea as the prerequisite corrections, and equally reversible.
+// ==========================
+(function(){
+  var BUILT_IN = ['robotics', 'cybersecurity', 'medical', 'cs'];
+  var KEY = 'aaup_structureEdits';
+
+  function load(){ return window.AAUP_STORAGE.getJSON(KEY, {}); }
+  function save(m){ window.AAUP_STORAGE.setJSON(KEY, m); }
+  function forPlan(prefix){
+    var m = load()[prefix] || {};
+    return { extraYears: m.extraYears || 0, summers: m.summers || [] };
+  }
+  function setForPlan(prefix, val){
+    var m = load();
+    if(!val.extraYears && !val.summers.length){ delete m[prefix]; }
+    else { m[prefix] = { extraYears: val.extraYears, summers: val.summers }; }
+    save(m);
+  }
+  function isRtl(prefix){ return window.__isRtl ? window.__isRtl(prefix) : false; }
+
+  function yearsContainer(prefix){
+    var page = document.getElementById('page-' + prefix);
+    return page ? page.querySelector('.years') : null;
+  }
+  function yearRowFor(prefix, yearId){
+    var first = document.getElementById(prefix + '-' + yearId + '-s1');
+    return first ? first.closest('.year-row') : null;
+  }
+  // How many years the published plan itself ships with — user-added ones
+  // carry data-user-year so they never get counted as official.
+  function baseYearCount(prefix){
+    var c = yearsContainer(prefix);
+    if(!c) return 0;
+    return c.querySelectorAll('.year-row:not([data-user-year])').length;
+  }
+  function semesterHasCourses(prefix, yearId, sem){
+    var row = document.getElementById(prefix + '-' + yearId + '-s' + sem);
+    return !!(row && row.querySelector('.course[id]'));
+  }
+
+  function makeSem(prefix, yearId, sem, labelEn, labelAr){
+    var wrap = document.createElement('div');
+    wrap.className = 'sem';
+    var label = document.createElement('div');
+    label.className = 'sem-label';
+    label.setAttribute('data-ar', labelAr);
+    label.textContent = labelEn;
+    var row = document.createElement('div');
+    row.className = 'course-row';
+    row.id = prefix + '-' + yearId + '-s' + sem;
+    wrap.appendChild(label);
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function makeYearRow(prefix, yearNum){
+    var yearId = 'y' + yearNum;
+    var row = document.createElement('div');
+    row.className = 'year-row';
+    row.setAttribute('data-user-year', yearId);
+
+    var badge = document.createElement('div');
+    badge.className = 'year-badge';
+    var num = document.createElement('div');
+    num.className = 'num';
+    var numSpan = document.createElement('span');
+    numSpan.textContent = String(yearNum);
+    num.appendChild(numSpan);
+    var label = document.createElement('div');
+    label.className = 'label';
+    // Ordinal words are only authored for years 1-4 in the shipped plans; an
+    // added year gets the plain numeric form rather than a guessed ordinal.
+    label.setAttribute('data-ar-html', 'السنة<br>' + yearNum);
+    label.innerHTML = 'Year<br>' + yearNum;
+
+    badge.appendChild(num);
+    badge.appendChild(label);
+
+    var sems = document.createElement('div');
+    sems.className = 'semesters';
+    sems.appendChild(makeSem(prefix, yearId, 1, 'First semester', 'الفصل الأول'));
+    var div = document.createElement('div');
+    div.className = 'divider';
+    sems.appendChild(div);
+    sems.appendChild(makeSem(prefix, yearId, 2, 'Second semester', 'الفصل الثاني'));
+
+    row.appendChild(badge);
+    row.appendChild(sems);
+    return row;
+  }
+
+  // Idempotent: brings the DOM in line with what's stored, adding only what's
+  // missing. Safe to call repeatedly (load, after an edit, after a language
+  // flip) without ever duplicating a row.
+  function apply(prefix){
+    var container = yearsContainer(prefix);
+    if(!container) return;
+    var state = forPlan(prefix);
+    var base = baseYearCount(prefix);
+
+    // Extra years go before the electives pool / special rows so the grid
+    // still reads top-to-bottom in year order.
+    var anchor = container.querySelector('.electives-row');
+    for(var i = 1; i <= state.extraYears; i++){
+      var yearNum = base + i;
+      if(yearRowFor(prefix, 'y' + yearNum)) continue;
+      var el = makeYearRow(prefix, yearNum);
+      if(anchor){ container.insertBefore(el, anchor); }
+      else { container.appendChild(el); }
+    }
+
+    state.summers.forEach(function(yearId){
+      if(document.getElementById(prefix + '-' + yearId + '-s3')) return;
+      var yr = yearRowFor(prefix, yearId);
+      if(!yr) return;
+      var sems = yr.querySelector('.semesters');
+      if(!sems) return;
+      var div = document.createElement('div');
+      div.className = 'divider';
+      sems.appendChild(div);
+      sems.appendChild(makeSem(prefix, yearId, 3, 'Summer semester', 'الفصل الصيفي'));
+    });
+
+    renderControls(prefix);
+  }
+
+  // ---- edit-mode controls (only visible inside .editing, via CSS) ----
+  function renderControls(prefix){
+    var container = yearsContainer(prefix);
+    if(!container) return;
+    var rtl = isRtl(prefix);
+    var state = forPlan(prefix);
+
+    container.querySelectorAll('.year-row').forEach(function(yr){
+      var firstRow = yr.querySelector('.course-row[id]');
+      var m = firstRow ? /-y(\d+)-s\d$/.exec(firstRow.id) : null;
+      if(!m) return;
+      var yearId = 'y' + m[1];
+      var bar = yr.querySelector('.bi-year-actions');
+      if(!bar){
+        bar = document.createElement('div');
+        bar.className = 'bi-year-actions';
+        yr.appendChild(bar);
+      }
+      var hasSummer = !!document.getElementById(prefix + '-' + yearId + '-s3');
+      var isUserYear = yr.hasAttribute('data-user-year');
+      var html = hasSummer
+        ? '<button type="button" class="home-btn" data-act="rmSummer" data-year="' + yearId + '">🗑 ' + (rtl ? 'إزالة الصيفي' : 'Remove summer') + '</button>'
+        : '<button type="button" class="home-btn" data-act="addSummer" data-year="' + yearId + '">☀️ ' + (rtl ? 'إضافة صيفي' : 'Add summer') + '</button>';
+      if(isUserYear){
+        html += '<button type="button" class="home-btn" data-act="rmYear" data-year="' + yearId + '">🗑 ' + (rtl ? 'إزالة السنة' : 'Remove year') + '</button>';
+      }
+      bar.innerHTML = html;
+    });
+
+    var addBar = container.querySelector('.bi-structure-actions');
+    if(!addBar){
+      addBar = document.createElement('div');
+      addBar.className = 'bi-structure-actions';
+      var anchor = container.querySelector('.electives-row');
+      if(anchor){ container.insertBefore(addBar, anchor); }
+      else { container.appendChild(addBar); }
+    }
+    addBar.innerHTML = '<button type="button" class="home-btn" data-act="addYear">➕ ' + (rtl ? 'إضافة سنة' : 'Add year') + '</button>' +
+      (state.extraYears || state.summers.length
+        ? '<span class="bi-structure-note">' + (rtl
+            ? 'تعديلاتك على السنوات/الفصول محفوظة محليًا.'
+            : 'Your added years/semesters are saved on this device.') + '</span>'
+        : '');
+  }
+
+  function addYear(prefix){
+    var state = forPlan(prefix);
+    state.extraYears += 1;
+    setForPlan(prefix, state);
+    apply(prefix);
+    refresh(prefix);
+    if(window.__showToast){ window.__showToast(isRtl(prefix) ? '✅ تمت إضافة سنة.' : '✅ Year added.'); }
+  }
+  function removeYear(prefix, yearId){
+    var rtl = isRtl(prefix);
+    if(semesterHasCourses(prefix, yearId, 1) || semesterHasCourses(prefix, yearId, 2) || semesterHasCourses(prefix, yearId, 3)){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'هذه السنة تحتوي على مساقات — انقلها أولًا.' : 'This year still has courses in it — move them out first.')); }
+      return;
+    }
+    var state = forPlan(prefix);
+    var base = baseYearCount(prefix);
+    // Only the LAST added year can go, so the remaining year numbers stay
+    // contiguous with the official ones (no y6 sitting after a deleted y5).
+    if(yearId !== 'y' + (base + state.extraYears)){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'يمكن إزالة آخر سنة مضافة فقط.' : 'Only the last added year can be removed.')); }
+      return;
+    }
+    var yr = yearRowFor(prefix, yearId);
+    if(yr) yr.remove();
+    state.extraYears -= 1;
+    state.summers = state.summers.filter(function(y){ return y !== yearId; });
+    setForPlan(prefix, state);
+    apply(prefix);
+    refresh(prefix);
+    if(window.__showToast){ window.__showToast(rtl ? '🗑 تمت إزالة السنة.' : '🗑 Year removed.'); }
+  }
+  function addSummer(prefix, yearId){
+    var state = forPlan(prefix);
+    if(state.summers.indexOf(yearId) === -1){ state.summers.push(yearId); }
+    setForPlan(prefix, state);
+    apply(prefix);
+    refresh(prefix);
+    if(window.__showToast){ window.__showToast(isRtl(prefix) ? '☀️ تمت إضافة الفصل الصيفي.' : '☀️ Summer semester added.'); }
+  }
+  function removeSummer(prefix, yearId){
+    var rtl = isRtl(prefix);
+    if(semesterHasCourses(prefix, yearId, 3)){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'الفصل الصيفي يحتوي على مساقات — انقلها أولًا.' : 'This summer still has courses in it — move them out first.')); }
+      return;
+    }
+    var row = document.getElementById(prefix + '-' + yearId + '-s3');
+    var sem = row ? row.closest('.sem') : null;
+    if(sem){
+      var prev = sem.previousElementSibling;
+      if(prev && prev.classList.contains('divider')) prev.remove();
+      sem.remove();
+    }
+    var state = forPlan(prefix);
+    state.summers = state.summers.filter(function(y){ return y !== yearId; });
+    setForPlan(prefix, state);
+    apply(prefix);
+    refresh(prefix);
+    if(window.__showToast){ window.__showToast(rtl ? '🗑 تمت إزالة الفصل الصيفي.' : '🗑 Summer semester removed.'); }
+  }
+
+  // Adding/removing a row changes the grid geometry, so the prerequisite
+  // arrows have to be recomputed against the new layout — same redraw hook
+  // course removal and the collapse toggle already use.
+  function refresh(prefix){
+    if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
+    if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
+  }
+
+  function bind(prefix){
+    var container = yearsContainer(prefix);
+    if(!container || container.__structureBound) return;
+    container.__structureBound = true;
+    container.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-act]');
+      if(!btn || !container.contains(btn)) return;
+      var page = document.getElementById('page-' + prefix);
+      if(!page || !page.classList.contains('editing')) return;
+      var act = btn.getAttribute('data-act');
+      var yearId = btn.getAttribute('data-year');
+      e.preventDefault();
+      e.stopPropagation();
+      if(act === 'addYear') addYear(prefix);
+      else if(act === 'rmYear') removeYear(prefix, yearId);
+      else if(act === 'addSummer') addSummer(prefix, yearId);
+      else if(act === 'rmSummer') removeSummer(prefix, yearId);
+    });
+  }
+
+  function init(){
+    BUILT_IN.forEach(function(prefix){
+      if(!document.getElementById('page-' + prefix)) return;
+      apply(prefix);
+      bind(prefix);
+    });
+  }
+
+  window.AAUP_STRUCTURE = {
+    apply: apply, renderControls: renderControls,
+    addYear: addYear, removeYear: removeYear,
+    addSummer: addSummer, removeSummer: removeSummer
+  };
+
+  if(document.readyState === 'complete'){ init(); }
+  else { window.addEventListener('load', init); }
+})();
+
+// ==========================
+// PREREQUISITE LINE EDITOR — student corrections to the arrows
+// ==========================
+// The plans are transcribed by hand from university PDFs, so an arrow can be
+// missed or read wrong. This lets a student fix that themselves, on the
+// official built-in plans as well as their own imported ones, without waiting
+// for an app release. Edits live in the window.__applyPrereqEdits overlay
+// (never in the shipped plan), so each one is individually reversible and a
+// future update that rewrites the base plan keeps them applied.
+(function(){
+  function isRtl(prefix){ return window.__isRtl ? window.__isRtl(prefix) : false; }
+  function infoFor(prefix){ return (window.__PLAN_DATA[prefix] || {}).courseInfo || {}; }
+  function nameFor(prefix, slug, rtl){
+    var meta = infoFor(prefix)[slug];
+    if(!meta) return slug;
+    return (rtl && meta.ar) ? meta.ar : (meta.name || slug);
+  }
+  function editsFor(prefix){
+    var m = window.__loadPrereqEdits()[prefix] || {};
+    return { added: m.added || [], removed: m.removed || [] };
+  }
+  function saveEditsFor(prefix, e){
+    var all = window.__loadPrereqEdits();
+    if(!e.added.length && !e.removed.length){ delete all[prefix]; }
+    else { all[prefix] = { added: e.added, removed: e.removed }; }
+    window.__savePrereqEdits(all);
+  }
+  function isUserAdded(prefix, a, b){
+    var k = window.__prereqPairKey(a, b);
+    return editsFor(prefix).added.some(function(p){ return window.__prereqPairKey(p[0], p[1]) === k; });
+  }
+
+  // Adding an arrow that closes a loop would make every course in that loop
+  // permanently "unavailable" (each waiting on the other), so it's rejected
+  // rather than silently corrupting the plan.
+  function wouldCycle(prefix, from, to){
+    var unlocks = (window.__PLAN_DATA[prefix] || {}).unlocksMap || {};
+    if(from === to) return true;
+    var seen = {}, stack = [to];
+    while(stack.length){
+      var cur = stack.pop();
+      if(cur === from) return true;
+      if(seen[cur]) continue;
+      seen[cur] = true;
+      (unlocks[cur] || []).forEach(function(n){ if(!seen[n]) stack.push(n); });
+    }
+    return false;
+  }
+
+  function afterChange(prefix){
+    window.__rebuildPlanData(prefix);
+    if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
+    render(prefix);
+  }
+
+  function addLine(prefix, from, to){
+    var rtl = isRtl(prefix);
+    var info = infoFor(prefix);
+    if(!from || !to){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'اختر المساقين أولًا.' : 'Pick both courses first.')); }
+      return;
+    }
+    if(!info[from] || !info[to]){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'مساق غير معروف.' : 'Unknown course.')); }
+      return;
+    }
+    if(from === to){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'لا يمكن ربط المساق بنفسه.' : 'A course can’t be its own prerequisite.')); }
+      return;
+    }
+    var existing = (window.__PLAN_DATA[prefix] || {}).prereqs || [];
+    var k = window.__prereqPairKey(from, to);
+    if(existing.some(function(p){ return window.__prereqPairKey(p[0], p[1]) === k; })){
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'هذا الخط موجود بالفعل.' : 'That line already exists.')); }
+      return;
+    }
+    if(wouldCycle(prefix, from, to)){
+      if(window.__showToast){
+        window.__showToast('🚫 ' + (rtl
+          ? 'هذا الربط يُنشئ حلقة مغلقة — سيجعل المساقين مستحيلي التسجيل.'
+          : 'That link would create a loop — both courses could never become available.'));
+      }
+      return;
+    }
+    var e = editsFor(prefix);
+    // If they'd previously removed this exact official line, adding it back is
+    // just dropping the removal — keeps the overlay minimal and honest.
+    var wasRemoved = e.removed.indexOf(k) !== -1;
+    if(wasRemoved){ e.removed = e.removed.filter(function(x){ return x !== k; }); }
+    else { e.added.push([from, to]); }
+    saveEditsFor(prefix, e);
+    afterChange(prefix);
+    if(window.__showToast){ window.__showToast(rtl ? '✅ تمت إضافة الخط.' : '✅ Line added.'); }
+  }
+
+  function removeLine(prefix, from, to){
+    var rtl = isRtl(prefix);
+    var k = window.__prereqPairKey(from, to);
+    var e = editsFor(prefix);
+    var addedIdx = -1;
+    e.added.forEach(function(p, i){ if(window.__prereqPairKey(p[0], p[1]) === k) addedIdx = i; });
+    if(addedIdx !== -1){ e.added.splice(addedIdx, 1); }
+    else if(e.removed.indexOf(k) === -1){ e.removed.push(k); }
+    saveEditsFor(prefix, e);
+    afterChange(prefix);
+    if(window.__showToast){ window.__showToast(rtl ? '🗑 تمت إزالة الخط.' : '🗑 Line removed.'); }
+  }
+
+  function resetAll(prefix){
+    var rtl = isRtl(prefix);
+    var msg = rtl
+      ? 'إعادة كل خطوط المتطلبات إلى الخطة الرسمية؟ ستفقد تعديلاتك على الخطوط في هذه الخطة.'
+      : 'Reset every prerequisite line back to the official plan? Your line edits for this plan will be lost.';
+    var doIt = function(){
+      var all = window.__loadPrereqEdits();
+      delete all[prefix];
+      window.__savePrereqEdits(all);
+      afterChange(prefix);
+      if(window.__showToast){ window.__showToast(rtl ? '↩ تمت الإعادة إلى الخطة الرسمية.' : '↩ Reset to the official plan.'); }
+    };
+    if(window.__showConfirmDialog){ window.__showConfirmDialog(msg, doIt, rtl); }
+    else { doIt(); }
+  }
+
+  function courseOptionsHtml(prefix, rtl){
+    var info = infoFor(prefix);
+    var esc = window.__escapeHtml;
+    return Object.keys(info).sort(function(a, b){
+      return nameFor(prefix, a, rtl).localeCompare(nameFor(prefix, b, rtl));
+    }).map(function(slug){
+      var num = info[slug] && info[slug].num && info[slug].num !== '-' ? ' (' + info[slug].num + ')' : '';
+      return '<option value="' + esc(slug) + '">' + esc(nameFor(prefix, slug, rtl) + num) + '</option>';
+    }).join('');
+  }
+
+  function render(prefix){
+    var body = document.getElementById('devModalBody');
+    if(!body) return;
+    var rtl = isRtl(prefix);
+    var esc = window.__escapeHtml;
+    var data = window.__PLAN_DATA[prefix] || {};
+    var lines = (data.prereqs || []).slice().sort(function(p, q){
+      return nameFor(prefix, p[1], rtl).localeCompare(nameFor(prefix, q[1], rtl));
+    });
+    var e = editsFor(prefix);
+    var opts = courseOptionsHtml(prefix, rtl);
+
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    body.innerHTML =
+      '<h2 style="margin-top:0;">🔗 ' + (rtl ? 'خطوط المتطلبات السابقة' : 'Prerequisite lines') + '</h2>' +
+      '<p class="form-note">' + (rtl
+        ? 'إذا لاحظت أن مساقًا ينقصه خط، أو أن خطًا غير صحيح، صحّحه هنا. تعديلاتك محفوظة على جهازك ولا تغيّر الخطة الرسمية لبقية الطلاب.'
+        : 'If a course is missing a line, or a line looks wrong, correct it here. Your edits are saved on your device and don’t change the official plan for anyone else.') + '</p>' +
+      '<div class="line-add-row">' +
+        '<label>' + (rtl ? 'المتطلب السابق' : 'Prerequisite') +
+          '<select id="lineFromSelect"><option value="">' + (rtl ? '— اختر —' : '— pick —') + '</option>' + opts + '</select></label>' +
+        '<span class="line-arrow" aria-hidden="true">→</span>' +
+        '<label>' + (rtl ? 'المساق الذي يحتاجه' : 'Course that needs it') +
+          '<select id="lineToSelect"><option value="">' + (rtl ? '— اختر —' : '— pick —') + '</option>' + opts + '</select></label>' +
+        '<button type="button" class="home-btn" id="lineAddBtn">➕ ' + (rtl ? 'إضافة خط' : 'Add line') + '</button>' +
+      '</div>' +
+      '<div class="line-list-head">' +
+        '<span>' + (rtl ? 'الخطوط الحالية' : 'Current lines') + ' (' + lines.length + ')</span>' +
+        ((e.added.length || e.removed.length)
+          ? '<button type="button" class="home-btn line-reset-btn" id="lineResetBtn">↩ ' + (rtl ? 'إعادة للرسمي' : 'Reset to official') + '</button>'
+          : '') +
+      '</div>' +
+      '<div class="line-list">' +
+        (lines.length
+          ? lines.map(function(p){
+              var added = isUserAdded(prefix, p[0], p[1]);
+              return '<div class="line-item">' +
+                '<span class="line-text">' + esc(nameFor(prefix, p[0], rtl)) + ' <b>→</b> ' + esc(nameFor(prefix, p[1], rtl)) + '</span>' +
+                (added ? '<span class="line-badge">' + (rtl ? 'مضاف' : 'added by you') + '</span>' : '') +
+                '<button type="button" class="line-remove" data-from="' + esc(p[0]) + '" data-to="' + esc(p[1]) + '" aria-label="' + (rtl ? 'إزالة' : 'Remove') + '">✕</button>' +
+                '</div>';
+            }).join('')
+          : '<p class="ex-note">' + (rtl ? 'لا توجد خطوط.' : 'No lines yet.') + '</p>') +
+      '</div>' +
+      (e.removed.length
+        ? '<p class="form-note">' + (rtl
+            ? ('أزلت ' + e.removed.length + ' من خطوط الخطة الرسمية.')
+            : ('You’ve removed ' + e.removed.length + ' official line' + (e.removed.length === 1 ? '' : 's') + '.')) + '</p>'
+        : '') +
+      '<div class="form-actions"><button type="button" class="home-btn" id="lineCloseBtn">' + (rtl ? 'إغلاق' : 'Close') + '</button></div>';
+
+    var closeBtn = document.getElementById('lineCloseBtn');
+    if(closeBtn){
+      closeBtn.addEventListener('click', function(){
+        var ov = document.getElementById('devModalOverlay');
+        if(ov) ov.classList.remove('open');
+      });
+    }
+    var addBtn = document.getElementById('lineAddBtn');
+    if(addBtn){
+      addBtn.addEventListener('click', function(){
+        var f = document.getElementById('lineFromSelect');
+        var t = document.getElementById('lineToSelect');
+        addLine(prefix, f ? f.value : '', t ? t.value : '');
+      });
+    }
+    var resetBtn = document.getElementById('lineResetBtn');
+    if(resetBtn){ resetBtn.addEventListener('click', function(){ resetAll(prefix); }); }
+    body.querySelectorAll('.line-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        removeLine(prefix, btn.getAttribute('data-from'), btn.getAttribute('data-to'));
+      });
+    });
+  }
+
+  function open(prefix){
+    var overlay = document.getElementById('devModalOverlay');
+    if(!overlay) return;
+    render(prefix);
+    overlay.classList.add('open');
+  }
+
+  window.AAUP_LINKS = { open: open, addLine: addLine, removeLine: removeLine };
 })();
 
 // ==========================
@@ -13951,13 +14630,17 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
       (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
       '</div>' +
+      (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '') +
       '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'الحسابات' : 'Accounts') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + (r ? '\u0643\u0644 \u062d\u0633\u0627\u0628 \u064a\u062d\u062a\u0641\u0638 \u0628\u062e\u0637\u0637\u0647 \u0648\u062a\u0642\u062f\u0651\u0645\u0647 \u0648\u0645\u0639\u062f\u0651\u0644\u0647 \u0628\u0634\u0643\u0644 \u0645\u0646\u0641\u0635\u0644 \u2014 \u0645\u0641\u064a\u062f \u0625\u0630\u0627 \u0643\u0627\u0646 \u0623\u0643\u062b\u0631 \u0645\u0646 \u0634\u062e\u0635 \u064a\u0634\u0627\u0631\u0643 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u060c \u0623\u0648 \u0623\u0631\u062f\u062a \u0645\u0644\u0641\u064b\u0627 \u0634\u062e\u0635\u064a\u064b\u0627 \u062b\u0627\u0646\u064a\u064b\u0627.' : 'Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.') + '</p>' +
       '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
       (others.length
         ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
           others.map(function(a){
-            return '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>';
+            return '<span class="acct-row">' +
+              '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>' +
+              '<button type="button" class="home-btn acct-delete-btn" data-acct="' + window.__escapeHtml(a) + '" aria-label="' + (r ? 'حذف الحساب' : 'Delete account') + '">🗑</button>' +
+              '</span>';
           }).join('') + '</div>'
         : '') +
       '<div class="form-field-row">' +
@@ -13969,6 +14652,9 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
       '<p class="form-note" style="text-align:center;opacity:.6;">v' + (window.APP_VERSION || '?') + ' \u00b7 ' + (r ? '\u0645\u0634\u0631\u0648\u0639 \u0637\u0644\u0627\u0628\u064a \u0645\u0641\u062a\u0648\u062d' : 'an open student project') + '</p>';
 
     document.getElementById('setClose').addEventListener('click', function(){ document.getElementById('devModalOverlay').classList.remove('open'); });
+    if(window.AAUP_ORPHANS){
+      window.AAUP_ORPHANS.bindSection(body, function(){ renderSettingsBody(body); });
+    }
     document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
     if(document.getElementById('setLangBtn')){
       document.getElementById('setLangBtn').addEventListener('click', function(){
@@ -14042,6 +14728,25 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
         var result = window.AAUP_ACCOUNTS.switchTo(btn.getAttribute('data-acct'));
         if(!result.ok){ msg.innerHTML = '<p class="dev-error-msg">' + result.error + '</p>'; }
         // On success, switchTo() reloads the page — nothing further to do here.
+      });
+    });
+    document.querySelectorAll('.acct-delete-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!window.AAUP_ACCOUNTS) return;
+        var acct = btn.getAttribute('data-acct');
+        var msg = document.getElementById('acctMsg');
+        // Deleting an account throws away everything it holds and there is no
+        // undo, so the warning names the account and points at the export
+        // first — the same escape hatch the switch failure suggests.
+        var warn = r
+          ? ('حذف الحساب «' + acct + '» نهائيًا؟ سيُحذف كل تقدّمه وعلاماته وخططه، ولا يمكن التراجع. صدّر نسخة احتياطية أولًا إن كنت غير متأكد.')
+          : ('Permanently delete the account “' + acct + '”? All of its progress, grades and plans go with it, and this cannot be undone. Export a backup first if you’re unsure.');
+        window.__showConfirmDialog(warn, function(){
+          var result = window.AAUP_ACCOUNTS.deleteAccount(acct);
+          if(!result.ok){ msg.innerHTML = '<p class="dev-error-msg">' + result.error + '</p>'; return; }
+          renderSettingsBody(body);
+          if(window.__showToast){ window.__showToast(r ? '🗑 تم حذف الحساب.' : '🗑 Account deleted.'); }
+        }, r);
       });
     });
     document.getElementById('newAcctBtn').addEventListener('click', function(){
@@ -14122,22 +14827,45 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     return keys;
   }
 
+  // Returns whether the snapshot is genuinely on disk. Writing it is not
+  // enough to know that: a device at its storage quota throws, and some
+  // browsers evict or truncate instead, so the value is read back and
+  // compared. switchTo() wipes live storage immediately after this, so a
+  // snapshot that only LOOKED saved would take the account's whole history
+  // with it \u2014 this boolean is the one thing standing between a full
+  // device and permanent data loss.
   function snapshotCurrent(name){
     var keys = relevantKeys();
     var data = {};
     keys.forEach(function(k){ data[k] = localStorage.getItem(k); });
-    try{ localStorage.setItem(SNAPSHOT_PREFIX + name, JSON.stringify(data)); }catch(e){}
+    var payload = JSON.stringify(data);
+    try{
+      localStorage.setItem(SNAPSHOT_PREFIX + name, payload);
+      return localStorage.getItem(SNAPSHOT_PREFIX + name) === payload;
+    }catch(e){ return false; }
   }
   function clearLiveKeys(){
     relevantKeys().forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
   }
+  // true = this account's data is now live. A brand-new account legitimately
+  // has no snapshot and a clean slate is the correct result, so that counts
+  // as success; only an unreadable or malformed one is a failure worth
+  // rolling back for.
   function restoreSnapshot(name){
+    var raw;
+    try{ raw = localStorage.getItem(SNAPSHOT_PREFIX + name); }
+    catch(e){ return false; }
+    if(raw === null || raw === '') return true;
+    var data;
+    try{ data = JSON.parse(raw); }
+    catch(e){ return false; }
+    if(!data || typeof data !== 'object') return false;
     try{
-      var raw = localStorage.getItem(SNAPSHOT_PREFIX + name);
-      if(!raw) return; // brand new account — nothing to restore, stays a clean slate
-      var data = JSON.parse(raw);
-      Object.keys(data).forEach(function(k){ localStorage.setItem(k, data[k]); });
-    }catch(e){}
+      Object.keys(data).forEach(function(k){
+        if(data[k] !== null && data[k] !== undefined){ localStorage.setItem(k, data[k]); }
+      });
+    }catch(e){ return false; }
+    return true;
   }
 
   function switchTo(name){
@@ -14145,10 +14873,21 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     if(!name) return { ok: false, error: 'Please enter a name.' };
     var current = currentAccount();
     if(name === current) return { ok: false, error: 'That\u2019s already the current account.' };
-    snapshotCurrent(current);
+    // Save the account being left, and confirm it stuck, BEFORE touching
+    // anything. Nothing has been modified at this point, so bailing out here
+    // is completely safe \u2014 unlike bailing out after the wipe below.
+    if(!snapshotCurrent(current)){
+      return { ok: false, error: 'Couldn\u2019t save \u201c' + current + '\u201d before switching, so nothing was changed and your progress is exactly as it was. This device\u2019s storage is most likely full \u2014 export a backup from Settings, free some space, then try again.' };
+    }
     markAccountExists(current);
     clearLiveKeys();
-    restoreSnapshot(name);
+    if(!restoreSnapshot(name)){
+      // The target's saved data is damaged. Live storage is empty right now,
+      // so put back the account we just left rather than stranding them in
+      // an empty app with everything apparently gone.
+      restoreSnapshot(current);
+      return { ok: false, error: 'Couldn\u2019t open \u201c' + name + '\u201d \u2014 its saved data looks damaged, so you\u2019ve been left on \u201c' + current + '\u201d with everything intact.' };
+    }
     markAccountExists(name);
     try{ localStorage.setItem(CURRENT_KEY, name); }catch(e){}
     location.reload();
@@ -14178,6 +14917,230 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
     listAccounts: listAccounts, currentAccount: currentAccount,
     switchTo: switchTo, createAccount: createAccount, deleteAccount: deleteAccount
   };
+})();
+
+// ==========================
+// LEFTOVER DATA AFTER A PLAN UPDATE
+// ==========================
+// Plans get corrected over time — a course is renamed, re-coded, split, or
+// dropped. When that happens, anything the student already recorded against
+// the OLD course (a grade, a note, assessment marks, a named elective) would
+// otherwise point at a course that no longer exists.
+//
+// The rule here is: never delete it silently. It stays in storage exactly as
+// they left it, and instead they get told — what it was, which plan it
+// belonged to, and that it's theirs to keep, remove, or re-enter against
+// whatever replaced it. Deleting a student's own record because the app
+// changed underneath them is the one outcome this must never produce.
+(function(){
+  var DISMISS_KEY = 'aaup_orphanDismissed';
+
+  // Every store keyed by a full course id (prefix-c-slug). Kept as data so a
+  // future per-course store is one line, not a new code path to remember.
+  function pidStores(){
+    var stores = [
+      { key: 'aaup_grades',              en: 'grade',                  ar: 'علامة' },
+      { key: 'aaup_courseStatus',        en: 'planning status',        ar: 'حالة تخطيط' },
+      { key: 'aaup_ratings',             en: 'difficulty/workload',    ar: 'تقييم الصعوبة' },
+      { key: 'aaup_notes',               en: 'personal note',          ar: 'ملاحظة شخصية' },
+      { key: 'aaup_customNames',         en: 'elective you named',     ar: 'اسم مادة اختيارية' },
+      { key: 'aaup_removedCourses',      en: 'removed-from-plan mark', ar: 'مساق مُزال' },
+      { key: 'aaup_assessmentBreakdown', en: 'assessment marks',       ar: 'علامات التقييم' },
+      { key: 'aaup_passMarkOverride',    en: 'pass-mark setting',      ar: 'إعداد علامة النجاح' }
+    ];
+    if(window.__PROGRESS_STORAGE_KEY){
+      stores.unshift({ key: window.__PROGRESS_STORAGE_KEY, en: 'completed tick', ar: 'إشارة الإكمال' });
+    }
+    return stores;
+  }
+
+  function readMap(key){
+    try{ return JSON.parse(localStorage.getItem(key) || '{}') || {}; }
+    catch(e){ return {}; }
+  }
+  function writeMap(key, m){
+    try{ localStorage.setItem(key, JSON.stringify(m)); }catch(e){}
+  }
+
+  // A plan only gets judged once it has actually registered its courses.
+  // A feed plan that simply hasn't synced yet must never have its data
+  // called "leftover" — that's the false positive that would cause exactly
+  // the data loss this module exists to prevent.
+  function knownPlans(){
+    var out = {};
+    Object.keys(window.__PLAN_DATA || {}).forEach(function(prefix){
+      var info = (window.__PLAN_DATA[prefix] || {}).courseInfo;
+      if(info && Object.keys(info).length){ out[prefix] = info; }
+    });
+    return out;
+  }
+
+  function loadDismissed(){ return readMap(DISMISS_KEY); }
+  function saveDismissed(m){ writeMap(DISMISS_KEY, m); }
+
+  // Groups every orphaned entry by the course it belonged to, so the student
+  // sees "Calculus I — grade, note, assessment marks" rather than eight
+  // separate rows for one course.
+  function scan(){
+    var plans = knownPlans();
+    var byPid = {};
+    pidStores().forEach(function(store){
+      var m = readMap(store.key);
+      Object.keys(m).forEach(function(pid){
+        var parts = window.__splitCourseId ? window.__splitCourseId(pid) : null;
+        if(!parts) return;
+        var info = plans[parts.prefix];
+        if(!info) return;              // plan not loaded — say nothing
+        if(info[parts.slug]) return;   // course still exists — fine
+        if(!byPid[pid]){
+          byPid[pid] = { pid: pid, prefix: parts.prefix, slug: parts.slug, kinds: [], values: {} };
+        }
+        byPid[pid].kinds.push(store);
+        byPid[pid].values[store.key] = m[pid];
+      });
+    });
+    var dismissed = loadDismissed();
+    return Object.keys(byPid).map(function(pid){
+      var o = byPid[pid];
+      o.dismissed = !!dismissed[pid];
+      return o;
+    }).sort(function(a, b){ return a.pid.localeCompare(b.pid); });
+  }
+
+  function activeCount(){
+    return scan().filter(function(o){ return !o.dismissed; }).length;
+  }
+
+  // "Keep" — stop nagging about it, but change nothing in storage. The data
+  // stays exactly where it was and still exports with everything else.
+  function keep(pid){
+    var d = loadDismissed();
+    d[pid] = true;
+    saveDismissed(d);
+  }
+  function keepAll(){
+    var d = loadDismissed();
+    scan().forEach(function(o){ d[o.pid] = true; });
+    saveDismissed(d);
+  }
+
+  // "Remove" — only ever on an explicit click, and only for this one course.
+  function remove(pid){
+    pidStores().forEach(function(store){
+      var m = readMap(store.key);
+      if(pid in m){ delete m[pid]; writeMap(store.key, m); }
+    });
+    var d = loadDismissed();
+    delete d[pid];
+    saveDismissed(d);
+  }
+
+  // A human label for something the app no longer has a course record for.
+  // The student's own name for it is the best hint available; otherwise the
+  // slug is shown, since that's all that's left of it.
+  function labelFor(o){
+    var names = readMap('aaup_customNames');
+    if(names[o.pid] && String(names[o.pid]).trim()) return String(names[o.pid]);
+    return o.slug;
+  }
+
+  function planLabel(prefix){
+    if(window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.planDisplayInfo){
+      try{ return window.AAUP_DASHBOARD.planDisplayInfo(prefix).name || prefix; }catch(e){}
+    }
+    return prefix;
+  }
+
+  // ---- Settings section ----
+  function sectionHtml(r){
+    var items = scan().filter(function(o){ return !o.dismissed; });
+    if(!items.length) return '';
+    var esc = window.__escapeHtml;
+    var byPlan = {};
+    items.forEach(function(o){ (byPlan[o.prefix] = byPlan[o.prefix] || []).push(o); });
+
+    return '<h3 style="margin-bottom:6px;">⚠️ ' + (r ? 'بيانات من نسخة أقدم من الخطة' : 'Data from an older version of your plan') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + (r
+        ? 'حدّثنا هذه الخطط، وبعض المساقات التي سجّلت عليها بيانات لم تعد موجودة فيها. لم نحذف شيئًا — بياناتك ما زالت محفوظة كما تركتها. راجعها: إمّا أن تبقيها، أو تزيلها، أو تُدخلها من جديد على المساق الذي حلّ محلّها.'
+        : 'These plans were updated, and some courses you recorded data against are no longer in them. Nothing was deleted — your data is still saved exactly as you left it. Review it: keep it, remove it, or re-enter it on whatever course replaced it.') + '</p>' +
+      Object.keys(byPlan).map(function(prefix){
+        return '<div class="orphan-plan">' +
+          '<div class="orphan-plan-name">' + esc(planLabel(prefix)) + '</div>' +
+          byPlan[prefix].map(function(o){
+            var kinds = o.kinds.map(function(k){ return r ? k.ar : k.en; }).join(r ? '، ' : ', ');
+            return '<div class="orphan-item">' +
+              '<div class="orphan-text">' +
+                '<b>' + esc(labelFor(o)) + '</b>' +
+                '<span class="orphan-kinds">' + esc(kinds) + '</span>' +
+              '</div>' +
+              '<button type="button" class="home-btn orphan-keep" data-pid="' + esc(o.pid) + '">' + (r ? 'إبقاء' : 'Keep') + '</button>' +
+              '<button type="button" class="home-btn orphan-remove" data-pid="' + esc(o.pid) + '">' + (r ? 'إزالة' : 'Remove') + '</button>' +
+              '</div>';
+          }).join('') +
+          '</div>';
+      }).join('') +
+      '<div class="form-actions" style="justify-content:flex-start;">' +
+        '<button type="button" class="home-btn" id="orphanKeepAll">' + (r ? 'إبقاء الكل وعدم التذكير' : 'Keep all, stop reminding me') + '</button>' +
+      '</div>';
+  }
+
+  // onChange re-renders the settings body so the list reflects the click.
+  function bindSection(root, onChange){
+    if(!root) return;
+    root.querySelectorAll('.orphan-keep').forEach(function(btn){
+      btn.addEventListener('click', function(){ keep(btn.getAttribute('data-pid')); onChange(); });
+    });
+    root.querySelectorAll('.orphan-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var pid = btn.getAttribute('data-pid');
+        var rtl = document.body.classList.contains('rtl-mode');
+        var msg = rtl
+          ? 'إزالة بياناتك المحفوظة لهذا المساق نهائيًا؟ لا يمكن التراجع عن هذا.'
+          : 'Permanently remove your saved data for this course? This can’t be undone.';
+        var doIt = function(){ remove(pid); onChange(); };
+        if(window.__showConfirmDialog){ window.__showConfirmDialog(msg, doIt, rtl); }
+        else { doIt(); }
+      });
+    });
+    var all = root.querySelector('#orphanKeepAll');
+    if(all){ all.addEventListener('click', function(){ keepAll(); onChange(); }); }
+  }
+
+  // Sitting quietly in Settings isn't enough — a student who doesn't go
+  // looking would never learn their old records are stranded. One toast per
+  // session (not per page view), offering the way straight to the review.
+  var announced = false;
+  function announce(){
+    if(announced) return;
+    var n = activeCount();
+    if(!n) return;
+    announced = true;
+    var rtl = document.body.classList.contains('rtl-mode');
+    var msg = rtl
+      ? ('⚠️ لديك بيانات على ' + n + ' مساق لم تعد موجودة في خطتك المحدّثة — لم نحذف شيئًا.')
+      : ('⚠️ You have saved data on ' + n + ' course' + (n === 1 ? '' : 's') + ' that your updated plan no longer has — nothing was deleted.');
+    var label = rtl ? 'مراجعة' : 'Review';
+    var openSettings = function(){
+      if(window.AAUP_SIDEBAR && window.AAUP_SIDEBAR.openSettings){ window.AAUP_SIDEBAR.openSettings(); }
+    };
+    if(window.__showActionToast){ window.__showActionToast(msg, label, openSettings); }
+    else if(window.__showToast){ window.__showToast(msg); }
+  }
+
+  window.AAUP_ORPHANS = {
+    scan: scan, activeCount: activeCount,
+    keep: keep, keepAll: keepAll, remove: remove,
+    labelFor: labelFor, planLabel: planLabel,
+    sectionHtml: sectionHtml, bindSection: bindSection,
+    announce: announce
+  };
+
+  // Deferred: plans register their courses during load, and retakes replay
+  // after that — scanning too early would flag courses that are about to
+  // exist.
+  function init(){ setTimeout(announce, 2500); }
+  if(document.readyState === 'complete'){ init(); }
+  else { window.addEventListener('load', init); }
 })();
 
 // ==========================

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "slug": "aasu",
+  "name": "Abdullah Al Salem University",
+  "nameAr": "جامعة عبدالله السالم",
+  "shortName": "AASU",
+  "icon": "🏫",
+  "website": "https://aasu.edu.kw",
+  "country": null,
+  "logoUrl": null,
+  "description": null,
+  "colleges": [
+    {
+      "slug": "aasu-cee",
+      "name": "College of Engineering and Energy",
+      "nameAr": "كلية الهندسة والطاقة",
+      "icon": "🦾"
+    }
+  ]
+}
