@@ -64,3 +64,23 @@ service issues would be forgeable.
 **Controllers never touch Prisma; services never touch `req`/`res`.** That
 boundary is what keeps the prerequisite engine unit-testable and reusable by a
 future recommendation service.
+
+## Frontend
+
+`web/` is the data-driven client. It contains **no** university, major, course,
+or prerequisite data — every item it renders is fetched from this API at
+runtime, which is the point of the refactor: adding a university is a database
+operation, never a code edit.
+
+```bash
+cd web && python3 -m http.server 8090   # any static server will do
+```
+
+It expects the API at `http://localhost:4010/api` (override with
+`window.__API_BASE__`). `CORS_ORIGINS` in the server `.env` must list the
+frontend's origin.
+
+`web/src/js/store.js` keeps completion state in localStorage. That is a cache,
+not a source of truth — once the auth and progress endpoints exist it becomes
+the offline write queue that flushes to `POST /api/me/progress/sync`. It keys
+on the server's course id precisely so that flush needs no migration.
