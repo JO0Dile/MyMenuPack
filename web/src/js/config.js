@@ -6,5 +6,5 @@
 // so it can be edited or overridden by hand on a static host with no build
 // step, the same way the API URL itself is not a secret.
 if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-  window.__API_BASE__ = 'https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/api';
+  window.__API_BASE__ = 'https://studyplan-api-3aeg.onrender.com/api';
 }
