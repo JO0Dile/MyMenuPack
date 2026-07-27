@@ -24,5 +24,19 @@ export const store = {
     return !!m[courseId];
   },
   completedIds: () => new Set(Object.keys(read())),
+
+  // The full record per course, which computeGpa/earnedCredits consume.
+  records: () => new Map(Object.entries(read())),
+
+  setGrade(courseId, grade) {
+    const m = read();
+    // A grade only exists for a course the student has marked done, so
+    // recording one implies completion rather than requiring two clicks.
+    if (!m[courseId]) m[courseId] = { completedAt: new Date().toISOString() };
+    if (grade) m[courseId].grade = grade;
+    else delete m[courseId].grade;
+    write(m);
+  },
+
   clear: () => write({}),
 };

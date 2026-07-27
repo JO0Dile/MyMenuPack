@@ -54,3 +54,7 @@ main{padding:20px;max-width:1200px;margin:0 auto}
   font-family:inherit}
 .tick:hover{border-color:var(--accent)}
 .course.done .tick{border-color:var(--ok);color:var(--ok)}
+.summary.gpa{color:var(--ok);font-weight:700}
+.grade{background:rgba(0,0,0,.25);border:1px solid var(--line);color:inherit;
+  border-radius:7px;padding:4px;font-size:11.5px;font-family:inherit}
+.grade:focus{outline:none;border-color:var(--accent)}

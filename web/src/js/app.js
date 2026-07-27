@@ -1,6 +1,7 @@
 import { api, ApiError } from './api.js';
 import { store } from './store.js';
 import { isAvailable, missingFor, summarise } from './prerequisites.js';
+import { makeScale, computeGpa, earnedCredits, formatGpa } from './gpa.js';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, text) => {
@@ -10,7 +11,7 @@ const el = (tag, cls, text) => {
   return n;                                  // every string here is server data
 };
 
-const state = { universities: [], majors: [], courses: [], major: null };
+const state = { universities: [], majors: [], courses: [], major: null, scale: null };
 
 function setStatus(msg, kind = 'info') {
   const s = $('#status');
@@ -78,7 +79,10 @@ async function showMajors(uni) {
 
 async function showPlan(uni, major) {
   await guard(async () => {
-    state.major = major;
+    // The full major carries its grading scale; the list endpoint does not.
+    const full = await api.major(major.id);
+    state.major = full;
+    state.scale = makeScale(full.gradingScale);
     state.courses = await api.courses(major.id);
     $('#crumb').textContent = `Universities / ${uni.name} / ${major.name}`;
     $('#list').hidden = true;
@@ -89,14 +93,21 @@ async function showPlan(uni, major) {
 
 function renderPlan() {
   const done = store.completedIds();
+  const records = store.records();
   const s = summarise(state.courses, done);
+  const { gpa } = computeGpa(state.courses, records, state.scale);
+  // Credits that count toward graduation — a ticked box with an F is taken,
+  // not passed, so it must not inflate this.
+  const earned = earnedCredits(state.courses, records, state.scale);
 
   const head = $('#planHead');
   head.replaceChildren();
   head.appendChild(el('h2', null, state.major.name));
   head.appendChild(el('p', 'summary',
-    `${s.done}/${s.total} courses · ${s.doneCredits}/${s.totalCredits} credit hours · ` +
+    `${s.done}/${s.total} courses · ${earned}/${s.totalCredits} credit hours earned · ` +
     `${s.percent}% · ${s.available} available now`));
+  head.appendChild(el('p', 'summary gpa',
+    `GPA ${formatGpa(gpa)}` + (state.scale ? `  ·  ${state.scale.name}` : '')));
   const bar = el('div', 'bar');
   const fill = el('div', 'bar-fill');
   fill.style.width = `${s.percent}%`;
@@ -167,6 +178,26 @@ function courseCard(c, done) {
     renderPlan();   // availability cascades, so the whole plan re-renders
   });
   card.appendChild(btn);
+
+  // Grades only make sense once a course is done, and the options come from
+  // the major's own scale rather than a fixed list in this file.
+  if (isDone && state.scale) {
+    const sel = el('select', 'grade');
+    const blank = el('option', null, 'grade —');
+    blank.value = '';
+    sel.appendChild(blank);
+    for (const letter of [...state.scale.letters, 'FA', 'W']) {
+      const o = el('option', null, letter);
+      o.value = letter;
+      sel.appendChild(o);
+    }
+    sel.value = store.records().get(c.id)?.grade || '';
+    sel.addEventListener('change', () => {
+      store.setGrade(c.id, sel.value);
+      renderPlan();
+    });
+    card.appendChild(sel);
+  }
   return card;
 }
 
