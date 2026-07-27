@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "slug": "birzeit",
+  "name": "Birzeit University",
+  "nameAr": "جامعة بيرزيت",
+  "shortName": "BZU",
+  "icon": "🎓",
+  "website": "https://www.birzeit.edu",
+  "country": null,
+  "logoUrl": null,
+  "description": null,
+  "colleges": [
+    {
+      "slug": "birzeit-cs",
+      "name": "Computer Science Programs",
+      "nameAr": "",
+      "icon": "💻"
+    }
+  ]
+}

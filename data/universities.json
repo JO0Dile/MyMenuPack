@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "universities": [
+    {
+      "slug": "aaup",
+      "name": "The Arab American University",
+      "nameAr": "الجامعة العربية الأمريكية",
+      "shortName": "AAUP",
+      "icon": "🏛️",
+      "collegeCount": 4
+    },
+    {
+      "slug": "birzeit",
+      "name": "Birzeit University",
+      "nameAr": "جامعة بيرزيت",
+      "shortName": "BZU",
+      "icon": "🎓",
+      "collegeCount": 1
+    },
+    {
+      "slug": "aasu",
+      "name": "Abdullah Al Salem University",
+      "nameAr": "جامعة عبدالله السالم",
+      "shortName": "AASU",
+      "icon": "🏫",
+      "collegeCount": 1
+    }
+  ]
+}

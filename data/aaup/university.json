@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "slug": "aaup",
+  "name": "The Arab American University",
+  "nameAr": "الجامعة العربية الأمريكية",
+  "shortName": "AAUP",
+  "icon": "🏛️",
+  "website": "https://www.aaup.edu",
+  "country": null,
+  "logoUrl": null,
+  "description": null,
+  "colleges": [
+    {
+      "slug": "aaup-ai-ds",
+      "name": "Faculty of Artificial Intelligence and Data Science",
+      "nameAr": "كلية الذكاء الاصطناعي وعلوم البيانات",
+      "icon": "🤖"
+    },
+    {
+      "slug": "aaup-it",
+      "name": "Faculty of Information Technology",
+      "nameAr": "كلية تكنولوجيا المعلومات",
+      "icon": "💻"
+    },
+    {
+      "slug": "aaup-nursing",
+      "name": "Faculty of Nursing",
+      "nameAr": "كلية التمريض",
+      "icon": "🩺"
+    },
+    {
+      "slug": "aaup-pharmacy",
+      "name": "Faculty of Pharmacy",
+      "nameAr": "كلية الصيدلة",
+      "icon": "💊"
+    }
+  ]
+}
