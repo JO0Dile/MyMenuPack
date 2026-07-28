@@ -17,6 +17,30 @@
     : 'https://studyplan-api-3aeg.onrender.com/api';
   window.APP_PLANS_FEED_URL = window.APP_API_BASE + '/feed';
 
+  // An empty grid is indistinguishable from "this app has no study plans",
+  // which is exactly how a sleeping free-tier server reads to a student. Say
+  // which of the two it actually is.
+  function showGridMessage(text, withRetry){
+    var grid = document.getElementById('homeUniversityGrid');
+    var step = document.getElementById('homeStepUniversities');
+    if(!grid || !step || step.style.display === 'none') return;
+    if(grid.querySelector('.plan-card')) return; // real content already won
+    grid.innerHTML = '';
+    var box = document.createElement('div');
+    box.className = 'catalogue-status';
+    box.textContent = text;
+    if(withRetry){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'home-btn';
+      btn.textContent = 'Try again';
+      btn.addEventListener('click', function(){ boot(); });
+      box.appendChild(document.createElement('br'));
+      box.appendChild(btn);
+    }
+    grid.appendChild(box);
+  }
+
   // Repaint step 1 only while the student is still looking at it — calling
   // this after they have drilled into a college would yank them back out.
   function repaintHomeIfIdle(){
@@ -52,6 +76,7 @@
   }
 
   function announceWaking(){
+    showGridMessage('\u23f3 Waking the study-plan server\u2026 free hosting sleeps when idle, so the first visit can take up to a minute.', false);
     if(window.__showToast){
       window.__showToast('\u23f3 Waking the study-plan server \u2014 free hosting sleeps when idle. One moment\u2026');
     }
@@ -67,6 +92,7 @@
   }
 
   function boot(){
+    showGridMessage('\u2026 Loading universities\u2026', false);
     loadRegistry()
       .then(function(){
         // Plans go through the app's existing sync path, so they are
@@ -75,6 +101,7 @@
       })
       .then(function(){ repaintHomeIfIdle(); })
       .catch(function(){
+        showGridMessage('\u26a0\ufe0f Could not reach the study-plan server. It may still be starting up.', true);
         if(window.__showToast){
           window.__showToast('\u26a0\ufe0f Could not reach the study-plan server. It may still be starting \u2014 reload in a moment.');
         }
