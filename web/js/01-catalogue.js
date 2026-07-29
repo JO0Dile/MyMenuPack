@@ -144,27 +144,48 @@ window.APP_VERSION = '4.4';
   }
 
   function announceWaking(){
+    if(cachedRegistry()) return;
     showGridMessage('\u23f3 Waking the study-plan server\u2026 free hosting sleeps when idle, so the first visit can take up to a minute.', false);
     if(window.__showToast){
       window.__showToast('\u23f3 Waking the study-plan server \u2014 free hosting sleeps when idle. One moment\u2026');
     }
   }
 
+  // ---- offline-first cache -------------------------------------------------
+  // The plans themselves already persist (AAUP_SYNC stores them via
+  // AAUP_IMPORTED), but the registry did not, so a student with all 34 plans
+  // cached locally still saw an empty home screen with no connection. The
+  // registry is small and changes rarely — keep the last copy and render from
+  // it instantly, then refresh in the background.
+  var REGISTRY_KEY = 'studyplan.registry.v1';
+
+  function applyRegistry(reg){
+    if(!reg || !reg.universities) return false;
+    window.APP_UNIVERSITIES = reg.universities;
+    var pools = {};
+    Object.keys(reg.universities).forEach(function(uid){
+      pools[uid] = reg.universities[uid].electivePool || [];
+    });
+    window.APP_UNIV_ELECTIVES = pools;
+    if(reg.colleges) window.APP_COLLEGES = reg.colleges;
+    return Object.keys(reg.universities).length > 0;
+  }
+
+  function cachedRegistry(){
+    try{ return JSON.parse(localStorage.getItem(REGISTRY_KEY) || 'null'); }
+    catch(e){ return null; }
+  }
+  function cacheRegistry(reg){
+    try{ localStorage.setItem(REGISTRY_KEY, JSON.stringify(reg)); }catch(e){ /* quota/private mode */ }
+  }
+
   function loadRegistry(){
     return fetchWithWake(window.APP_API_BASE + '/feed/registry', announceWaking)
       .then(function(reg){
-        if(reg && reg.universities){
-          window.APP_UNIVERSITIES = reg.universities;
-          // The elective pool rides along with each university rather than
-          // being a second request — the course popup needs it the moment a
-          // placeholder is tapped.
-          var pools = {};
-          Object.keys(reg.universities).forEach(function(uid){
-            pools[uid] = reg.universities[uid].electivePool || [];
-          });
-          window.APP_UNIV_ELECTIVES = pools;
-        }
-        if(reg && reg.colleges) window.APP_COLLEGES = reg.colleges;
+        // The elective pool rides along with each university rather than being
+        // a second request — the course popup needs it the moment a
+        // placeholder is tapped.
+        if(applyRegistry(reg)){ cacheRegistry(reg); }
         repaintHomeIfIdle();
       });
   }
@@ -188,7 +209,13 @@ window.APP_VERSION = '4.4';
   }
 
   function boot(){
-    showGridMessage('\u2026 Loading universities\u2026', false);
+    // Render from the last known catalogue first. A returning student never
+    // waits on the network — and never waits on the free tier waking up —
+    // because everything needed to draw the home screen is already local.
+    var haveCache = applyRegistry(cachedRegistry());
+    if(haveCache){ repaintHomeIfIdle(); }
+    else { showGridMessage('\u2026 Loading universities\u2026', false); }
+
     loadRegistry()
       .then(function(){
         // Plans go through the app's existing sync path, so they are
@@ -198,6 +225,9 @@ window.APP_VERSION = '4.4';
       .then(function(){ return loadSuggestions(); })
       .then(function(){ repaintHomeIfIdle(); })
       .catch(function(){
+        // With a cached catalogue the app is fully usable offline, so a failed
+        // refresh is not an error worth interrupting anyone over.
+        if(haveCache) return;
         showGridMessage('\u26a0\ufe0f Could not reach the study-plan server. It may still be starting up.', true);
         if(window.__showToast){
           window.__showToast('\u26a0\ufe0f Could not reach the study-plan server. It may still be starting \u2014 reload in a moment.');
