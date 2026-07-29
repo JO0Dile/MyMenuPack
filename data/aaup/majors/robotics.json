@@ -1059,5 +1059,8 @@
       "requires": "advanced-english-lab",
       "forCourse": "research-methods"
     }
+  ],
+  "freeElectiveSuggestions": [
+    "Basic Physics"
   ]
 }

@@ -64,6 +64,7 @@ function shapePlan(major) {
     collegeId: major.college?.slug ?? null,
     bio: { en: major.bio ?? '', ar: major.bioAr ?? '' },
     degreeHours: major.degreeHours ?? null,
+    freeElectiveSuggestions: major.freeElectiveSuggestions ?? [],
     gradingScale: major.gradingScale
       ? { name: major.gradingScale.name, passMark: major.gradingScale.passMark, bands: major.gradingScale.bands }
       : null,
@@ -127,6 +128,9 @@ function shapeUniversities(universities) {
         shortName: u.shortName ?? u.slug.toUpperCase(),
         icon: u.icon ?? '🎓',
         website: u.website ?? '',
+        // The University Elective pool used by the course popup when a
+        // generic "uni-elective-N" placeholder is tapped.
+        electivePool: u.electivePool ?? [],
       },
     ])
   );

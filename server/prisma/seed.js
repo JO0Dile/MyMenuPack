@@ -21,9 +21,21 @@ const DATA = path.resolve(HERE, '../../data');
 
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
 
+// rules.json is read twice (elective pool at university-upsert time, grading
+// scales just after), so cache it rather than hitting the disk twice.
+const rulesCache = new Map();
+function rulesFor(uniDir) {
+  return rulesCache.get(uniDir) ?? {};
+}
+
 async function seedUniversity(slug) {
   const uniDir = path.join(DATA, slug);
   const uni = await readJson(path.join(uniDir, 'university.json'));
+  try {
+    rulesCache.set(uniDir, await readJson(path.join(uniDir, 'rules.json')));
+  } catch {
+    rulesCache.set(uniDir, {});
+  }
 
   const university = await prisma.university.upsert({
     where: { slug: uni.slug },
@@ -39,6 +51,7 @@ async function seedUniversity(slug) {
       website: uni.website ?? null,
       logoUrl: uni.logoUrl ?? null,
       description: uni.description ?? null,
+      electivePool: rulesFor(uniDir).universityElectives ?? undefined,
     },
     update: {
       name: uni.name,
@@ -46,6 +59,7 @@ async function seedUniversity(slug) {
       shortName: uni.shortName ?? null,
       icon: uni.icon ?? null,
       website: uni.website ?? null,
+      electivePool: rulesFor(uniDir).universityElectives ?? undefined,
     },
   });
 
@@ -122,6 +136,7 @@ async function seedUniversity(slug) {
         icon: m.icon ?? null,
         bio: m.bio ?? null,
         bioAr: m.bioAr ?? null,
+        freeElectiveSuggestions: m.freeElectiveSuggestions ?? undefined,
         department: m.college ?? null,
         // Stays null until the real total is read off the official PDF — the
         // credit sum here counts pool electives no student takes all of.
@@ -137,6 +152,7 @@ async function seedUniversity(slug) {
         icon: m.icon ?? null,
         bio: m.bio ?? null,
         bioAr: m.bioAr ?? null,
+        freeElectiveSuggestions: m.freeElectiveSuggestions ?? undefined,
         department: m.college ?? null,
         degreeHours: m.degreeHours ?? null,
         gradingScaleId: scaleId,
