@@ -12,7 +12,7 @@ prerequisites, student progress, and developer imports.
 - [ ] Authentication (register / login / refresh / roles)
 - [ ] Import system (validate / apply, versioned)
 - [ ] Progress + prerequisite write APIs (student-side edit-mode corrections
-      currently live client-side only, in `web/src/js/editmode.js`, the same
+      currently live client-side only, in the plan-editor modules under `web/js/`, the same
       way the old `app/plan.html` kept them — this becomes a real sync
       endpoint once auth exists)
 
@@ -81,7 +81,7 @@ It expects the API at `http://localhost:4010/api` (override with
 `window.__API_BASE__`). `CORS_ORIGINS` in the server `.env` must list the
 frontend's origin.
 
-`web/src/js/store.js` keeps completion state in localStorage. That is a cache,
+`web/js/` keeps completion state in localStorage. That is a cache,
 not a source of truth — once the auth and progress endpoints exist it becomes
 the offline write queue that flushes to `POST /api/me/progress/sync`. It keys
 on the server's course id precisely so that flush needs no migration.
