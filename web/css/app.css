@@ -2483,3 +2483,10 @@
   color:var(--text-dim); font-size:13.5px;
 }
 .catalogue-status .home-btn{margin-top:12px;}
+
+/* A published programme whose course list has not been transcribed yet. Muted
+   rather than hidden: its existence is real information for a student choosing
+   a major, but the card must not promise a page it cannot show. */
+.plan-card-pending{opacity:.62;}
+.plan-card-pending:hover{opacity:.78;}
+.plan-card-pending .pc-cta{color:var(--text-dim); border-color:transparent;}
