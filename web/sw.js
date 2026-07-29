@@ -1,12 +1,12 @@
 // Service worker for the hosted app.
 //
-// The app itself is one self-contained file, so the shell is just that plus
-// the icons. Deliberately does NOT cache anything under /api/ — the catalogue
-// must always come from the database live; caching it here would reintroduce
-// exactly the stale-embedded-data problem this architecture removes.
-var CACHE = 'studyplan-shell-v2';
+// The app is self-contained: shell, styles, modules, icons, and the whole
+// study-plan catalogue (plans.json) are all precached, so it works with no
+// network at all from the first visit onward. The only thing that ever goes
+// online is the plan collector, when a student chooses to share a plan.
+var CACHE = 'studyplan-shell-v3';
 var CORE = [
-  './index.html', './manifest.json', './css/app.css', './js/01-catalogue.js',
+  './index.html', './manifest.json', './plans.json', './css/app.css', './js/01-catalogue.js',
   './js/02-shared-cross.js', './js/03-search.js', './js/05-collapse-finished-years.js',
   './js/06-per.js', './js/07-plan-overview-print.js', './js/08-celebrations.js',
   './js/10-progress-core.js', './js/11-module11.js', './js/12-removed.js',

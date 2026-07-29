@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+"""Build web/plans.json — the whole catalogue as one static file.
+
+The app is offline-first and self-contained: it ships its catalogue rather
+than asking a server for it at runtime. This turns the authored data under
+data/ into the exact structure the app's own plan renderer consumes, so there
+is no live API in the loop and no server that can be asleep when a student
+opens the app.
+
+data/ stays the place plans are authored and reviewed. This is the build step
+that publishes them.
+
+    python3 tools/build-catalogue.py
+
+Run it after editing anything under data/, then commit web/plans.json.
+"""
+import hashlib
+import json
+import pathlib
+import sys
+
+REPO = pathlib.Path(__file__).resolve().parent.parent
+DATA = REPO / 'data'
+OUT = REPO / 'web' / 'plans.json'
+
+# Inverse of the importer's mapping, which came from the app's own
+# CATEGORY_FALLBACK table. These two must round-trip losslessly.
+CATEGORY_OUT = {
+    'CORE': 'core',
+    'MATH': 'math',
+    'DEPARTMENT_ELECTIVE': 'dept',
+    'UNIVERSITY_ELECTIVE': 'uni',
+    'FREE_ELECTIVE': 'free',
+    'UNIVERSITY_REQUIREMENT': 'skills',
+    'ENGLISH': 'eng',
+}
+
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def shape_plan(major, scales_by_college):
+    # Years and summers are derived from where the courses actually sit, so the
+    # structure can never disagree with the courses it describes.
+    years = {}
+    for c in major.get('courses', []):
+        if c.get('year') is None:
+            continue
+        yid = f"y{c['year']}"
+        years[yid] = years.get(yid, False) or c.get('semester') == 3
+    structure = {
+        'years': [
+            {'id': yid, 'hasSummer': has}
+            for yid, has in sorted(years.items(), key=lambda kv: int(kv[0][1:]))
+        ]
+    }
+
+    courses = []
+    for c in major.get('courses', []):
+        courses.append({
+            'id': c['slug'],
+            'name': c.get('name') or c['slug'],
+            'ar': c.get('nameAr') or '',
+            'creditHours': float(c.get('credits') or 0),
+            'category': CATEGORY_OUT.get(c.get('category'), 'core'),
+            'yearId': None if c.get('year') is None else f"y{c['year']}",
+            'semester': None if c.get('semester') is None else f"s{c['semester']}",
+            'courseNumber': c.get('code') or '',
+        })
+
+    prereqs = [[p['requires'], p['forCourse']] for p in major.get('prerequisites', [])]
+
+    # Only the AI faculty's own majors use the 50-pass scale; everything else
+    # falls back to the engineering one. A default, never an assertion about a
+    # specific course.
+    scale = scales_by_college.get('ai' if major.get('college') == 'aaup-ai-ds' else 'engineering')
+
+    return {
+        'id': major['slug'],
+        # Bumped whenever this file is rebuilt, so a corrected plan replaces the
+        # copy a student already has instead of being ignored as "not newer".
+        'version': major.get('version', 1),
+        'majorName': {
+            'en': {'big': major.get('name') or major['slug'], 'small': major.get('subtitle') or ''},
+            'ar': {'big': major.get('nameAr') or '', 'small': major.get('subtitleAr') or ''},
+        },
+        'icon': major.get('icon') or '🎓',
+        'university': major['university'],
+        'collegeId': major.get('college'),
+        'bio': {'en': major.get('bio') or '', 'ar': major.get('bioAr') or ''},
+        'degreeHours': major.get('degreeHours'),
+        'freeElectiveSuggestions': major.get('freeElectiveSuggestions') or [],
+        'gradingScale': scale,
+        'structure': structure,
+        'courses': courses,
+        'prerequisites': prereqs,
+    }
+
+
+def main():
+    index = read(DATA / 'universities.json')
+    universities, colleges, plans = {}, {}, []
+
+    for entry in index['universities']:
+        slug = entry['slug']
+        uni_dir = DATA / slug
+        uni = read(uni_dir / 'university.json')
+
+        try:
+            rules = read(uni_dir / 'rules.json')
+        except FileNotFoundError:
+            rules = {}
+
+        universities[slug] = {
+            'name': {'en': uni['name'], 'ar': uni.get('nameAr') or ''},
+            'shortName': uni.get('shortName') or slug.upper(),
+            'icon': uni.get('icon') or '🎓',
+            'website': uni.get('website') or '',
+            'electivePool': rules.get('universityElectives') or [],
+        }
+
+        for c in uni.get('colleges', []):
+            colleges[c['slug']] = {
+                'university': slug,
+                'icon': c.get('icon') or '🎓',
+                'name': {'en': c['name'], 'ar': c.get('nameAr') or ''},
+            }
+
+        scales_by_college = {}
+        for s in rules.get('gradingScales', []):
+            scales_by_college[s['slug']] = {
+                'name': s['name'], 'passMark': s['passMark'], 'bands': s['bands'],
+            }
+
+        majors_dir = uni_dir / 'majors'
+        if not majors_dir.is_dir():
+            continue
+        for f in sorted(majors_dir.glob('*.json')):
+            plans.append(shape_plan(read(f), scales_by_college))
+
+    # A plan's version must increase when its content changes, or a student who
+    # already has the old copy never receives the fix. Content-derived rather
+    # than a timestamp, so rebuilding without editing anything does not force
+    # every device to re-download every plan.
+    for p in plans:
+        body = json.dumps(
+            {k: v for k, v in p.items() if k != 'version'},
+            ensure_ascii=False, sort_keys=True,
+        )
+        # hashlib, not hash(): Python's built-in hash is salted per process, so
+        # it would hand out a different version on every run and make every
+        # device re-download every plan for no reason.
+        p['version'] = int(hashlib.sha1(body.encode('utf-8')).hexdigest()[:8], 16)
+
+    out = {
+        'schemaVersion': 1,
+        'universities': universities,
+        'colleges': colleges,
+        'plans': plans,
+    }
+    OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
+
+    with_courses = sum(1 for p in plans if p['courses'])
+    print(f'wrote {OUT.relative_to(REPO)}')
+    print(f'  universities : {len(universities)}')
+    print(f'  colleges     : {len(colleges)}')
+    print(f'  plans        : {len(plans)}  ({with_courses} with courses, {len(plans) - with_courses} listing-only)')
+    print(f'  courses      : {sum(len(p["courses"]) for p in plans)}')
+    print(f'  prerequisites: {sum(len(p["prerequisites"]) for p in plans)}')
+    print(f'  size         : {OUT.stat().st_size / 1024:.0f} KB')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
