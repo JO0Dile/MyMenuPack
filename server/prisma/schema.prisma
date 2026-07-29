@@ -44,6 +44,10 @@ model University {
   logoUrl     String?
   website     String?
   description String?
+  // The official University Elective pool every major at this university
+  // draws from, as [{code, en}]. Kept as data rather than in the client so
+  // adding a course to the pool is a seed, not a code change.
+  electivePool Json?
 
   majors        Major[]
   colleges      College[]
@@ -104,6 +108,8 @@ model Major {
   icon           String?
   bio            String? // short description shown on the plan card
   bioAr          String?
+  // Courses this specific plan suggests for its Free Elective slots.
+  freeElectiveSuggestions Json?
   department     String?
   // Nullable because "not yet confirmed from the official PDF" is the honest
   // state for most plans. 0 would read as a real degree requiring no hours,

@@ -2475,3 +2475,11 @@
     padding:6px 14px; border-radius:999px; font-weight:800; font-size:12px;
     cursor:pointer; font-family:inherit; white-space:nowrap;
   }
+
+/* Catalogue loading / unreachable state on the home grid. Grid-column span so
+   it reads as one message rather than pretending to be a plan card. */
+.catalogue-status{
+  grid-column:1/-1; text-align:center; padding:26px 18px; line-height:1.6;
+  color:var(--text-dim); font-size:13.5px;
+}
+.catalogue-status .home-btn{margin-top:12px;}
