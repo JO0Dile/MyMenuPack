@@ -51,7 +51,19 @@
     return 'custom:' + uniId + ':unspecified';
   }
 
+  // Tapping a plan whose courses are not in yet: say why, rather than opening
+  // an empty grid or silently doing nothing.
+  function notePending(){
+    var rtl = window.__anyVisiblePageIsRtl ? window.__anyVisiblePageIsRtl() : false;
+    if(window.__showToast){
+      window.__showToast(rtl
+        ? '\u23f3 هذه الخطة منشورة لكن مساقاتها لم تُدخل بعد.'
+        : '\u23f3 This programme is published, but its course list has not been added yet.');
+    }
+  }
+
   function renderHomeCards(){
+    var rtl = window.__anyVisiblePageIsRtl ? window.__anyVisiblePageIsRtl() : false;
     var container = document.getElementById('importedPlansContainer');
     if(!container) return;
     var plans = loadImportedPlans();
@@ -71,20 +83,35 @@
       if(!p || !p.majorName || (!p.majorName.en && !p.majorName.ar)) return '';
       var en = nameParts(p.majorName.en);
       var ar = nameParts(p.majorName.ar);
-      var bio = (p.bio && p.bio.en) || ((Array.isArray(p.courses) ? p.courses.length : 0) + ' courses \u00b7 community-imported major');
+      var courseCount = Array.isArray(p.courses) ? p.courses.length : 0;
+      // A plan with no courses yet is a real, published programme whose
+      // curriculum has not been transcribed. Opening it shows an empty grid,
+      // which reads as "this app is broken" rather than "this plan is not in
+      // yet" — so the card says so and does not pretend to be openable.
+      var pending = courseCount === 0;
+      var bio = pending
+        ? (rtl
+            ? 'الخطة التفصيلية لم تُضف بعد \u2014 قريبًا.'
+            : 'Course list not added yet \u2014 coming soon.')
+        : ((p.bio && p.bio.en) || (courseCount + ' courses \u00b7 community-imported major'));
       var uni = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'];
       var badge = (uni ? uni.icon + ' ' + uni.shortName + ' \u00b7 ' : '') + (p.official ? (p.wasEdited ? '✏️ Official (Edited)' : '✅ Official') : (p.wasEdited ? '✏️ User Edited' : '👤 User Made'));
       // Reuses the exact .plan-card class the four built-in majors use —
       // same icon box, same two-tone title, same dim bio text, same small
       // blue CTA — rather than a bespoke look-alike that has to be kept in
       // sync with it by hand.
-      return '<div class="plan-card" data-page="' + id + '" data-imported="1" data-university="' + (p.university || 'aaup') + '" data-college="' + collegeKeyForPlan(p) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="AAUP_DASHBOARD.selectAndOpen(\'' + id + '\')" role="button" tabindex="0">' +
+      var openAction = pending
+        ? 'AAUP_IMPORTED.notePending()'
+        : 'AAUP_DASHBOARD.selectAndOpen(\'' + id + '\')';
+      return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + id + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + (p.university || 'aaup') + '" data-college="' + collegeKeyForPlan(p) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
         '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">🗑 Delete</button>' +
         '<div class="pc-icon">' + (p.icon || '🎓') + '</div>' +
         '<h2>' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</h2>' +
         '<p>' + bio + '</p>' +
-        '<div class="pc-cta">View plan →</div></div>';
+        '<div class="pc-cta">' + (pending
+          ? (rtl ? 'قريبًا' : 'Coming soon')
+          : (rtl ? 'عرض الخطة ←' : 'View plan →')) + '</div></div>';
      } catch(e){ return ''; }
     }).join('') + '</div>';
     if(window.AAUP_HOME){ window.AAUP_HOME.refreshPlanEmptyState(); window.AAUP_HOME.refreshCounts(); }
@@ -1559,7 +1586,8 @@
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
     exportPlan: exportPlan, submitPlan: submitPlan, editCoursePrompt: openCourseEditPopup, runAutoLink: runAutoLink,
     refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan,
-    openCourseModal: openCourseModal
+    openCourseModal: openCourseModal,
+    notePending: notePending
   };
 
   // If the person somehow navigates to a built-in plan while an imported
