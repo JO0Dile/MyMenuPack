@@ -2,8 +2,9 @@
 
 **Status: parity reached.** The frontend *is* the original app — all 29 feature
 modules, the same CSS, the same renderer — split into `web/index.html` +
-`web/css/app.css` + 39 files under `web/js/`, and fed from PostgreSQL through
-`GET /api/feed` instead of from hardcoded literals.
+`web/css/app.css` + 39 files under `web/js/`, and fed from `web/plans.json`
+(built from `data/` by `tools/build-catalogue.py`) instead of from hardcoded
+literals.
 
 This file exists because an earlier attempt rewrote the app from scratch,
 claimed "feature parity" after porting five features, and shipped a version
@@ -35,13 +36,13 @@ accounts, orphan rescue, export/import, tours.
 
 | Item | Status |
 |---|---|
-| 3 universities, 6 colleges | ✅ in PostgreSQL |
+| 3 universities, 6 colleges | ✅ in `data/`, published to `web/plans.json` |
 | 34 majors / 1,028 courses / 707 prerequisites | ✅ — was 4 majors / 239 courses |
 | 14 full plans recovered from the old plans feed | ✅ `tools/import-legacy-feed.py` |
 | 16 listing-only plans | ✅ |
 | Plan icon / subtitle / bio / college | ✅ |
 | Grading scales (dual AAUP scales) | ✅ served per plan |
-| No hardcoded catalogue data in the client | ✅ `web/js/09-catalogue-bootstrap.js` is the only entry point |
+| No hardcoded catalogue data in the client | ✅ `web/js/01-catalogue.js` is the only entry point |
 
 All 30 feed plans were verified present, field by field, by an assertion
 suite before the server was retired (6,668 assertions walking the legacy feed
@@ -56,19 +57,17 @@ publishes it to `web/plans.json`.
 
 | # | Item | Notes |
 |---|---|---|
-| 1 | **`degreeHours` is `null` for all 34 majors** | The official totals come from the university PDFs. Nullable on purpose: `0` would read as "a degree requiring no hours" and quietly corrupt any progress percentage. Set it in `data/<university>/majors/<slug>.json`, then `cd server && node prisma/seed.js`. |
-| 2 | **Contribute / auto-collect is stale** | `APP_COLLECT_URL` in `web/js/01-universities-registry.js` still points at the Cloudflare Worker, but `collector/` was deleted and that Worker commits to `app/plans/collected/`, which no longer exists. Either re-point it at a real import endpoint or turn it off — today it fails silently. |
-| 3 | Authentication | Schema ready (`User`, `RefreshToken`). Not built. |
-| 4 | Progress sync | Schema ready (`CourseCompletion`, unique on `(userId, courseId)` so a retried flush can't double-apply). Progress is still per-device localStorage. |
-| 5 | Developer/admin import system | Schema ready (`ImportBatch`). Adding a university is currently: edit `data/`, re-seed. |
-| 6 | Google Play / TWA packaging | Docs were removed with `app/`. The PWA itself (manifest, service worker, icons) is intact and installable. |
-| 7 | Offline first-load | The shell caches on demand rather than up front, so a *first* visit needs the network. After that, plans persist in localStorage and the app opens offline. |
+| 1 | **`degreeHours` is `null` for all 34 majors** | The official totals come from the university PDFs. Null on purpose: `0` would read as "a degree requiring no hours" and quietly corrupt any progress percentage. Set it in `data/<university>/majors/<slug>.json`, then rebuild with `python3 tools/build-catalogue.py`. |
+| 2 | **Deployed collector still uses the old path** | The repo's `collector/cloudflare-worker.js` now commits into `data/collected/`, but the Worker running on Cloudflare carries the old code until this file is pasted in again. |
+| 3 | Verify every plan against the official university PDFs | The data was migrated faithfully, but faithfulness to the *old app* is not correctness — the source of truth is the PDFs. |
+| 4 | Accounts / cross-device progress sync | Progress is per-device `localStorage`. A future account system is a new build, not a revival of the retired server. |
+| 5 | Google Play / TWA packaging | Old docs were removed with `app/`. The PWA itself (manifest, service worker, icons) is intact and installable. |
 
-## Known operational limits
+## Operational notes
 
-- **Free Render tier sleeps after 15 min idle**, so the first visit after a
-  quiet spell takes ~30–60s. The home screen now says so instead of showing an
-  empty grid. Removed by any paid tier, no code change.
-- **Seeding only runs when `data/` changes** (`SeedState` fingerprint). It used
-  to run on every deploy, which rewrote the database underneath the still-live
-  previous container and produced 500s plus half-seeded counts.
+- **Fully offline after first visit.** The service worker precaches the shell
+  and the whole catalogue (`web/plans.json`), so only the very first visit
+  needs a connection. The only online feature is Contribute.
+- **Publishing data changes**: edit `data/`, run `python3
+  tools/build-catalogue.py`, commit both. The Pages workflow deploys `web/` on
+  every push to `main`.
