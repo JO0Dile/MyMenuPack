@@ -1,4 +1,4 @@
-# Parity checklist — old `app/plan.html` → current `web/` + `server/`
+# Parity checklist — old `app/plan.html` → current `web/`
 
 **Status: parity reached.** The frontend *is* the original app — all 29 feature
 modules, the same CSS, the same renderer — split into `web/index.html` +
@@ -43,10 +43,12 @@ accounts, orphan rescue, export/import, tours.
 | Grading scales (dual AAUP scales) | ✅ served per plan |
 | No hardcoded catalogue data in the client | ✅ `web/js/09-catalogue-bootstrap.js` is the only entry point |
 
-Guarded by `server/tests/verify-legacy-data.js` (6,668 assertions) which walks
-the legacy feed and **demands every plan be present** — the completeness check
-whose absence caused the original loss — and `verify-seed.js` (8,681
-assertions) comparing the database to `data/`.
+All 30 feed plans were verified present, field by field, by an assertion
+suite before the server was retired (6,668 assertions walking the legacy feed
+and demanding every plan be present — the completeness check whose absence
+caused the original loss). The suite lived in `server/tests/` and left the
+tree with it; `data/` is now the reviewed source and `tools/build-catalogue.py`
+publishes it to `web/plans.json`.
 
 ---
 
