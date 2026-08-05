@@ -35,9 +35,9 @@ prerequisite, and your GPA — in English or Arabic, on any phone.
 - **💬 Built-in assistant** — ask it anything about the app: what a course
   needs, why one is locked, how the GPA is worked out, where a button is. Ask
   "how do I…" or "where is…" and it dims the page and points at the exact
-  control, one step at a time. It can tick courses off for you too — always
-  explaining the change first, and warning you if it clashes with a
-  prerequisite.
+  control, one step at a time. It can tick courses off and move you around the
+  app too — always explaining a change first, and warning you if it clashes
+  with a prerequisite. Nothing is ever saved without you tapping to confirm.
 - **🛠 Fix button** — bottom-left, on every screen. Checks the app and your
   saved data, explains anything it finds in plain language, and repairs what
   it safely can. Every repair is backed up first and can be undone.
@@ -56,8 +56,14 @@ StudyPlan/
 │                 step, no framework, no server.
 │   └── plans.json  — every university, college, and study plan, in one file
 ├── data/       — where plans are authored and reviewed, one file per major
-└── tools/      — build-catalogue.py turns data/ into web/plans.json
+├── tools/      — build-catalogue.py turns data/ into web/plans.json
+├── collector/  — optional Worker that receives plans students choose to share
+└── ai/         — optional Worker that powers the smart assistant
 ```
+
+Both folders under `ai/` and `collector/` are optional. With neither deployed
+the app is exactly what it looks like: a static site that runs offline and
+talks to nothing.
 
 **It works completely offline.** The app, its styles, all its modules, and the
 entire study-plan catalogue are cached on your device the first time you open
@@ -68,15 +74,34 @@ The only thing that ever goes online is **📨 Contribute**, if you choose to
 share a study plan you built. Even then only the *plan* is sent — its courses,
 years, and prerequisites — never your name, student ID, GPA, or grades.
 
-**The assistant is part of that.** It is not a chatbot service and there is no
-API behind it — no account, no key, no bill, and nothing you type leaves your
-device. It answers from the app's own knowledge base (`web/js/41-assistant-kb.js`)
-and from live state already in the page: the plan registry, the prerequisite
-graph, your progress. That is a real limit — it understands far less free-form
-phrasing than a large language model would — and a deliberate one, because it
-means it cannot invent a prerequisite or a credit total for someone's degree.
-Anything outside those two sources gets "that isn't part of this website"
-instead of a guess.
+**The assistant has two brains, and you choose which one.**
+
+The **offline brain** ships with the app. No account, no key, no bill, and
+nothing you type leaves your device. It answers from the app's own knowledge
+base (`web/js/41-assistant-kb.js`) and from live state already in the page: the
+plan registry, the prerequisite graph, your progress. It cannot invent a
+prerequisite or a credit total, because it has nothing to invent from. It is
+also limited — it recognises phrasing rather than understanding it, and says
+"that isn't part of this website" for everything else.
+
+The **smart brain** is a real language model, reached through a small Cloudflare
+Worker (see [`ai/README.md`](ai/README.md)). It understands ordinary questions,
+answers naturally in English or Arabic, and can drive the app for you. It runs
+entirely on free tiers — Gemini, then Cloudflare Workers AI, then back to the
+offline brain when a daily quota runs out — so it costs nothing and cannot
+start charging you.
+
+**It is off until you turn it on**, and the app asks once, in plain language,
+before anything is ever sent. When it is on, a question sends: your question,
+the plan you have open, its courses and prerequisites, which ones you have
+completed, and your GPA number. It never sends your name, your student ID, your
+individual grades, your assessment marks, or your notes. Turn it off and the
+app goes back to sending nothing at all.
+
+Every number the smart brain quotes — GPA, credit totals, what is unlocked,
+which prerequisites are missing — is computed by the app's own code and handed
+to it as fact. It explains; it does not do arithmetic on your degree. And it
+cannot change your record: it can only propose a change, which you confirm.
 
 ---
 

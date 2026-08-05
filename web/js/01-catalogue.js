@@ -57,6 +57,21 @@ window.APP_COLLECT_SECRET = 'Winston';
 //                 retry just re-saves the same plan, never a duplicate).
 // Leave it 'cloudflare' unless/until you deploy the Apps Script version.
 window.APP_COLLECT_MODE = 'cloudflare';
+// SMART ASSISTANT endpoint — a small Cloudflare Worker that holds a free
+// Gemini API key privately and answers the in-app assistant's questions (see
+// ai/README.md for the 5-minute setup). Same reasoning as the collector above:
+// a key pasted into this file would be public, since GitHub Pages serves it to
+// anyone. The Worker also holds the assistant's system prompt and the list of
+// things it is allowed to do, so those cannot be rewritten from a browser.
+//
+// Leave '' and the app is unchanged: the assistant runs entirely on-device
+// from the knowledge base in js/41-assistant-kb.js, the ✨ toggle never
+// appears, and nothing a student types can leave their phone.
+window.APP_AI_URL = '';
+// Optional. Match it to SHARED_SECRET on the Worker to turn away traffic that
+// did not come from this app. Not a login and it protects a free quota, not
+// money — so a simple value is fine. Leave '' to send none.
+window.APP_AI_SECRET = '';
 // Hosted JSON manifest of official/community plans the app can pull updates
 // from when online (see "Check for updates" in Settings). A relative path
 // works once this file is served (GitHub Pages, any static host) alongside
@@ -78,7 +93,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.5';
+window.APP_VERSION = '4.6';
 
 (function(){
   // The catalogue ships with the app. Relative on purpose: it must resolve the

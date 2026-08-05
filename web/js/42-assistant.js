@@ -727,6 +727,19 @@
     langFor: langFor,
     normalize: normalize,
     findCourse: findCourse,
-    currentPlan: currentPlan
+    currentPlan: currentPlan,
+    // The proposal builders are shared with the online assistant
+    // (js/46-assistant-ai.js): when the model asks to change a student's
+    // record, it goes through this same code — the same prerequisite
+    // warnings, the same cascade explanation, the same confirm-first
+    // contract. A second, model-side implementation of "what will this
+    // change" is exactly how the two would drift apart.
+    proposeMark: proposeMark,
+    proposeReset: proposeReset,
+    courseName: courseName,
+    courseState: courseState,
+    creditsOf: creditsOf,
+    planData: planData,
+    say: function (key, lang) { return pick(KB.say[key], lang || 'en'); }
   };
 })();

@@ -40,7 +40,8 @@ accounts, orphan rescue, export/import, tours.
 
 | Module | Files | Notes |
 |---|---|---|
-| `ASSISTANT_KB` / `ASSISTANT` / `ASSISTANT_UI` | `web/js/41-…`, `42-…`, `43-…` | Offline, deterministic assistant + Guided Mode. No API, no key, no network — it answers only from the knowledge base and live page state, so it cannot fabricate a prerequisite. |
+| `ASSISTANT_KB` / `ASSISTANT` / `ASSISTANT_UI` | `web/js/41-…`, `42-…`, `43-…` | Offline, deterministic assistant + Guided Mode. No API, no key, no network — it answers only from the knowledge base and live page state, so it cannot fabricate a prerequisite. Also the permanent fallback for the module below. |
+| `ASSISTANT_AI` | `web/js/46-assistant-ai.js`, `ai/cloudflare-worker.js` | The online brain: a real model, grounded in the app's own data, able to navigate and run walkthroughs. Opt-in, free-tier only, and its two editing tools can only *propose* — proposals are built by `42-…` so they carry the same prerequisite warnings. |
 | `FIX_ANALYZERS` / `FIX` | `web/js/44-…`, `45-…` | Ten analyzers; repairs saved data and the offline cache, reports everything else. Backup + undo + history on every repair. |
 | Diagnostics recorder | `web/js/00-diagnostics.js` | Loaded first, before every other script, so it is listening when a module fails on the way in. |
 

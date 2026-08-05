@@ -60,6 +60,50 @@
     addBubble('bot', b);
   }
 
+  // A language model writes markdown whether or not you ask it to — **bold**
+  // and "- " bullets come back constantly. Rendered as plain text those show
+  // up as literal asterisks, so this converts the two that actually appear.
+  //
+  // Built from DOM nodes rather than innerHTML, deliberately: this text comes
+  // off the network, and an assistant that pasted model output into innerHTML
+  // would be a script-injection hole wearing a chat bubble.
+  function appendInline(node, text) {
+    String(text).split(/\*\*(.+?)\*\*/g).forEach(function (part, i) {
+      if (!part) return;
+      if (i % 2 === 1) {
+        var strong = document.createElement('strong');
+        strong.textContent = part;
+        node.appendChild(strong);
+      } else {
+        node.appendChild(document.createTextNode(part));
+      }
+    });
+  }
+
+  function appendBlock(container, block) {
+    var list = null;
+    String(block).split('\n').forEach(function (raw) {
+      var line = raw.trim().replace(/^#{1,6}\s+/, '');
+      if (!line) return;
+      var bullet = line.match(/^[-*•]\s+(.*)$/);
+      if (bullet) {
+        if (!list) {
+          list = document.createElement('ul');
+          list.className = 'asst-list';
+          container.appendChild(list);
+        }
+        var li = document.createElement('li');
+        appendInline(li, bullet[1]);
+        list.appendChild(li);
+        return;
+      }
+      list = null; // a plain line ends the current bullet run
+      var p = document.createElement('p');
+      appendInline(p, line);
+      container.appendChild(p);
+    });
+  }
+
   function addReply(r, replyLang) {
     var dir = replyLang === 'ar' ? 'rtl' : 'ltr';
     var b = document.createElement('div');
@@ -72,11 +116,7 @@
       h.textContent = r.title;
       b.appendChild(h);
     }
-    (r.lines || []).forEach(function (line) {
-      var p = document.createElement('p');
-      p.textContent = line;
-      b.appendChild(p);
-    });
+    (r.lines || []).forEach(function (line) { appendBlock(b, line); });
 
     // An editing proposal: the change is described above, and nothing at all
     // happens until this button is pressed.
@@ -156,23 +196,151 @@
     scrollDown();
   }
 
+  // The three dots while the online brain is thinking. The offline one
+  // answers in under a millisecond and never shows this.
+  function addTyping() {
+    var log = el('asstLog');
+    if (!log) return null;
+    var row = document.createElement('div');
+    row.className = 'asst-msg asst-bot';
+    var b = document.createElement('div');
+    b.className = 'asst-bubble asst-typing';
+    for (var i = 0; i < 3; i++) b.appendChild(document.createElement('span'));
+    row.appendChild(b);
+    log.appendChild(row);
+    scrollDown();
+    return row;
+  }
+
+  function localAnswer(text, replyLang) {
+    try {
+      return ENGINE.ask(text);
+    } catch (e) {
+      // A thrown assistant is still an assistant that must answer.
+      if (window.console && console.error) { console.error('Assistant failed to answer:', e); }
+      return { lines: [replyLang === 'ar'
+        ? 'حدث خطأ عندي أثناء الإجابة. جرّب صياغة أخرى.'
+        : 'Something went wrong on my side. Try asking a different way.'] };
+    }
+  }
+
   function send(text) {
     var t = String(text || '').trim();
     if (!t) return;
     addUser(t);
     var replyLang = ENGINE.langFor(t);
     lastLang = replyLang;
-    var r;
-    try {
-      r = ENGINE.ask(t);
-    } catch (e) {
-      // A thrown assistant is still an assistant that must answer.
-      if (window.console && console.error) { console.error('Assistant failed to answer:', e); }
-      r = { lines: [replyLang === 'ar'
-        ? 'حدث خطأ عندي أثناء الإجابة. جرّب صياغة أخرى.'
-        : 'Something went wrong on my side. Try asking a different way.'] };
-    }
-    addReply(r, replyLang);
+    var dir = replyLang === 'ar' ? 'rtl' : 'ltr';
+
+    var AI = window.AAUP_ASSISTANT_AI;
+    if (!AI || !AI.enabled()) { addReply(localAnswer(t, replyLang), replyLang); return; }
+
+    var typing = addTyping();
+    AI.ask(t, replyLang).then(function (r) {
+      if (typing) typing.remove();
+      addReply(r, replyLang);
+    }, function (e) {
+      // The smart brain is unavailable — quota, connection, anything. The
+      // question still gets answered, by the brain that cannot go away.
+      if (typing) typing.remove();
+      addReply(localAnswer(t, replyLang), replyLang);
+      addPlain('ℹ️ ' + AI.fallbackNote(e, replyLang), dir);
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // SMART MODE — opt-in, because it is the one thing that sends anything
+  // ---------------------------------------------------------------
+  // The app's promise is that nothing leaves the device. The smart assistant
+  // breaks that promise for the students who choose it, so it is off until
+  // asked for, the question spells out exactly what travels and what never
+  // does, and it can be switched back off at any time.
+  var CONSENT = {
+    title: { en: 'Want the smarter assistant?', ar: 'تريد المساعد الأذكى؟' },
+    body: {
+      en: ['I can answer much better questions if I’m allowed to go online — I’ll understand how you actually phrase things, and I can take you to the right screen myself.',
+           'Sent when you ask something: your question, your open plan, its courses and prerequisites, which ones you’ve completed, and your GPA number.',
+           'Never sent: your name, your student ID, your individual grades, your assessment marks, or your notes.',
+           'It’s free, and you can turn it off any time. Say no and I stay fully offline — I just understand less.'],
+      ar: ['أستطيع الإجابة عن أسئلة أفضل بكثير إذا سُمح لي بالاتصال — سأفهم صياغتك الطبيعية، ويمكنني نقلك إلى الشاشة الصحيحة بنفسي.',
+           'يُرسَل عند سؤالك: سؤالك، وخطتك المفتوحة، ومساقاتها ومتطلباتها، وما أنجزته منها، ورقم معدّلك.',
+           'لا يُرسَل أبدًا: اسمك، ولا رقمك الجامعي، ولا علاماتك التفصيلية، ولا تقييماتك، ولا ملاحظاتك.',
+           'مجاني، ويمكنك إيقافه في أي وقت. وإن رفضت أبقى دون اتصال تمامًا — لكنني أفهم أقل.']
+    },
+    yes: { en: 'Turn it on', ar: 'فعّله' },
+    no: { en: 'Stay offline', ar: 'ابقَ دون اتصال' }
+  };
+
+  function offerSmartMode(l) {
+    var dir = l === 'ar' ? 'rtl' : 'ltr';
+    var b = document.createElement('div');
+    b.className = 'asst-bubble asst-consent';
+    b.setAttribute('dir', dir);
+    var h = document.createElement('div');
+    h.className = 'asst-title';
+    h.textContent = '✨ ' + (CONSENT.title[l] || CONSENT.title.en);
+    b.appendChild(h);
+    (CONSENT.body[l] || CONSENT.body.en).forEach(function (line) {
+      var p = document.createElement('p');
+      p.textContent = line;
+      b.appendChild(p);
+    });
+    var actions = document.createElement('div');
+    actions.className = 'asst-actions';
+    var yes = document.createElement('button');
+    yes.type = 'button';
+    yes.className = 'asst-act asst-act-primary';
+    yes.textContent = CONSENT.yes[l] || CONSENT.yes.en;
+    var no = document.createElement('button');
+    no.type = 'button';
+    no.className = 'asst-act';
+    no.textContent = CONSENT.no[l] || CONSENT.no.en;
+    yes.addEventListener('click', function () {
+      window.AAUP_ASSISTANT_AI.setMode('on');
+      yes.disabled = true; no.disabled = true;
+      paintMode();
+      addPlain(l === 'ar' ? 'تم — اسألني بأي صياغة تريد.' : 'Done — ask me anything, however you like.', dir);
+    });
+    no.addEventListener('click', function () {
+      window.AAUP_ASSISTANT_AI.setMode('off');
+      yes.disabled = true; no.disabled = true;
+      paintMode();
+      addPlain(l === 'ar' ? 'تمام، أبقى دون اتصال.' : 'Okay — I’ll stay offline.', dir);
+    });
+    actions.appendChild(yes);
+    actions.appendChild(no);
+    b.appendChild(actions);
+    addBubble('bot', b);
+  }
+
+  // The header toggle: shows which brain is answering, and switches it.
+  function paintMode() {
+    var btn = el('asstMode');
+    if (!btn) return;
+    var AI = window.AAUP_ASSISTANT_AI;
+    if (!AI || !AI.configured()) { btn.style.display = 'none'; return; }
+    btn.style.display = '';
+    var on = AI.mode() === 'on';
+    btn.textContent = on ? '✨' : '💤';
+    btn.classList.toggle('asst-mode-on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.title = on
+      ? (lang() === 'ar' ? 'المساعد الذكي مُفعَّل — اضغط لإيقافه' : 'Smart assistant on — tap to turn off')
+      : (lang() === 'ar' ? 'المساعد الذكي متوقف — اضغط لتفعيله' : 'Smart assistant off — tap to turn on');
+  }
+
+  function toggleMode() {
+    var AI = window.AAUP_ASSISTANT_AI;
+    if (!AI || !AI.configured()) return;
+    var l = lang();
+    var turningOn = AI.mode() !== 'on';
+    if (turningOn && !AI.asked()) { offerSmartMode(l); return; }
+    AI.setMode(turningOn ? 'on' : 'off');
+    paintMode();
+    addPlain(turningOn
+      ? (l === 'ar' ? 'تم تفعيل المساعد الذكي.' : 'Smart assistant on.')
+      : (l === 'ar' ? 'تم إيقافه — أعمل الآن دون اتصال بالكامل.' : 'Turned off — I’m fully offline now.'),
+      l === 'ar' ? 'rtl' : 'ltr');
   }
 
   function open() {
@@ -181,12 +349,16 @@
     panel.classList.add('open');
     var launcher = el('asstLauncher');
     if (launcher) launcher.setAttribute('aria-expanded', 'true');
+    paintMode();
     var log = el('asstLog');
     if (log && !log.childNodes.length) {
       var l = lang();
       lastLang = l;
       addPlain(ENGINE.greeting(l), l === 'ar' ? 'rtl' : 'ltr');
-      addChips(ENGINE.suggestions(l));
+      var AI = window.AAUP_ASSISTANT_AI;
+      // Asked once, on the first visit to the chat, and never again.
+      if (AI && AI.configured() && !AI.asked()) { offerSmartMode(l); }
+      else { addChips(ENGINE.suggestions(l)); }
     }
     var input = el('asstInput');
     if (input) setTimeout(function () { input.focus(); }, 80);
@@ -373,6 +545,9 @@
     if (launcher) launcher.addEventListener('click', toggle);
     var closeBtn = el('asstClose');
     if (closeBtn) closeBtn.addEventListener('click', close);
+    var modeBtn = el('asstMode');
+    if (modeBtn) modeBtn.addEventListener('click', toggleMode);
+    paintMode();
 
     var form = el('asstForm');
     if (form) {
@@ -405,6 +580,7 @@
   window.AAUP_ASSISTANT_UI = {
     open: open, close: close, toggle: toggle,
     send: send, startGuide: startGuide,
+    toggleMode: toggleMode,
     isGuiding: function () { return !!active; }
   };
 })();
