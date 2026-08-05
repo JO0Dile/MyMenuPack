@@ -180,6 +180,185 @@
   }
 
   // ---------------------------------------------------------------
+  // STRUCTURAL EDITS
+  // ---------------------------------------------------------------
+  // Adding, removing and moving courses. Every one of these describes the
+  // change and hands back a confirm block — the app writes nothing until the
+  // student taps. The writes themselves go through AAUP_IMPORTED's own
+  // functions, so a course the assistant adds is identical in every way to
+  // one added through the + button: same duplicate check, same prerequisite
+  // reduction, same auto-link, same re-render.
+
+  function slugify(name) {
+    var base = String(name || '').toLowerCase()
+      .replace(/[^a-z0-9\u0600-\u06FF]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    return base || ('course-' + Math.random().toString(36).slice(2, 7));
+  }
+
+  // Free the id if that slug is taken, so "University Elective" can be added
+  // three times without the second one silently failing the duplicate check.
+  function freeSlug(prefix, base) {
+    var info = window.AAUP_ASSISTANT.planData(prefix).courseInfo || {};
+    if (!info[base]) return base;
+    for (var n = 2; n < 40; n++) {
+      if (!info[base + '-' + n]) return base + '-' + n;
+    }
+    return base + '-' + Date.now().toString(36);
+  }
+
+  function semesterLabel(sem, lang) {
+    if (lang === 'ar') return sem === 3 ? 'الفصل الصيفي' : (sem === 2 ? 'الفصل الثاني' : 'الفصل الأول');
+    return sem === 3 ? 'the summer semester' : (sem === 2 ? 'semester 2' : 'semester 1');
+  }
+
+  function planOf(prefix) {
+    var plans = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()) || {};
+    return plans[prefix];
+  }
+
+  // A year the plan does not have yet cannot receive a course. Rather than
+  // failing, say so — adding years is its own feature with its own button.
+  function hasYear(prefix, yearId) {
+    var p = planOf(prefix);
+    if (!p || !p.structure || !p.structure.years) return true; // unknown shape: let the app decide
+    return p.structure.years.some(function (y) { return y.id === yearId; });
+  }
+
+  function proposeAddCourse(prefix, args, lang) {
+    if (!prefix) return null;
+    var name = String(args.name || '').trim();
+    if (!name) return null;
+    var year = parseInt(args.year, 10) || 1;
+    var sem = parseInt(args.semester, 10) || 1;
+    if (sem < 1 || sem > 3) sem = 1;
+    var yearId = 'y' + year;
+    var credits = Number(args.creditHours);
+    if (!(credits >= 0) || credits > 12) credits = 3;
+    var category = ['core', 'math', 'dept', 'uni', 'free', 'skills', 'eng'].indexOf(args.category) !== -1
+      ? args.category : 'core';
+
+    if (!hasYear(prefix, yearId)) {
+      return {
+        lines: [lang === 'ar'
+          ? 'خطتك لا تحتوي على سنة ' + year + ' بعد. أضف السنة أولًا من «وضع التعديل»، ثم اطلب مني إضافة المساق.'
+          : 'Your plan does not have a Year ' + year + ' yet. Add the year first from Edit Mode, then ask me again.'],
+        title: null, guide: 'editPlan', confirm: null, chips: null
+      };
+    }
+
+    return {
+      lines: [
+        lang === 'ar'
+          ? 'سأضيف «' + name + '» إلى السنة ' + year + '، ' + semesterLabel(sem, lang) + '.'
+          : 'I will add “' + name + '” to Year ' + year + ', ' + semesterLabel(sem, lang) + '.',
+        (lang === 'ar' ? 'الساعات المعتمدة: ' : 'Credit hours: ') + credits,
+        lang === 'ar'
+          ? 'تُضاف إلى نسختك من الخطة على هذا الجهاز فقط، ويمكنك حذفها أو تعديلها لاحقًا.'
+          : 'It goes into your copy of the plan on this device only, and you can edit or remove it later.'
+      ],
+      title: null, guide: null, chips: null,
+      confirm: {
+        label: lang === 'ar' ? 'أضف المساق' : 'Add the course',
+        warn: null,
+        run: function () {
+          var IMP = window.AAUP_IMPORTED;
+          if (!IMP || !IMP.addCourseDirect) {
+            return lang === 'ar' ? 'تعذّرت إضافة المساق.' : 'That course could not be added.';
+          }
+          var id = freeSlug(prefix, slugify(name));
+          IMP.addCourseDirect(prefix, yearId, 's' + sem, name, '', id, credits, category, []);
+          return lang === 'ar'
+            ? 'تم — أُضيف «' + name + '» إلى السنة ' + year + '.'
+            : 'Done — “' + name + '” is now in Year ' + year + '.';
+        }
+      }
+    };
+  }
+
+  function proposeRemoveCourse(prefix, args, lang) {
+    if (!prefix || !args.course) return null;
+    var A = window.AAUP_ASSISTANT;
+    var slug = A.findCourse(prefix, args.course);
+    if (!slug) return null;
+    var name = A.courseName(prefix, slug, lang);
+    var unlocks = (A.planData(prefix).unlocksMap || {})[slug] || [];
+
+    return {
+      lines: [
+        lang === 'ar' ? 'سأحذف «' + name + '» من خطتك.' : 'I will remove “' + name + '” from your plan.',
+        lang === 'ar'
+          ? 'يُحذف من نسختك على هذا الجهاز فقط، ولا يمكن التراجع عن ذلك.'
+          : 'This affects your copy on this device only, and cannot be undone.'
+      ],
+      title: null, guide: null, chips: null,
+      confirm: {
+        label: lang === 'ar' ? 'احذف المساق' : 'Remove it',
+        // Removing a course that others depend on strands their arrows, so
+        // the app cleans those up — the student should know that first.
+        warn: unlocks.length
+          ? (lang === 'ar'
+              ? unlocks.length + ' مساقًا يعتمد عليه كمتطلب سابق؛ ستُحذف تلك الروابط أيضًا.'
+              : unlocks.length + ' course' + (unlocks.length > 1 ? 's list' : ' lists') +
+                ' it as a prerequisite; those links are removed too.')
+          : null,
+        run: function () {
+          var IMP = window.AAUP_IMPORTED;
+          if (!IMP || !IMP.removeCourse) {
+            return lang === 'ar' ? 'تعذّر حذف المساق.' : 'That course could not be removed.';
+          }
+          IMP.removeCourse(prefix, slug);
+          return lang === 'ar' ? 'تم حذف «' + name + '».' : '“' + name + '” has been removed.';
+        }
+      }
+    };
+  }
+
+  function proposeMoveCourse(prefix, args, lang) {
+    if (!prefix || !args.course) return null;
+    var A = window.AAUP_ASSISTANT;
+    var slug = A.findCourse(prefix, args.course);
+    if (!slug) return null;
+    var name = A.courseName(prefix, slug, lang);
+    var year = parseInt(args.year, 10) || 1;
+    var sem = parseInt(args.semester, 10) || 1;
+    if (sem < 1 || sem > 3) sem = 1;
+    if (!hasYear(prefix, 'y' + year)) {
+      return {
+        lines: [lang === 'ar'
+          ? 'لا توجد سنة ' + year + ' في خطتك. أضفها أولًا من «وضع التعديل».'
+          : 'There is no Year ' + year + ' in your plan. Add it first from Edit Mode.'],
+        title: null, guide: 'editPlan', confirm: null, chips: null
+      };
+    }
+
+    return {
+      lines: [
+        lang === 'ar'
+          ? 'سأنقل «' + name + '» إلى السنة ' + year + '، ' + semesterLabel(sem, lang) + '.'
+          : 'I will move “' + name + '” to Year ' + year + ', ' + semesterLabel(sem, lang) + '.'
+      ],
+      title: null, guide: null, chips: null,
+      confirm: {
+        label: lang === 'ar' ? 'انقل المساق' : 'Move it',
+        warn: lang === 'ar'
+          ? 'إن كسر النقل ترتيب المتطلبات السابقة فسيرفضه التطبيق ويبقي المساق مكانه.'
+          : 'If the move would break prerequisite order, the app rejects it and leaves the course where it is.',
+        run: function () {
+          var IMP = window.AAUP_IMPORTED;
+          if (!IMP || !IMP.persistCourseMove) {
+            return lang === 'ar' ? 'تعذّر نقل المساق.' : 'That course could not be moved.';
+          }
+          IMP.persistCourseMove(prefix, slug, prefix + '-y' + year + '-s' + sem);
+          return lang === 'ar'
+            ? 'تم نقل «' + name + '» إلى السنة ' + year + '.'
+            : '“' + name + '” has been moved to Year ' + year + '.';
+        }
+      }
+    };
+  }
+
+  // ---------------------------------------------------------------
   // ACTIONS
   // ---------------------------------------------------------------
   // What the model is allowed to do. Navigation and walkthroughs run
@@ -211,12 +390,18 @@
       }
 
       case 'start_walkthrough': {
-        // Deferred a beat so the model's sentence is on screen before the
-        // page dims — otherwise the answer and the spotlight arrive together
-        // and the student reads neither.
-        if (UI && window.AAUP_ASSISTANT_KB.guides[args.guide]) {
-          setTimeout(function () { UI.startGuide(args.guide, lang, true); }, 700);
-        }
+        // "Let me show you — watch the screen", followed by nothing at all,
+        // was the single worst thing this assistant did. It happened whenever
+        // the model named a walkthrough that could not run from the screen the
+        // student was on, because the failure was silent.
+        //
+        // So: check first. If it can run, run it (deferred a beat so the
+        // model's sentence is read before the page dims). If it cannot, say so
+        // and answer the question in words instead — never promise a
+        // spotlight that is not coming.
+        if (!UI || !window.AAUP_ASSISTANT_KB.guides[args.guide]) return unguidable(args.guide, lang);
+        if (!UI.canGuide(args.guide)) return unguidable(args.guide, lang);
+        setTimeout(function () { UI.startGuide(args.guide, lang, true); }, 700);
         return null;
       }
 
@@ -243,6 +428,15 @@
         if (!target) return null;
         return A.proposeMark(prefix, target, args.completed !== false, lang);
       }
+
+      case 'propose_add_course':
+        return proposeAddCourse(prefix, args, lang);
+
+      case 'propose_remove_course':
+        return proposeRemoveCourse(prefix, args, lang);
+
+      case 'propose_move_course':
+        return proposeMoveCourse(prefix, args, lang);
 
       case 'propose_reset_progress':
         return prefix ? A.proposeReset(prefix, lang) : null;
@@ -271,6 +465,39 @@
     var s = ACTION_SAYS[name];
     if (!s) return lang === 'ar' ? 'تم.' : 'Done.';
     return s[lang] || s.en;
+  }
+
+  // Which knowledge-base topic explains, in words, what each walkthrough
+  // would have shown. Used when the walkthrough cannot run from here.
+  var GUIDE_TOPIC = {
+    addCourse: 'editplan', editPlan: 'editplan', backup: 'export', gpa: 'gpa',
+    markCourse: 'completed', settings: 'settings', findPlan: 'start',
+    nextSemester: 'available', audit: 'audit', achievements: 'achievements',
+    searchCourse: 'search', legend: 'legend', newPlan: 'newplan',
+    switchPlan: 'universities', menu: 'menu', fix: 'fixbutton'
+  };
+
+  // A walkthrough that cannot start from this screen. Answers the question in
+  // words instead, and says plainly why there is nothing to watch — the model
+  // has usually already said "let me show you", and leaving that unanswered is
+  // what made the assistant look broken.
+  function unguidable(guideId, lang) {
+    var KB = window.AAUP_ASSISTANT_KB;
+    var topic = null;
+    var wanted = GUIDE_TOPIC[guideId];
+    if (wanted) {
+      topic = KB.topics.filter(function (t) { return t.id === wanted; })[0] || null;
+    }
+    var lines = [lang === 'ar'
+      ? 'لا أستطيع الإشارة إليه من هذه الشاشة، لكن إليك الطريقة:'
+      : 'I can’t point at that from this screen, but here’s how:'];
+    if (topic) {
+      lines = lines.concat((topic.body[lang] || topic.body.en) || []);
+    }
+    lines.push(lang === 'ar'
+      ? 'افتح خطتك الدراسية ثم اطلب مني أن أريك مجددًا.'
+      : 'Open your study plan and ask me to show you again.');
+    return { lines: lines, title: null, guide: guideId, confirm: null, chips: null };
   }
 
   // ---------------------------------------------------------------
@@ -330,13 +557,22 @@
         if (action) {
           var proposal = runAction(action, lang);
           if (proposal) {
-            // The proposal's own text is the authoritative description of the
-            // change — the exact wording and prerequisite warnings the offline
-            // engine produces. The model's sentence introduces it; it must
-            // never replace it, or a student ends up confirming "here's what
-            // that changes" with no statement of what actually changes.
-            reply.lines = reply.lines.concat(proposal.lines);
-            reply.confirm = proposal.confirm;
+            if (action.name === 'start_walkthrough') {
+              // The model's line was a promise to show something that cannot
+              // be shown. Replace it rather than stack a contradiction on it.
+              reply.lines = proposal.lines;
+              reply.guide = proposal.guide;
+            } else {
+              // The proposal's own text is the authoritative description of
+              // the change — exact wording, exact prerequisite warnings,
+              // generated by the offline engine rather than by the model. It
+              // REPLACES the model's sentence rather than following it: the
+              // model has just said "I will add X to year 1" and the proposal
+              // says the same thing again, which reads as a stutter.
+              reply.lines = proposal.lines;
+              reply.confirm = proposal.confirm;
+              if (proposal.guide) reply.guide = proposal.guide;
+            }
           }
         }
 

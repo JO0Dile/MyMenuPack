@@ -509,18 +509,16 @@
     if (!guide) return;
     var l = guideLang || lastLang || 'en';
 
-    // Steps whose target is missing right now are dropped up front, so the
-    // step counter shown to the student ("2 / 3") matches what they will
-    // actually be walked through.
-    var steps = guide.steps.filter(function (s) {
-      return s.optional ? !!resolveTarget(s) : true;
-    });
-    var anyVisible = steps.some(function (s) { return !!resolveTarget(s); });
-    if (!anyVisible) {
+    // Every step is kept, including ones whose target does not exist yet: a
+    // walkthrough can create its own next target ("turn on Edit Mode" is what
+    // makes the "+" appear), and pre-filtering those broke the chain before it
+    // could start. A step whose target never arrives is skipped at runtime.
+    var steps = guide.steps;
+    if (!canGuide(id)) {
       if (!silentIfUnavailable) {
         addPlain(KB.say.guideUnavailable[l] || KB.say.guideUnavailable.en, l === 'ar' ? 'rtl' : 'ltr');
       }
-      return;
+      return false;
     }
 
     var wasOpen = !!(el('asstPanel') && el('asstPanel').classList.contains('open'));
@@ -535,6 +533,16 @@
     window.addEventListener('scroll', place, true);
     place();
     watch();
+    return true;
+  }
+
+  // Can this walkthrough get off the ground from the screen we are on? At
+  // least one step has to be pointable-at right now; the rest can appear as
+  // the student follows along.
+  function canGuide(id) {
+    var guide = KB.guides[id];
+    if (!guide) return false;
+    return guide.steps.some(function (s) { return !!resolveTarget(s); });
   }
 
   // ---------------------------------------------------------------
@@ -579,7 +587,7 @@
 
   window.AAUP_ASSISTANT_UI = {
     open: open, close: close, toggle: toggle,
-    send: send, startGuide: startGuide,
+    send: send, startGuide: startGuide, canGuide: canGuide,
     toggleMode: toggleMode,
     isGuiding: function () { return !!active; }
   };

@@ -59,6 +59,15 @@
       return root ? root.querySelector(sel) : null;
     };
   }
+  // Visible, not merely present. The app keeps whole screens in the DOM with
+  // display:none — the study-plan view is built and hidden the moment a plan
+  // is opened from the Dashboard — so `querySelector` alone answers "is this
+  // on screen?" with a confident, wrong yes.
+  function shown(sel) {
+    var el = document.querySelector(sel);
+    return !!(el && el.offsetParent !== null);
+  }
+
   function homeVisible() {
     var home = document.getElementById('home');
     return !!(home && home.offsetParent !== null);
@@ -200,6 +209,52 @@
         { target: q('#sbToggleBtn'),
           text: { en: 'On a phone the menu hides behind this button — Dashboard, Study Plan, Audit, Achievements, Settings.',
                   ar: 'على الهاتف تختفي القائمة خلف هذا الزر — لوحة التحكم والخطة والتدقيق والإنجازات والإعدادات.' } }
+      ]
+    },
+    addCourse: {
+      title: { en: 'Adding a course', ar: 'إضافة مساق' },
+      steps: [
+        { target: firstVisible(['.sb-item[data-sb-key="studyplan"]']),
+          text: { en: 'First open your study plan — courses are added there.',
+                  ar: 'افتح خطتك الدراسية أولًا — تُضاف المساقات من هناك.' },
+          optional: true,
+          waitFor: function () { return shown('#importedPlanView .home-btn[onclick*="toggleEdit"]'); } },
+        { target: firstVisible(['#importedPlanView .home-btn[onclick*="toggleEdit"]:not(.imp-exit-edit-btn)']),
+          text: { en: 'Turn on Edit Mode. Everything you change is yours and saves as you go.',
+                  ar: 'فعّل «وضع التعديل». كل ما تغيّره يخصّك ويُحفظ تلقائيًا.' },
+          optional: true,
+          waitFor: function () { return shown('#importedPlanView .imp-add-course-card'); } },
+        { target: firstVisible(['#importedPlanView .imp-add-course-card']),
+          text: { en: 'Now tap + in any semester — name, credit hours, category, even prerequisites. Try it.',
+                  ar: 'الآن اضغط + في أي فصل — الاسم والساعات والفئة وحتى المتطلبات السابقة. جرّب.' } },
+        { target: firstVisible(['#importedPlanView .home-btn[onclick*="openLibrary"]']),
+          text: { en: 'Or skip the typing: Course Library copies a course straight from another plan.',
+                  ar: 'أو تجنّب الكتابة: «مكتبة المساقات» تنسخ مساقًا جاهزًا من خطة أخرى.' } }
+      ]
+    },
+    editPlan: {
+      title: { en: 'Editing your plan', ar: 'تعديل خطتك' },
+      steps: [
+        { target: firstVisible(['.sb-item[data-sb-key="studyplan"]']),
+          text: { en: 'Open your study plan first.', ar: 'افتح خطتك الدراسية أولًا.' },
+          optional: true,
+          waitFor: function () { return shown('#importedPlanView .home-btn[onclick*="toggleEdit"]'); } },
+        { target: firstVisible(['#importedPlanView .home-btn[onclick*="toggleEdit"]:not(.imp-exit-edit-btn)']),
+          text: { en: 'Turn on Edit Mode — nothing is shared with anyone unless you Export or Contribute it.',
+                  ar: 'فعّل «وضع التعديل» — لا يُشارك شيء مع أحد إلا إذا صدّرته أو ساهمت به.' },
+          optional: true,
+          waitFor: function () { return shown('#importedPlanView .imp-add-course-card'); } },
+        { target: firstVisible(['#importedPlanView .imp-add-course-card']),
+          text: { en: '+ adds a course to that semester.', ar: '«+» يضيف مساقًا إلى ذلك الفصل.' } },
+        { target: firstVisible(['#importedPlanView .imp-edit-course-btn']),
+          text: { en: 'The pencil fixes a course’s name, hours, or category.',
+                  ar: 'القلم يعدّل اسم المساق أو ساعاته أو فئته.' } },
+        { target: firstVisible(['#importedPlanView .imp-remove-course-btn']),
+          text: { en: 'The ✕ removes it — you always get an "are you sure" first.',
+                  ar: '«✕» يحذفه — ويُسألك دائمًا للتأكيد أولًا.' } },
+        { target: firstVisible(['#importedPlanView .imp-exit-edit-btn']),
+          text: { en: 'Tap here when you’re done. There is nothing to save — it already has been.',
+                  ar: 'اضغط هنا عند الانتهاء. لا شيء لحفظه — فقد حُفظ بالفعل.' } }
       ]
     },
     fix: {

@@ -1588,6 +1588,18 @@
     confirmDelete: confirmDelete, deletePlan: deletePlan,
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
+    // Programmatic course creation, for callers that already have every field
+    // and do not want the popup — the assistant (js/46-assistant-ai.js) after
+    // a student has confirmed the change. Deliberately the SAME function the
+    // popup itself submits to, so a course added by the assistant gets the
+    // identical duplicate-id check, transitive prerequisite reduction,
+    // auto-link pass, and re-render. `overlay` is null: there is no dialog to
+    // close. Do not reimplement this elsewhere; that is how two ways of
+    // adding a course start behaving differently.
+    addCourseDirect: function (planId, yearId, semester, nameEn, nameAr, id, credits, category, prereqIds) {
+      return finalizeCourseCreation(planId, yearId, semester, nameEn, nameAr, id,
+                                    credits, category, prereqIds || [], null);
+    },
     exportPlan: exportPlan, submitPlan: submitPlan, editCoursePrompt: openCourseEditPopup, runAutoLink: runAutoLink,
     refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan,
     openCourseModal: openCourseModal,
