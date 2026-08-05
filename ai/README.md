@@ -25,8 +25,8 @@ each is exhausted:
 
 | Tier | Free allowance | Notes |
 |---|---|---|
-| `gemini-2.5-flash` | ~250 requests/day | Best answers, clearly best Arabic |
-| `gemini-2.5-flash-lite` | ~1,000 requests/day | Weaker, still good |
+| `gemini-flash-latest` | ~250 requests/day | Best answers, clearly best Arabic |
+| `gemini-flash-lite-latest` | ~1,000 requests/day | Weaker, still good |
 | Cloudflare Workers AI (Llama 3.1 8B) | 10,000 neurons/day ≈ ~600 chats | Text only, no app-driving |
 | Offline engine, in the app | unlimited | Works on a plane |
 
@@ -34,10 +34,12 @@ Neither Gemini's free tier nor Cloudflare's asks for a credit card, so there is
 no way for this to quietly start charging you. If every tier is spent, the
 assistant degrades to the offline engine and says so.
 
-> Free-tier allowances change often, and Google has announced that
-> `gemini-2.5-flash-lite` retires on **2026-10-16**. Both the model list and the
-> fallback are environment variables, so keeping up is a dashboard edit, not a
-> code change.
+> Those two are **aliases**, not pinned versions, on purpose. Pinned model
+> names expire: `gemini-2.5-flash` already returns *404 — no longer available
+> to new users* for a freshly created key, which would take this Worker's first
+> tier down with it. The aliases follow whatever the current Flash generation
+> is. Both the model list and the fallback are environment variables anyway, so
+> keeping up is a dashboard edit, never a code change.
 
 ---
 
@@ -89,7 +91,7 @@ ever revealing the key:
 
 ```json
 { "ok": true, "gemini": true, "workersAI": true,
-  "models": ["gemini-2.5-flash", "gemini-2.5-flash-lite"] }
+  "models": ["gemini-flash-latest", "gemini-flash-lite-latest"] }
 ```
 
 If `gemini` or `workersAI` is `false`, that step did not save.
@@ -100,7 +102,7 @@ If `gemini` or `workersAI` is `false`, that step did not save.
 
 | Name | Default | What it does |
 |---|---|---|
-| `GEMINI_MODELS` | `gemini-2.5-flash,gemini-2.5-flash-lite` | Models to try, in order |
+| `GEMINI_MODELS` | `gemini-flash-latest,gemini-flash-lite-latest` | Models to try, in order |
 | `CF_MODEL` | `@cf/meta/llama-3.1-8b-instruct-fp8-fast` | The Workers AI model |
 | `RATE_PER_MIN` | `8` | Questions per minute, per device |
 | `RATE_PER_DAY` | `120` | Questions per day, per device |
@@ -112,7 +114,13 @@ If `gemini` or `workersAI` is `false`, that step did not save.
 ## How it stays honest
 
 **The key is never in the app.** GitHub Pages serves static files that anyone
-can read. The key lives only in the Worker's secrets.
+can read. The key lives only in the Worker's secrets, and the Worker sends it
+in the `x-goog-api-key` header rather than the URL — query strings end up in
+logs, caches, and referrer headers.
+
+**If a key is ever pasted anywhere else** — a chat, a file, a screenshot, a
+commit — treat it as burned. Delete it in AI Studio and create a new one. It
+takes ten seconds and it is the only way to be sure.
 
 **The rules are never in the app either.** The system prompt and the list of
 things the model is allowed to do live in this Worker, not in `web/js/`. A
