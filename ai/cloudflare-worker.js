@@ -44,7 +44,10 @@
 const DEFAULTS = {
   GEMINI_MODELS: 'gemini-flash-latest,gemini-flash-lite-latest',
   CF_MODEL: '@cf/meta/llama-3.1-8b-instruct-fp8-fast',
-  ALLOWED_ORIGIN: '*',
+  // Defaults to this app's own site so there is one fewer variable to set by
+  // hand. Override with an ALLOWED_ORIGIN variable for a different domain, or
+  // '*' when testing from localhost.
+  ALLOWED_ORIGIN: 'https://jo0dile.github.io',
   RATE_PER_MIN: '8',
   RATE_PER_DAY: '120',
   MAX_CHARS: '24000',

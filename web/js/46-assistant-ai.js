@@ -40,14 +40,31 @@
   function url() { return window.APP_AI_URL || ''; }
   function configured() { return !!url(); }
 
+  // Circuit breaker for an endpoint that is not there.
+  //
+  // APP_AI_URL is set to the Worker's future address before the Worker is
+  // deployed, and a Worker can also be deleted, renamed, or be down. Without
+  // this, every single question would spend its timeout waiting on a host
+  // that will never answer, and a student would sit watching three dots for
+  // twenty seconds before getting a reply the app had available instantly.
+  //
+  // A few consecutive transport failures and the online brain is dropped for
+  // the rest of the session — answers come straight from the on-device
+  // engine, no wait, no repeated failures. Toggling smart mode resets it, so
+  // a student who knows the Worker just came back can retry immediately.
+  var consecutiveFailures = 0;
+  var UNREACHABLE_AFTER = 3;
+  function unreachable() { return consecutiveFailures >= UNREACHABLE_AFTER; }
+
   function mode() {
     try { return localStorage.getItem(MODE_KEY) || ''; } catch (e) { return ''; }
   }
   function setMode(v) {
     try { localStorage.setItem(MODE_KEY, v); } catch (e) {}
+    consecutiveFailures = 0; // an explicit toggle is a request to try again
   }
   function asked() { return mode() === 'on' || mode() === 'off'; }
-  function enabled() { return configured() && mode() === 'on' && navigator.onLine !== false; }
+  function enabled() { return configured() && mode() === 'on' && navigator.onLine !== false && !unreachable(); }
 
   // ---------------------------------------------------------------
   // GROUNDING
@@ -296,6 +313,7 @@
 
     return post({ messages: history, context: buildContext(), lang: lang })
       .then(function (data) {
+        consecutiveFailures = 0;
         var answer = String(data.text || '').trim();
         history.push({ role: 'assistant', content: answer });
 
@@ -339,6 +357,11 @@
         // Drop the unanswered turn so the next question is not sent with a
         // dangling user message the model never replied to.
         history.pop();
+        // A reply from the Worker — even an error one — proves the address is
+        // right, so 429 (quota) and 503 (providers down) must not trip the
+        // breaker. Only "nothing answered at all" counts.
+        var answered = e && e.payload && e.payload.error;
+        if (answered) { consecutiveFailures = 0; } else { consecutiveFailures++; }
         throw e;
       });
   }
@@ -376,6 +399,7 @@
     setMode: setMode,
     fallbackNote: fallbackNote,
     resetHistory: function () { history = []; },
+    unreachable: unreachable,
     // exposed for verification
     buildContext: buildContext,
     runAction: runAction
