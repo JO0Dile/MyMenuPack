@@ -2835,3 +2835,9 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 .asst-consent{border-color:var(--accent); background:var(--panel);}
 .asst-consent p{font-size:12.3px; color:var(--text-dim);}
 .asst-consent p:first-of-type{color:var(--text);}
+
+/* Bullets in an assistant reply. The online brain writes "- " lists whether
+   or not you ask it to, so they are rendered rather than shown as raw text. */
+.asst-list{margin:4px 0 8px; padding-inline-start:18px;}
+.asst-list li{margin-bottom:3px; line-height:1.55;}
+.asst-bubble strong{font-weight:800; color:var(--text);}

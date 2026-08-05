@@ -60,6 +60,50 @@
     addBubble('bot', b);
   }
 
+  // A language model writes markdown whether or not you ask it to — **bold**
+  // and "- " bullets come back constantly. Rendered as plain text those show
+  // up as literal asterisks, so this converts the two that actually appear.
+  //
+  // Built from DOM nodes rather than innerHTML, deliberately: this text comes
+  // off the network, and an assistant that pasted model output into innerHTML
+  // would be a script-injection hole wearing a chat bubble.
+  function appendInline(node, text) {
+    String(text).split(/\*\*(.+?)\*\*/g).forEach(function (part, i) {
+      if (!part) return;
+      if (i % 2 === 1) {
+        var strong = document.createElement('strong');
+        strong.textContent = part;
+        node.appendChild(strong);
+      } else {
+        node.appendChild(document.createTextNode(part));
+      }
+    });
+  }
+
+  function appendBlock(container, block) {
+    var list = null;
+    String(block).split('\n').forEach(function (raw) {
+      var line = raw.trim().replace(/^#{1,6}\s+/, '');
+      if (!line) return;
+      var bullet = line.match(/^[-*•]\s+(.*)$/);
+      if (bullet) {
+        if (!list) {
+          list = document.createElement('ul');
+          list.className = 'asst-list';
+          container.appendChild(list);
+        }
+        var li = document.createElement('li');
+        appendInline(li, bullet[1]);
+        list.appendChild(li);
+        return;
+      }
+      list = null; // a plain line ends the current bullet run
+      var p = document.createElement('p');
+      appendInline(p, line);
+      container.appendChild(p);
+    });
+  }
+
   function addReply(r, replyLang) {
     var dir = replyLang === 'ar' ? 'rtl' : 'ltr';
     var b = document.createElement('div');
@@ -72,11 +116,7 @@
       h.textContent = r.title;
       b.appendChild(h);
     }
-    (r.lines || []).forEach(function (line) {
-      var p = document.createElement('p');
-      p.textContent = line;
-      b.appendChild(p);
-    });
+    (r.lines || []).forEach(function (line) { appendBlock(b, line); });
 
     // An editing proposal: the change is described above, and nothing at all
     // happens until this button is pressed.

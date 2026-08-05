@@ -239,6 +239,23 @@
     }
   }
 
+  // What to say when the model calls a tool and says nothing else. Not a
+  // fallback for a broken reply — this is the common case, and the sentence
+  // has to make the action make sense on its own.
+  var ACTION_SAYS = {
+    open_page: { en: 'Here you go.', ar: 'تفضّل.' },
+    start_walkthrough: { en: 'Let me show you — watch the screen.', ar: 'سأريك — راقب الشاشة.' },
+    highlight_course: { en: 'Here it is on your plan.', ar: 'ها هو في خطتك.' },
+    open_fix_panel: { en: 'Let me run a check on the app.', ar: 'سأجري فحصًا للتطبيق.' },
+    propose_mark_course: { en: 'Here’s what that would change:', ar: 'إليك ما سيتغيّر:' },
+    propose_reset_progress: { en: 'Here’s what that would change:', ar: 'إليك ما سيتغيّر:' }
+  };
+  function actionSentence(name, lang) {
+    var s = ACTION_SAYS[name];
+    if (!s) return lang === 'ar' ? 'تم.' : 'Done.';
+    return s[lang] || s.en;
+  }
+
   // ---------------------------------------------------------------
   // TRANSPORT
   // ---------------------------------------------------------------
@@ -305,6 +322,14 @@
           }
         }
 
+        // A tool call frequently arrives with NO text beside it — the model
+        // treats "call the tool" as the whole reply. Falling through to the
+        // "not part of this website" line there would be badly wrong: it
+        // would deny knowing something while simultaneously doing it. Each
+        // action carries its own sentence for exactly this case.
+        if (!reply.lines.length && action) {
+          reply.lines = [actionSentence(action.name, lang)];
+        }
         if (!reply.lines.length) {
           reply.lines = [window.AAUP_ASSISTANT.say('notHere', lang)];
         }
