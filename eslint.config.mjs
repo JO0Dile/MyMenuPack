@@ -27,7 +27,7 @@ export default [
         getComputedStyle: 'readonly', matchMedia: 'readonly',
         alert: 'readonly', confirm: 'readonly', prompt: 'readonly',
         getSelection: 'readonly', self: 'readonly',
-        Blob: 'readonly', File: 'readonly', FileReader: 'readonly',
+        Blob: 'readonly', File: 'readonly', FileReader: 'readonly', AbortController: 'readonly',
         URL: 'readonly', Image: 'readonly', XMLHttpRequest: 'readonly',
         // Defined in js/02-shared-cross.js and called from other modules and
         // from inline onclick="" attributes, so they are genuinely global.

@@ -1,0 +1,358 @@
+// ==========================
+// SMART ASSISTANT — the online brain
+// ==========================
+// The offline assistant (js/42-assistant.js) matches phrasing it recognises.
+// This one actually understands the question: it sends it to a language model
+// through the app's own Worker (ai/cloudflare-worker.js), along with the real
+// data the app has loaded, and can operate the app in reply.
+//
+// Three things this module is responsible for, in order of importance:
+//
+//   1. GROUNDING. The model is never asked a question on its own. Every
+//      request carries a block built here from live state — the plan, its
+//      courses, prerequisites, credit hours, the student's progress, and what
+//      the app's features do. The model is told to answer from that and
+//      nothing else. Grounding is what keeps a fluent model from inventing a
+//      prerequisite, which is the failure that actually costs a student a
+//      semester.
+//
+//   2. NUMBERS COME FROM CODE, NOT FROM THE MODEL. GPA, credit totals, which
+//      courses are unlocked, which prerequisites are missing — all computed by
+//      the app's own modules and handed over as facts. The model's job is to
+//      understand and explain, not to do arithmetic on someone's degree.
+//
+//   3. NOTHING WRITES WITHOUT A HUMAN. The model can navigate and teach on its
+//      own. When it wants to change a student's record it can only *propose*,
+//      and the proposal is built by the offline engine's own code, so it
+//      carries the same prerequisite warnings. The student taps to accept.
+//
+// If any of this is unavailable — no Worker configured, no connection, daily
+// free quota spent — the caller falls back to the offline engine and the chat
+// keeps working.
+(function () {
+  var MODE_KEY = 'aaup_ai_mode';      // 'on' | 'off' | unset (never asked)
+  var MAX_TURNS = 6;                  // conversation turns sent for context
+  var MAX_COURSES = 200;              // grounding cap; the largest plan is ~86
+  var TIMEOUT_MS = 25000;
+
+  var history = [];                   // [{role, content}]
+
+  function url() { return window.APP_AI_URL || ''; }
+  function configured() { return !!url(); }
+
+  function mode() {
+    try { return localStorage.getItem(MODE_KEY) || ''; } catch (e) { return ''; }
+  }
+  function setMode(v) {
+    try { localStorage.setItem(MODE_KEY, v); } catch (e) {}
+  }
+  function asked() { return mode() === 'on' || mode() === 'off'; }
+  function enabled() { return configured() && mode() === 'on' && navigator.onLine !== false; }
+
+  // ---------------------------------------------------------------
+  // GROUNDING
+  // ---------------------------------------------------------------
+  function featureDigest() {
+    var KB = window.AAUP_ASSISTANT_KB;
+    if (!KB || !KB.topics) return '';
+    // Title plus the English body of every topic. This is the same material
+    // the offline assistant answers from — it stops being the answer and
+    // becomes the reference the model reads.
+    return KB.topics.map(function (t) {
+      return '- ' + t.title.en + ': ' + (t.body.en || []).join(' ');
+    }).join('\n');
+  }
+
+  function catalogueSummary() {
+    var unis = window.APP_UNIVERSITIES || {};
+    var names = Object.keys(unis).map(function (k) {
+      return ((unis[k].name || {}).en || k);
+    });
+    if (!names.length) return '';
+    var plans = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()) || {};
+    return 'Universities in this app: ' + names.join(', ') + '.\n' +
+           'Total study plans loaded: ' + Object.keys(plans).length + '.';
+  }
+
+  function currentScreen() {
+    var dash = document.getElementById('dashboard');
+    if (dash && dash.offsetParent !== null) return 'the Dashboard';
+    var pages = document.querySelectorAll('.plan-page, #importedPlanView');
+    for (var i = 0; i < pages.length; i++) {
+      if (pages[i].offsetParent !== null) return 'the Study Plan page';
+    }
+    var home = document.getElementById('home');
+    if (home && home.offsetParent !== null) return 'the plan picker (home)';
+    return 'the app';
+  }
+
+  function planSummary() {
+    var A = window.AAUP_ASSISTANT;
+    var prefix = A && A.currentPlan();
+    if (!prefix) return 'No study plan is open right now. The student is on ' + currentScreen() + '.';
+
+    var lines = [];
+    var info = (A.planData(prefix).courseInfo) || {};
+    var needsMap = A.planData(prefix).needsMap || {};
+    var unlocksMap = A.planData(prefix).unlocksMap || {};
+
+    var plans = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()) || {};
+    var plan = plans[prefix] || {};
+    var display = (window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.planDisplayInfo)
+      ? window.AAUP_DASHBOARD.planDisplayInfo(prefix) : { name: prefix };
+
+    lines.push('OPEN STUDY PLAN: ' + display.name);
+    if (plan.college && plan.college.en) lines.push('Faculty: ' + plan.college.en);
+    if (plan.degreeHours) {
+      lines.push('Official degree total: ' + plan.degreeHours + ' credit hours.');
+    } else {
+      lines.push('Official degree total: NOT CONFIRMED for this plan. Do not state a total or a completion percentage from any other source.');
+    }
+    if (plan.gradingScale && plan.gradingScale.passMark != null) {
+      lines.push('Pass mark for this plan: ' + plan.gradingScale.passMark +
+                 (plan.gradingScale.name ? ' (' + plan.gradingScale.name + ')' : ''));
+    }
+    lines.push('The student is currently looking at ' + currentScreen() + '.');
+
+    // Progress and GPA — computed by the app's own modules, never left to the
+    // model to work out.
+    if (window.AAUP_AUDIT) {
+      var total = 0, done = 0;
+      try {
+        window.AAUP_AUDIT.computeAudit(prefix).forEach(function (r) { total += r.total; done += r.completed; });
+      } catch (e) { total = 0; }
+      if (total) {
+        lines.push('PROGRESS: ' + done + ' of ' + total + ' credit hours completed (' +
+                   Math.round(done / total * 100) + '%), ' + (total - done) + ' remaining.');
+      }
+    }
+    var gpa = window.AAUP_GPA ? window.AAUP_GPA.gpaFor(prefix, null) : null;
+    lines.push('GPA: ' + (gpa && gpa.gpa != null ? gpa.gpa : 'no grades entered yet, so there is no GPA.'));
+
+    // Courses, one compact line each: everything needed to answer "what does
+    // X need", "why is X locked", "what can I take".
+    var slugs = Object.keys(info).slice(0, MAX_COURSES);
+    lines.push('');
+    lines.push('COURSES (name | code | credit hours | status | prerequisites):');
+    slugs.forEach(function (slug) {
+      var meta = info[slug] || {};
+      var needs = (needsMap[slug] || []).map(function (s) { return A.courseName(prefix, s, 'en'); });
+      lines.push('- ' + A.courseName(prefix, slug, 'en') +
+        (meta.ar ? ' / ' + meta.ar : '') +
+        ' | ' + (meta.num && meta.num !== '-' ? meta.num : 'no code') +
+        ' | ' + A.creditsOf(prefix, slug) + 'h' +
+        ' | ' + A.courseState(prefix, slug) +
+        ' | ' + (needs.length ? needs.join(', ') : 'none') +
+        ((unlocksMap[slug] || []).length ? ' | unlocks ' + unlocksMap[slug].length + ' course(s)' : ''));
+    });
+    if (Object.keys(info).length > MAX_COURSES) {
+      lines.push('(…' + (Object.keys(info).length - MAX_COURSES) + ' more courses not listed)');
+    }
+    return lines.join('\n');
+  }
+
+  function buildContext() {
+    return [
+      catalogueSummary(),
+      '',
+      planSummary(),
+      '',
+      'APP FEATURES (what each part of this app does):',
+      featureDigest()
+    ].join('\n');
+  }
+
+  // ---------------------------------------------------------------
+  // ACTIONS
+  // ---------------------------------------------------------------
+  // What the model is allowed to do. Navigation and walkthroughs run
+  // immediately — the worst case is a student on a page they did not ask for,
+  // one tap from going back. The two that touch saved data return a proposal
+  // instead, built by the offline engine so it carries the same prerequisite
+  // warnings, and the chat renders it as a confirmation card.
+  function runAction(action, lang) {
+    var A = window.AAUP_ASSISTANT;
+    var UI = window.AAUP_ASSISTANT_UI;
+    var prefix = A && A.currentPlan();
+    var args = action.args || {};
+
+    switch (action.name) {
+      case 'open_page': {
+        if (!prefix && args.page !== 'home' && args.page !== 'settings') return null;
+        var D = window.AAUP_DASHBOARD;
+        try {
+          if (args.page === 'dashboard' && D) D.open(prefix);
+          else if (args.page === 'study_plan' && D) D.openStudyPlan(prefix);
+          else if (args.page === 'audit' && window.AAUP_AUDIT) window.AAUP_AUDIT.open(prefix);
+          else if (args.page === 'achievements' && window.AAUP_ACHIEVEMENTS) window.AAUP_ACHIEVEMENTS.open(prefix);
+          else if (args.page === 'advisor' && window.AAUP_ADVISOR) window.AAUP_ADVISOR.open(prefix);
+          else if (args.page === 'overview' && window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix);
+          else if (args.page === 'settings' && window.AAUP_SIDEBAR) window.AAUP_SIDEBAR.openSettings();
+          else if (args.page === 'home' && D) D.choosePlan();
+        } catch (e) { return null; }
+        return null;
+      }
+
+      case 'start_walkthrough': {
+        // Deferred a beat so the model's sentence is on screen before the
+        // page dims — otherwise the answer and the spotlight arrive together
+        // and the student reads neither.
+        if (UI && window.AAUP_ASSISTANT_KB.guides[args.guide]) {
+          setTimeout(function () { UI.startGuide(args.guide, lang, true); }, 700);
+        }
+        return null;
+      }
+
+      case 'highlight_course': {
+        if (!prefix || !args.course) return null;
+        var slug = A.findCourse(prefix, args.course);
+        if (!slug) return null;
+        try {
+          if (window.__selectCourse) window.__selectCourse(prefix, slug);
+          else {
+            var el = document.getElementById(prefix + '-c-' + slug);
+            if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }
+        } catch (e) { /* the course may not be rendered right now */ }
+        return null;
+      }
+
+      case 'propose_mark_course': {
+        if (!prefix || !args.course) return null;
+        var target = A.findCourse(prefix, args.course);
+        // The model named a course that is not in this plan. Saying nothing
+        // is better than confirming a change to something that does not
+        // exist, so the proposal is simply dropped and its own sentence stands.
+        if (!target) return null;
+        return A.proposeMark(prefix, target, args.completed !== false, lang);
+      }
+
+      case 'propose_reset_progress':
+        return prefix ? A.proposeReset(prefix, lang) : null;
+
+      case 'open_fix_panel':
+        if (window.AAUP_FIX) window.AAUP_FIX.open();
+        return null;
+
+      default:
+        return null;
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // TRANSPORT
+  // ---------------------------------------------------------------
+  function post(body) {
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, TIMEOUT_MS) : null;
+    var opts = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    };
+    if (controller) opts.signal = controller.signal;
+    if (window.APP_AI_SECRET) opts.headers['x-app-secret'] = window.APP_AI_SECRET;
+
+    return fetch(url(), opts).then(function (res) {
+      if (timer) clearTimeout(timer);
+      return res.json().then(function (data) {
+        if (!res.ok) {
+          var err = new Error(data.error || ('HTTP ' + res.status));
+          err.status = res.status;
+          err.payload = data;
+          throw err;
+        }
+        return data;
+      });
+    }, function (e) {
+      if (timer) clearTimeout(timer);
+      throw e;
+    });
+  }
+
+  // Returns the same reply shape the offline engine produces, so the chat
+  // window renders both identically and knows nothing about which brain
+  // answered.
+  function ask(text, lang) {
+    history.push({ role: 'user', content: text });
+    if (history.length > MAX_TURNS * 2) history = history.slice(-MAX_TURNS * 2);
+
+    return post({ messages: history, context: buildContext(), lang: lang })
+      .then(function (data) {
+        var answer = String(data.text || '').trim();
+        history.push({ role: 'assistant', content: answer });
+
+        var reply = {
+          lines: answer ? answer.split(/\n{2,}/).map(function (s) { return s.trim(); }).filter(Boolean) : [],
+          title: null, guide: null, confirm: null, chips: null,
+          provider: data.provider, model: data.model
+        };
+
+        // At most one action is honoured. The prompt asks for one; enforcing
+        // it here means a confused reply cannot navigate three times and
+        // propose two edits in a single turn.
+        var action = (data.actions || [])[0];
+        if (action) {
+          var proposal = runAction(action, lang);
+          if (proposal) {
+            // The proposal's own text is the authoritative description of the
+            // change — the exact wording and prerequisite warnings the offline
+            // engine produces. The model's sentence introduces it; it must
+            // never replace it, or a student ends up confirming "here's what
+            // that changes" with no statement of what actually changes.
+            reply.lines = reply.lines.concat(proposal.lines);
+            reply.confirm = proposal.confirm;
+          }
+        }
+
+        if (!reply.lines.length) {
+          reply.lines = [window.AAUP_ASSISTANT.say('notHere', lang)];
+        }
+        return reply;
+      })
+      .catch(function (e) {
+        // Drop the unanswered turn so the next question is not sent with a
+        // dangling user message the model never replied to.
+        history.pop();
+        throw e;
+      });
+  }
+
+  // A short, honest note for why the smart brain did not answer this time.
+  function fallbackNote(e, lang) {
+    var status = e && e.status;
+    var payload = (e && e.payload) || {};
+    if (status === 429) {
+      if (payload.scope === 'minute') {
+        return lang === 'ar'
+          ? 'أسئلة كثيرة بسرعة — أجبتك من المساعد المدمج. انتظر قليلًا ثم جرّب مجددًا.'
+          : 'Too many questions at once — that answer came from the built-in assistant. Wait a moment and try again.';
+      }
+      return lang === 'ar'
+        ? 'انتهت حصة اليوم من المساعد الذكي (وهي مجانية ومحدودة). أجبتك من المساعد المدمج، ويعود الذكي غدًا.'
+        : 'Today’s free quota for the smart assistant is used up. That answer came from the built-in one; the smart one returns tomorrow.';
+    }
+    if (navigator.onLine === false) {
+      return lang === 'ar'
+        ? 'لا يوجد اتصال، فأجبتك من المساعد المدمج الذي يعمل دون إنترنت.'
+        : 'No connection, so that came from the built-in assistant, which works offline.';
+    }
+    return lang === 'ar'
+      ? 'تعذّر الوصول إلى المساعد الذكي، فأجبتك من المساعد المدمج.'
+      : 'Couldn’t reach the smart assistant, so that came from the built-in one.';
+  }
+
+  window.AAUP_ASSISTANT_AI = {
+    ask: ask,
+    enabled: enabled,
+    configured: configured,
+    asked: asked,
+    mode: mode,
+    setMode: setMode,
+    fallbackNote: fallbackNote,
+    resetHistory: function () { history = []; },
+    // exposed for verification
+    buildContext: buildContext,
+    runAction: runAction
+  };
+})();

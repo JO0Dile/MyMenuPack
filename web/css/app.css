@@ -2799,3 +2799,39 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   body.has-sidebar .fix-launcher{left:12px;}
   body.has-sidebar .fix-panel{left:8px;}
 }
+
+
+/* ---- Smart assistant: mode toggle, thinking indicator, consent ----------
+   The ✨/💤 toggle is hidden entirely until a Worker is configured, so an
+   install with no AI endpoint looks exactly as it did before. */
+.asst-head-actions{display:flex; align-items:center; gap:4px;}
+.asst-mode{
+  background:none; border:1px solid var(--line); color:var(--text-dim);
+  border-radius:999px; padding:3px 9px; font-size:12px; line-height:1.4;
+  cursor:pointer; font-family:inherit;
+}
+.asst-mode:hover{border-color:var(--accent); color:var(--text);}
+.asst-mode-on{border-color:var(--accent); background:rgba(93,184,255,.14);}
+
+/* Three dots while the online brain is thinking. The offline one answers
+   instantly and never shows this, which is itself a useful signal. */
+.asst-typing{display:flex; gap:5px; align-items:center; padding:14px 15px;}
+.asst-typing span{
+  width:6px; height:6px; border-radius:50%; background:var(--text-dim);
+  animation:asstBlink 1.3s infinite ease-in-out;
+}
+.asst-typing span:nth-child(2){animation-delay:.18s;}
+.asst-typing span:nth-child(3){animation-delay:.36s;}
+@keyframes asstBlink{
+  0%, 80%, 100%{opacity:.25; transform:translateY(0);}
+  40%{opacity:1; transform:translateY(-3px);}
+}
+@media (prefers-reduced-motion: reduce){
+  .asst-typing span{animation:none; opacity:.6;}
+}
+
+/* The one-time opt-in. Deliberately the most prominent thing in the window
+   when it appears — it is the only moment anything is ever sent off-device. */
+.asst-consent{border-color:var(--accent); background:var(--panel);}
+.asst-consent p{font-size:12.3px; color:var(--text-dim);}
+.asst-consent p:first-of-type{color:var(--text);}
