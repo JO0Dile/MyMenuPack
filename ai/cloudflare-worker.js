@@ -72,6 +72,7 @@ Every message includes a CONTEXT block with the real data currently loaded in th
 
 - Answer ONLY from that CONTEXT block and from the conversation.
 - NEVER invent a course, a prerequisite, a credit-hour number, a grading rule, or a feature. If it is not in CONTEXT, you do not know it.
+- ONE EXCEPTION: when the student asks you to ADD a course, its name comes from THEM, not from CONTEXT. Adding a course they named is not inventing anything — it is doing what they asked. Never refuse to add a course because it is absent from CONTEXT; absent is exactly why they are adding it.
 - Do not use general knowledge about universities, other study plans, or how degrees usually work. This app's data is the only truth.
 - If the answer is not in CONTEXT, reply exactly: "I don't have that information because it isn't part of this website." (Arabic: "لا أملك هذه المعلومة لأنها ليست جزءًا من هذا الموقع.")
 - Never guess at a number. Numbers come from CONTEXT only.
@@ -93,10 +94,23 @@ Use a tool only in these cases:
 - They ask HOW to do something, or WHERE something is ("how do I…", "where is…", "show me…", "I can't find…") → answer briefly, then call start_walkthrough. It dims the page and points at the real control, step by step.
 - They ask to GO somewhere ("take me to…", "open my plan") → answer briefly, then call open_page.
 - They ask to SEE or FIND a specific course ("show me Calculus II", "where is it on my plan") → answer briefly, then call highlight_course. Not for questions ABOUT a course.
-- They ask you to CHANGE their data (tick a course off, un-tick it, clear progress) → say what you are about to change and why, then call propose_mark_course or propose_reset_progress. These NEVER apply immediately: the app shows a confirmation card and the student decides.
+- They ask you to CHANGE their plan or their progress → DO IT. Say briefly what you are about to change, then call the matching tool:
+    · tick a course off as passed, or un-tick it  → propose_mark_course
+    · add a course to a year/semester             → propose_add_course
+    · remove a course                             → propose_remove_course
+    · move a course to another year/semester      → propose_move_course
+    · clear all progress for the plan             → propose_reset_progress
+  None of these apply immediately: the app shows the student a confirmation card and they decide. So propose freely — you are not committing anything.
+  Editing the student's own plan is a CORE part of this app, never out of scope. "Add a university elective to year 1 semester 1", "remove Arabic", "move Calculus II to the summer" are all normal requests: do them. Never answer one of these with the out-of-scope line.
+  If a detail is missing, pick a sensible default from CONTEXT rather than refusing — 3 credit hours is the usual default, and the category can be inferred from the course name (a "University Elective" is category uni).
+  Never say you are adding, removing, moving or ticking something without calling the matching tool in the same reply. The tool is what puts the confirm button on screen; saying "I will add it" and calling nothing leaves the student with a promise and no way to accept it.
 - Something in the app seems broken → say so, then call open_fix_panel.
 
-Call at most one tool per reply, and only ever with a course name copied exactly from CONTEXT.
+Call at most one tool per reply. Course names must be copied exactly from CONTEXT — except in propose_add_course, where the name is whatever the student called it.
+
+▸ Only use a walkthrough name from the list. There is no walkthrough for anything else — if what they asked about has none, explain it in words rather than picking the nearest name and promising to show them something different.
+
+▸ Do not describe what is about to happen on screen ("watch the screen", "look at the highlight"). The app may not be able to run the walkthrough from the screen they are on, and it will answer in words instead — a promise you cannot keep is worse than no promise. Just answer, and call the tool.
 
 ════ EDITING RULES ════
 Always explain what will change before proposing it. If a change conflicts with the prerequisite rules in CONTEXT, warn the student clearly first. Never modify data silently.
@@ -143,9 +157,10 @@ const TOOLS = [
       properties: {
         guide: {
           type: 'string',
-          enum: ['findPlan', 'settings', 'backup', 'markCourse', 'gpa', 'nextSemester', 'audit',
-                 'achievements', 'searchCourse', 'legend', 'newPlan', 'switchPlan', 'menu', 'fix'],
-          description: 'findPlan = choosing university/college/major; backup = export/import progress; markCourse = ticking a course off; gpa = entering a grade; nextSemester = the semester planner; fix = the Fix button.',
+          enum: ['addCourse', 'editPlan', 'findPlan', 'settings', 'backup', 'markCourse', 'gpa',
+                 'nextSemester', 'audit', 'achievements', 'searchCourse', 'legend', 'newPlan',
+                 'switchPlan', 'menu', 'fix'],
+          description: 'addCourse = adding a course to a plan (turns on Edit Mode and points at +); editPlan = adding, editing, removing and rearranging courses; findPlan = choosing university/college/major; newPlan = building a whole new plan from scratch; backup = export/import progress; markCourse = ticking a course off as passed; gpa = entering a grade; nextSemester = the semester planner; fix = the Fix button.',
         },
       },
       required: ['guide'],
@@ -170,6 +185,47 @@ const TOOLS = [
         completed: { type: 'boolean', description: 'true to mark completed, false to remove the completed mark.' },
       },
       required: ['course', 'completed'],
+    },
+  },
+  {
+    name: 'propose_add_course',
+    description: 'Add a NEW course to the student\'s plan at a specific year and semester. THE COURSE WILL NOT BE IN CONTEXT — that is the point: this is how a course that does not exist yet gets created, using whatever name the student gave. Call this whenever they ask to add a course. It shows a confirmation card; nothing is written until they accept, so calling it commits nothing.',
+    parameters: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Course name, e.g. "University Elective" or "Digital Marketing".' },
+        year: { type: 'integer', description: 'Year number, 1-based. Year 1 = 1.' },
+        semester: { type: 'integer', description: '1 = first semester, 2 = second, 3 = summer.' },
+        creditHours: { type: 'number', description: 'Credit hours. Use 3 if the student did not say and the plan gives no better clue.' },
+        category: {
+          type: 'string',
+          enum: ['core', 'math', 'dept', 'uni', 'free', 'skills', 'eng'],
+          description: 'core = major requirement; dept = department elective; uni = university elective; free = free elective; skills = university requirement; math; eng = English.',
+        },
+      },
+      required: ['name', 'year', 'semester'],
+    },
+  },
+  {
+    name: 'propose_remove_course',
+    description: 'Propose removing a course from the plan. Shows a confirmation card; nothing is removed until the student accepts.',
+    parameters: {
+      type: 'object',
+      properties: { course: { type: 'string', description: 'Exact course name as it appears in CONTEXT.' } },
+      required: ['course'],
+    },
+  },
+  {
+    name: 'propose_move_course',
+    description: 'Propose moving an existing course to a different year/semester. Shows a confirmation card first.',
+    parameters: {
+      type: 'object',
+      properties: {
+        course: { type: 'string', description: 'Exact course name as it appears in CONTEXT.' },
+        year: { type: 'integer', description: 'Destination year number, 1-based.' },
+        semester: { type: 'integer', description: '1 = first, 2 = second, 3 = summer.' },
+      },
+      required: ['course', 'year', 'semester'],
     },
   },
   {
@@ -239,6 +295,71 @@ function geminiBody(messages, contextBlock) {
   };
 }
 
+// ── FORCING THE CALL ───────────────────────────────────────────────────────
+// The model reliably UNDERSTANDS "add a university elective to year 1" and
+// reliably SAYS it will — and then, often, does not emit the function call.
+// The student is left reading "I'll add it" with no button to accept.
+//
+// Prompt wording did not fix this dependably (measured: 1-3 of 4 phrasings,
+// varying run to run), and an edit that works three times out of four is not
+// a feature. So it is enforced instead of asked for: when the first pass
+// produces no call but both the student's words and the model's own reply say
+// an edit was meant, ask again with Gemini's function-calling mode set to
+// ANY, restricted to the editing tools. That mode cannot answer with prose —
+// it must return one of them.
+//
+// Costs one extra request, and only in the case that was previously broken.
+const EDIT_TOOL_NAMES = ['propose_add_course', 'propose_remove_course', 'propose_move_course',
+                         'propose_mark_course', 'propose_reset_progress'];
+
+// Did the student ask for a change? Verbs only — deliberately not trying to
+// parse the whole sentence, because this only gates a retry whose worst case
+// is a proposal the student can cancel.
+const ASKED_FOR_EDIT = /\b(add|added|adding|remove|delete|drop|move|mark|tick|check off|uncheck|untick|clear|reset|put)\b/i;
+const ASKED_FOR_EDIT_AR = /(ضيف|اضف|أضف|احذف|امسح|انقل|حرك|علم|علّم|شيل|ازل|أزل|ضع)/;
+
+
+// The same enforcement for "how do I / where is / show me". Those are
+// requests to be SHOWN, and the app can show them — but the model answers
+// them in prose often enough that asking nicely is not sufficient.
+const ASKED_TO_BE_SHOWN = /\b(how do i|how can i|how to|where is|where do i|where can i|show me|walk me|guide me|i can'?t find)\b/i;
+const ASKED_TO_BE_SHOWN_AR = /(كيف|وين|اين|أين|ارني|أرني|دلني|ما بلاقي)/;
+
+function looksLikeUnfulfilledGuide(userText) {
+  return ASKED_TO_BE_SHOWN.test(userText) || ASKED_TO_BE_SHOWN_AR.test(userText);
+}
+
+// "How do I add a course" is a request to be TAUGHT, not to have one added.
+// Explanation-seeking phrasings are excluded here so they still get a
+// walkthrough rather than a confirmation card.
+const WANTS_EXPLANATION = /\b(how (do|can|does)|what (is|does|are)|why|explain|difference between)\b/i;
+const WANTS_EXPLANATION_AR = /(كيف|ما هو|ما هي|لماذا|ليش|شو يعني|اشرح)/;
+
+function looksLikeUnfulfilledEdit(userText) {
+  if (WANTS_EXPLANATION.test(userText) || WANTS_EXPLANATION_AR.test(userText)) return false;
+  // The student's own imperative is the whole signal. An earlier version also
+  // required the model to have PROMISED to act, and capped the reply length —
+  // both were guesses about phrasing, and both let real edit requests through
+  // as prose depending on how chatty that particular answer happened to be.
+  return ASKED_FOR_EDIT.test(userText) || ASKED_FOR_EDIT_AR.test(userText);
+}
+
+async function forceCall(model, key, messages, contextBlock, allowed) {
+  const body = geminiBody(messages, contextBlock);
+  body.toolConfig = {
+    functionCallingConfig: { mode: 'ANY', allowedFunctionNames: allowed },
+  };
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+    { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) }
+  );
+  if (!res.ok) return [];
+  const data = await res.json().catch(() => null);
+  const parts = ((((data || {}).candidates || [])[0] || {}).content || {}).parts || [];
+  return parts.filter((p) => p.functionCall)
+              .map((p) => ({ name: p.functionCall.name, args: p.functionCall.args || {} }));
+}
+
 async function callGemini(model, key, messages, contextBlock) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
   // The key goes in a header, not the query string: URLs get logged, cached,
@@ -276,6 +397,21 @@ async function callGemini(model, key, messages, contextBlock) {
     err.retryable = true;
     throw err;
   }
+  if (!actions.length) {
+    const lastUser = String((messages[messages.length - 1] || {}).content || '');
+    // Edit intent is checked first: "how do I add X" is a guide, but
+    // "add X" is an edit, and the guide test would swallow both.
+    var allowed = null;
+    if (looksLikeUnfulfilledEdit(lastUser)) allowed = EDIT_TOOL_NAMES;
+    else if (looksLikeUnfulfilledGuide(lastUser)) allowed = ['start_walkthrough'];
+    if (allowed) {
+      try {
+        const forced = await forceCall(model, key, messages, contextBlock, allowed);
+        if (forced.length) actions.push(forced[0]);
+      } catch (e) { /* the written answer still stands on its own */ }
+    }
+  }
+
   return { text: text.trim(), actions, provider: 'gemini', model };
 }
 
