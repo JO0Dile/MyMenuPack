@@ -84,6 +84,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>University Easy Plans</title>
+<!-- First script in the document on purpose: it records errors, failed file
+     loads, and failed requests, and can only record what happens after it is
+     listening. A module that throws on the way in is exactly the case the
+     Fix panel needs to be able to explain. -->
+<script src="js/00-diagnostics.js"></script>
 <script src="js/01-catalogue.js"></script>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0a1428">
@@ -292,6 +297,59 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div id="importedPlanView" style="display:none;"></div>
 
+<!-- ===== Assistant ==========================================================
+     The chat window is empty markup: every message is built by
+     js/43-assistant-ui.js with createElement, never innerHTML, because it
+     echoes both the student's own words and course names that can have
+     arrived from another student's device through the plans feed. -->
+<button type="button" class="asst-launcher" id="asstLauncher"
+        aria-label="Open the Study Plan assistant" aria-expanded="false">💬</button>
+
+<div class="asst-panel" id="asstPanel" role="dialog" aria-label="Study Plan assistant">
+  <div class="asst-head">
+    <span class="asst-head-title">🎓 Study Plan assistant</span>
+    <button type="button" class="asst-close" id="asstClose" aria-label="Close the assistant">&times;</button>
+  </div>
+  <div class="asst-log" id="asstLog" role="log" aria-live="polite"></div>
+  <form class="asst-form" id="asstForm" autocomplete="off">
+    <input type="text" id="asstInput" class="asst-input" aria-label="Ask the assistant"
+           placeholder="Ask about this app… / اسأل عن التطبيق…" maxlength="200">
+    <button type="submit" class="asst-send" aria-label="Send">➤</button>
+  </form>
+</div>
+
+<!-- Guided Mode. Separate from the onboarding tour layer above (#tutLayer):
+     that one plays fixed once-per-device introductions, this one is started
+     on demand by a question and can repeat. pointer-events stay off the
+     layer so the highlighted control is genuinely tappable underneath. -->
+<div class="guide-layer" id="guideLayer">
+  <div class="guide-spot" id="guideSpot"></div>
+  <div class="guide-tip" id="guideTip">
+    <h4 id="guideTitle"></h4>
+    <p id="guideText"></p>
+    <div class="guide-foot">
+      <span class="guide-step" id="guideStep"></span>
+      <div class="guide-actions">
+        <button type="button" class="guide-end" id="guideEnd">End</button>
+        <button type="button" class="guide-next" id="guideNext">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Fix ===============================================================
+     Bottom-left, on every screen, at all times. -->
+<button type="button" class="fix-launcher" id="fixLauncher"
+        aria-label="Fix — check this app for problems" aria-expanded="false">🛠</button>
+
+<div class="fix-panel" id="fixPanel" role="dialog" aria-label="Fix">
+  <div class="fix-head">
+    <span class="fix-head-title" id="fixTitle">🛠 Fix</span>
+    <button type="button" class="fix-close" id="fixClose" aria-label="Close the Fix panel">&times;</button>
+  </div>
+  <div class="fix-body" id="fixBody"></div>
+</div>
+
 
 <script src="js/02-shared-cross.js"></script>
 
@@ -340,6 +398,11 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/38-accounts.js"></script>
 <script src="js/39-orphans.js"></script>
 <script src="js/40-retakes.js"></script>
+<script src="js/41-assistant-kb.js"></script>
+<script src="js/42-assistant.js"></script>
+<script src="js/43-assistant-ui.js"></script>
+<script src="js/44-fix-analyzers.js"></script>
+<script src="js/45-fix.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 

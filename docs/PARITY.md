@@ -14,6 +14,10 @@ checked against the old file, which is still in git:
 
 ---
 
+Two modules have been added since parity was reached — the built-in assistant
+and the Fix panel. They are new features, not restorations, and are listed
+separately below so this file keeps meaning what it says.
+
 ## Modules (all 29 present)
 
 Verified by `grep -ho "window\.AAUP_[A-Z_]*" web/js/*.js | sort -u`:
@@ -31,6 +35,18 @@ workload summary, removed courses, retakes, GPA + assessment breakdown, degree
 audit, notes and difficulty ratings, achievements, confetti and shareable
 cards, AI advisor, developer mode, plan editor, overview/print, theme,
 accounts, orphan rescue, export/import, tours.
+
+## Added after parity (not part of the old app)
+
+| Module | Files | Notes |
+|---|---|---|
+| `ASSISTANT_KB` / `ASSISTANT` / `ASSISTANT_UI` | `web/js/41-…`, `42-…`, `43-…` | Offline, deterministic assistant + Guided Mode. No API, no key, no network — it answers only from the knowledge base and live page state, so it cannot fabricate a prerequisite. |
+| `FIX_ANALYZERS` / `FIX` | `web/js/44-…`, `45-…` | Ten analyzers; repairs saved data and the offline cache, reports everything else. Backup + undo + history on every repair. |
+| Diagnostics recorder | `web/js/00-diagnostics.js` | Loaded first, before every other script, so it is listening when a module fails on the way in. |
+
+The old `ADVISOR` module is untouched and still does its own job (a
+prerequisite-graph-driven next-semester plan). The assistant answers questions;
+it does not replace the advisor.
 
 ## Data
 
@@ -71,3 +87,9 @@ publishes it to `web/plans.json`.
 - **Publishing data changes**: edit `data/`, run `python3
   tools/build-catalogue.py`, commit both. The Pages workflow deploys `web/` on
   every push to `main`.
+- **Adding a module under `web/js/`** now has three steps, not two: add the
+  `<script>` tag to `index.html`, add the file to `CORE` in `web/sw.js`, and
+  add its global to `REQUIRED_GLOBALS` in `web/js/44-fix-analyzers.js` if other
+  code depends on it. Forgetting the second is silent — the app works until it
+  is opened offline — which is why `tools/check-precache.py` runs in CI and the
+  Fix panel performs the same comparison at runtime.
