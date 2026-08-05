@@ -36,6 +36,10 @@
 
   function collegeKeyForPlan(p){
     var uniId = p.university || 'aaup';
+    // A published plan carries its college's id. Prefer it: matching on the
+    // display name breaks the moment a faculty is renamed, and an unmatched
+    // name silently dumps the plan into "Other / Community".
+    if(p.collegeId && (window.APP_COLLEGES || {})[p.collegeId]) return p.collegeId;
     var enText = ((p.college && p.college.en) || '').trim().toLowerCase();
     var arText = ((p.college && p.college.ar) || '').trim();
     if(enText || arText){

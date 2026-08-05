@@ -40,7 +40,7 @@ def read(path):
     return json.loads(path.read_text(encoding='utf-8'))
 
 
-def shape_plan(major, scales_by_college):
+def shape_plan(major, scales_by_college, colleges):
     # Years and summers are derived from where the courses actually sit, so the
     # structure can never disagree with the courses it describes.
     years = {}
@@ -88,6 +88,13 @@ def shape_plan(major, scales_by_college):
         'icon': major.get('icon') or '🎓',
         'university': major['university'],
         'collegeId': major.get('college'),
+        # The names as well as the id: the plan header shows the faculty, and
+        # a plan whose college is not in the registry still has something
+        # meaningful to display.
+        'college': {
+            'en': (colleges.get(major.get('college')) or {}).get('name', {}).get('en', ''),
+            'ar': (colleges.get(major.get('college')) or {}).get('name', {}).get('ar', ''),
+        },
         'bio': {'en': major.get('bio') or '', 'ar': major.get('bioAr') or ''},
         'degreeHours': major.get('degreeHours'),
         'freeElectiveSuggestions': major.get('freeElectiveSuggestions') or [],
@@ -137,7 +144,7 @@ def main():
         if not majors_dir.is_dir():
             continue
         for f in sorted(majors_dir.glob('*.json')):
-            plans.append(shape_plan(read(f), scales_by_college))
+            plans.append(shape_plan(read(f), scales_by_college, colleges))
 
     # A plan's version must increase when its content changes, or a student who
     # already has the old copy never receives the fix. Content-derived rather
