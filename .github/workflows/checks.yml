@@ -1,0 +1,75 @@
+name: Checks
+
+# The source-level half of the Fix system.
+#
+# The 🛠 Fix panel inside the app checks what only a running browser can see:
+# real errors, files missing from offline storage, damaged saved data, broken
+# buttons. It cannot check the source files for problems that never surface at
+# runtime — and it cannot write a fix back to a file, because a browser cannot
+# edit the site it is loading.
+#
+# So that half runs here instead, on every push, with the free open-source
+# tools: ESLint for JavaScript, Stylelint for CSS, HTMLHint for the markup,
+# plus this project's own two consistency checks (the catalogue is rebuilt to
+# prove it matches data/, and the service worker's offline file list is
+# compared against the files the page actually loads).
+#
+# Nothing here is installed into the repo: npx fetches each tool for the run.
+# All of it is free on GitHub's own runners for a public repository.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: JavaScript (ESLint)
+        run: npx --yes eslint@9
+
+      - name: CSS (Stylelint)
+        run: npx --yes stylelint@16 "web/css/*.css"
+
+      - name: HTML (HTMLHint)
+        run: npx --yes htmlhint@1 "web/index.html"
+
+      - name: Every JSON file parses
+        run: |
+          python3 - <<'PY'
+          import glob, json, sys
+          bad = []
+          for f in sorted(glob.glob('data/**/*.json', recursive=True)) + ['web/plans.json', 'web/manifest.json']:
+              try:
+                  json.load(open(f, encoding='utf-8'))
+              except Exception as e:
+                  bad.append(f'{f}: {e}')
+          for b in bad:
+              print(b)
+          print(f'{len(bad)} invalid' if bad else 'all JSON files parse')
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Offline file list matches the page
+        run: python3 tools/check-precache.py
+
+      - name: web/plans.json matches data/
+        run: |
+          python3 tools/build-catalogue.py
+          git diff --exit-code web/plans.json || {
+            echo ''
+            echo 'web/plans.json is out of date with data/.'
+            echo 'Run: python3 tools/build-catalogue.py  — and commit the result.'
+            exit 1
+          }
