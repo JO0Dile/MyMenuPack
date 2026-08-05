@@ -43,58 +43,61 @@ assistant degrades to the offline engine and says so.
 
 ---
 
-## Setup (about 5 minutes)
+## Setup — 3 steps, about 3 minutes
 
-### 1. Get a free Gemini API key
+Everything that could be done in advance already has been: the app is
+**already pointing at** `https://studyplan-ai.pmhtrfalab999.workers.dev`, the
+allowed origin already defaults to this site, and the model list already
+defaults to working aliases. Nothing below needs editing afterwards.
 
-Go to **https://aistudio.google.com/apikey**, sign in with a Google account,
-and click **Create API key**. No credit card, no billing account. Copy it.
+Until the Worker exists the app simply falls back to its on-device assistant —
+so there is no rush and nothing is broken in the meantime.
 
-### 2. Create the Worker
+### 1. Create the Worker
 
-In the Cloudflare dashboard: **Workers & Pages → Create → Worker**. Name it
-something like `studyplan-ai`. Click **Deploy**, then **Edit code**, delete the
-placeholder, and paste in all of `ai/cloudflare-worker.js`. Deploy again.
+Cloudflare dashboard → **Workers & Pages** → **Create** → **Worker**.
 
-### 3. Add the key as a secret
+**Name it exactly `studyplan-ai`.** That is what makes the URL match what the
+app already expects. (If you name it something else, change `APP_AI_URL` in
+`web/js/01-catalogue.js` to match.)
 
-**Settings → Variables and Secrets → Add**:
+Click **Deploy**. Then **Edit code**, select everything in the editor, delete
+it, paste in the whole of `ai/cloudflare-worker.js` from this repo, and
+**Deploy** again.
 
-| Name | Type | Value |
-|---|---|---|
-| `GEMINI_API_KEY` | Secret | the key from step 1 |
-| `ALLOWED_ORIGIN` | Text | `https://jo0dile.github.io` |
+### 2. Add the key
 
-It must be a **Secret**, not a plain text variable — that is what keeps it out
-of logs and out of the dashboard after saving.
+**Settings → Variables and Secrets → Add**
 
-### 4. Add the Workers AI binding (the free fallback)
+- Type: **Secret** ← must be Secret, not Text
+- Name: `GEMINI_API_KEY`
+- Value: your key from https://aistudio.google.com/apikey
 
-**Settings → Bindings → Add → Workers AI**, and set the **Variable name** to
-exactly `AI`. That is the whole setup for tier 3 — no key, no separate account.
+**Deploy**. That is the last required step.
 
-### 5. Point the app at it
+### 3. (Optional) Add the free fallback
 
-Copy the Worker's URL (`https://studyplan-ai.<your-subdomain>.workers.dev`) into
-`web/js/01-catalogue.js`:
+**Settings → Bindings → Add → Workers AI**, variable name exactly `AI`.
 
-```js
-window.APP_AI_URL = 'https://studyplan-ai.<your-subdomain>.workers.dev';
-```
+This is the third free tier — it takes over if Gemini's daily quota runs out.
+Skipping it just means the app falls back to its on-device assistant instead,
+which is not a failure, only a less clever answer.
 
-Commit that, and it goes live with the next Pages deploy.
+### Check it worked
 
-### 6. Check it
-
-Open the Worker URL in a browser. A `GET` returns its configuration — without
-ever revealing the key:
+Open `https://studyplan-ai.pmhtrfalab999.workers.dev` in a browser. It reports
+its own configuration without ever revealing the key:
 
 ```json
 { "ok": true, "gemini": true, "workersAI": true,
   "models": ["gemini-flash-latest", "gemini-flash-lite-latest"] }
 ```
 
-If `gemini` or `workersAI` is `false`, that step did not save.
+`gemini: false` means step 2 did not save. `workersAI: false` means step 3 was
+skipped, which is fine.
+
+Then open the app, tap 💬, and accept the one-time prompt. The header shows ✨
+when the smart brain is answering.
 
 ---
 

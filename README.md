@@ -85,11 +85,15 @@ also limited — it recognises phrasing rather than understanding it, and says
 "that isn't part of this website" for everything else.
 
 The **smart brain** is a real language model, reached through a small Cloudflare
-Worker (see [`ai/README.md`](ai/README.md)). It understands ordinary questions,
-answers naturally in English or Arabic, and can drive the app for you. It runs
-entirely on free tiers — Gemini, then Cloudflare Workers AI, then back to the
-offline brain when a daily quota runs out — so it costs nothing and cannot
-start charging you.
+Worker (see [`ai/README.md`](ai/README.md) — three steps, nothing to edit
+afterwards). It understands ordinary questions, answers naturally in English or
+Arabic, and can drive the app for you. It runs entirely on free tiers — Gemini,
+then Cloudflare Workers AI, then back to the offline brain when a daily quota
+runs out — so it costs nothing and cannot start charging you.
+
+If the Worker is not deployed, is deleted, or is simply down, the app notices
+after a couple of tries and answers from the offline brain immediately instead
+of waiting on it. Nothing to configure and nothing visibly breaks.
 
 **It is off until you turn it on**, and the app asks once, in plain language,
 before anything is ever sent. When it is on, a question sends: your question,

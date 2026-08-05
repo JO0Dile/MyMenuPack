@@ -67,7 +67,16 @@ window.APP_COLLECT_MODE = 'cloudflare';
 // Leave '' and the app is unchanged: the assistant runs entirely on-device
 // from the knowledge base in js/41-assistant-kb.js, the ✨ toggle never
 // appears, and nothing a student types can leave their phone.
-window.APP_AI_URL = '';
+//
+// Set here in advance to the URL the Worker WILL have once it is deployed —
+// Cloudflare names workers <worker-name>.<account-subdomain>.workers.dev, and
+// this account's subdomain is already known from the collector. Pointing at a
+// Worker that does not exist yet is safe: the fetch fails, the app falls back
+// to the on-device assistant, and the student sees a normal answer. So this
+// can ship before the Worker does.
+//
+// If the Worker is named anything other than "studyplan-ai", change it here.
+window.APP_AI_URL = 'https://studyplan-ai.pmhtrfalab999.workers.dev';
 // Optional. Match it to SHARED_SECRET on the Worker to turn away traffic that
 // did not come from this app. Not a login and it protects a free quota, not
 // money — so a simple value is fine. Leave '' to send none.
@@ -93,7 +102,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.6';
+window.APP_VERSION = '4.7';
 
 (function(){
   // The catalogue ships with the app. Relative on purpose: it must resolve the
