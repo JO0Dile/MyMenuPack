@@ -17,7 +17,10 @@ prerequisite, and your GPA — in English or Arabic, on any phone.
 ## ✨ What it does
 
 - **University → College → Plan** — browse each university's colleges and
-  their full course maps.
+  their full course maps. The app ships with **AAUP** alone, so what a student
+  sees is one school done properly rather than three done partly. Other
+  universities stay authored in `data/` and can be published by flipping one
+  flag, or added from the Developer Panel on a single device.
 - **Track your progress** — check off completed courses; your credit-hour
   progress and GPA update automatically.
 - **See prerequisites at a glance** — every course shows what it needs and
@@ -151,7 +154,7 @@ up until someone opens it with no signal.
 
 ## 🗺️ Roadmap
 
-- [x] University → College → Plan browsing, 34 plans across 3 universities
+- [x] University → College → Plan browsing, 23 AAUP plans across 4 faculties
 - [x] Prerequisite graph, GPA engine, assessment breakdown, achievements
 - [x] Full Arabic interface with right-to-left layout
 - [x] Works offline; installable as an app

@@ -102,7 +102,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.7';
+window.APP_VERSION = '4.8';
 
 (function(){
   // The catalogue ships with the app. Relative on purpose: it must resolve the
@@ -115,6 +115,25 @@ window.APP_VERSION = '4.7';
   // while offline still has something to show.
   var REGISTRY_KEY = 'studyplan.registry.v1';
 
+  // Universities added from the Developer Panel, kept on this device only.
+  //
+  // The shipped catalogue is AAUP alone. Adding another university used to
+  // mean editing data/ and redeploying; this makes it something that can be
+  // done from inside the app, so a new school can be set up and its plans
+  // built before any of it is committed.
+  //
+  // Read with raw localStorage on purpose: this file runs in <head>, long
+  // before AAUP_STORAGE exists, and the home screen paints from whatever
+  // APP_UNIVERSITIES holds by then.
+  var DEV_UNIS_KEY = 'aaup_devUniversities';
+  window.__devUniversities = function(){
+    try{ return JSON.parse(localStorage.getItem(DEV_UNIS_KEY) || '{}') || {}; }
+    catch(e){ return {}; }
+  };
+  window.__saveDevUniversities = function(m){
+    try{ localStorage.setItem(DEV_UNIS_KEY, JSON.stringify(m)); }catch(e){}
+  };
+
   function applyRegistry(reg){
     if(!reg || !reg.universities) return false;
     window.APP_UNIVERSITIES = reg.universities;
@@ -124,7 +143,19 @@ window.APP_VERSION = '4.7';
     });
     window.APP_UNIV_ELECTIVES = pools;
     if(reg.colleges) window.APP_COLLEGES = reg.colleges;
-    return Object.keys(reg.universities).length > 0;
+
+    // Merged after the shipped ones, and never written back to the cache
+    // (cacheRegistry saves the feed, not this object) — so a locally added
+    // university can never be mistaken for a published one, and removing it
+    // in the panel removes it everywhere.
+    var extra = window.__devUniversities();
+    Object.keys(extra).forEach(function(uid){
+      if(window.APP_UNIVERSITIES[uid]) return; // never shadow a shipped one
+      window.APP_UNIVERSITIES[uid] = extra[uid];
+      window.APP_UNIV_ELECTIVES[uid] = extra[uid].electivePool || [];
+    });
+
+    return Object.keys(window.APP_UNIVERSITIES).length > 0;
   }
 
   function cachedRegistry(){

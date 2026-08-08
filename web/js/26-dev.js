@@ -144,12 +144,129 @@
       '<div id="devPlanList">' + planListHtml(rtl) + '</div>' +
       '<div class="form-actions"><button type="button" class="home-btn" id="devRefreshBtn">🔄 ' + (rtl ? 'تحديث الصفحة الرئيسية' : 'Refresh Study Plans') + '</button></div></div>' +
 
+      '<div class="dev-panel-section"><h3>🏛️ ' + (rtl ? 'الجامعات' : 'Universities') + '</h3>' +
+      '<p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin:0 0 10px;">' +
+      (rtl
+        ? 'التطبيق يشحن بالجامعة العربية الأمريكية وحدها. أضف جامعة هنا لتظهر في الشاشة الرئيسية وفي قائمة «خطة جديدة» — تُحفظ على هذا الجهاز فقط، لا تُنشر لأحد.'
+        : 'The app ships with AAUP alone. Add one here and it appears on the home screen and in the New Plan dropdown — saved on this device only, not published to anyone.') +
+      '</p>' +
+      '<div id="devUniList">' + uniListHtml(rtl) + '</div>' +
+      '<div class="form-field-row">' +
+        '<div class="form-field"><label for="devUniId">' + (rtl ? 'المعرّف' : 'ID') + '</label>' +
+        '<input type="text" id="devUniId" maxlength="24" placeholder="e.g. najah"></div>' +
+        '<div class="form-field"><label for="devUniShort">' + (rtl ? 'الاختصار' : 'Short name') + '</label>' +
+        '<input type="text" id="devUniShort" maxlength="12" placeholder="e.g. NNU"></div>' +
+        '<div class="form-field"><label for="devUniIcon">' + (rtl ? 'الأيقونة' : 'Icon') + '</label>' +
+        '<input type="text" id="devUniIcon" maxlength="4" placeholder="🏛️"></div>' +
+      '</div>' +
+      '<div class="form-field-row">' +
+        '<div class="form-field"><label for="devUniNameEn">' + (rtl ? 'الاسم بالإنجليزية' : 'Name — English') + '</label>' +
+        '<input type="text" id="devUniNameEn" maxlength="70" placeholder="e.g. An-Najah National University"></div>' +
+        '<div class="form-field"><label for="devUniNameAr">' + (rtl ? 'الاسم بالعربية' : 'Name — Arabic') + '</label>' +
+        '<input type="text" id="devUniNameAr" maxlength="70" placeholder="جامعة النجاح الوطنية"></div>' +
+      '</div>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="devUniAddBtn" style="border-color:var(--accent);color:var(--text);">' +
+      (rtl ? 'أضف الجامعة' : 'Add university') + '</button></div><div id="devUniMsg"></div></div>' +
+
       '<div class="dev-panel-section"><h3>📥 ' + (rtl ? 'استيراد ملاحظات المجتمع (من البريد)' : 'Import Community Feedback (from Email)') + '</h3>' +
       '<label for="devFeedbackJsonInput" style="font-size:11.5px;color:var(--text-dim);display:block;margin-bottom:6px;">' +
       (rtl ? 'ألصق نص JSON من البريد هنا' : 'Paste the JSON from the email here') + '</label>' +
       '<textarea class="notes-textarea" id="devFeedbackJsonInput" rows="5"></textarea>' +
       '<div class="form-actions"><button type="button" class="home-btn" id="devFeedbackImportBtn" style="border-color:var(--accent);color:var(--text);">' +
       (rtl ? 'استيراد' : 'Import') + '</button></div><div id="devFeedbackImportMsg"></div></div>';
+  }
+
+  // Universities added from this panel. Shipped ones are not listed: they
+  // come from data/ and cannot be removed from inside the app, so offering a
+  // button that would not work is worse than showing nothing.
+  function uniListHtml(rtl){
+    var added = window.__devUniversities ? window.__devUniversities() : {};
+    var ids = Object.keys(added);
+    if(!ids.length){
+      return '<p class="ex-note">' +
+        (rtl ? 'لم تُضف أي جامعة على هذا الجهاز.' : 'No universities added on this device.') + '</p>';
+    }
+    // Same row markup the imported-plan list above uses, so this section
+    // inherits its styling instead of introducing a parallel set of classes.
+    return ids.map(function(uid){
+      var u = added[uid];
+      return '<div class="imported-plan-row"><div>' +
+        '<div class="ipr-name">' + window.__escapeHtml(u.icon || '🏛️') + ' ' +
+        window.__escapeHtml((u.name && u.name.en) || uid) + '</div>' +
+        '<div class="ipr-meta">' + window.__escapeHtml(uid) +
+        (u.shortName ? ' &middot; ' + window.__escapeHtml(u.shortName) : '') + '</div></div>' +
+        '<button type="button" class="home-btn" data-remove-uni="' + window.__escapeHtml(uid) + '">🗑 ' +
+        (rtl ? 'حذف' : 'Remove') + '</button></div>';
+    }).join('');
+  }
+
+  // Ids become part of every plan record that references them, so they are
+  // held to the same shape the rest of the app uses for ids.
+  function addUniversity(){
+    var rtl = currentRtl();
+    var id = (document.getElementById('devUniId').value || '').trim().toLowerCase();
+    var nameEn = (document.getElementById('devUniNameEn').value || '').trim();
+    var nameAr = (document.getElementById('devUniNameAr').value || '').trim();
+    var shortName = (document.getElementById('devUniShort').value || '').trim();
+    var icon = (document.getElementById('devUniIcon').value || '').trim() || '🏛️';
+
+    var err = null;
+    if(!/^[a-z0-9-]{2,24}$/.test(id)){
+      err = rtl ? 'المعرّف يجب أن يكون حروفًا إنجليزية صغيرة أو أرقامًا أو شرطات (2–24).'
+                : 'ID must be lowercase letters, numbers or hyphens (2–24 characters).';
+    } else if(!nameEn && !nameAr){
+      err = rtl ? 'أدخل اسمًا بالإنجليزية أو بالعربية على الأقل.' : 'Enter a name in English or Arabic.';
+    } else if((window.APP_UNIVERSITIES || {})[id]){
+      err = rtl ? 'هذا المعرّف مستخدم بالفعل.' : 'That ID is already in use.';
+    }
+    var msgEl = document.getElementById('devUniMsg');
+    if(err){ msgEl.innerHTML = '<p class="dev-error-msg">' + window.__escapeHtml(err) + '</p>'; return; }
+
+    var added = window.__devUniversities();
+    added[id] = {
+      name: { en: nameEn || nameAr, ar: nameAr || nameEn },
+      shortName: shortName || id.toUpperCase(),
+      icon: icon,
+      website: '',
+      electivePool: []
+    };
+    window.__saveDevUniversities(added);
+
+    // Live, without a reload: the registries the whole app reads are updated
+    // in place and the home screen repainted.
+    window.APP_UNIVERSITIES[id] = added[id];
+    window.APP_UNIV_ELECTIVES[id] = [];
+    if(window.AAUP_HOME && window.AAUP_HOME.showUniversities){ window.AAUP_HOME.showUniversities(); }
+
+    ['devUniId','devUniNameEn','devUniNameAr','devUniShort','devUniIcon'].forEach(function(f){
+      var el = document.getElementById(f); if(el) el.value = '';
+    });
+    msgEl.innerHTML = '<p class="dev-success-msg">✅ ' +
+      (rtl ? 'أُضيفت. ستجدها في الشاشة الرئيسية.' : 'Added. It is on the home screen now.') + '</p>';
+    document.getElementById('devUniList').innerHTML = uniListHtml(rtl);
+    bindUniRemoveButtons();
+  }
+
+  // Removing a university does NOT touch any plan created under it. Those
+  // plans are the student's work; they simply fall back to the "Other /
+  // Community" bucket the home screen already has for a plan whose college
+  // is not in the registry, and reappear if the university is added again.
+  function bindUniRemoveButtons(){
+    var list = document.getElementById('devUniList');
+    if(!list) return;
+    list.querySelectorAll('[data-remove-uni]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var uid = btn.getAttribute('data-remove-uni');
+        var added = window.__devUniversities();
+        delete added[uid];
+        window.__saveDevUniversities(added);
+        delete window.APP_UNIVERSITIES[uid];
+        delete window.APP_UNIV_ELECTIVES[uid];
+        if(window.AAUP_HOME && window.AAUP_HOME.showUniversities){ window.AAUP_HOME.showUniversities(); }
+        document.getElementById('devUniList').innerHTML = uniListHtml(currentRtl());
+        bindUniRemoveButtons();
+      });
+    });
   }
 
   function currentRtl(){ return window.__anyVisiblePageIsRtl ? window.__anyVisiblePageIsRtl() : false; }
@@ -198,6 +315,9 @@
       });
     }
     bindRemoveButtons();
+    var uniAddBtn = document.getElementById('devUniAddBtn');
+    if(uniAddBtn){ uniAddBtn.addEventListener('click', addUniversity); }
+    bindUniRemoveButtons();
     var refreshBtn = document.getElementById('devRefreshBtn');
     if(refreshBtn){ refreshBtn.addEventListener('click', function(){ location.reload(); }); }
 
