@@ -35,10 +35,18 @@
         id: safeId(c.id), name: esc(c.name || c.id || ''), ar: esc(c.ar || ''),
         creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
         category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
-        yearId: yearIds.indexOf(safeId(c.yearId)) !== -1 ? safeId(c.yearId) : yearIds[0],
+        // A course with no year is not a course in year one — it is an
+        // elective the student picks, and the plan deliberately does not say
+        // when. Forcing it to yearIds[0] is what dumped every department
+        // elective into Year 1 Semester 1, mixed in with the required courses
+        // and with no way to tell them apart. Empty is preserved and the
+        // renderer gives them their own section.
+        yearId: yearIds.indexOf(safeId(c.yearId)) !== -1 ? safeId(c.yearId) : '',
         // "summer" is a friendly alias for the renderer's s3 summer slot —
         // normalize so a feed plan's summer courses actually render.
-        semester: window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1')
+        semester: (c.semester == null || c.semester === '')
+          ? ''
+          : (window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1'))
       };
       // The real catalog code (e.g. "100411010") — was silently dropped by
       // this sanitizer even though __sanitizeImportedPlan (the other entry

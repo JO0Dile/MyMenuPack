@@ -3048,3 +3048,55 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 .sync-consent-actions{display:flex; gap:8px; flex-wrap:wrap;}
 .sync-consent-actions .home-btn{flex:1 1 190px;}
 .sync-consent-apply{border-color:var(--unlock); color:var(--text);}
+
+/* ==========================================================================
+   DIALOG HEIGHT — every .modal-card is capped to the viewport and scrolls
+   inside itself.
+   Nothing here limited a dialog's height, so a long one (the Developer Panel
+   with 23 imported plans, the Degree Audit on a big major) simply grew past
+   the bottom of the screen. The page itself does not scroll while a modal is
+   open, so the ✕ and the buttons at the end became unreachable — the only way
+   to see them was to zoom the browser out.
+
+   All five .modal-card instances are <close><body>, so capping the card and
+   scrolling the body keeps ✕ pinned and always clickable.
+   ========================================================================== */
+.modal-card{
+  /* dvh, not vh: on a phone, vh counts the space behind the browser's own
+     toolbar, which is exactly where a dialog's last button ends up. */
+  max-height:calc(100dvh - 40px);
+  display:flex;
+  flex-direction:column;
+}
+.modal-card > .modal-body{
+  overflow-y:auto;
+  min-height:0;              /* or flex refuses to shrink it and nothing scrolls */
+  overscroll-behavior:contain;/* stops the page behind from scrolling at the end */
+  padding-inline-end:2px;    /* breathing room beside the scrollbar */
+}
+/* The close button stays pinned because the card no longer scrolls — but it
+   must sit above the scrolled content, not under it. */
+.modal-card > .modal-close{z-index:2;}
+
+/* A long list inside a dialog gets its own bound too, so one runaway section
+   cannot push everything else out of reach. */
+#devPlanList,
+#devUniList{
+  max-height:min(42dvh, 420px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-inline-end:2px;
+  border-radius:8px;
+}
+
+/* The unscheduled-elective block (js/28-imported.js). Visually separated from
+   the year blocks because these courses are a menu, not a schedule. */
+.imp-elective-block{border-style:dashed;}
+.imp-elective-note{
+  font-size:11.5px; color:var(--text-dim); line-height:1.65; margin:0 0 10px;
+}
+.imp-elective-count{
+  display:inline-block; margin-inline-start:6px; padding:1px 7px;
+  border-radius:99px; background:rgba(93,184,255,.16);
+  font-size:10.5px; font-weight:800; color:var(--accent);
+}

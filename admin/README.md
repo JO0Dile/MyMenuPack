@@ -67,7 +67,7 @@ Create a Cloudflare Worker named `studyplan-admin`, paste in
 
 | Name | Type | Value |
 |---|---|---|
-| `ADMIN_USERNAME` | Variable | whatever you want to type |
+| `ADMIN_USERNAME` | **Secret** | whatever you want to type |
 | `ADMIN_PASSWORD_HASH` | **Secret** | from step 1 |
 | `SESSION_SECRET` | **Secret** | from step 1 |
 | `GITHUB_TOKEN` | **Secret** | from step 2 |
@@ -75,9 +75,26 @@ Create a Cloudflare Worker named `studyplan-admin`, paste in
 | `REPO_NAME` | Variable | `MyMenuPack` |
 | `REPO_BRANCH` | Variable | `main` |
 | `ALLOWED_ORIGIN` | Variable | `https://jo0dile.github.io` |
+| `REQUIRE_CF_ACCESS` | Variable | `1`, once step 3b is done |
 
-The three marked **Secret** are encrypted by Cloudflare and cannot be read back,
-including by you. That is the point.
+The four marked **Secret** are encrypted by Cloudflare and cannot be read back,
+including by you. That is the point. The username is a Secret too — a Variable
+is displayed in plain text to anyone who can open the Cloudflare dashboard, and
+half a credential is still half a credential.
+
+### 3b. Put Cloudflare Access in front of it (strongly recommended, free)
+
+Zero Trust → Access → Applications → **Self-hosted**, pointing at the Worker's
+hostname. Add one policy: *Allow* → *Emails* → your address.
+
+Now Cloudflare authenticates **you** — by email one-time PIN, Google, GitHub,
+whatever you pick — before a request ever reaches this code. Then set
+`REQUIRE_CF_ACCESS=1` and the Worker returns a flat `404` to anything arriving
+without Cloudflare's signed assertion header.
+
+With this on, an attacker who somehow learned your username *and* password still
+cannot reach the login form. Free for up to 50 users. **This is the single
+biggest thing you can do**, and it takes about three minutes.
 
 ### 4. Point the app at it
 
@@ -91,29 +108,24 @@ Change it only if you named the Worker something else.
 
 ### 5. Check it
 
-Open `https://jo0dile.github.io/MyMenuPack/#admin`. The sign-in screen reports
-what it can see before you type anything:
+Open the app with `#admin` on the end of the URL and sign in.
 
-- *Connected to JO0Dile/MyMenuPack on main* — ready.
-- *…has no credentials set* — step 3 is incomplete.
-- *…no GitHub token configured* — sign-in will work but saving will not.
-- *Could not reach the admin Worker* — step 3 was never deployed, or the URL in
-  step 4 is wrong.
+The sign-in screen tells you **nothing** before you authenticate — that is
+deliberate (see Security below). It says only *Could not reach the admin API* if
+the Worker is not answering at all. Once you are in, the Dashboard reports which
+repo and branch it is writing to, and warns you there if the GitHub token is
+missing.
 
 ---
 
 ## Getting in
 
-Two ways, both deliberate:
+- **`#admin`** on the end of the app URL, or
+- **Developer Panel → 🛡 Admin Mode**.
 
-- **`#admin`** on the end of the app URL.
-- **Developer Panel → 🛡 Admin Mode** (the panel opens after clicking the
-  Developer link three times).
-
-Neither is discoverable by accident, and neither grants anything: the password
-is checked on the server, and every single request that changes data carries a
-signed session token that the Worker re-verifies. Publishing the Worker URL is
-harmless.
+Neither grants anything on its own. The Developer Panel's own password is a
+cosmetic Easter-egg gate on a panel that only touches your own browser — it is
+**not** related to the admin password and never protected anything real.
 
 ---
 
@@ -157,24 +169,64 @@ uploaded logo still shows when the student is offline.
 
 ## Security
 
-- The password is stored **only** as a PBKDF2-SHA256 hash (600,000 iterations,
-  random salt). The Worker cannot recover it and neither can anyone who reads
-  its configuration.
+### What is guaranteed
+
+**Your password cannot be discovered from anything published.** It is not in the
+repo, not in the app, not in `plans.json`, not in any commit, and it is never
+sent anywhere. Only a PBKDF2-SHA256 hash of it exists (600,000 iterations, random
+salt), and only inside Cloudflare's encrypted secret store, which does not let
+even you read it back. There is no path from the public site to the password.
+
+The same is true of the username, once it is stored as a Secret.
+
 - Sign-in returns an **HMAC-signed token** with an 8-hour expiry, kept in
-  `sessionStorage` so closing the tab ends the session. There is no session
-  store to steal.
-- **Every** request that changes anything re-verifies that token before the
-  route is even chosen. Nothing in the dashboard authorizes itself.
-- Every payload is **re-validated on the server** against the real schema:
-  slug shapes, credit-hour ranges, unknown categories, prerequisites pointing at
-  courses that do not exist, and prerequisite cycles. The dashboard's checks are
-  a convenience; these are the guarantee.
+  `sessionStorage` so closing the tab ends the session. There is no session store
+  to steal, and forging a token requires `SESSION_SECRET`.
+- **Every** request that changes anything re-verifies that token before the route
+  is even chosen. Nothing in the dashboard authorizes itself.
+- The sign-in screen is **deliberately uninformative**. `/api/health` answers
+  `{"ok":true}` and nothing else — it does not confirm an admin exists, does not
+  name the repo, does not say whether credentials are configured. A failed login
+  says only *invalid username or password*, never which one was wrong, and takes
+  the same 400 ms either way.
+- Every payload is **re-validated on the server**: slug shapes, credit-hour
+  ranges, unknown categories, prerequisites pointing at courses that do not
+  exist, and prerequisite cycles.
 - **SVG uploads carrying `<script>` or event handlers are rejected**, not
   sanitized — a half-cleaned SVG served from the app's own origin would be a
   stored XSS against every user.
 - The GitHub token never reaches a browser.
-- Login is delayed a fixed 400 ms whether it succeeds or fails, which slows
-  online guessing without affecting you.
+
+### What cannot be hidden, and why that is fine
+
+**The existence of an admin page cannot be kept secret.** This is a static site:
+every visitor downloads `web/js/48-admin.js`, and anyone who reads it learns that
+`#admin` opens a sign-in form. Minifying it, renaming the route, or removing it
+from the docs would not change that — the file still ships to every device.
+
+That is not the weakness it looks like. A login form is *supposed* to be
+public; the door is not the lock. What matters is that knowing where the door is
+gets an attacker no closer to opening it:
+
+- the password is not derivable from anything they can download,
+- the form does not tell them whether a username is right,
+- and with Cloudflare Access on (step 3b), they cannot even reach the form.
+
+Anyone who claims a public web app can hide its admin route is describing
+obscurity, not security. This design does not rely on it.
+
+### Your part
+
+The one place this can still go wrong is not in the code:
+
+- **Use a long, unique password.** Nothing here protects a password that is also
+  used somewhere that gets breached.
+- **Turn on Cloudflare Access.** It is free and it is the strongest control
+  available to this project.
+- **Never paste the password into a chat, an issue, a commit, or a screenshot.**
+  Only `tools/hash-admin-password.py` should ever see it, on your own machine.
+- **Keep the Cloudflare account itself secure** — 2FA on. Anyone who can log in
+  there can change the secrets, and no amount of code can prevent that.
 
 **To revoke access immediately** — a lost laptop, a shared password — replace
 `SESSION_SECRET` in the Worker. Every signed-in session stops working at once.

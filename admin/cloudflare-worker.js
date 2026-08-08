@@ -40,7 +40,11 @@
 // SETUP
 //   1. Paste this file into a new Cloudflare Worker, Deploy.
 //   2. Settings → Variables:
-//        ADMIN_USERNAME        (Variable) e.g. dile
+//        ADMIN_USERNAME        (Secret)   e.g. dile  — a Secret, not a Variable:
+//                                         a Variable is shown in plain text in the
+//                                         Cloudflare dashboard to anyone with access
+//                                         to the account, and half a credential is
+//                                         still half a credential
 //        ADMIN_PASSWORD_HASH   (Secret)   output of tools/hash-admin-password.py
 //        SESSION_SECRET        (Secret)   any long random string
 //        GITHUB_TOKEN          (Secret)   fine-grained PAT, Contents: Read+Write, this repo only
@@ -48,6 +52,7 @@
 //        REPO_NAME             (Variable) MyMenuPack
 //        REPO_BRANCH           (Variable) main
 //        ALLOWED_ORIGIN        (Variable) https://jo0dile.github.io
+//        REQUIRE_CF_ACCESS     (Variable) 1, once Cloudflare Access is in front (recommended)
 //   3. Put the Worker URL in APP_ADMIN_URL in web/js/01-catalogue.js.
 // ---------------------------------------------------------------------------
 
@@ -619,16 +624,25 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(env) });
     }
 
-    // Unauthenticated: lets the dashboard tell "not deployed" from "wrong
-    // password" without revealing anything about the configuration.
+    // Unauthenticated, and deliberately almost silent. An earlier version
+    // reported whether an admin was configured and which repo it wrote to,
+    // which is a free reconnaissance answer for anyone who finds this URL:
+    // it confirms an admin account exists and names the target. The only
+    // thing an anonymous caller now learns is that a Worker is running.
+    // Everything useful moved behind the session, into /api/status.
     if (path === '/api/health' || path === '/health') {
-      return json({
-        ok: true,
-        configured: !!(env.ADMIN_USERNAME && env.ADMIN_PASSWORD_HASH && env.SESSION_SECRET),
-        canWrite: !!(env.GITHUB_TOKEN && env.REPO_OWNER && env.REPO_NAME),
-        repo: env.REPO_OWNER && env.REPO_NAME ? `${env.REPO_OWNER}/${env.REPO_NAME}` : null,
-        branch: env.REPO_BRANCH || 'main',
-      }, 200, env);
+      return json({ ok: true }, 200, env);
+    }
+
+    // OPTIONAL SECOND GATE — Cloudflare Access (free for up to 50 users).
+    // With Access in front of this Worker, Cloudflare authenticates the person
+    // BEFORE any request reaches this code, and stamps a signed assertion
+    // header. Set REQUIRE_CF_ACCESS=1 and an anonymous request cannot even
+    // reach the password prompt, let alone guess at it. Without it, the
+    // password is the only thing standing here — which is why the setup guide
+    // recommends turning it on.
+    if (env.REQUIRE_CF_ACCESS === '1' && !request.headers.get('Cf-Access-Jwt-Assertion')) {
+      return json({ error: 'not found' }, 404, env);
     }
 
     if (path === '/api/login' && request.method === 'POST') return handleLogin(request, env);
@@ -639,8 +653,14 @@ export default {
     if (denied) return denied;
 
     try {
-      if (path === '/api/me') {
-        return json({ ok: true, username: env.ADMIN_USERNAME }, 200, env);
+      if (path === '/api/me' || path === '/api/status') {
+        return json({
+          ok: true,
+          username: env.ADMIN_USERNAME,
+          canWrite: !!(env.GITHUB_TOKEN && env.REPO_OWNER && env.REPO_NAME),
+          repo: env.REPO_OWNER && env.REPO_NAME ? `${env.REPO_OWNER}/${env.REPO_NAME}` : null,
+          branch: env.REPO_BRANCH || 'main',
+        }, 200, env);
       }
       if (path === '/api/tree' && request.method === 'GET') return handleTree(env);
 

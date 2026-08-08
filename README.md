@@ -44,12 +44,10 @@ prerequisite, and your GPA — in English or Arabic, on any phone.
 - **🛠 Fix button** — bottom-left, on every screen. Checks the app and your
   saved data, explains anything it finds in plain language, and repairs what
   it safely can. Every repair is backed up first and can be undone.
-- **🛡 Admin Mode** — edit the published catalogue from inside the app:
-  universities, majors, courses, prerequisites, semester layout, logos and
-  icons. Sign-in is checked on a server, and a change becomes a real commit —
-  see [`admin/README.md`](admin/README.md). If you have customised your own
-  copy of a plan, an official update never overwrites it: you get a list of
-  exactly what changed and choose whether to take it.
+- **Your own edits are never overwritten** — if you have customised a plan and
+  the official version later changes, the app does not silently replace your
+  copy. It shows you exactly what changed and lets you decide whether to take
+  it.
 
 > ⚠️ **Unofficial student project — not affiliated with or endorsed by any
 > university. Always confirm your plan with your academic advisor.**
@@ -68,7 +66,7 @@ StudyPlan/
 ├── tools/      — build-catalogue.py turns data/ into web/plans.json
 ├── collector/  — optional Worker that receives plans students choose to share
 ├── ai/         — optional Worker that powers the smart assistant
-└── admin/      — optional Worker that lets an admin edit data/ from the app
+└── admin/      — optional Worker for maintaining the catalogue (see its README)
 ```
 
 All three folders under `ai/`, `collector/` and `admin/` are optional. With none
@@ -172,7 +170,6 @@ up until someone opens it with no signal.
 - [x] Prerequisite graph, GPA engine, assessment breakdown, achievements
 - [x] Full Arabic interface with right-to-left layout
 - [x] Works offline; installable as an app
-- [x] Admin Mode: edit the catalogue from the app, with server-side sign-in
 - [x] Per-major icons and university logos, replaceable without touching code
 - [ ] Verify every plan against the official university PDFs
 - [ ] Confirm official degree credit totals

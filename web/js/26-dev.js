@@ -101,9 +101,21 @@
     var ids = Object.keys(plans);
     return ids.length ? ids.map(function(id){
       var p = plans[id];
-      return '<div class="imported-plan-row"><div><div class="ipr-name">' + p.majorName.en + ' / ' + p.majorName.ar + '</div>' +
-        '<div class="ipr-meta">' + p.courses.length + ' ' + (rtl ? 'مساقًا' : 'courses') + ' &middot; ' +
-        new Date(p.importedAt).toLocaleDateString() + '</div></div>' +
+      // majorName.en became {big, small} when plans gained two-tone titles;
+      // this still concatenated it as a string, so every row in the panel read
+      // "[object Object] / [object Object]". nameParts() reads both the old
+      // string shape and the new object one.
+      var np = window.AAUP_IMPORTED.nameParts;
+      var en = np(p.majorName && p.majorName.en);
+      var ar = np(p.majorName && p.majorName.ar);
+      var title = [en.big, en.small].filter(Boolean).join(' ') || id;
+      var titleAr = [ar.big, ar.small].filter(Boolean).join(' ');
+      var when = p.importedAt ? new Date(p.importedAt) : null;
+      return '<div class="imported-plan-row"><div><div class="ipr-name">' +
+        window.__escapeHtml(title) + (titleAr ? ' / ' + window.__escapeHtml(titleAr) : '') + '</div>' +
+        '<div class="ipr-meta">' + window.__escapeHtml(id) + ' &middot; ' +
+        (p.courses || []).length + ' ' + (rtl ? 'مساقًا' : 'courses') +
+        (when && !isNaN(when) ? ' &middot; ' + when.toLocaleDateString() : '') + '</div></div>' +
         '<button type="button" class="home-btn" data-remove-plan="' + id + '">🗑 ' + (rtl ? 'حذف' : 'Remove') + '</button></div>';
     }).join('') : '<p class="ex-note">' + (rtl ? 'لا توجد خطط مستوردة بعد.' : 'No imported plans yet.') + '</p>';
   }

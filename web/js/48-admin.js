@@ -30,7 +30,8 @@
     major: null,        // the full in-memory major object
     majorSlug: null,
     dirty: false,
-    assets: []
+    assets: [],
+    status: null
   };
 
   function esc(s){ return window.__escapeHtml(s == null ? '' : String(s)); }
@@ -184,7 +185,8 @@
         state.token = res.token;
         state.username = res.username || u;
         try{ sessionStorage.setItem(TOKEN_KEY, res.token); }catch(e){}
-        return loadTree();
+        return api('GET', '/api/status').then(function(st){ state.status = st; }).catch(function(){})
+          .then(loadTree);
       }).then(function(){
         state.section = 'dashboard';
         render();
@@ -196,22 +198,21 @@
     document.getElementById('adminPass').addEventListener('keydown', function(e){ if(e.key === 'Enter') go(); });
     document.getElementById('adminUser').focus();
 
-    // Distinguishes "the Worker is not deployed" from "wrong password", which
-    // otherwise look identical and waste an afternoon.
+    // Reachability only. It deliberately does NOT report whether an admin is
+    // configured or which repo is behind it: anyone can open this screen, and
+    // those answers tell a stranger there is an account here and what it is
+    // worth attacking. That detail now arrives after sign-in, from /api/status.
     if(base()){
-      fetch(base() + '/api/health').then(function(r){ return r.json(); }).then(function(h){
+      fetch(base() + '/api/health').then(function(r){ return r.json(); }).then(function(){
         var el = document.getElementById('adminHealth');
-        if(!el) return;
-        if(!h.configured) el.innerHTML = '⚠️ The admin Worker is reachable but has no credentials set. Add ADMIN_USERNAME, ADMIN_PASSWORD_HASH and SESSION_SECRET.';
-        else if(!h.canWrite) el.innerHTML = '⚠️ Signed-in edits will fail: the Worker has no GitHub token configured.';
-        else el.innerHTML = 'Connected to <strong>' + esc(h.repo) + '</strong> on <strong>' + esc(h.branch) + '</strong>.';
+        if(el) el.textContent = '';
       }).catch(function(){
         var el = document.getElementById('adminHealth');
-        if(el) el.innerHTML = '⚠️ Could not reach the admin Worker at <code>' + esc(base()) + '</code>.';
+        if(el) el.innerHTML = '⚠️ Could not reach the admin API.';
       });
     } else {
       var el = document.getElementById('adminHealth');
-      if(el) el.innerHTML = '⚠️ No admin API is configured. Set APP_ADMIN_URL in js/01-catalogue.js.';
+      if(el) el.innerHTML = 'No admin API is configured.';
     }
   }
 
@@ -238,6 +239,11 @@
         stat(majorCount, 'major files') +
         stat(state.assets.length, 'uploaded assets') +
       '</div>' +
+      (state.status
+        ? '<div class="admin-note">' + (state.status.canWrite
+            ? 'Writing to <strong>' + esc(state.status.repo) + '</strong> on <strong>' + esc(state.status.branch) + '</strong>.'
+            : '⚠️ Saving will fail: the Worker has no GitHub token configured.') + '</div>'
+        : '') +
       '<div class="admin-note">' +
         '<strong>How a change reaches students.</strong> Saving here writes a real commit to ' +
         '<code>data/</code>. CI rebuilds <code>web/plans.json</code> and GitHub Pages redeploys, so an edit is ' +
@@ -853,8 +859,9 @@
     document.body.style.overflow = 'hidden';
     try{ state.token = state.token || sessionStorage.getItem(TOKEN_KEY); }catch(e){}
     if(state.token && !state.tree){
-      api('GET', '/api/me').then(function(me){
+      api('GET', '/api/status').then(function(me){
         state.username = me.username || '';
+        state.status = me;
         return loadTree();
       }).then(function(){ return refreshAssets().catch(function(){}); })
         .then(render)
