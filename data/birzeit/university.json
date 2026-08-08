@@ -14,7 +14,10 @@
       "slug": "birzeit-cs",
       "name": "Computer Science Programs",
       "nameAr": "",
-      "icon": "💻"
+      "icon": "💻",
+      "imageUrl": null
     }
-  ]
+  ],
+  "iconKey": "university",
+  "imageUrl": null
 }

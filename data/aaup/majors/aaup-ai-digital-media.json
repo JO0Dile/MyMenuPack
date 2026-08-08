@@ -5,7 +5,7 @@
   "nameAr": null,
   "subtitle": "🚧 No Academic Plan available yet",
   "subtitleAr": null,
-  "icon": "🎓",
+  "icon": "🎬",
   "bio": "Merges AI (machine learning, computer vision, natural language processing) with digital media — graphic design, digital storytelling and multimedia production — to build AI-driven recommendation systems, interactive media content, and consumption-pattern analytics. 🚧 The department has not published an academic plan for this program yet.",
   "bioAr": null,
   "university": "aaup",
@@ -13,5 +13,7 @@
   "degreeHours": null,
   "sourceVersion": 1,
   "courses": [],
-  "prerequisites": []
+  "prerequisites": [],
+  "iconKey": "media",
+  "imageUrl": null
 }

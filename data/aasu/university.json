@@ -14,7 +14,10 @@
       "slug": "aasu-cee",
       "name": "College of Engineering and Energy",
       "nameAr": "كلية الهندسة والطاقة",
-      "icon": "🦾"
+      "icon": "🦾",
+      "imageUrl": null
     }
-  ]
+  ],
+  "iconKey": "university",
+  "imageUrl": null
 }

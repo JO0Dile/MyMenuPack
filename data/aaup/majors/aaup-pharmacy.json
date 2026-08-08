@@ -1749,5 +1749,7 @@
       "requires": "070115160",
       "forCourse": "170112160"
     }
-  ]
+  ],
+  "iconKey": "pharmacy",
+  "imageUrl": null
 }

@@ -1218,5 +1218,7 @@
       "requires": "020411010",
       "forCourse": "020334230"
     }
-  ]
+  ],
+  "iconKey": "finance",
+  "imageUrl": null
 }

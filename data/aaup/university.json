@@ -14,25 +14,35 @@
       "slug": "aaup-ai-ds",
       "name": "Faculty of Artificial Intelligence and Data Science",
       "nameAr": "كلية الذكاء الاصطناعي وعلوم البيانات",
-      "icon": "🤖"
+      "icon": "🤖",
+      "iconKey": "brain",
+      "imageUrl": null
     },
     {
       "slug": "aaup-it",
       "name": "Faculty of Information Technology",
       "nameAr": "كلية تكنولوجيا المعلومات",
-      "icon": "💻"
+      "icon": "💻",
+      "iconKey": "code",
+      "imageUrl": null
     },
     {
       "slug": "aaup-nursing",
       "name": "Faculty of Nursing",
       "nameAr": "كلية التمريض",
-      "icon": "🩺"
+      "icon": "🩺",
+      "iconKey": "health",
+      "imageUrl": null
     },
     {
       "slug": "aaup-pharmacy",
       "name": "Faculty of Pharmacy",
       "nameAr": "كلية الصيدلة",
-      "icon": "💊"
+      "icon": "💊",
+      "iconKey": "pharmacy",
+      "imageUrl": null
     }
-  ]
+  ],
+  "iconKey": "university",
+  "imageUrl": null
 }

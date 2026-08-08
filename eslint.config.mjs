@@ -19,6 +19,9 @@ export default [
       sourceType: 'script',
       globals: {
         window: 'readonly', document: 'readonly', localStorage: 'readonly',
+        // sessionStorage holds the admin session token deliberately rather
+        // than localStorage: closing the tab must end the session.
+        sessionStorage: 'readonly', history: 'readonly',
         navigator: 'readonly', location: 'readonly', console: 'readonly',
         fetch: 'readonly', setTimeout: 'readonly', clearTimeout: 'readonly',
         setInterval: 'readonly', clearInterval: 'readonly',

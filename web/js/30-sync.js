@@ -35,10 +35,18 @@
         id: safeId(c.id), name: esc(c.name || c.id || ''), ar: esc(c.ar || ''),
         creditHours: Math.max(0, Math.min(20, Number(c.creditHours) || 0)),
         category: CATS.indexOf(c.category) !== -1 ? c.category : 'core',
-        yearId: yearIds.indexOf(safeId(c.yearId)) !== -1 ? safeId(c.yearId) : yearIds[0],
+        // A course with no year is not a course in year one — it is an
+        // elective the student picks, and the plan deliberately does not say
+        // when. Forcing it to yearIds[0] is what dumped every department
+        // elective into Year 1 Semester 1, mixed in with the required courses
+        // and with no way to tell them apart. Empty is preserved and the
+        // renderer gives them their own section.
+        yearId: yearIds.indexOf(safeId(c.yearId)) !== -1 ? safeId(c.yearId) : '',
         // "summer" is a friendly alias for the renderer's s3 summer slot —
         // normalize so a feed plan's summer courses actually render.
-        semester: window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1')
+        semester: (c.semester == null || c.semester === '')
+          ? ''
+          : (window.__normalizeSemester ? window.__normalizeSemester(c.semester) : (['s1','s2'].indexOf(c.semester) !== -1 ? c.semester : 's1'))
       };
       // The real catalog code (e.g. "100411010") — was silently dropped by
       // this sanitizer even though __sanitizeImportedPlan (the other entry
@@ -55,6 +63,12 @@
       id: id,
       majorName: { en: escName(fp.majorName.en), ar: escName(fp.majorName.ar) },
       icon: String(fp.icon || '🎓').slice(0, 8),
+      // The two newer icon layers have to survive this sanitizer or every
+      // synced plan would fall back to its emoji. iconKey is checked against
+      // the built-in set rather than escaped — it is an enum, not text — and
+      // imageUrl goes through the same URL guard the renderer uses.
+      iconKey: (window.AAUP_ICONS && window.AAUP_ICONS.has(fp.iconKey)) ? fp.iconKey : '',
+      imageUrl: window.AAUP_ICONS ? window.AAUP_ICONS.safeImageUrl(fp.imageUrl) : '',
       bio: { en: esc(fp.bio && fp.bio.en), ar: esc(fp.bio && fp.bio.ar) },
       college: { en: esc(fp.college && fp.college.en), ar: esc(fp.college && fp.college.ar) },
       university: university,
@@ -74,30 +88,243 @@
       .catch(function(){ return null; });
   }
 
+  // ---------------------------------------------------------------------
+  // What changed, in words a student can act on
+  // ---------------------------------------------------------------------
+  // Only structural facts are listed. "Something changed" is not a decision
+  // anyone can make, and a raw JSON diff is not either.
+  function diffPlans(oldP, newP){
+    var out = [];
+    var byId = function(list){
+      var m = {};
+      (list || []).forEach(function(c){ m[c.id] = c; });
+      return m;
+    };
+    var a = byId(oldP.courses), b = byId(newP.courses);
+    var label = function(c){ return (c.courseNumber ? c.courseNumber + ' · ' : '') + (c.name || c.id); };
+
+    Object.keys(b).forEach(function(id){ if(!a[id]) out.push({ kind: 'add', text: 'Adds ' + label(b[id])}); });
+    Object.keys(a).forEach(function(id){ if(!b[id]) out.push({ kind: 'remove', text: 'Removes ' + label(a[id])}); });
+
+    Object.keys(b).forEach(function(id){
+      if(!a[id]) return;
+      var o = a[id], n = b[id];
+      if(o.creditHours !== n.creditHours){
+        out.push({ kind: 'change', text: label(n) + ': credit hours ' + o.creditHours + ' → ' + n.creditHours });
+      }
+      if(o.yearId !== n.yearId || o.semester !== n.semester){
+        out.push({ kind: 'move', text: label(n) + ': moved to ' + n.yearId + ' ' + semLabel(n.semester) });
+      }
+      if(o.name !== n.name){ out.push({ kind: 'rename', text: 'Renamed “' + o.name + '” → “' + n.name + '”' }); }
+    });
+
+    var key = function(p){ return p[0] + '>' + p[1]; };
+    var oldPr = {}, newPr = {};
+    (oldP.prerequisites || []).forEach(function(p){ oldPr[key(p)] = p; });
+    (newP.prerequisites || []).forEach(function(p){ newPr[key(p)] = p; });
+    Object.keys(newPr).forEach(function(k){
+      if(!oldPr[k]) out.push({ kind: 'prereq', text: 'New prerequisite: ' + nameIn(b, newPr[k][0]) + ' before ' + nameIn(b, newPr[k][1]) });
+    });
+    Object.keys(oldPr).forEach(function(k){
+      if(!newPr[k]) out.push({ kind: 'prereq', text: 'Dropped prerequisite: ' + nameIn(a, oldPr[k][0]) + ' before ' + nameIn(a, oldPr[k][1]) });
+    });
+
+    var oy = (oldP.structure && oldP.structure.years || []).length;
+    var ny = (newP.structure && newP.structure.years || []).length;
+    if(oy !== ny) out.push({ kind: 'structure', text: 'Plan length changes from ' + oy + ' to ' + ny + ' years' });
+    return out;
+  }
+
+  function semLabel(s){ return s === 's1' ? 'Semester 1' : s === 's2' ? 'Semester 2' : 'Summer'; }
+  function nameIn(map, id){ return map[id] ? (map[id].name || id) : id; }
+
+  // Icons, logos and blurbs are published presentation, not the student's
+  // work — nothing in the app lets them edit these — so they are refreshed
+  // even on a customized plan, with no prompt. This is what keeps a rebranded
+  // icon from being held hostage by an unrelated pending decision about
+  // courses.
+  var COSMETIC = ['icon', 'iconKey', 'imageUrl', 'bio', 'college', 'majorName', 'feedVersion'];
+  function applyCosmetic(existing, sanitized){
+    var changed = false;
+    COSMETIC.forEach(function(f){
+      if(f === 'feedVersion') return;
+      if(JSON.stringify(existing[f]) !== JSON.stringify(sanitized[f])){
+        existing[f] = sanitized[f];
+        changed = true;
+      }
+    });
+    return changed;
+  }
+
   function applyFeed(feed){
-    var result = { added: 0, updated: 0, skipped: 0 };
+    var result = { added: 0, updated: 0, pending: 0, cosmetic: 0 };
     if(!feed || !Array.isArray(feed.plans) || !window.AAUP_IMPORTED) return result;
     var local = window.AAUP_IMPORTED.loadImportedPlans();
+    var awaiting = [];
+
     feed.plans.forEach(function(fp){
       var sanitized = sanitizePlan(fp);
       if(!sanitized) return;
       var existing = local[sanitized.id];
+
       if(!existing){
         local[sanitized.id] = sanitized;
         result.added++;
-      } else if(existing.official && !existing.wasEdited){
-        if((existing.feedVersion || 0) < sanitized.feedVersion){
-          local[sanitized.id] = sanitized;
-          result.updated++;
-        }
+        return;
+      }
+      if(!existing.official){
+        // A plan the student built themselves that happens to share an id.
+        // Not ours to touch at all.
+        return;
+      }
+      if((existing.feedVersion || 0) >= sanitized.feedVersion) return;
+
+      if(!existing.wasEdited){
+        local[sanitized.id] = sanitized;
+        result.updated++;
+        return;
+      }
+
+      // Customized. Presentation refreshes now; structure waits for a yes.
+      if(applyCosmetic(existing, sanitized)) result.cosmetic++;
+      var changes = diffPlans(existing, sanitized);
+      if(changes.length){
+        awaiting.push({ id: sanitized.id, incoming: sanitized, changes: changes });
+        result.pending++;
       } else {
-        // A locally-made or locally-edited plan happens to share this id —
-        // never overwrite someone's own work with a feed version.
-        result.skipped++;
+        // Nothing structural actually differs, so there is nothing to ask
+        // about — take the new version number so this stops re-triggering.
+        existing.feedVersion = sanitized.feedVersion;
+        result.updated++;
       }
     });
-    if(result.added || result.updated){ window.AAUP_IMPORTED.saveImportedPlans(local); }
+
+    if(result.added || result.updated || result.cosmetic || result.pending){
+      window.AAUP_IMPORTED.saveImportedPlans(local);
+    }
+    if(awaiting.length) queueConsent(awaiting);
     return result;
+  }
+
+  // ---------------------------------------------------------------------
+  // The consent dialog
+  // ---------------------------------------------------------------------
+  // One plan at a time. Two plans' worth of changes in one dialog is a choice
+  // nobody reads, and these are irreversible in the direction that matters:
+  // "Apply" replaces work the student did by hand.
+  var consentQueue = [];
+  var consentOpen = false;
+
+  function queueConsent(items){
+    items.forEach(function(it){
+      if(!consentQueue.some(function(q){ return q.id === it.id; })) consentQueue.push(it);
+    });
+    showNextConsent();
+  }
+
+  function showNextConsent(){
+    if(consentOpen || !consentQueue.length) return;
+    // Never interrupt a tour, the assistant mid-answer, or another dialog.
+    if(document.querySelector('.modal-overlay.open, .dialog-overlay.open')) {
+      setTimeout(showNextConsent, 4000);
+      return;
+    }
+    consentOpen = true;
+    var item = consentQueue[0];
+    var plans = window.AAUP_IMPORTED.loadImportedPlans();
+    var plan = plans[item.id];
+    var name = plan && plan.majorName ? ((plan.majorName.en && plan.majorName.en.big) || item.id) : item.id;
+
+    var el = document.createElement('div');
+    el.className = 'sync-consent-overlay open';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+
+    var box = document.createElement('div');
+    box.className = 'sync-consent';
+
+    var h = document.createElement('h3');
+    h.textContent = 'The official ' + name + ' plan was updated';
+    box.appendChild(h);
+
+    var p = document.createElement('p');
+    p.className = 'sync-consent-lead';
+    p.textContent = 'You have made your own changes to this plan, so nothing has been altered. ' +
+      'Here is what the official version changed:';
+    box.appendChild(p);
+
+    var ul = document.createElement('ul');
+    ul.className = 'sync-consent-list';
+    item.changes.slice(0, 40).forEach(function(c){
+      var li = document.createElement('li');
+      li.className = 'sync-change sync-change-' + c.kind;
+      li.textContent = c.text;
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    if(item.changes.length > 40){
+      var more = document.createElement('p');
+      more.className = 'sync-consent-more';
+      more.textContent = '…and ' + (item.changes.length - 40) + ' more.';
+      box.appendChild(more);
+    }
+
+    var warn = document.createElement('p');
+    warn.className = 'sync-consent-warn';
+    warn.textContent = 'Applying replaces this plan\'s courses and prerequisites with the official version. ' +
+      'Your completed-course ticks, grades and notes are kept.';
+    box.appendChild(warn);
+
+    var actions = document.createElement('div');
+    actions.className = 'sync-consent-actions';
+
+    var apply = document.createElement('button');
+    apply.type = 'button';
+    apply.className = 'home-btn sync-consent-apply';
+    apply.textContent = '✅ Apply changes to my plan';
+    apply.addEventListener('click', function(){ resolveConsent(item, true, el); });
+
+    var keep = document.createElement('button');
+    keep.type = 'button';
+    keep.className = 'home-btn';
+    keep.textContent = '❌ Keep my current version';
+    keep.addEventListener('click', function(){ resolveConsent(item, false, el); });
+
+    actions.appendChild(apply);
+    actions.appendChild(keep);
+    box.appendChild(actions);
+    el.appendChild(box);
+    document.body.appendChild(el);
+    apply.focus();
+  }
+
+  function resolveConsent(item, accept, el){
+    var plans = window.AAUP_IMPORTED.loadImportedPlans();
+    var existing = plans[item.id];
+    if(existing){
+      if(accept){
+        // Progress lives in its own storage keyed by course id, so replacing
+        // the plan definition does not touch it — a course that survives the
+        // update keeps its tick, its grade and its notes.
+        var incoming = item.incoming;
+        incoming.wasEdited = false;
+        plans[item.id] = incoming;
+      } else {
+        // Record that this version was declined, so the same dialog does not
+        // reappear on every single page load for a decision already made.
+        existing.feedVersion = item.incoming.feedVersion;
+        existing.declinedVersion = item.incoming.feedVersion;
+      }
+      window.AAUP_IMPORTED.saveImportedPlans(plans);
+    }
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+    consentQueue = consentQueue.filter(function(q){ return q.id !== item.id; });
+    consentOpen = false;
+    if(window.__showToast){
+      window.__showToast(accept ? '✅ Updated to the official plan.' : '👍 Kept your version.');
+    }
+    if(accept && window.AAUP_IMPORTED.renderHomeCards) window.AAUP_IMPORTED.renderHomeCards();
+    showNextConsent();
   }
 
   function lastSyncLabel(){
@@ -116,19 +343,35 @@
     return fetchFeed().then(function(feed){
       if(!feed){
         if(manual && window.__showToast){ window.__showToast('⚠️ Could not reach the plans feed — check your connection.'); }
-        return { added: 0, updated: 0, skipped: 0 };
+        return { added: 0, updated: 0, pending: 0, cosmetic: 0 };
       }
       var result = applyFeed(feed);
       try{ localStorage.setItem('aaup_lastSync', String(Date.now())); }catch(e){}
-      if(manual || result.added || result.updated){
-        var msg = '🔄 ' + result.added + ' new, ' + result.updated + ' updated' + (result.skipped ? ', ' + result.skipped + ' skipped (you’ve customized ' + (result.skipped === 1 ? 'it' : 'them') + ')' : '') + '.';
+      // A pending item gets its own dialog, so it is not also announced in a
+      // toast that would scroll away behind it.
+      if(manual || result.added || result.updated || result.cosmetic){
+        var bits = [];
+        if(result.added) bits.push(result.added + ' new');
+        if(result.updated) bits.push(result.updated + ' updated');
+        if(result.cosmetic) bits.push(result.cosmetic + ' refreshed');
+        if(!bits.length) bits.push('already up to date');
+        var msg = '🔄 ' + bits.join(', ') +
+          (result.pending ? ' · ' + result.pending + ' need' + (result.pending === 1 ? 's' : '') + ' your decision' : '') + '.';
         if(window.__showToast){ window.__showToast(msg); }
       }
       return result;
     });
   }
 
-  window.AAUP_SYNC = { checkForUpdates: checkForUpdates, lastSyncLabel: lastSyncLabel };
+  window.AAUP_SYNC = {
+    checkForUpdates: checkForUpdates,
+    lastSyncLabel: lastSyncLabel,
+    // Exposed so the consent path can be driven with a crafted feed. Reaching
+    // it through the network would mean publishing a change and waiting for a
+    // deploy, which is not a thing a test can do — and this is the one branch
+    // in the app that can destroy a student's own work if it is wrong.
+    __applyFeedForTest: applyFeed
+  };
 
   function init(){
     // Quiet on startup — only speaks up if it actually found something new,

@@ -1062,5 +1062,8 @@
   ],
   "freeElectiveSuggestions": [
     "Basic Physics"
-  ]
+  ],
+  "iconKey": "robot",
+  "icon": "🤖",
+  "imageUrl": null
 }

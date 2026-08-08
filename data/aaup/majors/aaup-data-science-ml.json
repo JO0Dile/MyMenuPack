@@ -5,7 +5,7 @@
   "nameAr": null,
   "subtitle": "🚧 No Academic Plan available yet",
   "subtitleAr": null,
-  "icon": "🎓",
+  "icon": "🧠",
   "bio": "Interdisciplinary program in data science, AI and machine learning, combining mathematics, statistics, computer science and ML algorithms — covering data preprocessing, visualization, statistical inference, predictive modeling and tools like TensorFlow and PyTorch. 🚧 The department has not published an academic plan for this program yet.",
   "bioAr": null,
   "university": "aaup",
@@ -13,5 +13,7 @@
   "degreeHours": null,
   "sourceVersion": 1,
   "courses": [],
-  "prerequisites": []
+  "prerequisites": [],
+  "iconKey": "datascience",
+  "imageUrl": null
 }

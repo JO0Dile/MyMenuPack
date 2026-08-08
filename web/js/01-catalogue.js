@@ -77,6 +77,15 @@ window.APP_COLLECT_MODE = 'cloudflare';
 //
 // If the Worker is named anything other than "studyplan-ai", change it here.
 window.APP_AI_URL = 'https://studyplan-ai.pmhtrfalab999.workers.dev';
+
+// The admin API (admin/cloudflare-worker.js). Reachable only from #admin, and
+// useless without a password that is verified on the Worker — so publishing
+// this URL grants nothing. It is here rather than in 48-admin.js because this
+// file is where every other endpoint the app talks to is declared.
+//
+// Leave it '' and Admin Mode still loads, says it has no API configured, and
+// no student ever notices the difference.
+window.APP_ADMIN_URL = 'https://studyplan-admin.pmhtrfalab999.workers.dev';
 // Optional. Match it to SHARED_SECRET on the Worker to turn away traffic that
 // did not come from this app. Not a login and it protects a free quota, not
 // money — so a simple value is fine. Leave '' to send none.
@@ -102,7 +111,7 @@ window.APP_GITHUB_REPO = 'jo0dile/mymenupack';
 //   small feature             -> +0.1   (2.0  -> 2.1)
 //   big feature / redesign    -> next .5, or next whole number if already
 //                                 past x.5 (2.0 -> 2.5, 2.5 -> 3.0)
-window.APP_VERSION = '4.8';
+window.APP_VERSION = '5.0';
 
 (function(){
   // The catalogue ships with the app. Relative on purpose: it must resolve the

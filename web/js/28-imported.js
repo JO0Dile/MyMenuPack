@@ -110,7 +110,7 @@
       return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + id + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + (p.university || 'aaup') + '" data-college="' + collegeKeyForPlan(p) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
         '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">🗑 Delete</button>' +
-        '<div class="pc-icon">' + (p.icon || '🎓') + '</div>' +
+        '<div class="pc-icon">' + window.AAUP_ICONS.markup(p, { size: 30 }) + '</div>' +
         '<h2>' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</h2>' +
         '<p>' + bio + '</p>' +
         '<div class="pc-cta">' + (pending
@@ -1029,6 +1029,58 @@
       '</div></div>';
   }
 
+  // Courses the plan lists but does not schedule — department and free
+  // electives you choose and slot in yourself. They used to be forced into
+  // Year 1 Semester 1, which read as "these are all first-semester courses"
+  // and made that semester look impossibly heavy. They get their own block,
+  // labelled, after the years.
+  //
+  // Same .course-row / .course markup as a real semester on purpose: ticking
+  // one off, its grade, its prerequisite arrows and the degree audit all go
+  // through the shared code, which finds courses by id and does not care
+  // where on the page they sit.
+  var UNSCHEDULED_LABEL = {
+    dept: { en: 'Department Electives', ar: 'متطلبات القسم الاختيارية' },
+    free: { en: 'Free Electives', ar: 'المتطلبات الحرة' },
+    uni:  { en: 'University Electives', ar: 'المتطلبات الجامعية الاختيارية' },
+    other:{ en: 'Electives — choose from these', ar: 'مواد اختيارية' }
+  };
+
+  function unscheduledHtml(planId, plan, editing, rtl){
+    var loose = (plan.courses || []).filter(function(c){ return !c.yearId; });
+    if(!loose.length) return '';
+
+    // Grouped by category so a plan with both department and free electives
+    // does not present them as one undifferentiated pile.
+    var order = ['dept', 'free', 'uni', 'other'];
+    var groups = {};
+    loose.forEach(function(c){
+      var k = UNSCHEDULED_LABEL[c.category] ? c.category : 'other';
+      (groups[k] = groups[k] || []).push(c);
+    });
+
+    var html = '<div class="imp-year-block imp-elective-block">' +
+      '<div class="imp-year-header"><h3>' +
+      (rtl ? 'مواد اختيارية — غير مجدولة' : 'Electives — not tied to a semester') + '</h3></div>' +
+      '<p class="imp-elective-note">' +
+      (rtl
+        ? 'اختر منها بالعدد الذي تتطلبه خطتك. الخطة لا تحدد لها فصلًا — ضعها في الفصل الذي يناسبك.'
+        : 'Pick as many as your plan requires. The plan does not assign these to a semester, so you choose when to take them.') +
+      '</p>';
+
+    order.forEach(function(k){
+      if(!groups[k]) return;
+      var label = UNSCHEDULED_LABEL[k];
+      html += '<div class="imp-semester-block"><div class="imp-semester-title">' +
+        (rtl ? label.ar : label.en) + ' <span class="imp-elective-count">' +
+        groups[k].length + '</span></div>' +
+        '<div class="course-row" id="' + planId + '-elective-' + k + '">' +
+        groups[k].map(function(c){ return courseCardHtml(planId, c, rtl); }).join('') +
+        '</div></div>';
+    });
+    return html + '</div>';
+  }
+
   function render(id){
     var plans = loadImportedPlans();
     var p = plans[id];
@@ -1069,7 +1121,7 @@
     // simplified look-alike.
     var html = '<div class="sheet' + (editing ? ' editing' : '') + (rtl ? ' rtl-mode' : '') + '" id="page-' + id + '"' + (rtl ? ' dir="rtl"' : '') + ' style="max-width:1200px;margin:20px auto;">' +
       '<header>' +
-      '<div class="brand"><div class="mark" style="display:flex;align-items:center;justify-content:center;font-size:20px;">' + (p.icon || '🎓') + '</div>' +
+      '<div class="brand"><div class="mark" style="display:flex;align-items:center;justify-content:center;font-size:20px;">' + window.AAUP_ICONS.markup(p, { size: 22 }) + '</div>' +
       '<div><h1>' + (function(){ var u = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'] || { name: { en: 'The Arab American University', ar: 'الجامعة العربية الأمريكية' } }; return rtl ? u.name.ar : u.name.en; })() + '</h1><p>' + (rtl ? (p.college && p.college.ar ? p.college.ar : 'كلية غير محددة') : (p.college && p.college.en ? p.college.en : 'Faculty not specified')) + '</p></div></div>' +
       '<div class="title-block"><div class="icon-row">' +
       '<div class="en">' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</div>' +
@@ -1127,6 +1179,8 @@
       if(y.hasSummer){ html += semesterHtml(id, p, y.id, 's3', editing, rtl); }
       html += '</div>';
     });
+
+    html += unscheduledHtml(id, p, editing, rtl);
 
     if(editing){
       html += '<div class="imp-structure-actions">' +
@@ -1315,7 +1369,7 @@
     var p = plans[id];
     if(!p) return null;
     return {
-      majorName: p.majorName, icon: p.icon, bio: p.bio,
+      majorName: p.majorName, icon: p.icon, iconKey: p.iconKey, imageUrl: p.imageUrl, bio: p.bio,
       structure: p.structure, courses: p.courses, prerequisites: p.prerequisites,
       university: p.university || 'aaup', college: p.college
     };

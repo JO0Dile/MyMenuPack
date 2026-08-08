@@ -101,9 +101,21 @@
     var ids = Object.keys(plans);
     return ids.length ? ids.map(function(id){
       var p = plans[id];
-      return '<div class="imported-plan-row"><div><div class="ipr-name">' + p.majorName.en + ' / ' + p.majorName.ar + '</div>' +
-        '<div class="ipr-meta">' + p.courses.length + ' ' + (rtl ? 'مساقًا' : 'courses') + ' &middot; ' +
-        new Date(p.importedAt).toLocaleDateString() + '</div></div>' +
+      // majorName.en became {big, small} when plans gained two-tone titles;
+      // this still concatenated it as a string, so every row in the panel read
+      // "[object Object] / [object Object]". nameParts() reads both the old
+      // string shape and the new object one.
+      var np = window.AAUP_IMPORTED.nameParts;
+      var en = np(p.majorName && p.majorName.en);
+      var ar = np(p.majorName && p.majorName.ar);
+      var title = [en.big, en.small].filter(Boolean).join(' ') || id;
+      var titleAr = [ar.big, ar.small].filter(Boolean).join(' ');
+      var when = p.importedAt ? new Date(p.importedAt) : null;
+      return '<div class="imported-plan-row"><div><div class="ipr-name">' +
+        window.__escapeHtml(title) + (titleAr ? ' / ' + window.__escapeHtml(titleAr) : '') + '</div>' +
+        '<div class="ipr-meta">' + window.__escapeHtml(id) + ' &middot; ' +
+        (p.courses || []).length + ' ' + (rtl ? 'مساقًا' : 'courses') +
+        (when && !isNaN(when) ? ' &middot; ' + when.toLocaleDateString() : '') + '</div></div>' +
         '<button type="button" class="home-btn" data-remove-plan="' + id + '">🗑 ' + (rtl ? 'حذف' : 'Remove') + '</button></div>';
     }).join('') : '<p class="ex-note">' + (rtl ? 'لا توجد خطط مستوردة بعد.' : 'No imported plans yet.') + '</p>';
   }
@@ -167,6 +179,18 @@
       '</div>' +
       '<div class="form-actions"><button type="button" class="home-btn" id="devUniAddBtn" style="border-color:var(--accent);color:var(--text);">' +
       (rtl ? 'أضف الجامعة' : 'Add university') + '</button></div><div id="devUniMsg"></div></div>' +
+
+      // Admin Mode is a different thing from this panel and says so. This one
+      // only ever touches this browser; Admin Mode changes what every student
+      // sees, needs a real password, and is checked on a server.
+      '<div class="dev-panel-section"><h3>🛡 ' + (rtl ? 'وضع المسؤول' : 'Admin Mode') + '</h3>' +
+      '<p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin:0 0 10px;">' +
+      (rtl
+        ? 'يعدّل البيانات المنشورة لجميع الطلاب — الجامعات والتخصصات والمساقات والشعارات. يتطلب اسم مستخدم وكلمة مرور يتم التحقق منهما على الخادم.'
+        : 'Edits the published data every student sees — universities, majors, courses, logos. Needs a username and password, checked on the server. This panel, by contrast, only ever changes this one device.') +
+      '</p>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="devAdminBtn" style="border-color:var(--accent);color:var(--text);">' +
+      (rtl ? 'افتح وضع المسؤول' : 'Open Admin Mode') + '</button></div></div>' +
 
       '<div class="dev-panel-section"><h3>📥 ' + (rtl ? 'استيراد ملاحظات المجتمع (من البريد)' : 'Import Community Feedback (from Email)') + '</h3>' +
       '<label for="devFeedbackJsonInput" style="font-size:11.5px;color:var(--text-dim);display:block;margin-bottom:6px;">' +
@@ -317,6 +341,13 @@
     bindRemoveButtons();
     var uniAddBtn = document.getElementById('devUniAddBtn');
     if(uniAddBtn){ uniAddBtn.addEventListener('click', addUniversity); }
+    var adminBtn = document.getElementById('devAdminBtn');
+    if(adminBtn){
+      adminBtn.addEventListener('click', function(){
+        closeDialog();
+        if(window.AAUP_ADMIN) window.AAUP_ADMIN.open();
+      });
+    }
     bindUniRemoveButtons();
     var refreshBtn = document.getElementById('devRefreshBtn');
     if(refreshBtn){ refreshBtn.addEventListener('click', function(){ location.reload(); }); }

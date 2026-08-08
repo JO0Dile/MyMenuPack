@@ -184,6 +184,10 @@
     ['AAUP_ORPHANS', '39-orphans.js'], ['AAUP_RETAKES', '40-retakes.js'],
     ['AAUP_ASSISTANT_KB', '41-assistant-kb.js'], ['AAUP_ASSISTANT', '42-assistant.js'],
     ['AAUP_ASSISTANT_UI', '43-assistant-ui.js'],
+    // AAUP_ICONS is load-bearing in a way the others are not: the home screen,
+    // the college tiles and every plan card call it while painting, so if it
+    // fails to load the app renders nothing rather than rendering plainly.
+    ['AAUP_ICONS', '04-icons.js'], ['AAUP_ADMIN', '48-admin.js'],
     ['__getProgress', '11-module11.js'], ['__registerPlanData', '02-shared-cross.js'],
     ['__escapeHtml', '02-shared-cross.js'], ['__showToast', '14-storage.js'],
     ['__computeStats', '11-module11.js'], ['__splitCourseId', '11-module11.js']
