@@ -4,11 +4,11 @@
 // study-plan catalogue (plans.json) are all precached, so it works with no
 // network at all from the first visit onward. The only thing that ever goes
 // online is the plan collector, when a student chooses to share a plan.
-var CACHE = 'studyplan-shell-v7';
+var CACHE = 'studyplan-shell-v9';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',
-  './js/02-shared-cross.js', './js/03-search.js', './js/05-collapse-finished-years.js',
+  './js/02-shared-cross.js', './js/03-search.js', './js/04-icons.js', './js/05-collapse-finished-years.js',
   './js/06-per.js', './js/07-plan-overview-print.js', './js/08-celebrations.js',
   './js/10-progress-core.js', './js/11-module11.js', './js/12-removed.js',
   './js/13-pair-mode-toggle.js', './js/14-storage.js', './js/15-student.js', './js/16-data.js',
@@ -20,7 +20,7 @@ var CORE = [
   './js/36-dashboard.js', './js/37-sidebar.js', './js/38-accounts.js', './js/39-orphans.js',
   './js/40-retakes.js', './js/41-assistant-kb.js', './js/42-assistant.js',
   './js/43-assistant-ui.js', './js/44-fix-analyzers.js', './js/45-fix.js',
-  './js/46-assistant-ai.js',
+  './js/46-assistant-ai.js', './js/48-admin.js',
   './assets/icons/icon-any-192.png', './assets/icons/icon-any-384.png',
   './assets/icons/icon-any-512.png', './assets/icons/icon-any.svg',
   './assets/icons/icon-maskable-192.png', './assets/icons/icon-maskable-384.png',

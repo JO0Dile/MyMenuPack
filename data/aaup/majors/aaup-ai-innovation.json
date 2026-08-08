@@ -1010,5 +1010,7 @@
       "requires": "290312120",
       "forCourse": "291123230"
     }
-  ]
+  ],
+  "iconKey": "brain",
+  "imageUrl": null
 }

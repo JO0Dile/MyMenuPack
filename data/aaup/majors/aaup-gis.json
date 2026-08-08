@@ -969,5 +969,7 @@
       "requires": "240514120",
       "forCourse": "240514980"
     }
-  ]
+  ],
+  "iconKey": "globe",
+  "imageUrl": null
 }

@@ -1415,5 +1415,8 @@
       "requires": "advanced-english-lab",
       "forCourse": "research-methods"
     }
-  ]
+  ],
+  "iconKey": "code",
+  "icon": "💻",
+  "imageUrl": null
 }

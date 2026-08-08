@@ -86,6 +86,8 @@ def shape_plan(major, scales_by_college, colleges):
             'ar': {'big': major.get('nameAr') or '', 'small': major.get('subtitleAr') or ''},
         },
         'icon': major.get('icon') or '🎓',
+        'iconKey': major.get('iconKey') or '',
+        'imageUrl': major.get('imageUrl') or '',
         'university': major['university'],
         'collegeId': major.get('college'),
         # The names as well as the id: the plan header shows the faculty, and
@@ -128,10 +130,19 @@ def main():
         except FileNotFoundError:
             rules = {}
 
+        # Three icon layers travel together, all optional. The app tries
+        # imageUrl (a PNG an admin uploaded), then iconKey (a built-in line
+        # icon), then icon (the emoji it has always used). logoUrl is the
+        # university's own official mark and is just imageUrl by another name
+        # — kept as a distinct field because that is what the record has
+        # always called it.
         universities[slug] = {
             'name': {'en': uni['name'], 'ar': uni.get('nameAr') or ''},
             'shortName': uni.get('shortName') or slug.upper(),
             'icon': uni.get('icon') or '🎓',
+            'iconKey': uni.get('iconKey') or '',
+            'logoUrl': uni.get('logoUrl') or uni.get('imageUrl') or '',
+            'description': uni.get('description') or '',
             'website': uni.get('website') or '',
             'electivePool': rules.get('universityElectives') or [],
         }
@@ -140,6 +151,8 @@ def main():
             colleges[c['slug']] = {
                 'university': slug,
                 'icon': c.get('icon') or '🎓',
+                'iconKey': c.get('iconKey') or '',
+                'imageUrl': c.get('imageUrl') or '',
                 'name': {'en': c['name'], 'ar': c.get('nameAr') or ''},
             }
 

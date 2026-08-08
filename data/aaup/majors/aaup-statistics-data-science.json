@@ -1069,5 +1069,7 @@
       "requires": "250113060",
       "forCourse": "250112200"
     }
-  ]
+  ],
+  "iconKey": "stats",
+  "imageUrl": null
 }

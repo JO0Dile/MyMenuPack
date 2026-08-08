@@ -1275,5 +1275,8 @@
       "requires": "advanced-english-lab",
       "forCourse": "research-methods"
     }
-  ]
+  ],
+  "iconKey": "medical",
+  "icon": "⚕️",
+  "imageUrl": null
 }

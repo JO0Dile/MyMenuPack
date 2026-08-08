@@ -1073,5 +1073,7 @@
       "requires": "240213081",
       "forCourse": "110114080"
     }
-  ]
+  ],
+  "iconKey": "code",
+  "imageUrl": null
 }

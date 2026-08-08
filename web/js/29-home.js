@@ -51,7 +51,10 @@
     Object.keys(window.APP_COLLEGES || {}).forEach(function(cid){
       var c = window.APP_COLLEGES[cid];
       if(c.university !== uniId) return;
-      out[cid] = { id: cid, name: c.name, icon: c.icon, count: 0 };
+      // Carries all three icon layers, not just the emoji: this object is what
+      // the tile renders from, so anything dropped here is invisible downstream.
+      out[cid] = { id: cid, name: c.name, icon: c.icon, iconKey: c.iconKey,
+                   imageUrl: c.imageUrl, count: 0 };
     });
     allPlanMeta().filter(function(m){ return m.university === uniId; }).forEach(function(m){
       if(!out[m.college]){ out[m.college] = { id: m.college, name: m.collegeMeta, count: 0 }; }
@@ -113,7 +116,7 @@
       var count = countForUniversity(uid);
       return '<div class="plan-card" onclick="AAUP_HOME.showColleges(\'' + uid + '\')" role="button" tabindex="0" onkeydown="if(event.key===\'Enter\')AAUP_HOME.showColleges(\'' + uid + '\')">' +
         '<span class="home-tile-badge">' + count + ' plan' + (count === 1 ? '' : 's') + '</span>' +
-        '<div class="pc-icon" style="font-size:26px;">' + u.icon + '</div>' +
+        '<div class="pc-icon">' + window.AAUP_ICONS.markup(u, { size: 30, label: u.shortName }) + '</div>' +
         '<h2>' + u.name.en + '<em>' + u.shortName + '</em></h2>' +
         '<p style="direction:rtl;">' + u.name.ar + '</p>' +
         '<div class="pc-cta">Browse colleges →</div></div>';
@@ -131,10 +134,9 @@
       // Registered colleges (APP_COLLEGES) carry their own icon; a college
       // that only exists because a student's custom plan named it (no
       // registered entry) falls back to a plain building.
-      var icon = c.icon || '🏫';
       return '<div class="plan-card" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0">' +
         '<span class="home-tile-badge">' + c.count + ' plan' + (c.count === 1 ? '' : 's') + '</span>' +
-        '<div class="pc-icon" style="font-size:22px;">' + icon + '</div>' +
+        '<div class="pc-icon">' + window.AAUP_ICONS.markup(c, { size: 26, fallback: '🏫' }) + '</div>' +
         '<h2 style="font-size:14.5px;">' + name.en + '</h2>' +
         '<p style="direction:rtl;">' + name.ar + '</p>' +
         (c.count ? '<div class="pc-cta">View plans →</div>' : '<div class="pc-cta home-tile-empty">No plans yet</div>') +
@@ -189,7 +191,7 @@
     var pct = dash.planPercent ? dash.planPercent(prefix) : null;
     var esc = window.__escapeHtml;
     card.innerHTML =
-      '<div class="hr-icon">' + esc(info.icon || '🎓') + '</div>' +
+      '<div class="hr-icon">' + window.AAUP_ICONS.markup(info, { size: 24 }) + '</div>' +
       '<div class="hr-body">' +
         '<div class="hr-kicker">Continue · تابع</div>' +
         '<div class="hr-name">' + esc(info.name || prefix) + '</div>' +

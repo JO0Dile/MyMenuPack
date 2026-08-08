@@ -5,7 +5,7 @@
   "nameAr": null,
   "subtitle": "B.Sc. · 133 CH · Program 29022",
   "subtitleAr": null,
-  "icon": "💰",
+  "icon": "📈",
   "bio": "Uses mathematical and computer-engineering techniques to solve financial problems and devise new financial products and trading tools, for banks, investment houses, insurers and hedge funds. 133 credit hours: University Req. 14, University Elec. 8, College Req. 24, Specialization Req. 69, Specialization Elec. 12 (pick 4 of 16 courses), Free Elective 6. Course list, credit hours and prerequisites are exactly as published; no official semester order was published, so the placement shown here is a suggested prerequisite-valid sequence — confirm the official order with your academic advisor.",
   "bioAr": null,
   "university": "aaup",
@@ -1213,5 +1213,7 @@
       "requires": "250222010",
       "forCourse": "250113090"
     }
-  ]
+  ],
+  "iconKey": "chart",
+  "imageUrl": null
 }

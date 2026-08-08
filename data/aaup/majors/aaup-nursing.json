@@ -1312,5 +1312,7 @@
       "requires": "170112320",
       "forCourse": "170114360"
     }
-  ]
+  ],
+  "iconKey": "health",
+  "imageUrl": null
 }

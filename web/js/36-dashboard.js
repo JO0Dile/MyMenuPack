@@ -18,7 +18,8 @@
     if(isImportedPlan(prefix)){
       var p = window.AAUP_IMPORTED.loadImportedPlans()[prefix];
       var en = window.AAUP_IMPORTED.nameParts(p.majorName.en);
-      return { icon: p.icon || '🎓', name: en.big + (en.small ? ' ' + en.small : '') };
+      return { icon: p.icon || '🎓', iconKey: p.iconKey || '', imageUrl: p.imageUrl || '',
+               name: en.big + (en.small ? ' ' + en.small : '') };
     }
     var page = document.getElementById('page-' + prefix);
     var nameEl = page && page.querySelector('.title-block .en');

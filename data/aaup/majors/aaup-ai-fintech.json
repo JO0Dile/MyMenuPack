@@ -5,7 +5,7 @@
   "nameAr": null,
   "subtitle": "B.Sc. · 121 CH (as stated) · Program 29033",
   "subtitleAr": null,
-  "icon": "💰",
+  "icon": "💳",
   "bio": "Equips students with AI and machine learning skills applied to modern financial markets — blockchain, digital payments, algorithmic trading — for the FinTech sector. University Req. 14 + University Elec. 8 + College Req. 47 + Specialization Req. 42 + Specialization Elec. 6 (pick 2 of 5 courses) + Free Elective 6 = 123H, 2H over the program's own stated total of 121H — a small inconsistency in the source that couldn't be resolved from what was provided, flagged here rather than silently dropped. No official semester order was published; the placement shown is a prerequisite-valid suggested sequence — confirm both details with your academic advisor.",
   "bioAr": null,
   "university": "aaup",
@@ -989,5 +989,7 @@
       "requires": "290312230",
       "forCourse": "290333180"
     }
-  ]
+  ],
+  "iconKey": "fintech",
+  "imageUrl": null
 }

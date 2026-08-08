@@ -5,7 +5,7 @@
   "nameAr": "شبكات الحاسوب",
   "subtitle": "Minor: Information Security · 134 CH",
   "subtitleAr": "تخصص فرعي: أمن المعلومات · 134 ساعة",
-  "icon": "🛡️",
+  "icon": "🌐",
   "bio": "BA in Computer Networks with a minor in Information Security (Program 24031 · Jenin Campus). Designing, building, maintaining, and managing computer networks while protecting the security and secrecy of information transfer. 134 credit hours over 4 years, following the official advisory plan. The 0-credit remedial Beginning English is omitted (students place out of it).",
   "bioAr": "بكالوريوس في شبكات الحاسوب مع تخصص فرعي في أمن المعلومات (برنامج 24031 · حرم جنين). تصميم وبناء وصيانة وإدارة شبكات الحاسوب مع حماية أمن وسرية نقل المعلومات. 134 ساعة معتمدة على 4 سنوات وفق الخطة الإرشادية الرسمية. تُستثنى مادة الإنجليزية التمهيدية (بدون ساعات).",
   "university": "aaup",
@@ -1091,5 +1091,7 @@
       "requires": "240614970",
       "forCourse": "240614980"
     }
-  ]
+  ],
+  "iconKey": "network",
+  "imageUrl": null
 }

@@ -44,6 +44,12 @@ prerequisite, and your GPA — in English or Arabic, on any phone.
 - **🛠 Fix button** — bottom-left, on every screen. Checks the app and your
   saved data, explains anything it finds in plain language, and repairs what
   it safely can. Every repair is backed up first and can be undone.
+- **🛡 Admin Mode** — edit the published catalogue from inside the app:
+  universities, majors, courses, prerequisites, semester layout, logos and
+  icons. Sign-in is checked on a server, and a change becomes a real commit —
+  see [`admin/README.md`](admin/README.md). If you have customised your own
+  copy of a plan, an official update never overwrites it: you get a list of
+  exactly what changed and choose whether to take it.
 
 > ⚠️ **Unofficial student project — not affiliated with or endorsed by any
 > university. Always confirm your plan with your academic advisor.**
@@ -61,12 +67,20 @@ StudyPlan/
 ├── data/       — where plans are authored and reviewed, one file per major
 ├── tools/      — build-catalogue.py turns data/ into web/plans.json
 ├── collector/  — optional Worker that receives plans students choose to share
-└── ai/         — optional Worker that powers the smart assistant
+├── ai/         — optional Worker that powers the smart assistant
+└── admin/      — optional Worker that lets an admin edit data/ from the app
 ```
 
-Both folders under `ai/` and `collector/` are optional. With neither deployed
-the app is exactly what it looks like: a static site that runs offline and
-talks to nothing.
+All three folders under `ai/`, `collector/` and `admin/` are optional. With none
+of them deployed the app is exactly what it looks like: a static site that runs
+offline and talks to nothing.
+
+**There is no database.** Study plans are authored in `data/`, built into
+`web/plans.json`, and served as static files. Admin Mode does not change that —
+it commits to `data/` through a Worker that holds the GitHub token privately, CI
+rebuilds the catalogue, and Pages redeploys. So `data/` stays the single source
+of truth, every edit has an author and a message, and anything can be undone
+with `git revert`.
 
 **It works completely offline.** The app, its styles, all its modules, and the
 entire study-plan catalogue are cached on your device the first time you open
@@ -158,6 +172,8 @@ up until someone opens it with no signal.
 - [x] Prerequisite graph, GPA engine, assessment breakdown, achievements
 - [x] Full Arabic interface with right-to-left layout
 - [x] Works offline; installable as an app
+- [x] Admin Mode: edit the catalogue from the app, with server-side sign-in
+- [x] Per-major icons and university logos, replaceable without touching code
 - [ ] Verify every plan against the official university PDFs
 - [ ] Confirm official degree credit totals
 - [ ] Accounts, so progress can follow a student across devices

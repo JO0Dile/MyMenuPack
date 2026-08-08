@@ -2841,3 +2841,210 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 .asst-list{margin:4px 0 8px; padding-inline-start:18px;}
 .asst-list li{margin-bottom:3px; line-height:1.55;}
 .asst-bubble strong{font-weight:800; color:var(--text);}
+
+/* ==========================================================================
+   ICONS — the three-layer mark used for a university, a college, or a major
+   (js/47-icons.js). One box, whichever layer fills it: an uploaded PNG, a
+   built-in line icon, or the emoji the app has always used.
+   ========================================================================== */
+.app-icon{display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+
+/* The SVGs are drawn with currentColor, so they take the accent from whatever
+   tile they sit in and follow the theme without a second set for dark mode. */
+.app-icon-svg{color:var(--accent);}
+.app-icon-svg svg{width:100%; height:100%; display:block;}
+
+/* Beats the older `.plan-card .pc-icon svg{width:30px}` rule, which sized the
+   built-in cards' inline SVGs directly. Here the wrapper owns the size and the
+   SVG just fills it, so one markup() call works at every call site. */
+.pc-icon .app-icon-svg svg,
+.hr-icon .app-icon-svg svg,
+.mark .app-icon-svg svg{width:100%; height:100%;}
+
+/* An uploaded logo is never cropped or stretched: it is fitted, so a wide
+   university wordmark and a square crest both sit correctly in the same box. */
+.app-icon-img{display:block; border-radius:6px;}
+
+/* Emoji needs no colour treatment — it carries its own. */
+.app-icon-emoji{color:inherit;}
+
+/* ==========================================================================
+   ADMIN MODE (js/48-admin.js) — reached at #admin, invisible otherwise.
+   Deliberately borrows the app's tokens rather than introducing an admin
+   theme: the same colours, the same .home-btn, the same field styling, so it
+   reads as part of the product and not a bolted-on console.
+   ========================================================================== */
+.admin-overlay{
+  position:fixed; inset:0; z-index:9600; display:none;
+  /* --page-bg, not --bg: there is no --bg token, so the overlay painted
+     transparent and the whole app showed through behind the dashboard. */
+  background:var(--page-bg); overflow:hidden;
+}
+.admin-overlay.open{display:block;}
+
+/* A real app shell rather than a long scrolling page with sticky pieces: the
+   header is a flex row that never scrolls, and the nav and the main panel each
+   scroll on their own. The earlier version pinned the nav with `top:57px`,
+   which is only correct while the header happens to be 57px tall — it wraps on
+   narrow screens and on long usernames, and then it sat on top of the nav. */
+.admin-shell{height:100%; display:flex; flex-direction:column;}
+
+.admin-top{
+  flex:0 0 auto; z-index:2; display:flex; align-items:center;
+  justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:12px 16px; background:var(--panel); border-bottom:1px solid var(--line);
+}
+.admin-brand{font-size:15px; color:var(--text);}
+.admin-brand span{color:var(--text-dim); font-weight:600;}
+.admin-top-actions{display:flex; align-items:center; gap:8px;}
+.admin-savestate{font-size:11.5px; color:var(--text-dim); font-weight:700;}
+
+.admin-body{display:flex; flex:1 1 auto; min-height:0; align-items:stretch;}
+.admin-nav{
+  flex:0 0 208px; padding:14px 10px; border-inline-end:1px solid var(--line);
+  display:flex; flex-direction:column; gap:4px; overflow-y:auto;
+}
+.admin-navbtn{
+  text-align:start; padding:9px 11px; border-radius:9px; border:1px solid transparent;
+  background:none; color:var(--text-dim); font-size:12.5px; font-weight:700; cursor:pointer;
+}
+.admin-navbtn:hover{background:rgba(93,184,255,.08); color:var(--text);}
+.admin-navbtn.is-active{background:rgba(93,184,255,.16); color:var(--text); border-color:var(--accent);}
+.admin-navbtn.is-off{opacity:.45;}
+.admin-nav-context{
+  margin-top:10px; padding:9px 11px; border-radius:9px; background:rgba(93,184,255,.07);
+  font-size:11px; color:var(--text-dim); line-height:1.6;
+}
+.admin-dot-dirty{color:var(--prereq); font-weight:800;}
+
+.admin-main{flex:1 1 auto; min-width:0; padding:18px 20px 60px; max-width:1100px; overflow-y:auto;}
+.admin-main h2{margin:0 0 6px; font-size:19px;}
+.admin-main h3{margin:22px 0 8px; font-size:14px;}
+.admin-main h4{margin:16px 0 6px; font-size:12.5px; color:var(--text-dim);}
+.admin-sub{font-size:11.5px; color:var(--text-dim); font-weight:600;}
+.admin-hint{font-size:11.5px; color:var(--text-dim); line-height:1.65; margin:4px 0 12px;}
+
+.admin-login{max-width:380px; margin:8vh auto 0;}
+.admin-primary{border-color:var(--accent); color:var(--text);}
+
+.admin-stats{display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 18px;}
+.admin-stat{
+  flex:1 1 130px; padding:12px 14px; border-radius:11px;
+  background:var(--panel); border:1px solid var(--line);
+  font-size:11.5px; color:var(--text-dim);
+}
+.admin-stat-n{font-size:22px; font-weight:800; color:var(--text);}
+
+.admin-note{
+  padding:11px 13px; border-radius:10px; margin:10px 0;
+  background:rgba(93,184,255,.07); border:1px solid var(--line);
+  font-size:12px; line-height:1.7; color:var(--text-dim);
+}
+.admin-note strong{color:var(--text);}
+.admin-note-warn{background:rgba(255,193,94,.09);}
+
+.admin-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:6px;}
+.admin-table th{
+  text-align:start; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--text-dim); padding:6px 8px; border-bottom:1px solid var(--line);
+}
+.admin-table td{padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:middle;}
+.admin-table input, .admin-table select{width:100%; min-width:60px;}
+.admin-course-table td:nth-child(4) input{max-width:64px;}
+.admin-mini{padding:4px 9px; font-size:11px;}
+.admin-danger{border-color:var(--prereq); color:var(--prereq);}
+.admin-pill{
+  display:inline-block; padding:2px 8px; border-radius:99px; font-size:10.5px; font-weight:800;
+  background:rgba(255,255,255,.06); color:var(--text-dim);
+}
+.admin-pill-on{background:rgba(93,255,160,.14); color:var(--unlock);}
+
+.admin-editor{
+  margin-top:18px; padding:16px; border-radius:12px;
+  background:var(--panel); border:1px solid var(--accent);
+}
+.admin-row{display:flex; gap:6px; align-items:center; margin-bottom:6px; flex-wrap:wrap;}
+.admin-row input, .admin-row select{flex:1 1 120px; min-width:0;}
+.admin-check{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); margin:8px 0;}
+.admin-check input{width:auto;}
+.admin-savebar{align-items:center; gap:10px; flex-wrap:wrap;}
+.admin-savebar .admin-hint{margin:0;}
+
+.admin-semlist{list-style:none; margin:0 0 10px; padding:0;}
+.admin-semlist li{
+  display:flex; align-items:center; gap:8px; justify-content:space-between;
+  padding:5px 8px; border-radius:8px; background:rgba(255,255,255,.03); margin-bottom:3px; font-size:12.5px;
+}
+.admin-semlist select{max-width:160px;}
+
+.admin-iconpick{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;}
+.admin-icontile{
+  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  border-radius:9px; border:1px solid var(--line); background:var(--panel);
+  color:var(--accent); cursor:pointer; font-size:10px; padding:0;
+}
+.admin-icontile:hover{border-color:var(--accent);}
+.admin-icontile.is-active{border-color:var(--accent); background:rgba(93,184,255,.18);}
+
+.admin-logo-preview{
+  margin-top:8px; padding:10px; border-radius:9px; display:inline-flex;
+  background:rgba(255,255,255,.05); border:1px solid var(--line);
+}
+.admin-assets{display:flex; flex-wrap:wrap; gap:10px;}
+.admin-asset{
+  width:150px; padding:9px; border-radius:10px; text-align:center;
+  background:var(--panel); border:1px solid var(--line);
+}
+.admin-asset img{width:100%; height:70px; object-fit:contain; margin-bottom:6px;}
+.admin-asset code{display:block; font-size:9.5px; color:var(--text-dim); word-break:break-all; margin-bottom:6px;}
+
+@media (max-width:760px){
+  .admin-body{flex-direction:column;}
+  .admin-nav{
+    flex:0 0 auto; width:100%; flex-direction:row;
+    overflow-x:auto; overflow-y:visible;
+    border-inline-end:none; border-bottom:1px solid var(--line);
+  }
+  .admin-navbtn{white-space:nowrap;}
+  .admin-nav-context{display:none;}
+  .admin-main{padding:14px;}
+  .admin-table{display:block; overflow-x:auto;}
+}
+
+/* ==========================================================================
+   SYNC CONSENT (js/30-sync.js) — shown when an official plan changed and the
+   student has edits of their own on it. Deliberately blocking: it is the one
+   moment the app would otherwise overwrite someone's work.
+   ========================================================================== */
+.sync-consent-overlay{
+  position:fixed; inset:0; z-index:9700; display:none;
+  align-items:center; justify-content:center; padding:18px;
+  background:rgba(4,10,22,.72); backdrop-filter:blur(2px);
+}
+.sync-consent-overlay.open{display:flex;}
+.sync-consent{
+  width:min(520px,100%); max-height:82vh; overflow:auto;
+  background:var(--panel); border:1px solid var(--accent); border-radius:14px; padding:18px;
+}
+.sync-consent h3{margin:0 0 8px; font-size:16px; line-height:1.35;}
+.sync-consent-lead{font-size:12.5px; color:var(--text-dim); line-height:1.65; margin:0 0 12px;}
+.sync-consent-list{list-style:none; margin:0 0 10px; padding:0;}
+.sync-change{
+  font-size:12.3px; line-height:1.55; padding:6px 10px; margin-bottom:4px;
+  border-radius:8px; border-inline-start:3px solid var(--line);
+  background:rgba(255,255,255,.035); color:var(--text);
+}
+/* Colour carries the same meaning it does everywhere else in the app, so the
+   list is skimmable without a legend. */
+.sync-change-add{border-inline-start-color:var(--unlock);}
+.sync-change-remove{border-inline-start-color:var(--prereq);}
+.sync-change-prereq{border-inline-start-color:var(--accent);}
+.sync-change-move,.sync-change-change,.sync-change-rename,.sync-change-structure{border-inline-start-color:#ffc15e;}
+.sync-consent-more{font-size:11.5px; color:var(--text-dim); margin:0 0 10px;}
+.sync-consent-warn{
+  font-size:11.8px; line-height:1.6; color:var(--text-dim);
+  background:rgba(255,193,94,.09); border-radius:9px; padding:9px 11px; margin:0 0 14px;
+}
+.sync-consent-actions{display:flex; gap:8px; flex-wrap:wrap;}
+.sync-consent-actions .home-btn{flex:1 1 190px;}
+.sync-consent-apply{border-color:var(--unlock); color:var(--text);}

@@ -13,5 +13,7 @@
   "degreeHours": null,
   "sourceVersion": 1,
   "courses": [],
-  "prerequisites": []
+  "prerequisites": [],
+  "iconKey": "gamepad",
+  "imageUrl": null
 }
