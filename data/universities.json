@@ -15,7 +15,8 @@
       "nameAr": "جامعة بيرزيت",
       "shortName": "BZU",
       "icon": "🎓",
-      "collegeCount": 1
+      "collegeCount": 1,
+      "published": false
     },
     {
       "slug": "aasu",
@@ -23,7 +24,8 @@
       "nameAr": "جامعة عبدالله السالم",
       "shortName": "AASU",
       "icon": "🏫",
-      "collegeCount": 1
+      "collegeCount": 1,
+      "published": false
     }
   ]
 }

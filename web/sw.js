@@ -4,7 +4,7 @@
 // study-plan catalogue (plans.json) are all precached, so it works with no
 // network at all from the first visit onward. The only thing that ever goes
 // online is the plan collector, when a student chooses to share a plan.
-var CACHE = 'studyplan-shell-v6';
+var CACHE = 'studyplan-shell-v7';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',

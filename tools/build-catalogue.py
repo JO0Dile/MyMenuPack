@@ -108,9 +108,18 @@ def shape_plan(major, scales_by_college, colleges):
 def main():
     index = read(DATA / 'universities.json')
     universities, colleges, plans = {}, {}, []
+    skipped = []
 
     for entry in index['universities']:
+        # "published": false keeps a university out of the shipped app without
+        # deleting the work. Birzeit's 10 transcribed plans and Al-Salem's one
+        # stay exactly where they are in data/, reviewed and version-controlled
+        # — they are simply not offered to students while the focus is AAUP.
+        # Flip the flag back to publish them; nothing else has to change.
         slug = entry['slug']
+        if entry.get('published') is False:
+            skipped.append(slug)
+            continue
         uni_dir = DATA / slug
         uni = read(uni_dir / 'university.json')
 
@@ -170,6 +179,8 @@ def main():
 
     with_courses = sum(1 for p in plans if p['courses'])
     print(f'wrote {OUT.relative_to(REPO)}')
+    if skipped:
+        print(f'  unpublished  : {", ".join(skipped)}  (in data/, not shipped)')
     print(f'  universities : {len(universities)}')
     print(f'  colleges     : {len(colleges)}')
     print(f'  plans        : {len(plans)}  ({with_courses} with courses, {len(plans) - with_courses} listing-only)')

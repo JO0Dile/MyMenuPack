@@ -53,8 +53,8 @@ it does not replace the advisor.
 
 | Item | Status |
 |---|---|
-| 3 universities, 6 colleges | ✅ in `data/`, published to `web/plans.json` |
-| 34 majors / 1,028 courses / 707 prerequisites | ✅ — was 4 majors / 239 courses |
+| 1 published university (AAUP), 4 colleges | ✅ Birzeit and Al-Salem stay in `data/` with `"published": false` — authored and version-controlled, deliberately not shipped |
+| 23 published majors / 934 courses / 645 prerequisites | ✅ 11 more majors sit unpublished in `data/` |
 | 14 full plans recovered from the old plans feed | ✅ `tools/import-legacy-feed.py` |
 | 16 listing-only plans | ✅ |
 | Plan icon / subtitle / bio / college | ✅ |
