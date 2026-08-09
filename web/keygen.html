@@ -140,7 +140,18 @@
 
   // Matches verifyPassword() in admin/cloudflare-worker.js exactly. If either
   // side changes, sign-in stops working, so they are cross-checked by a test.
+  //
+  // The work is split into chunks because Cloudflare Workers refuses any single
+  // PBKDF2 call above 100,000 iterations:
+  //
+  //   NotSupportedError: Pbkdf2 failed: iteration counts above 100000 are not
+  //   supported (requested 600000).
+  //
+  // A browser has no such limit, but it has to compute the hash the same way
+  // the Worker will verify it. Six chunks of 100,000 cost an attacker exactly
+  // what one 600,000 pass costs.
   var ITERATIONS = 600000;
+  var CHUNK = 100000;
 
   function b64url(bytes){
     var a = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
@@ -156,9 +167,17 @@
   }
 
   async function hash(password, salt){
-    var key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-    var bits = await crypto.subtle.deriveBits(
-      { name:'PBKDF2', salt: salt, iterations: ITERATIONS, hash:'SHA-256' }, key, 256);
+    var material = enc.encode(password);
+    var remaining = ITERATIONS;
+    var bits = null;
+    while(remaining > 0){
+      var n = Math.min(CHUNK, remaining);
+      var key = await crypto.subtle.importKey('raw', material, 'PBKDF2', false, ['deriveBits']);
+      bits = await crypto.subtle.deriveBits(
+        { name:'PBKDF2', salt: salt, iterations: n, hash:'SHA-256' }, key, 256);
+      material = new Uint8Array(bits);
+      remaining -= n;
+    }
     return b64url(bits);
   }
 
