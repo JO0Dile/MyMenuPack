@@ -41,13 +41,35 @@ prompt even on a customised plan.
 
 ### 1. Generate your credentials
 
+**No computer needed — a phone works.** Open:
+
+```
+https://jo0dile.github.io/MyMenuPack/keygen.html
+```
+
+Type a password twice (or tap **Suggest a strong one**) and press **Generate**.
+It prints `ADMIN_PASSWORD_HASH` and a fresh `SESSION_SECRET`, each with a Copy
+button. Copy both, then close the page.
+
+That page does the hashing **in your browser**, using the browser's own crypto.
+It contains no network code at all — no fetch, no form action, no third-party
+script — so nothing you type there can leave the device. You can prove it: turn
+on aeroplane mode, reload, and generate anyway; it still works.
+
+Publishing that page is harmless. PBKDF2 is a public algorithm and the page
+holds no secret — it is a calculator. It is deliberately not linked from the app
+and not in the service worker's precache list, so no student ever loads it.
+
+**If you do have a computer with Python**, this is the same thing offline:
+
 ```bash
 python3 tools/hash-admin-password.py
 ```
 
-It asks for a password twice and prints two lines: `ADMIN_PASSWORD_HASH` and a
-fresh `SESSION_SECRET`. The password itself is never stored, never sent, and
-never written to a file — only the PBKDF2-SHA256 hash of it.
+Either way the password itself is never stored, never sent, and never written to
+a file — only the PBKDF2-SHA256 hash of it. Which means **nobody can recover it
+for you**, so keep it somewhere you trust. If you lose it, generate a new hash
+and replace the old value in Cloudflare; nothing else has to change.
 
 ### 2. Create a GitHub token
 
