@@ -52,7 +52,11 @@
 //        REPO_NAME             (Variable) MyMenuPack
 //        REPO_BRANCH           (Variable) main
 //        ALLOWED_ORIGIN        (Variable) https://jo0dile.github.io
-//        REQUIRE_CF_ACCESS     (Variable) 1, once Cloudflare Access is in front (recommended)
+//        REQUIRE_CF_ACCESS     (Variable) LEAVE THIS UNSET until Cloudflare Access is
+//                                         actually in front of the Worker. Setting it to 1
+//                                         first makes every route return 404, including
+//                                         your own login — the door locks with the key
+//                                         still inside.
 //   3. Put the Worker URL in APP_ADMIN_URL in web/js/01-catalogue.js.
 // ---------------------------------------------------------------------------
 
@@ -693,6 +697,12 @@ export default {
         origin: seen || null,
         originAllowed: !seen || allowedOrigins(env).length === 0 ||
                        allowedOrigins(env).includes('*') || allowedOrigins(env).includes(seen),
+        // True only when the gate is on AND this caller is not carrying an
+        // Access assertion — i.e. exactly when every other route will 404 on
+        // them. Saying so reveals only that the Worker is protected, which is
+        // not a secret, and turns a dead end into a one-line fix.
+        accessGateBlocking: env.REQUIRE_CF_ACCESS === '1' &&
+                            !request.headers.get('Cf-Access-Jwt-Assertion'),
       }, 200, env, request);
     }
 
@@ -704,6 +714,13 @@ export default {
     // password is the only thing standing here — which is why the setup guide
     // recommends turning it on.
     if (env.REQUIRE_CF_ACCESS === '1' && !request.headers.get('Cf-Access-Jwt-Assertion')) {
+      // Turning this on BEFORE Cloudflare Access is actually in front of the
+      // Worker locks the door with the key still inside: nothing sends that
+      // header, so every route 404s and the sign-in screen reports "not found"
+      // — which reads as a bug in the app rather than as a setting that was
+      // switched on too early. The 404 is kept (that is the point of the gate),
+      // but /api/health below now says the gate is what answered, so the
+      // dashboard can name the variable instead of leaving it to be guessed.
       return json({ error: 'not found' }, 404, env, request);
     }
 
