@@ -264,8 +264,14 @@
         fetch(u + '/api/health')
           .then(function(r){ return r.json(); })
           .then(function(h){
-            if(h && h.ok) urlMsg('✅ Reached it. Press "Use this address", then sign in.', true);
-            else urlMsg('Something answered, but not the admin Worker.', false);
+            if(h && h.ok && h.originAllowed === false){
+              urlMsg('Reached it, but it refuses this site. Set its ALLOWED_ORIGIN to exactly ' +
+                     esc(location.origin) + ' and redeploy.', false);
+            } else if(h && h.ok){
+              urlMsg('✅ Reached it. Press "Use this address", then sign in.', true);
+            } else {
+              urlMsg('Something answered, but not the admin Worker.', false);
+            }
           })
           .catch(function(){
             urlMsg('❌ Nothing there. Check the Worker name, and that its workers.dev route is enabled.', false);
@@ -292,9 +298,20 @@
     // those answers tell a stranger there is an account here and what it is
     // worth attacking. That detail now arrives after sign-in, from /api/status.
     if(base()){
-      fetch(base() + '/api/health').then(function(r){ return r.json(); }).then(function(){
+      fetch(base() + '/api/health').then(function(r){ return r.json(); }).then(function(h){
         var el = document.getElementById('adminHealth');
-        if(el) el.textContent = '';
+        if(!el) return;
+        // The Worker answers, so the address is right. If it also says this
+        // page's origin is not on its list, every later request will be
+        // blocked by the browser with no explanation — name the exact value
+        // that needs setting rather than leaving a CORS failure to be guessed.
+        if(h && h.originAllowed === false){
+          el.innerHTML = '⚠️ The Worker is reachable but is refusing this site. ' +
+            'Set its <code>ALLOWED_ORIGIN</code> to exactly <code>' + esc(location.origin) +
+            '</code> — an origin only, with no path and no trailing slash — then redeploy.';
+        } else {
+          el.textContent = '';
+        }
       }).catch(function(){
         var el = document.getElementById('adminHealth');
         if(el) el.innerHTML = '⚠️ Could not reach the admin API — see below.';

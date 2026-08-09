@@ -96,7 +96,7 @@ Create a Cloudflare Worker named `studyplan-admin`, paste in
 | `REPO_OWNER` | Variable | `JO0Dile` |
 | `REPO_NAME` | Variable | `MyMenuPack` |
 | `REPO_BRANCH` | Variable | `main` |
-| `ALLOWED_ORIGIN` | Variable | `https://jo0dile.github.io` |
+| `ALLOWED_ORIGIN` | Variable | `https://jo0dile.github.io` — an **origin**: scheme and host only, no path, no trailing slash. A full app URL is accepted and trimmed down, but the bare origin is the honest value. Comma-separate to allow more than one. |
 | `REQUIRE_CF_ACCESS` | Variable | `1`, once step 3b is done |
 
 The four marked **Secret** are encrypted by Cloudflare and cannot be read back,
@@ -132,11 +132,23 @@ Change it only if you named the Worker something else.
 
 Open the app with `#admin` on the end of the URL and sign in.
 
-The sign-in screen tells you **nothing** before you authenticate — that is
-deliberate (see Security below). It says only *Could not reach the admin API* if
-the Worker is not answering at all. Once you are in, the Dashboard reports which
-repo and branch it is writing to, and warns you there if the GitHub token is
-missing.
+The sign-in screen tells you **nothing** about your credentials before you
+authenticate — that is deliberate (see Security below). It does report the two
+failures that are otherwise impossible to tell apart:
+
+- *Could not reach the admin API* — the Worker is not answering at that address.
+  Open `<worker-url>/api/health` in a tab: `{"ok":true}` means the address is
+  right, nothing loading means it is wrong. The panel underneath lets you paste
+  a different address and Test it, with no code change.
+- *The Worker is reachable but is refusing this site* — `ALLOWED_ORIGIN` does
+  not match. The message names the exact value to set.
+
+Once you are in, the Dashboard reports which repo and branch it is writing to,
+and warns you there if the GitHub token is missing.
+
+**Whenever you change the Worker's code, redeploy it.** Cloudflare keeps
+serving the last deployed version, so a fix in this repo does nothing until it
+is pasted in and deployed again.
 
 ---
 
