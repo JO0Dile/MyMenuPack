@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Credential generator</title>
+<!--
+  Browser version of tools/hash-admin-password.py, for setting up the admin
+  Worker without a computer — a phone and this page are enough.
+
+  IT SENDS NOTHING. There is no fetch, no form action, no analytics, no script
+  from anywhere else, and no network code at all in this file. The hashing runs
+  in your browser through the built-in WebCrypto API. You can confirm that:
+  turn on aeroplane mode, reload this page, and it still works.
+
+  Publishing this page is harmless. PBKDF2 is a public algorithm and this page
+  holds no secret — it is a calculator. Knowing it exists tells nobody anything
+  about your password, exactly as knowing what a lock looks like does not open
+  a door.
+
+  It is deliberately NOT linked from the app and NOT in the service worker's
+  precache list, so it is never downloaded by a student.
+-->
+<style>
+  :root{
+    --page-bg:#0a1020; --panel:#111a30; --line:#243354; --text:#e8eeff;
+    --text-dim:#93a3c8; --accent:#5db8ff; --ok:#5dffa0; --warn:#ffc15e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:20px; background:var(--page-bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; font-size:15px;
+  }
+  main{max-width:640px; margin:0 auto;}
+  h1{font-size:21px; margin:0 0 4px;}
+  h2{font-size:15px; margin:26px 0 8px;}
+  p{margin:0 0 12px; color:var(--text-dim); font-size:13.5px;}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px;}
+  .offline-note{border-color:var(--ok);}
+  .offline-note strong{color:var(--ok);}
+  label{display:block; font-size:12px; font-weight:700; color:var(--text-dim); margin-bottom:5px;}
+  input[type=password],input[type=text]{
+    width:100%; padding:11px 12px; border-radius:9px; font-size:16px;
+    background:#0c132a; border:1px solid var(--line); color:var(--text);
+  }
+  input:focus{outline:none; border-color:var(--accent);}
+  .row{margin-bottom:12px;}
+  button{
+    font:inherit; font-size:14px; font-weight:700; cursor:pointer;
+    background:none; color:var(--text); border:1px solid var(--line);
+    border-radius:9px; padding:10px 16px;
+  }
+  button:hover{border-color:var(--accent);}
+  button.primary{border-color:var(--accent); background:rgba(93,184,255,.14);}
+  button:disabled{opacity:.5; cursor:default;}
+  .out{margin-top:16px;}
+  .field-out{margin-bottom:14px;}
+  .field-out .name{font-size:12px; font-weight:800; color:var(--accent); letter-spacing:.03em;}
+  .field-out .why{font-size:12px; color:var(--text-dim); margin:2px 0 6px;}
+  code.value{
+    display:block; background:#0c132a; border:1px solid var(--line); border-radius:8px;
+    padding:11px 12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:12.5px; word-break:break-all; user-select:all; margin-bottom:6px;
+  }
+  .msg{font-size:12.5px; font-weight:700; margin-top:8px; min-height:18px;}
+  .msg.err{color:#ff8f8f;}
+  .msg.ok{color:var(--ok);}
+  .warn{background:rgba(255,193,94,.08); border-color:rgba(255,193,94,.35);}
+  .warn strong{color:var(--warn);}
+  ol{padding-inline-start:20px; font-size:13.5px; color:var(--text-dim);}
+  ol li{margin-bottom:7px;}
+  .strength{font-size:12px; font-weight:700; margin-top:6px;}
+  @media (prefers-color-scheme: light){
+    :root{--page-bg:#f4f7ff; --panel:#fff; --line:#d6deef; --text:#111a2e; --text-dim:#4d5c7d;}
+    input[type=password],input[type=text],code.value{background:#f7f9ff;}
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>🔑 Credential generator</h1>
+<p>For setting up the admin Worker. Everything below is worked out on this device.</p>
+
+<div class="panel offline-note">
+  <strong>Nothing you type here leaves this page.</strong>
+  <p style="margin:6px 0 0;">This file contains no network code of any kind. To prove it to
+  yourself: switch on aeroplane mode, reload, and generate anyway — it still works.
+  Your password is turned into a one-way hash by your browser and only the hash is shown.</p>
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0;">Your password</h2>
+  <div class="row">
+    <label for="pw">Choose a password (12 characters or more)</label>
+    <input type="password" id="pw" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+    <div class="strength" id="strength"></div>
+  </div>
+  <div class="row">
+    <label for="pw2">Type it again</label>
+    <input type="password" id="pw2" autocomplete="new-password" autocapitalize="none" spellcheck="false">
+  </div>
+  <div class="row">
+    <label><input type="checkbox" id="show"> Show what I typed</label>
+  </div>
+  <button type="button" id="suggest">🎲 Suggest a strong one</button>
+  <button type="button" class="primary" id="go">Generate</button>
+  <div class="msg" id="msg"></div>
+</div>
+
+<div id="out" class="out" hidden></div>
+
+<div class="panel warn">
+  <strong>Remember the password yourself.</strong>
+  <p style="margin:6px 0 0;">It is never stored anywhere — not here, not in Cloudflare, not in
+  the repo. Nobody can recover it for you, including the person who built this.
+  If you forget it, generate a new hash on this page and replace the old one.</p>
+  <p style="margin:8px 0 0;">Never send it to anyone, in any chat, screenshot or message.
+  Only the two generated values below are meant to be copied out.</p>
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0;">Then, in Cloudflare</h2>
+  <ol>
+    <li>Open your Worker → <strong>Settings</strong> → <strong>Variables and Secrets</strong>.</li>
+    <li>Add each value below with <strong>Add</strong>, choosing type <strong>Secret</strong>.</li>
+    <li>Add <code>ADMIN_USERNAME</code> as a Secret too — any name you will remember typing.</li>
+    <li>Deploy. Nothing else needs the password.</li>
+  </ol>
+</div>
+
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var enc = new TextEncoder();
+
+  // Matches verifyPassword() in admin/cloudflare-worker.js exactly. If either
+  // side changes, sign-in stops working, so they are cross-checked by a test.
+  var ITERATIONS = 600000;
+
+  function b64url(bytes){
+    var a = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    var s = '';
+    for(var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]);
+    return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+
+  function randomBytes(n){
+    var b = new Uint8Array(n);
+    crypto.getRandomValues(b);
+    return b;
+  }
+
+  async function hash(password, salt){
+    var key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    var bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', salt: salt, iterations: ITERATIONS, hash:'SHA-256' }, key, 256);
+    return b64url(bits);
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  // A blunt but honest meter: length dominates, variety helps a little. It
+  // never blocks — it is advice, not a rule.
+  function rate(pw){
+    if(!pw) return ['', ''];
+    var kinds = (/[a-z]/.test(pw)?1:0) + (/[A-Z]/.test(pw)?1:0) +
+                (/[0-9]/.test(pw)?1:0) + (/[^a-zA-Z0-9]/.test(pw)?1:0);
+    if(pw.length < 12) return ['Too short — 12 characters minimum', '#ff8f8f'];
+    if(pw.length >= 20 || (pw.length >= 16 && kinds >= 3)) return ['Strong', 'var(--ok)'];
+    if(pw.length >= 14 || kinds >= 3) return ['Reasonable — longer is better', 'var(--warn)'];
+    return ['Weak — make it longer', 'var(--warn)'];
+  }
+
+  $('pw').addEventListener('input', function(){
+    var r = rate($('pw').value);
+    $('strength').textContent = r[0];
+    $('strength').style.color = r[1];
+  });
+
+  $('show').addEventListener('change', function(){
+    var t = $('show').checked ? 'text' : 'password';
+    $('pw').type = t; $('pw2').type = t;
+  });
+
+  // Four random words plus digits: long, memorable, and typeable on a phone —
+  // which matters more than symbols nobody can remember.
+  var WORDS = ('anchor amber basin beacon canyon cedar cobalt copper dune ember falcon garnet harbor ' +
+    'indigo ivory jasper kernel lantern lagoon marble meadow nectar nimbus onyx opal pebble quartz ' +
+    'quiver ribbon river saffron summit tundra timber umber velvet walnut willow zenith zephyr').split(' ');
+
+  $('suggest').addEventListener('click', function(){
+    var picks = [];
+    var idx = new Uint32Array(4);
+    crypto.getRandomValues(idx);
+    for(var i = 0; i < 4; i++) picks.push(WORDS[idx[i] % WORDS.length]);
+    var n = new Uint32Array(1); crypto.getRandomValues(n);
+    var pw = picks.join('-') + '-' + (n[0] % 9000 + 1000);
+    $('pw').value = pw; $('pw2').value = pw;
+    $('show').checked = true; $('pw').type = 'text'; $('pw2').type = 'text';
+    var r = rate(pw); $('strength').textContent = r[0]; $('strength').style.color = r[1];
+    $('msg').className = 'msg'; $('msg').textContent = 'Written into both boxes — copy it somewhere safe before you leave this page.';
+  });
+
+  function fieldHtml(name, why, value){
+    var box = document.createElement('div');
+    box.className = 'field-out';
+    var n = document.createElement('div'); n.className = 'name'; n.textContent = name;
+    var w = document.createElement('div'); w.className = 'why'; w.textContent = why;
+    var c = document.createElement('code'); c.className = 'value'; c.textContent = value;
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.textContent = 'Copy';
+    btn.addEventListener('click', function(){
+      // Clipboard API needs a secure context; the textarea fallback works
+      // everywhere else, including a page opened straight off a phone.
+      var done = function(){ btn.textContent = '✓ Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1600); };
+      if(navigator.clipboard && window.isSecureContext){
+        navigator.clipboard.writeText(value).then(done, fallback);
+      } else { fallback(); }
+      function fallback(){
+        var ta = document.createElement('textarea');
+        ta.value = value; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); done(); }catch(e){ btn.textContent = 'Select it and copy'; }
+        document.body.removeChild(ta);
+      }
+    });
+    box.appendChild(n); box.appendChild(w); box.appendChild(c); box.appendChild(btn);
+    return box;
+  }
+
+  $('go').addEventListener('click', async function(){
+    var pw = $('pw').value, pw2 = $('pw2').value;
+    var msg = $('msg');
+    msg.className = 'msg err';
+    if(pw.length < 12){ msg.textContent = 'Use at least 12 characters.'; return; }
+    if(pw !== pw2){ msg.textContent = 'The two boxes do not match.'; return; }
+
+    msg.className = 'msg'; msg.textContent = 'Working… (600,000 rounds, this takes a moment)';
+    $('go').disabled = true;
+
+    // Yield once so the message actually paints before the CPU-bound part.
+    await new Promise(function(r){ setTimeout(r, 30); });
+
+    var salt = randomBytes(16);
+    var digest = await hash(pw, salt);
+    var stored = 'pbkdf2$' + ITERATIONS + '$' + b64url(salt) + '$' + digest;
+    var session = b64url(randomBytes(48));
+
+    var out = $('out');
+    out.innerHTML = '';
+    var panel = document.createElement('div');
+    panel.className = 'panel';
+    var h = document.createElement('h2');
+    h.style.marginTop = '0';
+    h.textContent = 'Paste these into Cloudflare as Secrets';
+    panel.appendChild(h);
+    panel.appendChild(fieldHtml('ADMIN_PASSWORD_HASH',
+      'Your password put through a one-way function. It cannot be turned back into the password.',
+      stored));
+    panel.appendChild(fieldHtml('SESSION_SECRET',
+      'Unrelated to your password. Signs your logged-in ticket. Replacing it later logs every session out at once.',
+      session));
+    out.appendChild(panel);
+    out.hidden = false;
+
+    msg.className = 'msg ok';
+    msg.textContent = 'Done. Copy both, then close this page.';
+    $('go').disabled = false;
+    out.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+})();
+</script>
+</body>
+</html>
