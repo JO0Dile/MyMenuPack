@@ -97,7 +97,7 @@ Create a Cloudflare Worker named `studyplan-admin`, paste in
 | `REPO_NAME` | Variable | `MyMenuPack` |
 | `REPO_BRANCH` | Variable | `main` |
 | `ALLOWED_ORIGIN` | Variable | `https://jo0dile.github.io` — an **origin**: scheme and host only, no path, no trailing slash. A full app URL is accepted and trimmed down, but the bare origin is the honest value. Comma-separate to allow more than one. |
-| `REQUIRE_CF_ACCESS` | Variable | `1`, once step 3b is done |
+| `REQUIRE_CF_ACCESS` | Variable | **Do not add this yet.** Only after step 3b is finished — see the warning there. |
 
 The four marked **Secret** are encrypted by Cloudflare and cannot be read back,
 including by you. That is the point. The username is a Secret too — a Variable
@@ -117,6 +117,16 @@ without Cloudflare's signed assertion header.
 With this on, an attacker who somehow learned your username *and* password still
 cannot reach the login form. Free for up to 50 users. **This is the single
 biggest thing you can do**, and it takes about three minutes.
+
+> ⚠️ **Set `REQUIRE_CF_ACCESS=1` only after Access is actually working.** The
+> Worker returns `404` to anything without Cloudflare's assertion header — and
+> if Access is not in front of it, *nothing* sends that header, including you.
+> Every route answers `{"error":"not found"}`, sign-in included. The door locks
+> with the key inside.
+>
+> If that happens: delete the `REQUIRE_CF_ACCESS` variable in the Worker's
+> settings. Variables apply immediately, so no redeploy is needed. The sign-in
+> screen also detects this case by name and tells you the same thing.
 
 ### 4. Point the app at it
 

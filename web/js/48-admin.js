@@ -305,7 +305,14 @@
         // page's origin is not on its list, every later request will be
         // blocked by the browser with no explanation — name the exact value
         // that needs setting rather than leaving a CORS failure to be guessed.
-        if(h && h.originAllowed === false){
+        // Checked before the origin, because when this is on nothing else can
+        // possibly succeed and the origin question is moot.
+        if(h && h.accessGateBlocking){
+          el.innerHTML = '⚠️ The Worker has <code>REQUIRE_CF_ACCESS</code> switched on, but this ' +
+            'request carries no Cloudflare Access token — so every route answers ' +
+            '<em>not found</em>, including sign-in. Either finish setting up Cloudflare Access, ' +
+            'or delete the <code>REQUIRE_CF_ACCESS</code> variable in the Worker\'s settings.';
+        } else if(h && h.originAllowed === false){
           el.innerHTML = '⚠️ The Worker is reachable but is refusing this site. ' +
             'Set its <code>ALLOWED_ORIGIN</code> to exactly <code>' + esc(location.origin) +
             '</code> — an origin only, with no path and no trailing slash — then redeploy.';
