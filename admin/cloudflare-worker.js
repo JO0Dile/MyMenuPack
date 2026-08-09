@@ -155,12 +155,21 @@ async function verifyPassword(password, stored) {
   const iterations = parseInt(parts[1], 10);
   if (!Number.isFinite(iterations) || iterations < 1000) return false;
 
-  const salt = unb64url(parts[2]);
-  const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, key, 256,
-  );
-  return timingSafeEqual(b64url(bits), parts[3]);
+  // A stored hash is pasted by hand, so it is exactly where malformed base64
+  // comes from — and atob() throws rather than returning null. An exception
+  // here used to escape as a Cloudflare 1101 page, which carries no CORS
+  // headers, so the browser reported the completely misleading "Failed to
+  // fetch" instead of "wrong password".
+  try {
+    const salt = unb64url(parts[2]);
+    const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations, hash: 'SHA-256' }, key, 256,
+    );
+    return timingSafeEqual(b64url(bits), parts[3]);
+  } catch {
+    return false;
+  }
 }
 
 async function hmacKey(secret) {
@@ -645,14 +654,14 @@ export default {
       return json({ error: 'not found' }, 404, env);
     }
 
-    if (path === '/api/login' && request.method === 'POST') return handleLogin(request, env);
-
-    // Everything past this line requires a valid session. One gate, checked
-    // before the route is even chosen, so no handler can be reached unguarded.
-    const denied = await requireAdmin(request, env);
-    if (denied) return denied;
-
     try {
+      if (path === '/api/login' && request.method === 'POST') return await handleLogin(request, env);
+
+      // Everything past this line requires a valid session. One gate, checked
+      // before the route is even chosen, so no handler can be reached unguarded.
+      const denied = await requireAdmin(request, env);
+      if (denied) return denied;
+
       if (path === '/api/me' || path === '/api/status') {
         return json({
           ok: true,
@@ -687,12 +696,20 @@ export default {
 
       return json({ error: 'not found' }, 404, env);
     } catch (err) {
+      // EVERY exit from this Worker must carry CORS headers, including the
+      // failures. An uncaught throw returns Cloudflare's own 1101 page, which
+      // has none — and a browser cannot read a response it is not allowed to
+      // read, so it reports the request as having failed outright. That is why
+      // a genuine server error used to surface in the dashboard as the
+      // completely misleading "Failed to fetch", pointing at the network
+      // instead of at the actual bug.
+      //
       // A validation failure is the admin's problem and is worth reading; a
       // GitHub or runtime failure is not, and its text can contain the repo
       // path or token scope, so it is logged rather than returned.
       if (err && err.userFacing) return json({ error: err.message }, 400, env);
       console.error('admin worker error:', err && err.stack ? err.stack : err);
-      return json({ error: 'the change could not be saved — check the Worker logs' }, 500, env);
+      return json({ error: 'something went wrong on the server — check the Worker logs' }, 500, env);
     }
   },
 };

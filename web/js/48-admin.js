@@ -35,7 +35,23 @@
   };
 
   function esc(s){ return window.__escapeHtml(s == null ? '' : String(s)); }
-  function base(){ return (window.APP_ADMIN_URL || '').replace(/\/+$/, ''); }
+
+  // The Worker's URL is a guess until someone actually deploys one — Cloudflare
+  // builds it from the Worker name and the account subdomain, neither of which
+  // this file can know. Getting it wrong produces a bare "Failed to fetch" with
+  // nothing to act on, so the sign-in screen lets it be corrected here and
+  // remembers it, rather than needing a code change and a redeploy to try a
+  // different name.
+  var URL_KEY = 'aaup_adminUrl';
+  function savedUrl(){
+    try{ return localStorage.getItem(URL_KEY) || ''; }catch(e){ return ''; }
+  }
+  function saveUrl(u){
+    try{
+      if(u) localStorage.setItem(URL_KEY, u); else localStorage.removeItem(URL_KEY);
+    }catch(e){}
+  }
+  function base(){ return (savedUrl() || window.APP_ADMIN_URL || '').replace(/\/+$/, ''); }
 
   // ---------- API ----------
 
@@ -47,7 +63,17 @@
       opts.headers['Content-Type'] = 'application/json';
       opts.body = JSON.stringify(body);
     }
-    return fetch(base() + path, opts).then(function(r){
+    return fetch(base() + path, opts).catch(function(){
+      // fetch() rejects — rather than returning a status — when the request
+      // never completed: DNS did not resolve, the Worker is not deployed, its
+      // workers.dev route is switched off, or CORS blocked the reply. The
+      // browser deliberately does not say which. "Failed to fetch" on its own
+      // sends people hunting through their password; this says what it
+      // actually means and offers the one thing worth trying.
+      var e = new Error('unreachable');
+      e.unreachable = true;
+      throw e;
+    }).then(function(r){
       return r.json().catch(function(){ return { error: 'HTTP ' + r.status }; }).then(function(data){
         // A 401 from /api/login means the password was wrong and must say so.
         // Anywhere else it means the session expired or the signing secret was
@@ -159,7 +185,7 @@
 
   // ---------- login ----------
 
-  function renderLogin(err){
+  function renderLogin(err, unreachable){
     var main = document.getElementById('adminMain');
     var nav = document.getElementById('adminNav');
     if(nav) nav.innerHTML = '';
@@ -175,6 +201,25 @@
         '<div class="form-actions"><button type="button" class="home-btn admin-primary" id="adminLoginBtn">Sign in</button></div>' +
         (err ? '<p class="dev-error-msg">' + esc(err) + '</p>' : '') +
         '<p class="admin-hint" id="adminHealth"></p>' +
+        '<details class="admin-endpoint"' + (unreachable ? ' open' : '') + '>' +
+          '<summary>Admin API address</summary>' +
+          (unreachable
+            ? '<p class="admin-hint">The browser could not reach it at all — that happens before any ' +
+              'password is checked, so this is not about your credentials. Usually it means the ' +
+              'Worker is not deployed, is named something else, or its <code>workers.dev</code> ' +
+              'route is switched off.</p>' +
+              '<p class="admin-hint">Open <code>' + esc(base()) + '/api/health</code> in a tab. ' +
+              'If it shows <code>{"ok":true}</code> the address is right; if nothing loads, it is wrong.</p>'
+            : '') +
+          '<div class="form-field"><label for="adminUrl">Worker URL</label>' +
+          '<input type="text" id="adminUrl" spellcheck="false" autocapitalize="none" ' +
+          'value="' + esc(base()) + '" placeholder="https://your-worker.your-subdomain.workers.dev"></div>' +
+          '<div class="form-actions">' +
+          '<button type="button" class="home-btn" id="adminUrlTest">Test</button>' +
+          '<button type="button" class="home-btn" id="adminUrlSave">Use this address</button>' +
+          (savedUrl() ? '<button type="button" class="home-btn" id="adminUrlReset">Reset to default</button>' : '') +
+          '</div><div id="adminUrlMsg" class="admin-hint"></div>' +
+        '</details>' +
       '</div>';
 
     var go = function(){
@@ -191,10 +236,54 @@
         state.section = 'dashboard';
         render();
       }).catch(function(e){
-        renderLogin(e.message);
+        renderLogin(e.unreachable
+          ? 'Could not reach the admin API.'
+          : e.message, !!e.unreachable);
       });
     };
     document.getElementById('adminLoginBtn').addEventListener('click', go);
+
+    var urlMsg = function(t, ok){
+      var el = document.getElementById('adminUrlMsg');
+      if(el){ el.innerHTML = t; el.style.color = ok ? 'var(--unlock)' : 'var(--prereq)'; }
+    };
+    var typedUrl = function(){
+      return (document.getElementById('adminUrl').value || '').trim().replace(/\/+$/, '');
+    };
+    var testBtn = document.getElementById('adminUrlTest');
+    if(testBtn){
+      testBtn.addEventListener('click', function(){
+        var u = typedUrl();
+        // https only, except a local address — a Worker under `wrangler dev`
+        // is served over plain http on localhost, and refusing that would make
+        // this box useless for the one case where you are actively debugging.
+        var okScheme = /^https:\/\//i.test(u) ||
+                       /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(u);
+        if(!okScheme){ urlMsg('That needs to start with https://', false); return; }
+        urlMsg('Checking…', true);
+        fetch(u + '/api/health')
+          .then(function(r){ return r.json(); })
+          .then(function(h){
+            if(h && h.ok) urlMsg('✅ Reached it. Press "Use this address", then sign in.', true);
+            else urlMsg('Something answered, but not the admin Worker.', false);
+          })
+          .catch(function(){
+            urlMsg('❌ Nothing there. Check the Worker name, and that its workers.dev route is enabled.', false);
+          });
+      });
+    }
+    var saveBtn = document.getElementById('adminUrlSave');
+    if(saveBtn){
+      saveBtn.addEventListener('click', function(){
+        saveUrl(typedUrl());
+        renderLogin('', false);
+        urlMsg('Saved on this device.', true);
+      });
+    }
+    var resetBtn = document.getElementById('adminUrlReset');
+    if(resetBtn){
+      resetBtn.addEventListener('click', function(){ saveUrl(''); renderLogin('', false); });
+    }
     document.getElementById('adminPass').addEventListener('keydown', function(e){ if(e.key === 'Enter') go(); });
     document.getElementById('adminUser').focus();
 
@@ -208,7 +297,9 @@
         if(el) el.textContent = '';
       }).catch(function(){
         var el = document.getElementById('adminHealth');
-        if(el) el.innerHTML = '⚠️ Could not reach the admin API.';
+        if(el) el.innerHTML = '⚠️ Could not reach the admin API — see below.';
+        var d = document.querySelector('.admin-endpoint');
+        if(d) d.open = true;
       });
     } else {
       var el = document.getElementById('adminHealth');
