@@ -67,9 +67,49 @@ const LOGIN_DELAY_MS = 400;                   // blunts online password guessing
 
 const enc = new TextEncoder();
 
-function corsHeaders(env) {
+// An origin is scheme + host + port and nothing else. ALLOWED_ORIGIN is typed
+// by hand, so it routinely arrives as the full app URL
+// ("https://example.github.io/MyMenuPack/") or with a trailing slash — neither
+// of which ever equals the Origin header a browser sends. The mismatch is
+// invisible from the outside: the Worker keeps working in an address bar,
+// because a top-level navigation sends no Origin at all, and only fetches from
+// the page break. So the value is normalized down to a real origin rather than
+// compared as a raw string.
+function normalizeOrigin(value) {
+  const raw = String(value || '').trim();
+  if (!raw || raw === '*') return raw;
+  try {
+    const u = new URL(raw);
+    return u.origin;
+  } catch {
+    return raw.replace(/\/+$/, '');
+  }
+}
+
+function allowedOrigins(env) {
+  // Comma-separated so a custom domain and the github.io address can both be
+  // allowed without picking one.
+  return String(env.ALLOWED_ORIGIN || '')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean);
+}
+
+// Echoes the caller's own origin when it is on the list, which is both more
+// correct than a fixed string and what any future credentialed request would
+// require. With nothing configured it falls back to '*' — open, but the
+// password is what protects this, not the origin header.
+function resolveOrigin(request, env) {
+  const list = allowedOrigins(env);
+  if (!list.length || list.includes('*')) return '*';
+  const got = normalizeOrigin(request.headers.get('Origin') || '');
+  if (got && list.includes(got)) return got;
+  return list[0];
+}
+
+function corsHeaders(env, request) {
   return {
-    'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN || '*',
+    'Access-Control-Allow-Origin': request ? resolveOrigin(request, env) : (allowedOrigins(env)[0] || '*'),
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
@@ -77,10 +117,10 @@ function corsHeaders(env) {
   };
 }
 
-function json(body, status, env) {
+function json(body, status, env, request) {
   return new Response(JSON.stringify(body), {
     status: status || 200,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', ...corsHeaders(env) },
+    headers: { 'Content-Type': 'application/json; charset=utf-8', ...corsHeaders(env, request) },
   });
 }
 
@@ -210,7 +250,7 @@ async function requireAdmin(request, env) {
   const auth = request.headers.get('Authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   const user = await verifyToken(token, env);
-  if (!user) return json({ error: 'unauthorized' }, 401, env);
+  if (!user) return json({ error: 'unauthorized' }, 401, env, request);
   return null;
 }
 
@@ -430,16 +470,16 @@ async function handleLogin(request, env) {
   await sleep(LOGIN_DELAY_MS);
 
   if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD_HASH || !env.SESSION_SECRET) {
-    return json({ error: 'admin not configured on the server' }, 500, env);
+    return json({ error: 'admin not configured on the server' }, 500, env, request);
   }
   let body;
-  try { body = await request.json(); } catch { return json({ error: 'invalid json' }, 400, env); }
+  try { body = await request.json(); } catch { return json({ error: 'invalid json' }, 400, env, request); }
 
   const userOk = timingSafeEqual(String(body.username || ''), env.ADMIN_USERNAME);
   const passOk = await verifyPassword(String(body.password || ''), env.ADMIN_PASSWORD_HASH);
 
   // Both checks always run, and the message never says which one failed.
-  if (!userOk || !passOk) return json({ error: 'invalid username or password' }, 401, env);
+  if (!userOk || !passOk) return json({ error: 'invalid username or password' }, 401, env, request);
 
   return json({
     ok: true,
@@ -449,9 +489,9 @@ async function handleLogin(request, env) {
   }, 200, env);
 }
 
-async function handleTree(env) {
+async function handleTree(env, request) {
   const index = await ghGet(env, 'data/universities.json');
-  if (!index.exists) return json({ error: 'data/universities.json not found' }, 500, env);
+  if (!index.exists) return json({ error: 'data/universities.json not found' }, 500, env, request);
   const parsed = JSON.parse(index.text);
 
   const universities = [];
@@ -465,18 +505,18 @@ async function handleTree(env) {
         .map((f) => ({ slug: f.name.replace(/\.json$/, ''), path: f.path })),
     });
   }
-  return json({ ok: true, universities }, 200, env);
+  return json({ ok: true, universities }, 200, env, request);
 }
 
-async function handleGetUniversity(env, slug) {
-  if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env);
+async function handleGetUniversity(env, slug, request) {
+  if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const f = await ghGet(env, `data/${slug}/university.json`);
-  if (!f.exists) return json({ error: 'not found' }, 404, env);
-  return json({ ok: true, university: JSON.parse(f.text), sha: f.sha }, 200, env);
+  if (!f.exists) return json({ error: 'not found' }, 404, env, request);
+  return json({ ok: true, university: JSON.parse(f.text), sha: f.sha }, 200, env, request);
 }
 
 async function handlePutUniversity(request, env, slug) {
-  if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env);
+  if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const body = await readJson(request, MAX_JSON_BYTES);
   const clean = validUniversity({ ...body.university, slug });
 
@@ -507,48 +547,48 @@ async function handlePutUniversity(request, env, slug) {
     });
   }
   await ghPut(env, idxPath, jsonBytes(parsed), `admin: update ${slug} in the university index`, idx.sha);
-  return json({ ok: true, university: clean }, 200, env);
+  return json({ ok: true, university: clean }, 200, env, request);
 }
 
-async function handleDeleteUniversity(env, slug) {
-  if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env);
+async function handleDeleteUniversity(env, slug, request) {
+  if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   // Unpublishing, not deleting. Removing the folder would throw away every
   // major transcribed under it, and the build already honours this flag.
   const idxPath = 'data/universities.json';
   const idx = await ghGet(env, idxPath);
   const parsed = JSON.parse(idx.text);
   const row = (parsed.universities || []).find((u) => u.slug === slug);
-  if (!row) return json({ error: 'not found' }, 404, env);
+  if (!row) return json({ error: 'not found' }, 404, env, request);
   row.published = false;
   await ghPut(env, idxPath, jsonBytes(parsed), `admin: unpublish ${slug}`, idx.sha);
-  return json({ ok: true, unpublished: slug, note: 'files kept in data/; set published:true to restore' }, 200, env);
+  return json({ ok: true, unpublished: slug, note: 'files kept in data/; set published:true to restore' }, 200, env, request);
 }
 
-async function handleGetMajor(env, uni, slug) {
-  if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env);
+async function handleGetMajor(env, uni, slug, request) {
+  if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const f = await ghGet(env, `data/${uni}/majors/${slug}.json`);
-  if (!f.exists) return json({ error: 'not found' }, 404, env);
-  return json({ ok: true, major: JSON.parse(f.text), sha: f.sha }, 200, env);
+  if (!f.exists) return json({ error: 'not found' }, 404, env, request);
+  return json({ ok: true, major: JSON.parse(f.text), sha: f.sha }, 200, env, request);
 }
 
 async function handlePutMajor(request, env, uni, slug) {
-  if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env);
+  if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const body = await readJson(request, MAX_JSON_BYTES);
   const clean = validMajor({ ...body.major, slug, university: uni });
   const path = `data/${uni}/majors/${slug}.json`;
   const existing = await ghGet(env, path);
   const verb = existing.exists ? 'update' : 'add';
   await ghPut(env, path, jsonBytes(clean), `admin: ${verb} ${uni}/${slug}`, existing.sha);
-  return json({ ok: true, major: clean, created: !existing.exists }, 200, env);
+  return json({ ok: true, major: clean, created: !existing.exists }, 200, env, request);
 }
 
-async function handleDeleteMajor(env, uni, slug) {
-  if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env);
+async function handleDeleteMajor(env, uni, slug, request) {
+  if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const path = `data/${uni}/majors/${slug}.json`;
   const f = await ghGet(env, path);
-  if (!f.exists) return json({ error: 'not found' }, 404, env);
+  if (!f.exists) return json({ error: 'not found' }, 404, env, request);
   await ghDelete(env, path, `admin: remove ${uni}/${slug}`, f.sha);
-  return json({ ok: true, removed: `${uni}/${slug}`, note: 'recoverable with git revert' }, 200, env);
+  return json({ ok: true, removed: `${uni}/${slug}`, note: 'recoverable with git revert' }, 200, env, request);
 }
 
 // PNG/JPEG/SVG uploads land in web/assets/uploads/ so they deploy with the
@@ -565,7 +605,7 @@ async function handleUpload(request, env) {
   // base64 inflates by ~4/3, plus the JSON envelope.
   const body = await readJson(request, Math.ceil(MAX_IMAGE_BYTES * 1.4) + 4096);
   const ext = IMAGE_TYPES[body.contentType];
-  if (!ext) return json({ error: 'only PNG, JPEG, WebP or SVG' }, 400, env);
+  if (!ext) return json({ error: 'only PNG, JPEG, WebP or SVG' }, 400, env, request);
 
   const name = String(body.name || '').toLowerCase().replace(/[^a-z0-9.-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
   const base = name.replace(/\.[a-z0-9]+$/, '') || `asset-${Date.now()}`;
@@ -575,10 +615,10 @@ async function handleUpload(request, env) {
   try {
     bytes = b64decode(String(body.dataBase64 || '').replace(/^data:[^,]+,/, ''));
   } catch {
-    return json({ error: 'image data is not valid base64' }, 400, env);
+    return json({ error: 'image data is not valid base64' }, 400, env, request);
   }
   if (bytes.length > MAX_IMAGE_BYTES) {
-    return json({ error: `image is ${Math.round(bytes.length / 1024)} KB; the limit is ${MAX_IMAGE_BYTES / 1024} KB` }, 413, env);
+    return json({ error: `image is ${Math.round(bytes.length / 1024)} KB; the limit is ${MAX_IMAGE_BYTES / 1024} KB` }, 413, env, request);
   }
   // An SVG is a document, not just pixels — it can carry script. Rejected
   // outright rather than sanitized, because a half-sanitized SVG served from
@@ -586,7 +626,7 @@ async function handleUpload(request, env) {
   if (ext === 'svg') {
     const text = new TextDecoder().decode(bytes);
     if (/<script|on[a-z]+\s*=|javascript:|<foreignObject/i.test(text)) {
-      return json({ error: 'that SVG contains script or event handlers and was rejected' }, 400, env);
+      return json({ error: 'that SVG contains script or event handlers and was rejected' }, 400, env, request);
     }
   }
 
@@ -601,7 +641,7 @@ async function handleUpload(request, env) {
   }, 200, env);
 }
 
-async function handleListAssets(env) {
+async function handleListAssets(env, request) {
   const items = await ghList(env, 'web/assets/uploads');
   return json({
     ok: true,
@@ -611,14 +651,14 @@ async function handleListAssets(env) {
   }, 200, env);
 }
 
-async function handleDeleteAsset(env, filename) {
+async function handleDeleteAsset(env, filename, request) {
   const safe = String(filename || '').replace(/[^a-zA-Z0-9._-]/g, '');
-  if (!safe) return json({ error: 'bad filename' }, 400, env);
+  if (!safe) return json({ error: 'bad filename' }, 400, env, request);
   const path = `web/assets/uploads/${safe}`;
   const f = await ghGet(env, path);
-  if (!f.exists) return json({ error: 'not found' }, 404, env);
+  if (!f.exists) return json({ error: 'not found' }, 404, env, request);
   await ghDelete(env, path, `admin: delete asset ${safe}`, f.sha);
-  return json({ ok: true, removed: safe }, 200, env);
+  return json({ ok: true, removed: safe }, 200, env, request);
 }
 
 // ---------------------------------------------------------------------------
@@ -630,7 +670,7 @@ export default {
     const seg = path.split('/').filter(Boolean);
 
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: corsHeaders(env) });
+      return new Response(null, { status: 204, headers: corsHeaders(env, request) });
     }
 
     // Unauthenticated, and deliberately almost silent. An earlier version
@@ -640,7 +680,20 @@ export default {
     // thing an anonymous caller now learns is that a Worker is running.
     // Everything useful moved behind the session, into /api/status.
     if (path === '/api/health' || path === '/health') {
-      return json({ ok: true }, 200, env);
+      // originAllowed is the one diagnostic worth exposing without a password.
+      // A CORS rejection is otherwise completely opaque from the browser side —
+      // it reports a failed request and refuses to say why — and the caller
+      // already knows its own origin, so telling it whether that origin is on
+      // the list reveals nothing it could not infer. Without this, a
+      // misconfigured ALLOWED_ORIGIN is indistinguishable from a Worker that
+      // was never deployed.
+      const seen = normalizeOrigin(request.headers.get('Origin') || '');
+      return json({
+        ok: true,
+        origin: seen || null,
+        originAllowed: !seen || allowedOrigins(env).length === 0 ||
+                       allowedOrigins(env).includes('*') || allowedOrigins(env).includes(seen),
+      }, 200, env, request);
     }
 
     // OPTIONAL SECOND GATE — Cloudflare Access (free for up to 50 users).
@@ -651,7 +704,7 @@ export default {
     // password is the only thing standing here — which is why the setup guide
     // recommends turning it on.
     if (env.REQUIRE_CF_ACCESS === '1' && !request.headers.get('Cf-Access-Jwt-Assertion')) {
-      return json({ error: 'not found' }, 404, env);
+      return json({ error: 'not found' }, 404, env, request);
     }
 
     try {
@@ -671,30 +724,30 @@ export default {
           branch: env.REPO_BRANCH || 'main',
         }, 200, env);
       }
-      if (path === '/api/tree' && request.method === 'GET') return handleTree(env);
+      if (path === '/api/tree' && request.method === 'GET') return handleTree(env, request);
 
       // /api/university/:slug
       if (seg[1] === 'university' && seg[2]) {
-        if (request.method === 'GET') return handleGetUniversity(env, seg[2]);
+        if (request.method === 'GET') return handleGetUniversity(env, seg[2], request);
         if (request.method === 'PUT') return handlePutUniversity(request, env, seg[2]);
-        if (request.method === 'DELETE') return handleDeleteUniversity(env, seg[2]);
+        if (request.method === 'DELETE') return handleDeleteUniversity(env, seg[2], request);
       }
 
       // /api/major/:university/:slug
       if (seg[1] === 'major' && seg[2] && seg[3]) {
-        if (request.method === 'GET') return handleGetMajor(env, seg[2], seg[3]);
+        if (request.method === 'GET') return handleGetMajor(env, seg[2], seg[3], request);
         if (request.method === 'PUT') return handlePutMajor(request, env, seg[2], seg[3]);
-        if (request.method === 'DELETE') return handleDeleteMajor(env, seg[2], seg[3]);
+        if (request.method === 'DELETE') return handleDeleteMajor(env, seg[2], seg[3], request);
       }
 
       // /api/assets  ·  /api/assets/:filename
       if (seg[1] === 'assets') {
-        if (request.method === 'GET' && !seg[2]) return handleListAssets(env);
+        if (request.method === 'GET' && !seg[2]) return handleListAssets(env, request);
         if (request.method === 'POST' && !seg[2]) return handleUpload(request, env);
-        if (request.method === 'DELETE' && seg[2]) return handleDeleteAsset(env, seg[2]);
+        if (request.method === 'DELETE' && seg[2]) return handleDeleteAsset(env, seg[2], request);
       }
 
-      return json({ error: 'not found' }, 404, env);
+      return json({ error: 'not found' }, 404, env, request);
     } catch (err) {
       // EVERY exit from this Worker must carry CORS headers, including the
       // failures. An uncaught throw returns Cloudflare's own 1101 page, which
@@ -707,9 +760,9 @@ export default {
       // A validation failure is the admin's problem and is worth reading; a
       // GitHub or runtime failure is not, and its text can contain the repo
       // path or token scope, so it is logged rather than returned.
-      if (err && err.userFacing) return json({ error: err.message }, 400, env);
+      if (err && err.userFacing) return json({ error: err.message }, 400, env, request);
       console.error('admin worker error:', err && err.stack ? err.stack : err);
-      return json({ error: 'something went wrong on the server — check the Worker logs' }, 500, env);
+      return json({ error: 'something went wrong on the server — check the Worker logs' }, 500, env, request);
     }
   },
 };
