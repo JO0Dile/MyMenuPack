@@ -3100,3 +3100,17 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   border-radius:99px; background:rgba(93,184,255,.16);
   font-size:10.5px; font-weight:800; color:var(--accent);
 }
+
+/* The Worker-address escape hatch on the admin sign-in screen. Collapsed until
+   something fails, because it is a repair tool, not a normal step. */
+.admin-endpoint{
+  margin-top:18px; border-top:1px solid var(--line); padding-top:12px;
+}
+.admin-endpoint summary{
+  cursor:pointer; font-size:12px; font-weight:700; color:var(--text-dim); list-style:revert;
+}
+.admin-endpoint summary:hover{color:var(--text);}
+.admin-endpoint code{
+  background:rgba(93,184,255,.10); padding:1px 5px; border-radius:5px;
+  font-size:11.5px; word-break:break-all;
+}
