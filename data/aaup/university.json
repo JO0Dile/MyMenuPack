@@ -5,44 +5,44 @@
   "nameAr": "الجامعة العربية الأمريكية",
   "shortName": "AAUP",
   "icon": "🏛️",
+  "iconKey": "",
   "website": "https://www.aaup.edu",
   "country": null,
-  "logoUrl": null,
-  "description": null,
+  "logoUrl": "assets/uploads/main-logo-transparent.png",
+  "description": "",
+  "imageUrl": "",
   "colleges": [
     {
       "slug": "aaup-ai-ds",
       "name": "Faculty of Artificial Intelligence and Data Science",
       "nameAr": "كلية الذكاء الاصطناعي وعلوم البيانات",
       "icon": "🤖",
-      "iconKey": "brain",
-      "imageUrl": null
+      "iconKey": "",
+      "imageUrl": ""
     },
     {
       "slug": "aaup-it",
       "name": "Faculty of Information Technology",
       "nameAr": "كلية تكنولوجيا المعلومات",
       "icon": "💻",
-      "iconKey": "code",
-      "imageUrl": null
+      "iconKey": "",
+      "imageUrl": ""
     },
     {
       "slug": "aaup-nursing",
       "name": "Faculty of Nursing",
       "nameAr": "كلية التمريض",
       "icon": "🩺",
-      "iconKey": "health",
-      "imageUrl": null
+      "iconKey": "",
+      "imageUrl": ""
     },
     {
       "slug": "aaup-pharmacy",
       "name": "Faculty of Pharmacy",
       "nameAr": "كلية الصيدلة",
       "icon": "💊",
-      "iconKey": "pharmacy",
-      "imageUrl": null
+      "iconKey": "",
+      "imageUrl": ""
     }
-  ],
-  "iconKey": "university",
-  "imageUrl": null
+  ]
 }
