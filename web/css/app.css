@@ -3168,3 +3168,12 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   .admin-faculty-grid label:nth-child(3){width:100%;}
   .admin-markpreview{flex-direction:column; align-items:flex-start;}
 }
+
+/* A university's description, set in Admin Mode. Sits under the Arabic name on
+   its home tile; hidden entirely when empty so nothing shifts for a university
+   that has none. */
+.plan-card .pc-uni-desc{
+  font-size:12px; line-height:1.6; color:var(--text-dim);
+  margin:6px 0 0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+  overflow:hidden;
+}
