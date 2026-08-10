@@ -57,7 +57,12 @@
 
   function api(method, path, body){
     if(!base()) return Promise.reject(new Error('No admin API configured (APP_ADMIN_URL is empty).'));
-    var opts = { method: method, headers: {} };
+    // no-store, because a cached read here is not a stale view — it is data
+    // loss. The editor renders its form from the response and Save posts the
+    // whole object back, so a minutes-old copy silently reverts everything
+    // saved in between. The Worker sends no-store too; this is the belt to
+    // that brace, and it also covers replies cached before the Worker did.
+    var opts = { method: method, headers: {}, cache: 'no-store' };
     if(state.token) opts.headers.Authorization = 'Bearer ' + state.token;
     if(body !== undefined){
       opts.headers['Content-Type'] = 'application/json';
@@ -765,6 +770,9 @@
         var row = (state.tree || []).filter(function(u){ return u.slug === slug; })[0] || { slug: slug };
         api('GET', '/api/university/' + slug).then(function(res){
           var host = document.getElementById('adminUniEditor') || main;
+          // The version this form is a picture of. Save sends it back so the
+          // Worker can tell an edit from an accidental rollback.
+          state.uniSha = res.sha || '';
           host.innerHTML = universityEditor(row, res.university);
           bindIconPickers();
           bindUniEditor(slug);
@@ -794,6 +802,7 @@
         if(!slug) return;
         if(!/^[a-z0-9][a-z0-9-]{1,48}$/.test(slug)){ toast('Slug must be lowercase letters, numbers and hyphens.'); return; }
         state.uni = uni; state.majorSlug = slug;
+        state.majorSha = '';   // nothing to be stale against — this is a create
         state.major = { schemaVersion: 1, slug: slug, university: uni, name: slug, college: '',
                         icon: '🎓', iconKey: '', years: [{ id: 'y1', hasSummer: false }], courses: [], prerequisites: [] };
         state.section = 'majors'; markDirty(); render();
@@ -826,6 +835,7 @@
   function openMajor(uni, slug){
     api('GET', '/api/major/' + uni + '/' + slug).then(function(res){
       state.uni = uni; state.majorSlug = slug; state.major = res.major; state.dirty = false;
+      state.majorSha = res.sha || '';
       state.section = 'majors'; render();
       var host = document.getElementById('adminMajorEditor');
       if(host){
@@ -870,10 +880,13 @@
           icon: val('auIcon'), iconKey: val('auIconKey'), website: val('auWebsite'),
           description: val('auDesc'), logoUrl: val('auLogo'), colleges: colleges
         },
-        published: document.getElementById('auPublished').checked
+        published: document.getElementById('auPublished').checked,
+        baseSha: state.uniSha || ''
       };
       setMsg('Saving…', 'ok');
-      api('PUT', '/api/university/' + slug, payload).then(function(){
+      api('PUT', '/api/university/' + slug, payload).then(function(res){
+        // Track forward, so pressing Save twice in a row is not a conflict.
+        state.uniSha = res.sha || '';
         setMsg('Saved. Live for everyone in about a minute.', 'ok');
         return loadTree();
       }).catch(function(e){ setMsg(esc(e.message), 'err'); });
@@ -1015,9 +1028,11 @@
     on('amSave', 'click', function(){
       harvestCourses(); harvestMajorMeta();
       setMsg('Saving…', 'ok');
-      api('PUT', '/api/major/' + state.uni + '/' + state.majorSlug, { major: state.major })
+      api('PUT', '/api/major/' + state.uni + '/' + state.majorSlug,
+          { major: state.major, baseSha: state.majorSha || '' })
         .then(function(res){
           state.major = res.major;
+          state.majorSha = res.sha || '';
           markClean();
           setMsg('Saved. Live for everyone in about a minute.', 'ok');
           return loadTree();

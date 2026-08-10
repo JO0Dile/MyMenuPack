@@ -121,10 +121,23 @@ function corsHeaders(env, request) {
   };
 }
 
+// no-store is not decoration. Without it these replies carry no cache
+// directives and no validators, so a browser is free to apply heuristic
+// freshness and hand the dashboard a minutes-old copy of a university. The
+// dashboard renders its form from that copy and Save posts the whole object
+// back — which silently reverts every edit made in between. That is exactly
+// what happened: five consecutive saves each rewrote the file to a
+// byte-identical *earlier* version, undoing a logo and a description that had
+// saved correctly minutes before. Nothing here is cacheable by nature; the
+// only correct freshness for an editing surface is none.
 function json(body, status, env, request) {
   return new Response(JSON.stringify(body), {
     status: status || 200,
-    headers: { 'Content-Type': 'application/json; charset=utf-8', ...corsHeaders(env, request) },
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      ...corsHeaders(env, request),
+    },
   });
 }
 
@@ -310,9 +323,18 @@ function ghUrl(env, path) {
   return `https://api.github.com/repos/${env.REPO_OWNER}/${env.REPO_NAME}/contents/${path}`;
 }
 
+// Every read here is a read-before-write: whatever comes back is edited and
+// committed straight over the top. A cached response therefore does not cost
+// freshness, it costs data. Cloudflare will happily serve a subrequest from
+// its edge cache, so the URL carries a unique parameter (GitHub ignores
+// unknown query params) and the request opts out of caching explicitly.
 async function ghGet(env, path) {
   const branch = env.REPO_BRANCH || 'main';
-  const r = await fetch(`${ghUrl(env, path)}?ref=${encodeURIComponent(branch)}`, { headers: ghHeaders(env) });
+  const url = `${ghUrl(env, path)}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`;
+  const r = await fetch(url, {
+    headers: { ...ghHeaders(env), 'Cache-Control': 'no-cache' },
+    cf: { cacheTtl: 0, cacheEverything: false },
+  });
   if (r.status === 404) return { exists: false };
   if (!r.ok) throw new Error(`github GET ${path}: ${r.status} ${await r.text()}`);
   const meta = await r.json();
@@ -332,7 +354,10 @@ async function ghPut(env, path, contentBytes, message, sha) {
   });
   if (!r.ok) throw new Error(`github PUT ${path}: ${r.status} ${await r.text()}`);
   const out = await r.json();
-  return out.commit ? out.commit.sha : null;
+  // The file's new sha, not the commit's. This is what the next save has to
+  // send back as its baseSha, so an admin can press Save twice in a row
+  // without the second one looking like a conflict.
+  return out.content ? out.content.sha : null;
 }
 
 async function ghDelete(env, path, message, sha) {
@@ -376,6 +401,27 @@ function fail(msg) {
   const e = new Error(msg);
   e.userFacing = true;
   return e;
+}
+
+// Save posts the *whole* object, so a form rendered from an out-of-date read
+// does not merely fail to add something — it actively reverts everything saved
+// since. There is no way to detect that from the payload alone: a description
+// the admin deliberately cleared and one that was never loaded look identical.
+//
+// So the read hands out the file's sha and the save has to hand it back. If it
+// no longer matches, the base moved and the payload describes a world that no
+// longer exists — refuse it and say so, rather than committing a silent
+// rollback. Saves sent without a baseSha are still accepted: an older
+// dashboard, or a first-time create, must keep working.
+function staleBase(body, existing, env, request) {
+  const sent = body && typeof body.baseSha === 'string' ? body.baseSha : '';
+  if (!sent || !existing.exists || sent === existing.sha) return null;
+  return json({
+    error: 'This changed since you opened it, so saving now would undo that change. ' +
+           'Reload the editor and reapply your edit.',
+    conflict: true,
+    currentSha: existing.sha,
+  }, 409, env, request);
 }
 
 function validUniversity(u) {
@@ -681,9 +727,19 @@ async function handlePutUniversity(request, env, slug) {
   const body = await readJson(request, MAX_JSON_BYTES);
   const clean = validUniversity({ ...body.university, slug });
 
+  // A save that quietly drops a field is indistinguishable from one that never
+  // carried it, and that ambiguity cost a logo and a description before anyone
+  // could see it happening. One line in the Worker's log makes every save
+  // answerable after the fact without exposing anything sensitive.
+  console.log(`PUT university ${slug}: logoUrl=${JSON.stringify(clean.logoUrl)} ` +
+              `iconKey=${JSON.stringify(clean.iconKey)} descLen=${(clean.description || '').length} ` +
+              `colleges=${clean.colleges.length} baseSha=${body.baseSha ? 'sent' : 'absent'}`);
+
   const path = `data/${slug}/university.json`;
   const existing = await ghGet(env, path);
-  await ghPut(env, path, jsonBytes(clean), `admin: update ${slug} university info`, existing.sha);
+  const conflict = staleBase(body, existing, env, request);
+  if (conflict) return conflict;
+  const newSha = await ghPut(env, path, jsonBytes(clean), `admin: update ${slug} university info`, existing.sha);
 
   // The index carries the tile-level fields, so it has to move with the file
   // or the home screen and the detail page disagree.
@@ -708,7 +764,7 @@ async function handlePutUniversity(request, env, slug) {
     });
   }
   await ghPut(env, idxPath, jsonBytes(parsed), `admin: update ${slug} in the university index`, idx.sha);
-  return json({ ok: true, university: clean }, 200, env, request);
+  return json({ ok: true, university: clean, sha: newSha }, 200, env, request);
 }
 
 async function handleDeleteUniversity(env, slug, request) {
@@ -738,13 +794,15 @@ async function handlePutMajor(request, env, uni, slug) {
   const clean = validMajor({ ...body.major, slug, university: uni });
   const path = `data/${uni}/majors/${slug}.json`;
   const existing = await ghGet(env, path);
+  const conflict = staleBase(body, existing, env, request);
+  if (conflict) return conflict;
   const original = existing.exists ? JSON.parse(existing.text) : null;
   const verb = existing.exists ? 'update' : 'add';
-  await ghPut(env, path, jsonBytes(toStored(clean, original)),
+  const newSha = await ghPut(env, path, jsonBytes(toStored(clean, original)),
     `admin: ${verb} ${uni}/${slug}`, existing.sha);
   // Hands back the editable shape, so the dashboard's in-memory copy stays in
   // the vocabulary it was working in rather than flipping to the stored one.
-  return json({ ok: true, major: clean, created: !existing.exists }, 200, env, request);
+  return json({ ok: true, major: clean, created: !existing.exists, sha: newSha }, 200, env, request);
 }
 
 async function handleDeleteMajor(env, uni, slug, request) {

@@ -18,6 +18,22 @@ on:
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
+  # The admin path cannot use the push trigger above: Publish catalogue commits
+  # the rebuilt plans.json with GITHUB_TOKEN, and GitHub deliberately does not
+  # let a GITHUB_TOKEN push start another workflow. So it asks for a deploy
+  # explicitly instead — and when that request was refused for want of a
+  # permission, there was no second route and the site quietly stopped updating
+  # while every admin edit still committed perfectly. Nothing in the repo looked
+  # wrong; it was just never served.
+  #
+  # This is that second route. It needs no token scope at all, so a permissions
+  # mistake can slow the deploy down but can no longer stop it. Double deploys
+  # are harmless — the concurrency group below serialises them.
+  workflow_run:
+    workflows: ["Publish catalogue"]
+    types: [completed]
+    branches: [main]
+
 permissions:
   contents: read
   pages: write

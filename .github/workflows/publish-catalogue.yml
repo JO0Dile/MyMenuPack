@@ -23,9 +23,25 @@ on:
       - '.github/workflows/publish-catalogue.yml'
   workflow_dispatch:
 
-# Needed to push the rebuilt file back.
+# contents: write to push the rebuilt file back, actions: write to ask for the
+# Pages deploy at the end.
+#
+# actions: write is not optional and its absence is not obvious. Naming a
+# permissions block at all sets every scope you do not list to *none*, so
+# `contents: write` alone silently removed the one the deploy step needs. Every
+# run then did the same thing: committed the rebuilt plans.json successfully,
+# then died on
+#
+#   POST /actions/workflows/pages.yml/dispatches -> 403
+#   Resource not accessible by integration
+#
+# Twelve runs in a row failed exactly there. The commits all landed, so data/
+# and plans.json stayed correct and nothing looked wrong in the repo — but the
+# site was never redeployed, so it sat frozen on an old build for hours while
+# admin edits appeared to do nothing at all.
 permissions:
   contents: write
+  actions: write
 
 # Two admin saves in quick succession would otherwise race and one would land on
 # a stale checkout. Queue them instead of cancelling: every edit must be built.
@@ -83,10 +99,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'pages.yml',
-              ref: 'main',
-            });
-            core.info('Requested a Pages deploy.');
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'pages.yml',
+                ref: 'main',
+              });
+              core.info('Requested a Pages deploy.');
+            } catch (e) {
+              // Do not fail the run. Pages also deploys from this workflow
+              // finishing (the workflow_run trigger in pages.yml), so the site
+              // still updates — and failing here would hide a rebuild that
+              // actually succeeded behind a red X, which is how this went
+              // unnoticed for twelve runs.
+              core.warning(
+                `Could not request a Pages deploy directly (${e.status || ''} ${e.message}). ` +
+                'Falling back to the workflow_run trigger in pages.yml, so the deploy should ' +
+                'still happen. If this says 403 "Resource not accessible by integration", this ' +
+                "workflow's permissions block is missing actions: write.");
+            }
