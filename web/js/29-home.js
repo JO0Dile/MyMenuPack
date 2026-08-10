@@ -119,6 +119,12 @@
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(u, { size: 30, label: u.shortName }) + '</div>' +
         '<h2>' + u.name.en + '<em>' + u.shortName + '</em></h2>' +
         '<p style="direction:rtl;">' + u.name.ar + '</p>' +
+        // The description was editable in Admin Mode and displayed nowhere, so
+        // writing one had no visible effect at all. Only shown when set, so a
+        // university without one looks exactly as it did before.
+        (u.description
+          ? '<p class="pc-uni-desc">' + window.__escapeHtml(u.description) + '</p>'
+          : '') +
         '<div class="pc-cta">Browse colleges →</div></div>';
     }).join('');
   }
