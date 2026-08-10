@@ -490,12 +490,134 @@ function validMajor(m) {
       creditHours: Number(c.creditHours) || 0,
       category: CATEGORIES.includes(c.category) ? c.category : 'core',
       yearId: str(c.yearId, 20),
-      semester: ['s1', 's2', 's3', 'summer'].includes(c.semester) ? c.semester : 's1',
+      // Empty is a real value: a course the plan deliberately does not schedule.
+      // Defaulting it to s1 silently moved every department elective into
+      // Semester 1 the first time a major was saved.
+      semester: ['s1', 's2', 's3', 'summer'].includes(c.semester) ? c.semester
+        : (c.semester === '' || c.semester == null ? '' : 's1'),
       description: str(c.description, 2000),
     })),
     prerequisites: prereqs.map((p) => [p[0], p[1]]),
   };
   return out;
+}
+
+
+// ---------------------------------------------------------------------------
+// data/ schema  <->  dashboard schema
+// ---------------------------------------------------------------------------
+// A major file under data/ is authored in the shape tools/build-catalogue.py
+// reads: slug/code/credits/year/semester and an UPPER_CASE category, with
+// prerequisites as {requires, forCourse} objects and no years array at all
+// (years are derived from where the courses sit). The dashboard works in the
+// shape the app itself uses: id/courseNumber/creditHours/yearId/semester with
+// lower-case categories and [before, after] pairs.
+//
+// Nothing translated between them, so every field the dashboard read was
+// undefined: no course codes, no credit hours, no years, every category
+// falling back to the first option, and every prerequisite resolving to the
+// first course in the list because both ids were undefined. Editing was
+// impossible and saving would have rewritten real plans into rubbish.
+//
+// Both directions live here, next to each other, because they are one contract
+// and drift between them is silent.
+
+const CATEGORY_TO_APP = {
+  CORE: 'core', MATH: 'math', DEPARTMENT_ELECTIVE: 'dept', UNIVERSITY_ELECTIVE: 'uni',
+  FREE_ELECTIVE: 'free', UNIVERSITY_REQUIREMENT: 'skills', ENGLISH: 'eng',
+};
+const CATEGORY_TO_DATA = Object.fromEntries(
+  Object.entries(CATEGORY_TO_APP).map(([k, v]) => [v, k]),
+);
+
+function toEditable(stored) {
+  const courses = Array.isArray(stored.courses) ? stored.courses : [];
+  const years = {};
+  for (const c of courses) {
+    if (c.year == null) continue;
+    years[`y${c.year}`] = years[`y${c.year}`] || Number(c.semester) === 3;
+  }
+  return {
+    schemaVersion: stored.schemaVersion || 1,
+    slug: stored.slug,
+    university: stored.university,
+    college: stored.college || '',
+    name: stored.name || '',
+    nameAr: stored.nameAr || '',
+    subtitle: stored.subtitle || '',
+    subtitleAr: stored.subtitleAr || '',
+    icon: stored.icon || '',
+    iconKey: stored.iconKey || '',
+    imageUrl: stored.imageUrl || '',
+    bio: stored.bio || '',
+    bioAr: stored.bioAr || '',
+    degreeHours: stored.degreeHours == null ? null : stored.degreeHours,
+    freeElectiveSuggestions: stored.freeElectiveSuggestions || [],
+    years: Object.keys(years)
+      .sort((a, b) => parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10))
+      .map((id) => ({ id, hasSummer: years[id] })),
+    courses: courses.map((c) => ({
+      id: c.slug,
+      courseNumber: c.code == null ? '' : String(c.code),
+      name: c.name || '',
+      nameAr: c.nameAr || '',
+      // credits is a string in data/ ("2"), a number everywhere else.
+      creditHours: Number(c.credits) || 0,
+      category: CATEGORY_TO_APP[c.category] || 'core',
+      // A null year means the plan deliberately does not schedule this course —
+      // a department elective you choose. That must survive the round trip as
+      // empty, not be invented into year one.
+      yearId: c.year == null ? '' : `y${c.year}`,
+      semester: c.semester == null ? '' : `s${c.semester}`,
+      description: c.description || '',
+    })),
+    prerequisites: (Array.isArray(stored.prerequisites) ? stored.prerequisites : [])
+      .map((p) => [p.requires, p.forCourse])
+      .filter((p) => p[0] && p[1]),
+  };
+}
+
+// `original` is the file as it sits in data/. Every course field the dashboard
+// does not show — theoretical/practical hours, isElective, pairGroup,
+// prerequisiteText, independentGrades — is carried through from it untouched.
+// Rebuilding a course from only the edited fields would quietly delete the
+// rest, and lab pairing and the assessment breakdown depend on them.
+function toStored(edited, original) {
+  const prev = {};
+  for (const c of (original && original.courses) || []) prev[c.slug] = c;
+
+  return {
+    ...original,
+    schemaVersion: original && original.schemaVersion ? original.schemaVersion : 1,
+    slug: edited.slug,
+    university: edited.university,
+    college: edited.college,
+    name: edited.name,
+    nameAr: edited.nameAr,
+    subtitle: edited.subtitle,
+    subtitleAr: edited.subtitleAr,
+    icon: edited.icon,
+    iconKey: edited.iconKey,
+    imageUrl: edited.imageUrl,
+    bio: edited.bio,
+    bioAr: edited.bioAr,
+    degreeHours: edited.degreeHours,
+    freeElectiveSuggestions: edited.freeElectiveSuggestions,
+    courses: edited.courses.map((c) => ({
+      ...(prev[c.id] || {}),
+      slug: c.id,
+      code: c.courseNumber || null,
+      name: c.name,
+      nameAr: c.nameAr,
+      // Kept as a string to match every other row in these files; a mixed-type
+      // column would show up as noise in every future diff.
+      credits: String(c.creditHours),
+      category: CATEGORY_TO_DATA[c.category] || 'CORE',
+      year: c.yearId ? parseInt(c.yearId.slice(1), 10) : null,
+      semester: c.semester ? parseInt(c.semester.slice(1), 10) : null,
+    })),
+    prerequisites: edited.prerequisites.map(([requires, forCourse]) => ({ requires, forCourse })),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -607,7 +729,7 @@ async function handleGetMajor(env, uni, slug, request) {
   if (!SLUG_RE.test(uni) || !SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const f = await ghGet(env, `data/${uni}/majors/${slug}.json`);
   if (!f.exists) return json({ error: 'not found' }, 404, env, request);
-  return json({ ok: true, major: JSON.parse(f.text), sha: f.sha }, 200, env, request);
+  return json({ ok: true, major: toEditable(JSON.parse(f.text)), sha: f.sha }, 200, env, request);
 }
 
 async function handlePutMajor(request, env, uni, slug) {
@@ -616,8 +738,12 @@ async function handlePutMajor(request, env, uni, slug) {
   const clean = validMajor({ ...body.major, slug, university: uni });
   const path = `data/${uni}/majors/${slug}.json`;
   const existing = await ghGet(env, path);
+  const original = existing.exists ? JSON.parse(existing.text) : null;
   const verb = existing.exists ? 'update' : 'add';
-  await ghPut(env, path, jsonBytes(clean), `admin: ${verb} ${uni}/${slug}`, existing.sha);
+  await ghPut(env, path, jsonBytes(toStored(clean, original)),
+    `admin: ${verb} ${uni}/${slug}`, existing.sha);
+  // Hands back the editable shape, so the dashboard's in-memory copy stays in
+  // the vocabulary it was working in rather than flipping to the stored one.
   return json({ ok: true, major: clean, created: !existing.exists }, 200, env, request);
 }
 

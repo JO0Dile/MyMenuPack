@@ -23,6 +23,25 @@ duplicated, every edit is a real commit with a message, and a mistake is undone
 with `git revert`. The honest cost is latency: a change is live in **about a
 minute**, not instantly.
 
+The rebuild step is the `Publish catalogue` workflow. Without it an admin edit
+lands in `data/`, `web/plans.json` keeps the old content, and the app keeps
+serving the old content — the change looks saved and never appears.
+
+### Icons, logos and emoji — which one shows
+
+Three fields, one mark, tried in this order:
+
+| | Wins over | Use it for |
+|---|---|---|
+| **Uploaded image** | everything | a real logo or artwork |
+| **Built-in icon** | the emoji | a clean themed mark from the picker |
+| **Emoji** | — | the last fallback; always works |
+
+You do not have to choose one — fill in as many as you like and the topmost one
+wins. Both editors show a live **What students will see** panel with the actual
+mark and a line saying which field produced it, so clearing an icon and setting
+a logo is never a guess.
+
 ### Students who customised a plan are not overwritten
 
 If someone edited their own copy of a plan and you then publish a change to it,

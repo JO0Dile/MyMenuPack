@@ -3114,3 +3114,57 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   background:rgba(93,184,255,.10); padding:1px 5px; border-radius:5px;
   font-size:11.5px; word-break:break-all;
 }
+
+/* ---- Admin: which mark actually wins -------------------------------------
+   Three fields (uploaded image, built-in icon, emoji) produce one mark, and
+   before this nothing showed which. Clearing the icon and setting a logo left
+   the old emoji on screen with no explanation. */
+.admin-markpreview{
+  display:flex; align-items:center; gap:14px; margin:6px 0 16px;
+  padding:12px 14px; border-radius:11px;
+  background:rgba(93,184,255,.07); border:1px solid var(--line);
+}
+.admin-markpreview-box{
+  flex:0 0 auto; width:64px; height:64px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.05); border:1px solid var(--line);
+}
+.admin-markpreview-title{font-size:12px; font-weight:800; margin-bottom:2px;}
+
+/* ---- Admin: faculty rows ------------------------------------------------
+   Four unlabelled boxes in a row gave no clue which was which — and the id,
+   the one that must not change, looked like just another text field. */
+.admin-faculty{
+  border:1px solid var(--line); border-radius:11px;
+  padding:11px 13px; margin-bottom:9px; background:rgba(255,255,255,.025);
+}
+.admin-faculty-head{display:flex; align-items:center; gap:9px; margin-bottom:9px;}
+.admin-faculty-n{
+  flex:0 0 auto; width:21px; height:21px; border-radius:50%;
+  background:rgba(93,184,255,.18); color:var(--accent);
+  font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center;
+}
+.admin-faculty-name{flex:1 1 auto; font-size:13px; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.admin-faculty-grid{display:grid; grid-template-columns:1fr 1fr auto; gap:8px;}
+.admin-faculty-grid label{
+  display:flex; flex-direction:column; gap:3px;
+  font-size:11px; font-weight:700; color:var(--text-dim); margin:0;
+}
+.admin-faculty-grid label input{width:100%;}
+.admin-faculty-grid label:nth-child(3){width:78px;}
+/* The id spans the full width and reads as the warning it is. */
+.admin-faculty-id{grid-column:1 / -1;}
+.admin-faculty-id span{font-weight:600; color:var(--prereq); text-transform:none; letter-spacing:0;}
+.admin-faculty-id input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;}
+
+/* With 77 icons the picker needs a bound, or it pushes the Save button off
+   the screen on the very form it belongs to. */
+.admin-iconpick{max-height:186px; overflow-y:auto; padding:4px; border-radius:9px;
+  background:rgba(0,0,0,.14); overscroll-behavior:contain;}
+
+@media (max-width:620px){
+  .admin-faculty-grid{grid-template-columns:1fr;}
+  .admin-faculty-grid label:nth-child(3){width:100%;}
+  .admin-markpreview{flex-direction:column; align-items:flex-start;}
+}
