@@ -4,7 +4,18 @@
 // study-plan catalogue (plans.json) are all precached, so it works with no
 // network at all from the first visit onward. The only thing that ever goes
 // online is the plan collector, when a student chooses to share a plan.
-var CACHE = 'studyplan-shell-v10';
+// BUMP THIS whenever a precached file changes. It is the only thing that
+// makes a browser reinstall the shell.
+//
+// The trap is that nothing warns you. A browser checks for an update by
+// comparing *this file* byte for byte; if sw.js is unchanged it does not
+// reinstall, addAll never re-runs, and every already-installed browser keeps
+// serving the old cache entries. Shipping a fixed js/48-admin.js therefore
+// changed nothing for anyone who had already opened the app — the fix was on
+// the CDN, correct and verified, and simply not what the browser ran. The
+// fetch handler below does refresh entries one at a time, so it heals after an
+// extra reload, but "reload twice" is not a fix anyone can be told to rely on.
+var CACHE = 'studyplan-shell-v11';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',
