@@ -221,6 +221,30 @@ Three layers, tried in order, all optional:
 Uploads are committed to `web/assets/uploads/` and deploy with the app, so an
 uploaded logo still shows when the student is offline.
 
+### Why a save can say "this changed since you opened it"
+
+Save posts the **whole** university or major, not just the field you touched.
+That is what makes one Save write metadata, courses, prerequisites and the
+semester layout together — but it also means a form rendered from an
+out-of-date copy does not merely fail to add something, it reverts everything
+saved in between.
+
+That is not hypothetical. Five consecutive saves once walked
+`data/aaup/university.json` *backwards* — each one committing a byte-identical
+earlier version, undoing a logo and a description that had saved correctly
+minutes before. Every request returned `200`. Nothing was in the logs, because
+nothing failed.
+
+So each read now hands out the file's version, and each save has to hand it
+back. If it no longer matches, the save is refused with that message instead of
+being applied. Reload the editor and reapply the edit. Saves are still allowed
+when there is nothing to be stale against — creating a major, or an older
+dashboard that does not send a version.
+
+Two things make the stale copy far less likely in the first place: every admin
+reply is `Cache-Control: no-store` (a browser was free to serve a minutes-old
+one before), and every read of GitHub is explicitly uncacheable.
+
 ### Deleting
 
 - **Deleting a major** removes the file. Recoverable with `git revert`.
