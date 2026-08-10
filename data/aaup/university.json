@@ -43,6 +43,14 @@
       "icon": "💊",
       "iconKey": "",
       "imageUrl": ""
+    },
+    {
+      "slug": "test-faculty",
+      "name": "test faculty",
+      "nameAr": "كلية تجريبية",
+      "icon": "💀",
+      "iconKey": "",
+      "imageUrl": ""
     }
   ]
 }
