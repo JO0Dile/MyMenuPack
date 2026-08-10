@@ -419,8 +419,8 @@
       '<input type="text" id="auLogo" value="' + esc(full.logoUrl || '') + '" placeholder="assets/uploads/aaup-logo.png or https://…">' +
       '<p class="admin-hint">Upload the file in <strong>Assets</strong>, then paste its path here. ' +
       'An uploaded file is served from the app itself, so the logo still shows offline.</p>' +
-      (full.logoUrl ? '<div class="admin-logo-preview">' + window.AAUP_ICONS.markup({ imageUrl: full.logoUrl }, { size: 64 }) + '</div>' : '') +
       '</div>' +
+      markPreview('au') +
       '<label class="admin-check"><input type="checkbox" id="auPublished"' + (pub ? ' checked' : '') + '> Published (visible to students)</label>' +
       '<h4>Faculties</h4><div id="auColleges">' + collegeRows(full.colleges || []) + '</div>' +
       '<div class="form-actions">' +
@@ -429,16 +429,64 @@
       '</div><div id="adminMsg"></div></div>';
   }
 
+  // Three fields, one mark. Which one a student actually sees was invisible
+  // here: you could clear the icon, set a logo, and still be looking at the
+  // old emoji with nothing explaining why. This shows the real answer, live,
+  // and says which field produced it.
+  function markPreview(prefix){
+    return '<div class="admin-markpreview" data-markpreview="' + prefix + '">' +
+      '<div class="admin-markpreview-box" id="' + prefix + 'MarkBox"></div>' +
+      '<div><div class="admin-markpreview-title">What students will see</div>' +
+      '<div class="admin-hint" id="' + prefix + 'MarkWhy" style="margin:0;"></div></div></div>';
+  }
+
+  // The order here is the renderer's order (js/04-icons.js), not a guess: an
+  // uploaded image wins, then a built-in icon, then the emoji. Keeping the two
+  // in step matters — a preview that disagrees with the app is worse than none.
+  function refreshMarkPreview(prefix, fields){
+    var box = document.getElementById(prefix + 'MarkBox');
+    var why = document.getElementById(prefix + 'MarkWhy');
+    if(!box || !why) return;
+    var img = (document.getElementById(fields.image) || {}).value || '';
+    var key = (document.getElementById(fields.key) || {}).value || '';
+    var emoji = (document.getElementById(fields.emoji) || {}).value || '';
+    var entity = { imageUrl: img, iconKey: key, icon: emoji };
+    box.innerHTML = window.AAUP_ICONS.markup(entity, { size: 52 });
+
+    if(img && window.AAUP_ICONS.safeImageUrl(img)){
+      why.innerHTML = 'Using the <strong>uploaded image</strong>. It wins over both the icon and the emoji — clear this field to fall back to them.';
+    } else if(img){
+      why.innerHTML = '⚠️ That image path is not usable (it must start with <code>assets/</code> or <code>https://</code>), so the icon or emoji is being used instead.';
+    } else if(key && window.AAUP_ICONS.has(key)){
+      why.innerHTML = 'Using the <strong>built-in icon</strong>. Upload an image above to override it; pick <em>none</em> to fall back to the emoji.';
+    } else if(emoji){
+      why.innerHTML = 'Using the <strong>emoji</strong>, because no image and no icon are set. This is the last fallback and always works.';
+    } else {
+      why.innerHTML = 'Nothing is set, so a default mark is shown. Any one of the three fields replaces it.';
+    }
+  }
+
+  // Four unlabelled boxes in a row gave no clue which was which, and the id was
+  // the least obvious of them while being the one that must not change: majors
+  // reference it, so renaming it orphans them. It is labelled as such and set
+  // apart from the display names.
   function collegeRows(list){
+    if(!list.length) return '<p class="ex-note">No faculties yet.</p>';
     return list.map(function(c, i){
-      return '<div class="admin-row" data-college-row="' + i + '">' +
-        '<input type="text" class="ac-slug" value="' + esc(c.slug) + '" placeholder="slug">' +
-        '<input type="text" class="ac-name" value="' + esc(c.name) + '" placeholder="Name (English)">' +
-        '<input type="text" class="ac-namear" value="' + esc(c.nameAr || '') + '" placeholder="Name (Arabic)">' +
-        '<input type="text" class="ac-icon" value="' + esc(c.icon || '') + '" placeholder="🏫" style="max-width:60px;">' +
-        '<button type="button" class="home-btn admin-mini admin-danger" data-del-college="' + i + '">✕</button>' +
-        '</div>';
-    }).join('') || '<p class="ex-note">No faculties yet.</p>';
+      return '<div class="admin-faculty" data-college-row="' + i + '">' +
+        '<div class="admin-faculty-head">' +
+          '<span class="admin-faculty-n">' + (i + 1) + '</span>' +
+          '<strong class="admin-faculty-name">' + esc(c.name || c.slug || 'New faculty') + '</strong>' +
+          '<button type="button" class="home-btn admin-mini admin-danger" data-del-college="' + i + '">🗑 Remove</button>' +
+        '</div>' +
+        '<div class="admin-faculty-grid">' +
+          '<label>Name (English)<input type="text" class="ac-name" value="' + esc(c.name) + '" placeholder="Faculty of Information Technology"></label>' +
+          '<label>Name (Arabic)<input type="text" class="ac-namear" dir="rtl" value="' + esc(c.nameAr || '') + '" placeholder="كلية تكنولوجيا المعلومات"></label>' +
+          '<label>Emoji<input type="text" class="ac-icon" value="' + esc(c.icon || '') + '" placeholder="🏫" maxlength="4"></label>' +
+          '<label class="admin-faculty-id">ID <span>— referenced by majors; changing it unlinks them</span>' +
+          '<input type="text" class="ac-slug" value="' + esc(c.slug) + '" placeholder="aaup-it" spellcheck="false"></label>' +
+        '</div></div>';
+    }).join('');
   }
 
   function field(id, label, val){
@@ -462,6 +510,27 @@
       '</div></div>';
   }
 
+  var MARK_FIELDS = {
+    au: { image: 'auLogo',  key: 'auIconKey', emoji: 'auIcon' },
+    am: { image: 'amImage', key: 'amIconKey', emoji: 'amIcon' }
+  };
+
+  function bindMarkPreview(){
+    Object.keys(MARK_FIELDS).forEach(function(prefix){
+      var fields = MARK_FIELDS[prefix];
+      if(!document.getElementById(prefix + 'MarkBox')) return;
+      refreshMarkPreview(prefix, fields);
+      [fields.image, fields.key, fields.emoji].forEach(function(id){
+        var el = document.getElementById(id);
+        if(!el) return;
+        // 'input' as well as 'change': the preview should follow typing, since
+        // the whole point is answering "what did that just do?" immediately.
+        el.addEventListener('input', function(){ refreshMarkPreview(prefix, fields); });
+        el.addEventListener('change', function(){ refreshMarkPreview(prefix, fields); });
+      });
+    });
+  }
+
   function bindIconPickers(){
     document.querySelectorAll('.admin-iconpick').forEach(function(pick){
       pick.addEventListener('click', function(e){
@@ -472,8 +541,10 @@
         pick.querySelectorAll('.admin-icontile').forEach(function(x){ x.classList.remove('is-active'); });
         b.classList.add('is-active');
         markDirty();
+        bindMarkPreview();
       });
     });
+    bindMarkPreview();
   }
 
   function sectionMajors(){
@@ -508,6 +579,7 @@
       iconPicker('amIconKey', m.iconKey) +
       '<div class="form-field"><label for="amImage">Icon image (optional)</label>' +
       '<input type="text" id="amImage" value="' + esc(m.imageUrl || '') + '" placeholder="assets/uploads/…"></div>' +
+      markPreview('am') +
       '<div class="form-field"><label for="amBio">Description</label><textarea id="amBio" rows="3">' + esc(m.bio || '') + '</textarea></div>' +
       '<div class="form-field"><label for="amBioAr">Description (Arabic)</label><textarea id="amBioAr" rows="3">' + esc(m.bioAr || '') + '</textarea></div>' +
       saveBar() + '</div>';
@@ -649,7 +721,11 @@
       '<code>ADMIN_PASSWORD_HASH</code> secret. The password itself is never stored anywhere.</div>' +
       '<div class="admin-note"><strong>Revoking access.</strong> Replace <code>SESSION_SECRET</code> in the ' +
       'Worker. Every signed-in session stops working immediately.</div>' +
-      '<div class="form-actions"><button type="button" class="home-btn" id="adminReload">Reload data from GitHub</button></div>';
+      '<div class="admin-note"><strong>Refresh from GitHub.</strong> Re-reads the list of ' +
+      'universities and majors from the repo. It changes nothing and deletes nothing — ' +
+      'use it if you edited files in GitHub directly and want this dashboard to catch up. ' +
+      'Any major you have open with unsaved changes is left alone.</div>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="adminReload">🔄 Refresh list from GitHub</button></div>';
   }
 
   // ---------- render + binding ----------
@@ -765,10 +841,18 @@
   function bindUniEditor(slug){
     on('auAddCollege', 'click', function(){
       var host = document.getElementById('auColleges');
-      var i = host.querySelectorAll('[data-college-row]').length;
-      if(!host.querySelector('[data-college-row]')) host.innerHTML = '';
-      host.insertAdjacentHTML('beforeend', collegeRows([{ slug: '', name: '', nameAr: '', icon: '🏫' }]).replace('data-college-row="0"', 'data-college-row="' + i + '"'));
+      var rows = host.querySelectorAll('[data-college-row]').length;
+      if(!rows) host.innerHTML = '';
+      // Rendered with its real index rather than string-patching index 0, which
+      // produced duplicate indices as soon as two were added.
+      var html = collegeRows([{ slug: '', name: '', nameAr: '', icon: '🏫' }])
+        .replace(/data-college-row="0"/, 'data-college-row="' + rows + '"')
+        .replace(/data-del-college="0"/, 'data-del-college="' + rows + '"')
+        .replace(/admin-faculty-n">1</, 'admin-faculty-n">' + (rows + 1) + '<');
+      host.insertAdjacentHTML('beforeend', html);
       bindCollegeDeletes();
+      var last = host.querySelector('[data-college-row="' + rows + '"] .ac-name');
+      if(last) last.focus();
     });
     bindCollegeDeletes();
     on('auSave', 'click', function(){
@@ -796,10 +880,16 @@
     });
   }
 
+  // Every destructive control asks first. A misclick in a table of forty rows
+  // is easy and, before this, instant and silent.
   function bindCollegeDeletes(){
     document.querySelectorAll('[data-del-college]').forEach(function(b){
       b.addEventListener('click', function(){
-        b.closest('[data-college-row]').remove();
+        var row = b.closest('[data-college-row]');
+        var name = (row.querySelector('.ac-name').value || row.querySelector('.ac-slug').value || 'this faculty').trim();
+        if(!confirm('Remove the faculty "' + name + '"?\n\nMajors already pointing at it keep their own copy of the name, ' +
+                    'but they stop being grouped under it. Nothing is saved until you press Save university.')) return;
+        row.remove();
       });
     });
   }
@@ -839,7 +929,15 @@
       b.addEventListener('click', function(){
         harvestCourses();
         var i = Number(b.getAttribute('data-del-course'));
-        var id = state.major.courses[i].id;
+        var c = state.major.courses[i];
+        var links = (state.major.prerequisites || []).filter(function(p){
+          return p[0] === c.id || p[1] === c.id;
+        }).length;
+        if(!confirm('Remove "' + (c.name || c.id) + '"?' +
+                    (links ? '\n\nThis also removes ' + links + ' prerequisite link' + (links === 1 ? '' : 's') +
+                             ' that refer to it — otherwise the plan could not be saved.' : '') +
+                    '\n\nNothing is saved until you press Save major.')) return;
+        var id = c.id;
         state.major.courses.splice(i, 1);
         // A dangling prerequisite would fail server validation, so the pairs
         // that referenced this course go with it.
@@ -870,7 +968,12 @@
     });
     document.querySelectorAll('[data-del-pr]').forEach(function(btn){
       btn.addEventListener('click', function(){
-        state.major.prerequisites.splice(Number(btn.getAttribute('data-del-pr')), 1);
+        var i = Number(btn.getAttribute('data-del-pr'));
+        var p = state.major.prerequisites[i];
+        if(!confirm('Remove this prerequisite?\n\n' + nameOf(p[0]) + '  →  ' + nameOf(p[1]) +
+                    '\n\nThe second course becomes available without the first. ' +
+                    'Nothing is saved until you press Save major.')) return;
+        state.major.prerequisites.splice(i, 1);
         markDirty(); render();
       });
     });
@@ -895,7 +998,10 @@
         var i = Number(b.getAttribute('data-del-year'));
         var y = state.major.years[i];
         var used = (state.major.courses || []).filter(function(c){ return c.yearId === y.id; }).length;
-        if(used && !confirm(y.id + ' still has ' + used + ' course(s). Remove the year anyway? Those courses would need a new year before saving.')) return;
+        if(!confirm('Remove year ' + y.id + '?' +
+                    (used ? '\n\nIt still holds ' + used + ' course' + (used === 1 ? '' : 's') +
+                            ', which would need a new year before this major can be saved.' : '') +
+                    '\n\nNothing is saved until you press Save major.')) return;
         state.major.years.splice(i, 1);
         markDirty(); render();
       });
