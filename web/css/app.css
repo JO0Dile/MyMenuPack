@@ -3272,3 +3272,94 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   margin:6px 0 0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
   overflow:hidden;
 }
+
+/* ============================================================================
+   COURSE DETAIL PANEL  (js/49-course-detail.js)
+
+   Written narrow-first. Every rule here is the phone layout; the two-column
+   arrangement only appears above 720px. That order is deliberate — the wide
+   version is the exception in this app, not the baseline, and building it the
+   other way is how a phone ends up with a desktop layout squeezed into it.
+   ========================================================================= */
+.modal-card.cd-card{max-width:840px; padding:0; overflow:hidden;}
+.modal-card.cd-card .modal-body{padding:0;}
+.modal-card.cd-card .modal-close{top:14px; right:14px; z-index:3;}
+html[dir="rtl"] .modal-card.cd-card .modal-close,
+.cd[dir="rtl"] ~ .modal-close{right:auto; left:14px;}
+
+.cd-head{
+  padding:20px 46px 16px 22px; border-bottom:1px solid var(--line);
+  display:flex; gap:12px; align-items:flex-start; justify-content:space-between;
+}
+html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
+.cd-title{min-width:0; padding-inline-end:26px;}
+.cd-head h3{font-size:19px; font-weight:800; margin:0 0 5px; line-height:1.25;}
+.cd-sub{font-size:11.5px; color:var(--text-dim); line-height:1.5;}
+
+.cd-pill{
+  flex:0 0 auto; font-size:11px; font-weight:800; border-radius:99px;
+  padding:6px 13px; white-space:nowrap; border:1px solid transparent;
+}
+.cd-open{background:rgba(93,184,255,.14); border-color:rgba(93,184,255,.45); color:var(--accent);}
+.cd-passed{background:rgba(47,191,113,.14); border-color:rgba(47,191,113,.45); color:var(--unlock);}
+.cd-locked{background:rgba(255,182,72,.12); border-color:rgba(255,182,72,.4); color:#ffb648;}
+
+.cd-body{display:block;}
+.cd-main{padding:18px 22px;}
+.cd-side{padding:4px 22px 20px;}
+
+.cd-sec{margin-bottom:20px;}
+.cd-sec:last-child{margin-bottom:0;}
+.cd-lbl{
+  font-size:10.5px; font-weight:800; letter-spacing:1.1px; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:9px;
+}
+.cd-note{font-size:12.5px; color:var(--text); line-height:1.65; margin:0 0 10px;}
+.cd-note strong{font-weight:700;}
+
+/* Each prerequisite carries its own state, so "why is this locked" is answered
+   by looking rather than by reading. */
+.cd-chain{display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
+.cd-chip{
+  font-family:inherit; font-size:12px; font-weight:600; cursor:pointer;
+  background:var(--search-bg); border:1px solid var(--line); color:var(--text);
+  border-radius:9px; padding:7px 12px; max-width:100%; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap;
+}
+.cd-chip:hover{border-color:var(--accent);}
+.cd-chip.is-ok{border-color:rgba(47,191,113,.5); color:var(--unlock);}
+.cd-chip.is-missing{border-color:rgba(255,182,72,.5); color:#ffb648;}
+.cd-chip.is-self{cursor:default; border-color:var(--accent); color:var(--accent); background:rgba(93,184,255,.1);}
+.cd-chip.is-self:hover{border-color:var(--accent);}
+.cd-arrow{color:var(--text-dim); font-size:13px;}
+
+.cd-row{
+  display:flex; justify-content:space-between; align-items:center; gap:14px;
+  padding:9px 0; border-bottom:1px solid var(--line); font-size:12.5px;
+  color:var(--text-dim);
+}
+.cd-row:last-child{border-bottom:0;}
+.cd-row b{color:var(--text); font-weight:700; text-align:end;}
+
+/* The grade controls are js/21-course-modal-extras.js and are not restyled
+   here — only given room and a rule off the section above them. */
+.cd-extras:empty{display:none;}
+.cd-extras{margin-top:18px; padding-top:16px; border-top:1px solid var(--line);}
+.cd-extras .modal-extras{margin:0;}
+
+@media (min-width:720px){
+  .cd-body{display:grid; grid-template-columns:1.35fr 1fr; align-items:start;}
+  .cd-main{padding:20px 24px; border-inline-end:1px solid var(--line);}
+  .cd-side{padding:20px 24px;}
+  .cd-head{padding:22px 50px 18px 26px;}
+}
+
+/* The modal is the full height of a small screen, so the panel scrolls inside
+   it rather than the page behind it. */
+@media (max-width:719px){
+  .modal-card.cd-card{max-height:90vh; display:flex; flex-direction:column;}
+  .modal-card.cd-card .modal-body{overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .cd-head{position:sticky; top:0; background:var(--panel); z-index:2;}
+  .cd-head h3{font-size:17px;}
+  .cd-arrow{transform:rotate(90deg); display:inline-block;}
+}

@@ -982,20 +982,55 @@
     var body = document.getElementById('impCourseModalBody');
     if(!overlay || !body) return;
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
-    body.innerHTML =
-      '<h3>' + window.__escapeHtml(displayName) + '</h3>' +
-      '<div class="modal-row"><span class="k">' + L.num + '</span><span class="v">' + window.__escapeHtml(String(info.num || '-')) + '</span></div>' +
-      '<div class="modal-row"><span class="k">' + L.name + '</span><span class="v">' + window.__escapeHtml(displayName) + '</span></div>' +
-      '<div class="modal-row"><span class="k">' + L.cr + '</span><span class="v">' + window.__escapeHtml(String(course.creditHours != null ? course.creditHours : 0)) + '</span></div>' +
-      '<div class="modal-row"><span class="k">' + L.prereq + '</span><span class="v">' + window.__escapeHtml(String(info.prereq || '-')) + '</span></div>' +
-      '<div class="modal-row"><span class="k">' + L.th + '</span><span class="v">' + window.__escapeHtml(String(info.th || '-')) + '</span></div>' +
-      '<div class="modal-row"><span class="k">' + L.pr + '</span><span class="v">' + window.__escapeHtml(String(info.pr || '-')) + '</span></div>';
-    if(window.__renderCourseModalExtras){ body.innerHTML += window.__renderCourseModalExtras(planId, slug); }
+
+    // The six label/value rows this used to print are still here — they moved
+    // into the Details column of the detail panel. What is in front of them now
+    // is whether the course is available and why, which is the thing a course
+    // is opened to find out. Falls back to the old rows if the module is
+    // missing, so the modal degrades rather than blanking.
+    // The shared modal card is sized for a short list of rows. The detail
+    // panel needs room for two columns on a wide screen, so it says so — via a
+    // class rather than :has(), which is not safe to rely on across the phones
+    // this has to work on.
+    var cardEl = overlay.querySelector('.modal-card');
+    if(cardEl) cardEl.classList.toggle('cd-card', !!window.AAUP_COURSE_DETAIL);
+
+    if(window.AAUP_COURSE_DETAIL){
+      body.innerHTML = window.AAUP_COURSE_DETAIL.build(planId, slug, course, rtl);
+    } else {
+      body.innerHTML =
+        '<h3>' + window.__escapeHtml(displayName) + '</h3>' +
+        '<div class="modal-row"><span class="k">' + L.num + '</span><span class="v">' + window.__escapeHtml(String(info.num || '-')) + '</span></div>' +
+        '<div class="modal-row"><span class="k">' + L.name + '</span><span class="v">' + window.__escapeHtml(displayName) + '</span></div>' +
+        '<div class="modal-row"><span class="k">' + L.cr + '</span><span class="v">' + window.__escapeHtml(String(course.creditHours != null ? course.creditHours : 0)) + '</span></div>' +
+        '<div class="modal-row"><span class="k">' + L.prereq + '</span><span class="v">' + window.__escapeHtml(String(info.prereq || '-')) + '</span></div>' +
+        '<div class="modal-row"><span class="k">' + L.th + '</span><span class="v">' + window.__escapeHtml(String(info.th || '-')) + '</span></div>' +
+        '<div class="modal-row"><span class="k">' + L.pr + '</span><span class="v">' + window.__escapeHtml(String(info.pr || '-')) + '</span></div>';
+    }
+
+    // The grade and planning controls are untouched and still owned by
+    // js/21-course-modal-extras.js. They are placed inside the panel rather
+    // than appended after it, so the layout keeps them beside the reasoning
+    // instead of below a two-column block.
+    if(window.__renderCourseModalExtras){
+      var slot = body.querySelector('.cd-extras');
+      var extrasHTML = window.__renderCourseModalExtras(planId, slug);
+      if(slot) slot.innerHTML = extrasHTML; else body.innerHTML += extrasHTML;
+    }
     overlay.classList.add('open');
     if(window.__bindCourseModalExtras){
       var extrasEl = body.querySelector('.modal-extras');
       window.__bindCourseModalExtras(planId, slug, extrasEl);
     }
+
+    // A prerequisite chip is a course too. Following one is the whole point of
+    // drawing the chain, and it beats closing the panel and hunting the grid.
+    body.querySelectorAll('[data-goto]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var next = b.getAttribute('data-goto');
+        if(next) openCourseModal(planId, next);
+      });
+    });
   }
 
   function closeCourseModal(){
