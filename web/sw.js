@@ -15,7 +15,7 @@
 // the CDN, correct and verified, and simply not what the browser ran. The
 // fetch handler below does refresh entries one at a time, so it heals after an
 // extra reload, but "reload twice" is not a fix anyone can be told to rely on.
-var CACHE = 'studyplan-shell-v12';
+var CACHE = 'studyplan-shell-v13';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',
@@ -34,9 +34,9 @@ var CORE = [
   './js/46-assistant-ai.js', './js/48-admin.js',
   './assets/icons/favicon.png', './assets/icons/apple-touch-icon.png',
   './assets/icons/icon-any-192.png', './assets/icons/icon-any-384.png',
-  './assets/icons/icon-any-512.png', './assets/icons/icon-any.svg',
+  './assets/icons/icon-any-512.png',
   './assets/icons/icon-maskable-192.png', './assets/icons/icon-maskable-384.png',
-  './assets/icons/icon-maskable-512.png', './assets/icons/icon-maskable.svg'
+  './assets/icons/icon-maskable-512.png'
 ];
 
 // Precached at install rather than opportunistically on first fetch. The
