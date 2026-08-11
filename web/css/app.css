@@ -1872,7 +1872,12 @@
      ========================================================================== */
   /* ================= GPA / DEGREE AUDIT MODAL ================= */
 
-  .audit-modal-card{max-width:720px;width:92vw;max-height:85vh;overflow-y:auto;}
+  /* Also the shared card for Achievements and Advisor (see index.html), so
+     the width bump for the GPA table below is scoped to THIS modal only —
+     #auditModalOverlay's own .modal-card, not the class everywhere it's
+     used — rather than widening those other two along with it. */
+  .audit-modal-card{max-width:720px;width:92vw;max-height:85vh;overflow-y:auto;overflow-x:hidden;}
+  #auditModalOverlay .modal-card{max-width:960px;}
 
   .gpa-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 20px;}
 
@@ -1907,7 +1912,17 @@
   .gs-col-main{min-width:0;}
   .gs-col-side{display:flex; flex-direction:column; gap:14px; min-width:0;}
 
-  @media (min-width:720px){
+  /* 860px, not the usual 720px this codebase uses elsewhere: this layout
+     lives inside .audit-modal-card, which is capped at 92vw — so a 720px
+     viewport only ever hands it about 660px, less than the table's own
+     min-width plus a usable side column need. 860px was picked backwards
+     from that cap (0.92 x 860 =~ 790px, comfortably more than the two
+     columns' combined minimums) rather than copied from elsewhere, since a
+     media query answers "how wide is the viewport", not "how wide is this
+     modal" — the two are not the same question the moment a card has its
+     own max-width, and treating them as one is what actually overflowed
+     here the first time. */
+  @media (min-width:860px){
     .gs-layout{flex-direction:row; align-items:flex-start;}
     .gs-col-main{flex:1.4 1 0;}
     .gs-col-side{flex:1 1 0;}
@@ -1946,19 +1961,28 @@
 
   .gs-table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:10px;}
 
-  .gs-table{width:100%; min-width:480px; border-collapse:collapse; font-size:12.5px;}
+  /* Course/CH/Grade/Points — no fixed min-width: the table is meant to fit
+     the modal's own content box (as narrow as ~300px on a phone) without
+     forcing .gs-table-wrap's internal scrollbar, which is the fallback for
+     content that genuinely can't shrink further (long course names), not
+     the normal case. */
+  .gs-table{width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed;}
+  .gs-table col.gs-col-course{width:auto;}
+  .gs-table col.gs-col-ch{width:34px;}
+  .gs-table col.gs-col-grade{width:64px;}
+  .gs-table col.gs-col-pts{width:54px;}
 
   .gs-table th{
     text-align:left; color:var(--text-dim); font-weight:700; font-size:10.5px;
-    text-transform:uppercase; letter-spacing:.03em; padding:8px 10px;
+    text-transform:uppercase; letter-spacing:.03em; padding:8px 6px;
     border-bottom:1px solid var(--line); background:rgba(255,255,255,.02);
+    overflow-wrap:anywhere;
   }
   html[dir="rtl"] .gs-table th, .plan-page.rtl-mode .gs-table th{text-align:right;}
 
-  .gs-table td{padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .gs-table td{padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:middle; overflow-wrap:anywhere;}
   .gs-table tr:last-child td{border-bottom:0;}
 
-  .gs-term{color:var(--text-dim); font-size:11.5px; white-space:nowrap;}
   .gs-code{color:var(--text-dim); font-size:10.5px;}
   .gs-pts{font-weight:700; text-align:right; white-space:nowrap;}
   html[dir="rtl"] .gs-pts{text-align:left;}
@@ -1967,7 +1991,7 @@
 
   .gs-grade-select{
     background:var(--search-bg); border:1px solid var(--line); border-radius:7px;
-    padding:5px 7px; color:var(--text); font-size:12px; font-family:inherit; max-width:100%;
+    padding:5px 3px; color:var(--text); font-size:11.5px; font-family:inherit; width:100%;
   }
   .gs-grade-select:focus{outline:none; border-color:var(--accent);}
 

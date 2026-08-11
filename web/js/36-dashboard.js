@@ -125,8 +125,18 @@
 
     var achv = window.AAUP_ACHIEVEMENTS ? window.AAUP_ACHIEVEMENTS.getUnlockedCount(prefix) : { unlocked: 0, total: 0 };
 
+    // js/50-whats-next.js owns this card's content when it has loaded — it
+    // is the same ranked-with-reasons module used in the study-plan
+    // sidebar, not a second implementation. Before this, the card here used
+    // a plain unranked list (AAUP_ADVISOR.recommend, first 4 in whatever
+    // order it returned them) while the actual upgrade lived only in the
+    // sidebar of a different page — a page nobody had reason to open just
+    // to see it, so the improvement was effectively invisible. This is the
+    // screen every student actually lands on after choosing a plan, so this
+    // is where it has to be to be found. The old list stays as the fallback
+    // if that module fails to load, rather than an empty card.
     var nextCourses = [];
-    if(window.AAUP_ADVISOR && window.AAUP_ADVISOR.recommend){
+    if(!window.AAUP_WHATS_NEXT && window.AAUP_ADVISOR && window.AAUP_ADVISOR.recommend){
       var rec = window.AAUP_ADVISOR.recommend(prefix);
       nextCourses = (rec.chosen || []).slice(0, 4);
     }
@@ -146,9 +156,11 @@
         '<div class="dash-card"><h3>' + (rtl ? 'الإنجازات' : 'Achievements') + '</h3><div class="dash-big">' + achv.unlocked + ' / ' + achv.total + '</div><div class="dash-sub">' + (rtl ? 'مُنجَز' : 'unlocked') + '</div></div>' +
       '</div>' +
       '<div class="dash-card" style="margin-bottom:20px;"><h3>' + (rtl ? 'ما الذي يمكنني أخذه الآن؟' : 'What Can I Take Next') + '</h3>' +
-      (nextCourses.length
-        ? '<div class="dash-next-list">' + nextCourses.map(function(c){ return '<div class="dash-next-item"><span>' + nameFor(c.slug) + '</span><span>' + c.cr + 'H</span></div>'; }).join('') + '</div>'
-        : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>') +
+      (window.AAUP_WHATS_NEXT
+        ? '<div id="' + prefix + '-dashNextBody"></div>'
+        : (nextCourses.length
+            ? '<div class="dash-next-list">' + nextCourses.map(function(c){ return '<div class="dash-next-item"><span>' + nameFor(c.slug) + '</span><span>' + c.cr + 'H</span></div>'; }).join('') + '</div>'
+            : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>')) +
       '</div>' +
       '<div class="dash-quicklinks">' +
         '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">📋</span>' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</div>' +
@@ -168,6 +180,7 @@
                'Tip: export a backup of your progress from Settings \u2014 browser data can be wiped.') + '</p>';
     }
     host.innerHTML = html;
+    if(window.AAUP_WHATS_NEXT){ window.AAUP_WHATS_NEXT.render(prefix, prefix + '-dashNextBody'); }
   }
 
   // showPage('home') now means "take me to my personal landing point" —

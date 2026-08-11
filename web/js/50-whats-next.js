@@ -239,8 +239,14 @@
 
   var TOP_N = 3, TOTAL_CAP = 8;
 
-  function render(prefix){
-    var body = document.getElementById(prefix + '-nextCoursesBody');
+  // containerId defaults to the sidebar panel this started in
+  // (js/11-module11.js's "My Progress" card on the full study-plan page),
+  // but the Dashboard — the screen every student actually lands on after
+  // choosing a plan — has its OWN "What Can I Take Next" card with a
+  // different id, and calls this directly rather than through the sidebar
+  // hook below. Same function, same data, two mount points.
+  function render(prefix, containerId){
+    var body = document.getElementById(containerId || (prefix + '-nextCoursesBody'));
     if(!body) return;
     var rtl = isRtl(prefix);
     var t = T[rtl ? 'ar' : 'en'];
