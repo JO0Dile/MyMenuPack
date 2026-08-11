@@ -197,7 +197,7 @@
     // Richer credit-hour / elective / "what's next" panel, kept in sync
     // with the same completion data as the bar above.
     renderMyProgressPanel(prefix);
-    renderNextCourses(prefix);
+    nextCoursesRenderer(prefix);
 
     // Checking off a course can unlock an achievement — check right away
     // rather than waiting for the student to open the Achievements modal.
@@ -378,6 +378,14 @@
     });
   }
   window.__renderWelcomeMessages = renderWelcomeMessages;
+
+  // Swappable rather than hardcoded, so a later module (js/50-whats-next.js)
+  // can take over what fills this card without this file needing to know
+  // that module exists. If nothing patches it, the flat list right below
+  // keeps working exactly as before — there is no scenario where the card
+  // silently goes blank because a later script failed to load.
+  var nextCoursesRenderer = renderNextCourses;
+  window.__patchNextCoursesRenderer = function(fn){ nextCoursesRenderer = fn; };
 
   function renderNextCourses(prefix){
     var body = document.getElementById(prefix + '-nextCoursesBody');

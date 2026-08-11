@@ -1,0 +1,242 @@
+// ==========================
+// WHAT'S NEXT
+// ==========================
+// Upgrades the "What Can I Take Next" card (js/36-dashboard.js) from a flat
+// list of unlocked courses into a ranked one with a reason attached to each,
+// plus a small simulation of what taking the top picks would do to overall
+// progress.
+//
+// The flat list answered "what am I allowed to take" but not "which of these
+// actually matters" — eight unlocked courses in file order gives no signal
+// that one of them is the only thing standing between you and three more
+// courses next year, and another is a free elective nothing depends on.
+// Ranking by how much a course actually unlocks (and saying so) is the
+// difference.
+//
+// Every number here is computed from data the app already trusts — the same
+// unlocksMap prerequisite graph js/49-course-detail.js reads, and the same
+// dept-elective-aware total/done arithmetic js/11-module11.js's progress bar
+// uses. Nothing is estimated or fabricated: there is no way to know a future
+// grade, so there is no GPA-effect figure here, only credit hours and counts
+// that are true today.
+(function(){
+  'use strict';
+
+  function esc(s){ return window.__escapeHtml(s == null ? '' : String(s)); }
+  function isRtl(prefix){ return window.__isRtl ? window.__isRtl(prefix) : false; }
+  function splitId(id){ return window.__splitCourseId ? window.__splitCourseId(id) : null; }
+
+  var CAT_ORDER = ['skills', 'core', 'math', 'dept', 'eng', 'uni', 'free'];
+  var CAT_LABEL = {
+    en: { skills:'Skills', core:'Core', math:'Math', dept:'Department',
+          eng:'English', uni:'University', free:'Free elective' },
+    ar: { skills:'مهارات', core:'إجباري', math:'رياضيات', dept:'تخصص',
+          eng:'إنجليزي', uni:'متطلب جامعة', free:'متطلب حر' }
+  };
+
+  var T = {
+    en: {
+      empty: 'Nothing new is unlocked yet — complete a few prerequisites first.',
+      ready: 'Ready now', opensN: function(n){ return 'Opens ' + n; },
+      reasonMany: function(names, extra){
+        return 'Unlocks ' + names + (extra ? ' and ' + extra + ' more' : '') + '.';
+      },
+      reasonNone: 'Nothing else in this plan waits on it yet, but it still counts toward the degree.',
+      more: function(n){ return '+' + n + ' more available'; },
+      sim: 'If you take these', simCh: function(a,b){ return a + ' of ' + b + ' CH'; },
+      simPct: function(a,b){ return a + '% → ' + b + '%'; },
+      simLabel: 'Credit hours', simPctLabel: 'Degree progress after'
+    },
+    ar: {
+      empty: 'لا توجد مساقات جديدة متاحة الآن — أكمل بعض المتطلبات السابقة أولاً.',
+      ready: 'متاح الآن', opensN: function(n){ return 'يفتح ' + n; },
+      reasonMany: function(names, extra){
+        return 'يفتح المجال أمام ' + names + (extra ? ' و' + extra + ' أخرى' : '') + '.';
+      },
+      reasonNone: 'لا يوجد مساق آخر بانتظاره الآن، لكنه لا يزال يُحتسب ضمن الخطة.',
+      more: function(n){ return '+' + n + ' مساقًا إضافيًا متاحًا'; },
+      sim: 'إذا أخذت هذه المساقات', simCh: function(a,b){ return a + ' من ' + b + ' س.م'; },
+      simPct: function(a,b){ return a + '٪ ← ' + b + '٪'; },
+      simLabel: 'الساعات المعتمدة', simPctLabel: 'نسبة الإنجاز بعدها'
+    }
+  };
+
+  // Same dept-elective-pool arithmetic js/11-module11.js's progress bar uses
+  // (only that many .dept courses count toward "done", however many are
+  // ticked), reimplemented here read-only so the simulation below can never
+  // disagree with the bar the student is already looking at.
+  function planTotals(prefix){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return null;
+    var progress = window.__getProgress ? window.__getProgress() : {};
+    var required = window.__DEPT_REQUIRED ? window.__DEPT_REQUIRED[prefix] : null;
+    var courses = page.querySelectorAll('.course[id]:not(.course-removed)');
+    var deptTotal = 0, deptDone = 0, otherTotal = 0, otherDone = 0;
+    courses.forEach(function(el){
+      var done = !!progress[el.id];
+      if(el.classList.contains('dept')){ deptTotal++; if(done) deptDone++; }
+      else { otherTotal++; if(done) otherDone++; }
+    });
+    var deptNeeded = (typeof required === 'number') ? required : deptTotal;
+    return {
+      total: otherTotal + deptNeeded,
+      done: otherDone + Math.min(deptDone, deptNeeded),
+      deptDone: deptDone, deptNeeded: deptNeeded
+    };
+  }
+
+  function categoryOf(el){
+    for(var i = 0; i < CAT_ORDER.length; i++){
+      if(el.classList.contains(CAT_ORDER[i])) return CAT_ORDER[i];
+    }
+    return null;
+  }
+
+  // The unlocked-and-not-yet-taken courses, each carrying how many further
+  // courses wait on it. window.__PLAN_DATA's unlocksMap is the same
+  // prerequisite graph the course detail panel reads, so "opens 3" here and
+  // the chips it links to are always describing the same edges.
+  function candidates(prefix){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return [];
+    var data = window.__PLAN_DATA[prefix] || {};
+    var info = data.courseInfo || {};
+    var progress = window.__getProgress ? window.__getProgress() : {};
+    var els = Array.prototype.slice.call(page.querySelectorAll('.course.available[id]'));
+
+    return els.map(function(el){
+      var parts = splitId(el.id);
+      var meta = parts && info[parts.slug];
+      var unlocks = (parts && data.unlocksMap && data.unlocksMap[parts.slug]) || [];
+      // Only count what taking THIS course would still change today — a
+      // dependent already passed some other way is not this course's doing.
+      var stillWaiting = unlocks.filter(function(u){
+        var uid = parts.prefix + '-c-' + u;
+        return !progress[uid] && info[u];
+      });
+      return {
+        id: el.id, prefix: parts ? parts.prefix : prefix, slug: parts ? parts.slug : null,
+        name: meta ? meta.name : el.textContent.trim(),
+        nameAr: meta ? meta.ar : '',
+        code: meta ? meta.num : '',
+        cr: meta ? (parseFloat(meta.cr) || 0) : 0,
+        category: categoryOf(el),
+        opens: stillWaiting.length,
+        opensNames: stillWaiting.map(function(u){ return info[u] ? info[u].name : u; }),
+        opensNamesAr: stillWaiting.map(function(u){ return info[u] ? (info[u].ar || info[u].name) : u; })
+      };
+    }).sort(function(a, b){
+      if(b.opens !== a.opens) return b.opens - a.opens;
+      if(b.cr !== a.cr) return b.cr - a.cr;
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  function reasonFor(c, rtl, t){
+    if(!c.opens) return t.reasonNone;
+    var names = rtl ? c.opensNamesAr : c.opensNames;
+    var shown = names.slice(0, 2).map(function(n){ return '<strong>' + esc(n) + '</strong>'; });
+    var extra = names.length > 2 ? (names.length - 2) : 0;
+    var joiner = rtl ? '، ' : ', ';
+    return t.reasonMany(shown.join(joiner), extra || '');
+  }
+
+  function cardHTML(c, rtl, t, rank){
+    var name = rtl && c.nameAr ? c.nameAr : c.name;
+    var cat = c.category ? (CAT_LABEL[rtl ? 'ar' : 'en'][c.category] || '') : '';
+    return '<button type="button" class="wn-card' + (rank === 0 ? ' is-top' : '') +
+      '" data-wn-id="' + esc(c.id) + '">' +
+      '<div class="wn-card-head"><h4>' + esc(name) + '</h4>' +
+        (c.opens ? '<span class="wn-tag wn-tag-hot">' + esc(t.opensN(c.opens)) + '</span>' : '') + '</div>' +
+      '<div class="wn-sub">' + [c.code, c.cr ? c.cr + ' CH' : '', cat].filter(Boolean).map(esc).join(' · ') + '</div>' +
+      '<p class="wn-reason">' + reasonFor(c, rtl, t) + '</p>' +
+      '</button>';
+  }
+
+  function chipHTML(c, rtl){
+    var name = rtl && c.nameAr ? c.nameAr : c.name;
+    return '<button type="button" class="next-course-chip" data-wn-id="' + esc(c.id) + '">' +
+      '<span>' + esc(name) + '</span>' + (c.cr ? '<span class="ncc-cr">' + esc(c.cr) + 'H</span>' : '') +
+      '</button>';
+  }
+
+  var TOP_N = 3, TOTAL_CAP = 8;
+
+  function render(prefix){
+    var body = document.getElementById(prefix + '-nextCoursesBody');
+    if(!body) return;
+    var rtl = isRtl(prefix);
+    var t = T[rtl ? 'ar' : 'en'];
+    var list = candidates(prefix).slice(0, TOTAL_CAP);
+
+    if(!list.length){
+      body.innerHTML = '<p class="ncp-empty">' + t.empty + '</p>';
+      return;
+    }
+
+    var top = list.slice(0, TOP_N);
+    var rest = list.slice(TOP_N);
+    var html = '<div class="wn-cards">' +
+      top.map(function(c, i){ return cardHTML(c, rtl, t, i); }).join('') + '</div>';
+
+    if(rest.length){
+      html += '<div class="next-courses-list wn-rest">' +
+        rest.map(function(c){ return chipHTML(c, rtl); }).join('') + '</div>';
+    }
+    var overflow = candidates(prefix).length - list.length;
+    if(overflow > 0){
+      html += '<p class="ncp-empty" style="margin-top:8px;">' + esc(t.more(overflow)) + '</p>';
+    }
+
+    // The simulation only means something once there is a real total to
+    // compare against — an imported plan with no page rendered has none.
+    var totals = planTotals(prefix);
+    if(totals && totals.total){
+      var deptRoomLeft = Math.max(0, totals.deptNeeded - totals.deptDone);
+      var simDone = totals.done, deptUsed = 0, simCh = 0;
+      top.forEach(function(c){
+        simCh += c.cr;
+        if(c.category === 'dept'){
+          if(deptUsed < deptRoomLeft){ simDone++; deptUsed++; }
+        } else {
+          simDone++;
+        }
+      });
+      var beforePct = Math.round(totals.done / totals.total * 100);
+      var afterPct = Math.round(Math.min(simDone, totals.total) / totals.total * 100);
+      html += '<div class="wn-sim">' +
+        '<div class="wn-sim-row"><span>' + t.simLabel + '</span><b>' + simCh + ' CH</b></div>' +
+        '<div class="wn-sim-row"><span>' + t.simPctLabel + '</span><b>' + t.simPct(beforePct, afterPct) + '</b></div>' +
+        '</div>';
+    }
+
+    body.innerHTML = html;
+
+    body.querySelectorAll('[data-wn-id]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-wn-id');
+        var parts = splitId(id);
+        if(!parts) return;
+        if(window.__selectCourse){ window.__selectCourse(parts.prefix, parts.slug); }
+        var el = document.getElementById(id);
+        if(el){
+          el.classList.add('jump-highlight');
+          setTimeout(function(){ el.classList.remove('jump-highlight'); }, 2000);
+        }
+      });
+    });
+  }
+
+  window.AAUP_WHATS_NEXT = { render: render };
+
+  // js/11-module11.js calls renderNextCourses(prefix) on every progress
+  // change; redirect it here rather than touching that file's own render
+  // loop, so a module load order problem degrades to the old flat list
+  // (still defined there) instead of a blank card.
+  var tries = 0;
+  (function patch(){
+    if(window.__patchNextCoursesRenderer){ window.__patchNextCoursesRenderer(render); return; }
+    if(tries++ > 40) return; // ~4s of retrying at 100ms, then give up quietly
+    setTimeout(patch, 100);
+  })();
+})();

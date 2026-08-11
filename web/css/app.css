@@ -1430,6 +1430,51 @@
     50%{ box-shadow:0 0 0 7px rgba(93,184,255,0); }
   }
 
+  /* js/50-whats-next.js — the ranked cards above the plain chip list. Sized
+     for the card they actually mount in (the Dashboard's "What Can I Take
+     Next" panel), not a full page, so they stay compact by design rather
+     than being a cramped version of something bigger. */
+  .wn-cards{display:flex; flex-direction:column; gap:8px; margin-bottom:8px;}
+
+  .wn-card{
+    display:block; width:100%; text-align:left; font-family:inherit; cursor:pointer;
+    background:var(--search-bg); border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; color:var(--text);
+  }
+  html[dir="rtl"] .wn-card, .plan-page.rtl-mode .wn-card{text-align:right;}
+  .wn-card:hover{border-color:var(--accent);}
+  .wn-card.is-top{border-color:var(--accent); background:rgba(93,184,255,.06);}
+
+  .wn-card-head{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+  .wn-card-head h4{font-size:13px; font-weight:700; margin:0; line-height:1.35;}
+
+  .wn-tag{
+    flex:0 0 auto; font-size:10px; font-weight:800; border-radius:99px;
+    padding:3px 9px; white-space:nowrap;
+  }
+  .wn-tag-hot{background:rgba(255,182,72,.14); color:#ffb648; border:1px solid rgba(255,182,72,.4);}
+
+  .wn-sub{font-size:10.5px; color:var(--text-dim); margin-top:3px;}
+  .wn-reason{font-size:11.5px; color:var(--text); line-height:1.55; margin:6px 0 0;}
+  .wn-reason strong{font-weight:700;}
+
+  .wn-rest{margin-top:2px;}
+
+  /* Credit hours and the before/after progress figure for taking the top
+     picks — two facts, not a chart, because this lives in a dashboard card
+     next to three other cards and has to earn its space. */
+  .wn-sim{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);
+    display:flex; flex-direction:column; gap:5px;
+  }
+  .wn-sim-row{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim);}
+  .wn-sim-row b{color:var(--text); font-weight:700;}
+
+  @media (min-width:600px){
+    .wn-cards{flex-direction:row; flex-wrap:wrap;}
+    .wn-card{flex:1 1 220px; min-width:0;}
+  }
+
   /* ==========================================================================
      10. FORMS, BUTTONS & RATING CONTROLS — shared form-field styling (used by
      the student-info dialog, new-plan dialog, etc.), plus the difficulty
