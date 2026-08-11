@@ -17,13 +17,13 @@
   "courses": [
     {
       "slug": "new-course-1",
-      "code": null,
+      "code": "123321",
       "name": "New course",
-      "nameAr": "",
+      "nameAr": "الباف",
       "credits": "3",
       "category": "CORE",
-      "year": 2,
-      "semester": 3
+      "year": 1,
+      "semester": 1
     }
   ],
   "prerequisites": []
