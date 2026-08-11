@@ -3048,6 +3048,11 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   font-weight:700; color:var(--text-dim);
 }
 .admin-pickhit-name{flex:1 1 auto; min-width:0;}
+
+/* A row filling itself in is a big change to make silently — four boxes move
+   at once. The flash says which row it was. */
+@keyframes adminAutofill{from{background:rgba(93,184,255,.22);} to{background:transparent;}}
+.admin-table tr.is-autofilled td{animation:adminAutofill 1.2s ease-out;}
 .admin-warn{color:var(--danger, #ff6b6b);}
 
 /* Which university, which faculty, which major — the three sections that can
