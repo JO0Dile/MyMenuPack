@@ -10,10 +10,21 @@
 -- Apply with:
 --   npx wrangler d1 execute studyplan-cloud --remote --file=cloud/schema.sql
 -- (drop --remote for a local dev database).
+--
+-- Already have a database from before `username` existed? CREATE TABLE IF
+-- NOT EXISTS won't add a column to a table that's already there — run this
+-- once instead (safe to paste into the D1 Console, same as this file):
+--   ALTER TABLE users ADD COLUMN username TEXT;
+--   CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
 
 CREATE TABLE IF NOT EXISTS users (
   id            TEXT PRIMARY KEY,
   email         TEXT NOT NULL UNIQUE,
+  -- Optional friendlier sign-in identifier. NULL, not '', when unset — SQLite
+  -- treats every NULL as distinct under a UNIQUE index, so any number of
+  -- accounts can go without a username; two accounts could never both set it
+  -- to '' under the same constraint.
+  username      TEXT UNIQUE,
   password_hash TEXT NOT NULL,
   -- Bumped on every password change. Embedded in every session token, so
   -- changing the password invalidates every OTHER signed-in device's token

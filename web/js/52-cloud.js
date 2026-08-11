@@ -1,28 +1,33 @@
 // ==========================
 // CLOUD SYNC
 // ==========================
-// Real sign-in: an email and password, verified by cloud/cloudflare-worker.js
-// against Cloudflare D1, so a student's selected plan, progress, grades, and
-// custom plans follow them to a new device. This is a different feature from
-// js/38-accounts.js's "Accounts" — that lets ONE device hold several separate
-// local profiles (a sibling sharing a laptop); this lets ONE profile follow a
-// student across devices. Two different problems, so they get two different
-// names throughout the UI: "Accounts" stays local-profile switching, this is
-// always "Cloud Sync."
+// Real sign-in: an email (or a chosen username) and password, verified by
+// cloud/cloudflare-worker.js against Cloudflare D1, so a student's selected
+// plan, progress, grades, and custom plans follow them to a new device.
+// This is a different feature from js/38-accounts.js's "Accounts" — that
+// lets ONE device hold several separate local profiles (a sibling sharing a
+// laptop); this lets ONE profile follow a student across devices. Two
+// different problems, so they get two different names throughout the UI:
+// "Accounts" stays local-profile switching, this is always "Cloud Sync."
+//
+// The whole sign-in/up flow and account management live in ONE dedicated
+// popup (open()/close() below), not spread across the general Settings
+// modal — Settings only carries a one-line status + a button that opens it.
 //
 // Optional end to end: with window.APP_CLOUD_URL left '', isConfigured() is
-// false, the Settings section says so, and nothing else about the app
-// changes. Nobody's data leaves their device until a student actually signs
-// up.
+// false, the Settings line says so, and nothing else about the app changes.
+// Nobody's data leaves their device until a student actually signs up.
 (function(){
+  var ICON = '🗄️'; // deliberately not a cloud — see the Settings section below
   var TOKEN_KEY = 'aaup_cloudToken';
   var EMAIL_KEY = 'aaup_cloudEmail';
+  var USERNAME_KEY = 'aaup_cloudUsername';
   var LAST_SYNC_KEY = 'aaup_cloudLastSyncedAt';
   // Keys that exist under the aaup_ prefix but describe THIS DEVICE, not the
   // signed-in student, so they must never round-trip through a sync blob —
   // syncing "the list of local profile names on this device" from one
   // device to another would just corrupt both.
-  var EXCLUDE_EXACT = { aaup_cloudToken: 1, aaup_cloudEmail: 1, aaup_cloudLastSyncedAt: 1,
+  var EXCLUDE_EXACT = { aaup_cloudToken: 1, aaup_cloudEmail: 1, aaup_cloudUsername: 1, aaup_cloudLastSyncedAt: 1,
                          aaup_accounts: 1, aaup_currentAccount: 1 };
   var EXCLUDE_PREFIX = 'aaup_account_snapshot_';
   var AUTO_SYNC_MS = 45000;
@@ -34,7 +39,10 @@
   function setToken(t){ try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){} }
   function clearToken(){ try{ localStorage.removeItem(TOKEN_KEY); }catch(e){} }
   function getEmail(){ try{ return localStorage.getItem(EMAIL_KEY) || ''; }catch(e){ return ''; } }
-  function setEmail(e){ try{ localStorage.setItem(EMAIL_KEY, e); }catch(e){} }
+  function setEmailCache(e){ try{ localStorage.setItem(EMAIL_KEY, e || ''); }catch(e2){} }
+  function getUsername(){ try{ return localStorage.getItem(USERNAME_KEY) || ''; }catch(e){ return ''; } }
+  function setUsernameCache(u){ try{ localStorage.setItem(USERNAME_KEY, u || ''); }catch(e){} }
+  function displayName(){ return getUsername() || getEmail(); }
   function getLastSyncedAt(){ try{ return parseInt(localStorage.getItem(LAST_SYNC_KEY) || '0', 10) || 0; }catch(e){ return 0; } }
   function setLastSyncedAt(t){ try{ localStorage.setItem(LAST_SYNC_KEY, String(t)); }catch(e){} }
 
@@ -95,19 +103,21 @@
   }
 
   // ---------- auth ----------
-  function signUp(email, password){
-    return request('/api/signup', { method: 'POST', body: { email: email, password: password } }).then(function(r){
+  function signUp(email, username, password){
+    return request('/api/signup', { method: 'POST', body: { email: email, username: username || undefined, password: password } }).then(function(r){
       if(!r.ok) return r;
-      setToken(r.data.token); setEmail(r.data.email);
+      setToken(r.data.token); setEmailCache(r.data.email); setUsernameCache(r.data.username);
       // A brand-new account has nothing to conflict with — push straight away
       // so this device's data is the starting point.
       return push(null).then(function(){ return r; });
     });
   }
-  function signIn(email, password){
-    return request('/api/login', { method: 'POST', body: { email: email, password: password } }).then(function(r){
+  // identifier: an email OR a username — the server tells the two apart by
+  // shape (contains '@' and a dot => email), so the client never has to know.
+  function signIn(identifier, password){
+    return request('/api/login', { method: 'POST', body: { email: identifier, password: password } }).then(function(r){
       if(!r.ok) return r;
-      setToken(r.data.token); setEmail(r.data.email);
+      setToken(r.data.token); setEmailCache(r.data.email); setUsernameCache(r.data.username);
       return r;
     });
   }
@@ -116,15 +126,21 @@
     // latest state, but never blocks signing out on it — a flaky connection
     // must not trap someone in a signed-in state they asked to leave.
     if(isSignedIn()){ push(getLastSyncedAt(), true); }
-    clearToken(); setEmail('');
+    clearToken(); setEmailCache(''); setUsernameCache('');
   }
   function changePassword(current, next){
     return request('/api/password/change', { method: 'POST', body: { currentPassword: current, newPassword: next } })
       .then(function(r){ if(r.ok){ setToken(r.data.token); } return r; });
   }
+  function setUsername(username){
+    return request('/api/username', { method: 'POST', body: { username: username } }).then(function(r){
+      if(r.ok){ setUsernameCache(r.data.username); }
+      return r;
+    });
+  }
   function deleteCloudAccount(){
     return request('/api/account', { method: 'DELETE' }).then(function(r){
-      if(r.ok){ clearToken(); setEmail(''); setLastSyncedAt(0); }
+      if(r.ok){ clearToken(); setEmailCache(''); setUsernameCache(''); setLastSyncedAt(0); }
       return r;
     });
   }
@@ -171,7 +187,7 @@
         // signing into an account that already has real progress — just
         // load it, nothing here is worth asking about.
         applyRemoteData(r.data.data);
-        onDone({ ok: true, applied: true });
+        onDone({ ok: true, applied: true, reload: true });
         return;
       }
       // Both sides have something real. Ask, rather than guessing which one
@@ -193,14 +209,14 @@
   function showConflictChoice(rtl, onChoice){
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay open';
-    overlay.style.zIndex = '999';
+    overlay.style.zIndex = '1001';
     var card = document.createElement('div');
     card.className = 'modal-card';
     card.style.maxWidth = '380px';
     card.style.textAlign = 'center';
     var title = document.createElement('h3');
     title.style.margin = '0 0 8px';
-    title.textContent = rtl ? '☁️ يوجد تقدّم محفوظ في الحسابين' : '☁️ Both this device and your account have progress';
+    title.textContent = rtl ? (ICON + ' يوجد تقدّم محفوظ في الحسابين') : (ICON + ' Both this device and your account have progress');
     var text = document.createElement('p');
     text.style.cssText = 'margin:0 0 18px;color:var(--text-dim);font-size:12.5px;line-height:1.55;';
     text.textContent = rtl
@@ -220,7 +236,7 @@
       return b;
     }
     actions.appendChild(btn(rtl ? '📱 إبقاء بيانات هذا الجهاز' : '📱 Keep this device’s data', 'local'));
-    actions.appendChild(btn(rtl ? '☁️ استخدام البيانات المتزامنة' : '☁️ Use the synced data', 'remote'));
+    actions.appendChild(btn(rtl ? (ICON + ' استخدام البيانات المتزامنة') : (ICON + ' Use the synced data'), 'remote'));
     var skip = btn(rtl ? 'قرّر لاحقًا' : 'Decide later', 'skip');
     skip.className = 'home-btn'; skip.style.cssText = 'width:100%;';
     actions.appendChild(skip);
@@ -243,9 +259,73 @@
   });
   if(isSignedIn()){ startAutoSync(); }
 
-  // ---------- Settings section (same sectionHtml/bindSection contract as
-  // js/39-orphans.js, so 37-sidebar.js's Settings body wires it in the same
-  // way it already wires that one) ----------
+  // ---------- Settings: a one-line status + a button that opens the popup ----------
+  function sectionHtml(r){
+    if(!isConfigured()){
+      return '<h3 style="margin-bottom:6px;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
+        '<p class="form-note" style="margin-top:0;">' + (r
+          ? 'المزامنة السحابية غير مُفعّلة لهذا التطبيق بعد. بياناتك تبقى على هذا الجهاز كما هي.'
+          : 'Cloud Sync isn’t set up for this app yet. Your data stays on this device exactly as it always has.') + '</p>';
+    }
+    var status = isSignedIn()
+      ? ((r ? 'مسجّل الدخول باسم ' : 'Signed in as ') + window.__escapeHtml(displayName()))
+      : (r ? 'غير مسجّل الدخول' : 'Not signed in');
+    return '<h3 style="margin-bottom:6px;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + status + '</p>' +
+      '<div class="form-actions" style="justify-content:flex-start;">' +
+      '<button type="button" class="home-btn" id="cloudOpenBtn" style="border-color:var(--accent);color:var(--text);">' + ICON + ' ' +
+        (isSignedIn() ? (r ? 'إدارة المزامنة السحابية' : 'Manage Cloud Sync') : (r ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up')) +
+      '</button></div>';
+  }
+
+  function bindSection(root){
+    if(!root || !isConfigured()) return;
+    var openBtn = root.querySelector('#cloudOpenBtn');
+    if(openBtn){ openBtn.addEventListener('click', open); }
+  }
+
+  // ---------- the dedicated popup ----------
+  function detailHtml(r){
+    if(isSignedIn()){
+      var name = window.__escapeHtml(displayName());
+      return '<h2 style="margin-top:0;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h2>' +
+        '<p class="form-note" style="margin-top:0;">' + (r ? 'مسجّل الدخول باسم ' : 'Signed in as ') + '<b>' + name + '</b></p>' +
+        '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
+        '<button type="button" class="home-btn" id="cloudSyncNowBtn">🔄 ' + (r ? 'مزامنة الآن' : 'Sync now') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudUsernameBtn">👤 ' + (r ? 'اسم المستخدم' : 'Username') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudChangePwBtn">🔑 ' + (r ? 'تغيير كلمة المرور' : 'Change password') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudSignOutBtn">🚪 ' + (r ? 'تسجيل الخروج' : 'Sign out') + '</button>' +
+        '</div>' +
+        '<p class="form-note" id="cloudSyncStatus" style="margin-top:4px;">' + lastSyncLabel(r) + '</p>' +
+        '<div id="cloudUsernameForm" style="display:none;margin-top:8px;"></div>' +
+        '<div id="cloudChangePwForm" style="display:none;margin-top:8px;"></div>' +
+        '<p class="form-note" style="margin-top:14px;"><button type="button" id="cloudDeleteAcctBtn" style="background:none;border:none;color:var(--danger, #ff6b6b);font-size:11.5px;cursor:pointer;padding:0;">' +
+          (r ? '🗑 حذف الحساب السحابي نهائيًا' : '🗑 Permanently delete cloud account') + '</button></p>' +
+        '<div id="cloudMsg"></div>';
+    }
+    return '<h2 style="margin-top:0;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h2>' +
+      '<p class="form-note" style="margin-top:0;">' + (r
+        ? 'سجّل بإيميل أو اسم مستخدم وكلمة مرور ليتبعك تقدّمك وعلاماتك وخططك إلى أي جهاز جديد.'
+        : 'Sign in with an email (or username) and password, and your progress, grades, and plans follow you to a new device.') + '</p>' +
+      '<div class="form-field-row" style="flex-wrap:wrap;">' +
+      '<div class="form-field"><input type="text" id="cloudIdentifier" placeholder="' + (r ? 'الإيميل أو اسم المستخدم' : 'Email or username') + '" autocomplete="username"></div>' +
+      '<div class="form-field"><input type="password" id="cloudPassword" placeholder="' + (r ? 'كلمة المرور' : 'Password') + '" autocomplete="current-password"></div>' +
+      '</div>' +
+      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
+      '<button type="button" class="home-btn" id="cloudSignInBtn" style="border-color:var(--accent);color:var(--text);">🔓 ' + (r ? 'تسجيل الدخول' : 'Sign in') + '</button>' +
+      '<button type="button" class="home-btn" id="cloudToggleSignUpBtn">➕ ' + (r ? 'إنشاء حساب' : 'Sign up') + '</button>' +
+      '</div>' +
+      '<div id="cloudSignUpBox" style="display:none;margin-top:10px;">' +
+      '<p class="form-note" style="margin-top:0;">' + (r
+        ? 'أنشئ حسابًا بنفس الإيميل أعلاه — اسم مستخدم اختياري لتسجيل دخول أسهل من الإيميل.'
+        : 'Create an account with the email above — an optional username makes signing in later easier than typing a full email.') + '</p>' +
+      '<div class="form-field"><input type="text" id="cloudSignUpUsername" placeholder="' + (r ? 'اسم مستخدم (اختياري)' : 'Username (optional)') + '" autocomplete="username"></div>' +
+      '<div class="form-actions" style="justify-content:flex-start;">' +
+      '<button type="button" class="home-btn" id="cloudSignUpBtn" style="border-color:var(--accent);color:var(--text);">➕ ' + (r ? 'إنشاء الحساب' : 'Create account') + '</button>' +
+      '</div></div>' +
+      '<div id="cloudMsg"></div>';
+  }
+
   function lastSyncLabel(r){
     var t = getLastSyncedAt();
     if(!t) return '';
@@ -256,64 +336,24 @@
     return (r ? 'آخر مزامنة: ' : 'Last synced: ') + when;
   }
 
-  function sectionHtml(r){
-    if(!isConfigured()){
-      return '<h3 style="margin-bottom:6px;">☁️ ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
-        '<p class="form-note" style="margin-top:0;">' + (r
-          ? 'المزامنة السحابية غير مُفعّلة لهذا التطبيق بعد. بياناتك تبقى على هذا الجهاز كما هي.'
-          : 'Cloud Sync isn’t set up for this app yet. Your data stays on this device exactly as it always has.') + '</p>';
-    }
-    if(isSignedIn()){
-      var email = window.__escapeHtml(getEmail());
-      return '<h3 style="margin-bottom:6px;">☁️ ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
-        '<p class="form-note" style="margin-top:0;">' + (r ? 'مسجّل الدخول باسم ' : 'Signed in as ') + '<b>' + email + '</b></p>' +
-        '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-        '<button type="button" class="home-btn" id="cloudSyncNowBtn">🔄 ' + (r ? 'مزامنة الآن' : 'Sync now') + '</button>' +
-        '<button type="button" class="home-btn" id="cloudChangePwBtn">🔑 ' + (r ? 'تغيير كلمة المرور' : 'Change password') + '</button>' +
-        '<button type="button" class="home-btn" id="cloudSignOutBtn">🚪 ' + (r ? 'تسجيل الخروج' : 'Sign out') + '</button>' +
-        '</div>' +
-        '<p class="form-note" id="cloudSyncStatus" style="margin-top:4px;">' + lastSyncLabel(r) + '</p>' +
-        '<div id="cloudChangePwForm" style="display:none;margin-top:8px;"></div>' +
-        '<p class="form-note" style="margin-top:14px;"><button type="button" id="cloudDeleteAcctBtn" style="background:none;border:none;color:var(--danger, #ff6b6b);font-size:11.5px;cursor:pointer;padding:0;">' +
-          (r ? '🗑 حذف الحساب السحابي نهائيًا' : '🗑 Permanently delete cloud account') + '</button></p>' +
-        '<div id="cloudMsg"></div>';
-    }
-    return '<h3 style="margin-bottom:6px;">☁️ ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
-      '<p class="form-note" style="margin-top:0;">' + (r
-        ? 'سجّل بإيميل وكلمة مرور ليتبعك تقدّمك وعلاماتك وخططك إلى أي جهاز جديد.'
-        : 'Sign in with an email and password, and your progress, grades, and plans follow you to a new device.') + '</p>' +
-      '<div class="form-field-row" style="flex-wrap:wrap;">' +
-      '<div class="form-field"><input type="email" id="cloudEmail" placeholder="' + (r ? 'الإيميل' : 'Email') + '" autocomplete="email"></div>' +
-      '<div class="form-field"><input type="password" id="cloudPassword" placeholder="' + (r ? 'كلمة المرور' : 'Password') + '" autocomplete="current-password"></div>' +
-      '</div>' +
-      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="cloudSignInBtn" style="border-color:var(--accent);color:var(--text);">🔓 ' + (r ? 'تسجيل الدخول' : 'Sign in') + '</button>' +
-      '<button type="button" class="home-btn" id="cloudSignUpBtn">➕ ' + (r ? 'إنشاء حساب' : 'Sign up') + '</button>' +
-      '</div>' +
-      '<div id="cloudMsg"></div>';
-  }
-
   function showMsg(root, text, isError){
     var el = root.querySelector('#cloudMsg');
     if(!el) return;
     el.innerHTML = '<p class="' + (isError ? 'dev-error-msg' : 'form-note') + '">' + window.__escapeHtml(text) + '</p>';
   }
 
-  function bindSection(root, onChange){
-    if(!root || !isConfigured()) return;
-    var rtl = document.body.classList.contains('rtl-mode');
-
+  function bindDetail(root, rtl){
     var syncBtn = root.querySelector('#cloudSyncNowBtn');
     if(syncBtn){
       syncBtn.addEventListener('click', function(){
         syncBtn.disabled = true; syncBtn.textContent = '🔄 ' + (rtl ? 'جارٍ...' : 'Syncing…');
         push(getLastSyncedAt()).then(function(r){
-          if(r.ok){ onChange(); return; }
+          if(r.ok){ render(); return; }
           if(r.data && r.data.conflict){
             showConflictChoice(rtl, function(choice){
               if(choice === 'remote'){ applyRemoteData(r.data.serverData); setLastSyncedAt(r.data.serverUpdatedAt); location.reload(); }
-              else if(choice === 'local'){ push(r.data.serverUpdatedAt).then(onChange); }
-              else { onChange(); }
+              else if(choice === 'local'){ push(r.data.serverUpdatedAt).then(render); }
+              else { render(); }
             });
             return;
           }
@@ -324,7 +364,7 @@
     }
     var signOutBtn = root.querySelector('#cloudSignOutBtn');
     if(signOutBtn){
-      signOutBtn.addEventListener('click', function(){ signOut(); onChange(); });
+      signOutBtn.addEventListener('click', function(){ signOut(); stopAutoSync(); location.reload(); });
     }
     var deleteBtn = root.querySelector('#cloudDeleteAcctBtn');
     if(deleteBtn){
@@ -335,9 +375,32 @@
         window.__showConfirmDialog(warn, function(){
           deleteCloudAccount().then(function(r){
             if(!r.ok){ showMsg(root, (r.data && r.data.error) || 'Could not delete account.', true); return; }
-            onChange();
+            stopAutoSync();
+            location.reload();
           });
         }, rtl);
+      });
+    }
+    var usernameBtn = root.querySelector('#cloudUsernameBtn');
+    if(usernameBtn){
+      usernameBtn.addEventListener('click', function(){
+        var box = root.querySelector('#cloudUsernameForm');
+        if(!box) return;
+        var showing = box.style.display !== 'none';
+        if(showing){ box.style.display = 'none'; box.innerHTML = ''; return; }
+        box.style.display = 'block';
+        box.innerHTML =
+          '<div class="form-field"><input type="text" id="cloudUsernameInput" value="' + window.__escapeHtml(getUsername()) + '" placeholder="' + (rtl ? 'اسم مستخدم' : 'Username') + '" autocomplete="username"></div>' +
+          '<div class="form-actions" style="justify-content:flex-start;">' +
+          '<button type="button" class="home-btn" id="cloudUsernameSubmit" style="border-color:var(--accent);color:var(--text);">' + (rtl ? 'حفظ' : 'Save') + '</button>' +
+          '</div>';
+        box.querySelector('#cloudUsernameSubmit').addEventListener('click', function(){
+          var val = box.querySelector('#cloudUsernameInput').value.trim();
+          setUsername(val).then(function(r){
+            if(!r.ok){ showMsg(root, (r.data && r.data.error) || 'Could not update username.', true); return; }
+            render();
+          });
+        });
       });
     }
     var changePwBtn = root.querySelector('#cloudChangePwBtn');
@@ -368,45 +431,80 @@
       });
     }
     var signInBtn = root.querySelector('#cloudSignInBtn');
-    var signUpBtn = root.querySelector('#cloudSignUpBtn');
-    function readCreds(){
-      var email = (root.querySelector('#cloudEmail') || {}).value || '';
-      var password = (root.querySelector('#cloudPassword') || {}).value || '';
-      return { email: email.trim(), password: password };
+    var toggleSignUpBtn = root.querySelector('#cloudToggleSignUpBtn');
+    if(toggleSignUpBtn){
+      toggleSignUpBtn.addEventListener('click', function(){
+        var box = root.querySelector('#cloudSignUpBox');
+        if(box){ box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
+      });
     }
     if(signInBtn){
       signInBtn.addEventListener('click', function(){
-        var c = readCreds();
+        var identifier = (root.querySelector('#cloudIdentifier') || {}).value || '';
+        var password = (root.querySelector('#cloudPassword') || {}).value || '';
         signInBtn.disabled = true;
-        signIn(c.email, c.password).then(function(r){
+        signIn(identifier.trim(), password).then(function(r){
           signInBtn.disabled = false;
           if(!r.ok){ showMsg(root, r.data.error || 'Sign in failed.', true); return; }
           reconcileAfterSignIn(rtl, function(res){
             startAutoSync();
             if(res.reload){ location.reload(); return; }
-            onChange();
-            if(window.__showToast){ window.__showToast(rtl ? '☁️ تم تسجيل الدخول.' : '☁️ Signed in.'); }
+            render();
+            if(window.__showToast){ window.__showToast(rtl ? (ICON + ' تم تسجيل الدخول.') : (ICON + ' Signed in.')); }
           });
         });
       });
     }
+    var signUpBtn = root.querySelector('#cloudSignUpBtn');
     if(signUpBtn){
       signUpBtn.addEventListener('click', function(){
-        var c = readCreds();
+        var email = (root.querySelector('#cloudIdentifier') || {}).value || '';
+        var username = (root.querySelector('#cloudSignUpUsername') || {}).value || '';
+        var password = (root.querySelector('#cloudPassword') || {}).value || '';
         signUpBtn.disabled = true;
-        signUp(c.email, c.password).then(function(r){
+        signUp(email.trim(), username.trim(), password).then(function(r){
           signUpBtn.disabled = false;
           if(!r.ok){ showMsg(root, r.data.error || 'Sign up failed.', true); return; }
           startAutoSync();
-          onChange();
-          if(window.__showToast){ window.__showToast(rtl ? '☁️ تم إنشاء الحساب.' : '☁️ Account created.'); }
+          location.reload();
         });
       });
     }
   }
 
+  function render(){
+    var body = document.getElementById('cloudModalBody');
+    if(!body) return;
+    var rtl = document.body.classList.contains('rtl-mode');
+    body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    body.innerHTML = detailHtml(rtl);
+    bindDetail(body, rtl);
+  }
+
+  function open(){
+    if(!isConfigured()) return;
+    var overlay = document.getElementById('cloudModalOverlay');
+    if(!overlay) return;
+    render();
+    overlay.classList.add('open');
+  }
+  function close(){
+    var overlay = document.getElementById('cloudModalOverlay');
+    if(overlay){ overlay.classList.remove('open'); }
+  }
+
+  function initModalClose(){
+    var closeBtn = document.getElementById('cloudModalClose');
+    var overlay = document.getElementById('cloudModalOverlay');
+    if(closeBtn){ closeBtn.addEventListener('click', close); }
+    if(overlay){ overlay.addEventListener('click', function(e){ if(e.target === overlay){ close(); } }); }
+  }
+  if(document.readyState === 'complete'){ initModalClose(); }
+  else { window.addEventListener('load', initModalClose); }
+
   window.AAUP_CLOUD = {
-    isConfigured: isConfigured, isSignedIn: isSignedIn, getEmail: getEmail,
-    sectionHtml: sectionHtml, bindSection: bindSection
+    isConfigured: isConfigured, isSignedIn: isSignedIn, getEmail: getEmail, getUsername: getUsername, displayName: displayName,
+    sectionHtml: sectionHtml, bindSection: bindSection,
+    open: open, close: close
   };
 })();
