@@ -4,20 +4,25 @@
   every screen inside it is a state, not an address. A sitemap listing invented
   fragment URLs would not help.
 
-  This is not auto-discovered. A crawler looks for a sitemap at the ROOT of the
-  domain (jo0dile.github.io/robots.txt), and this is a project page under
-  /MyMenuPack/, so nothing under here can point at it. It has to be submitted
-  by hand, once, in Google Search Console — which is the step that actually
-  gets the site indexed at all.
+  Not auto-discovered. A crawler looks for the sitemap named in robots.txt at
+  the ROOT of the domain (jo0dile.github.io/robots.txt), and this is a project
+  page under /MyMenuPack/, so nothing here can point at it. It has to be
+  submitted by hand in Google Search Console.
+
+  Deliberately minimal. The first version declared hreflang alternates for en,
+  ar and x-default that all pointed at this same URL — which describes nothing,
+  because the app switches language in the browser and has one address either
+  way. Alternates exist to map one language to one URL each; three of them
+  aimed at a single URL is noise in a file whose whole job is to be parsed
+  without argument.
+
+  No lastmod for the same reason: a hardcoded date would start lying the day
+  after it was written, and Google discounts a lastmod it learns not to trust.
 -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://jo0dile.github.io/MyMenuPack/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://jo0dile.github.io/MyMenuPack/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://jo0dile.github.io/MyMenuPack/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://jo0dile.github.io/MyMenuPack/"/>
   </url>
 </urlset>
