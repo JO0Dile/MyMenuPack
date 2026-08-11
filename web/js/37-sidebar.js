@@ -114,6 +114,80 @@
     overlay.classList.add('open');
   }
 
+  // Grouped under four top tabs rather than one long scroll — this used to
+  // be a single wall of buttons (theme, language, export/import/reset,
+  // online plans, tours, cloud sync, device profiles all stacked one after
+  // another) and finding any one setting meant scanning past all the
+  // others. The active tab persists across re-renders within the same
+  // modal session (every action here re-renders to reflect its own result,
+  // e.g. toggling the theme), so acting on something never bounces the
+  // student back to the first tab.
+  var SETTINGS_TABS = [
+    { key: 'account', icon: '👤', en: 'Account', ar: 'الحساب' },
+    { key: 'prefs', icon: '🎨', en: 'Preferences', ar: 'التفضيلات' },
+    { key: 'data', icon: '💾', en: 'Data', ar: 'البيانات' },
+    { key: 'help', icon: '❓', en: 'Help', ar: 'مساعدة' }
+  ];
+  var activeSettingsTab = 'account';
+
+  function accountTabHtml(r, current, others){
+    return (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
+      '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + (r
+        ? 'مختلف عن المزامنة السحابية أعلاه: كل ملف هنا يبقى على هذا الجهاز فقط ولا يُزامَن — مفيد إذا كان أكثر من شخص يشارك هذا الجهاز، أو أردت ملفًا محليًا ثانيًا.'
+        : 'Different from Cloud Sync above: each profile here stays on this device only and is never synced anywhere — useful if more than one person shares this device, or you want a second local profile of your own.') + '</p>' +
+      '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
+      (others.length
+        ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
+          others.map(function(a){
+            return '<span class="acct-row">' +
+              '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>' +
+              '<button type="button" class="home-btn acct-delete-btn" data-acct="' + window.__escapeHtml(a) + '" aria-label="' + (r ? 'حذف الحساب' : 'Delete account') + '">🗑</button>' +
+              '</span>';
+          }).join('') + '</div>'
+        : '') +
+      '<div class="form-field-row">' +
+      '<div class="form-field"><input type="text" id="newAcctName" maxlength="40" placeholder="' + (r ? 'اسم حساب جديد' : 'New account name') + '"></div>' +
+      '<button type="button" class="home-btn" id="newAcctBtn" style="border-color:var(--accent);color:var(--text);align-self:flex-start;">➕ ' + (r ? 'إنشاء' : 'Create') + '</button>' +
+      '</div>' +
+      '<div id="acctMsg"></div>';
+  }
+
+  function prefsTabHtml(r, selectedPlan, isRtlNow){
+    return '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
+      '<button type="button" class="home-btn" id="setThemeBtn">🌙 ' + (r ? 'تبديل السمة' : 'Toggle Theme') + '</button>' +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">🌐 ' + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
+      '</div>';
+  }
+
+  function dataTabHtml(r){
+    return '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
+      '<button type="button" class="home-btn" id="setExportBtn">📤 ' + (r ? 'تصدير التقدّم' : 'Export Progress') + '</button>' +
+      '<button type="button" class="home-btn" id="setImportBtn">📥 ' + (r ? 'استيراد التقدّم' : 'Import Progress') + '</button>' +
+      '<button type="button" class="home-btn" id="setResetBtn">🗑 ' + (r ? 'مسح كل البيانات' : 'Reset All Data') + '</button>' +
+      '</div>' +
+      (window.APP_PLANS_FEED_URL ? (
+        '<h3 style="margin-bottom:6px;">🌐 ' + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
+        '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
+        '<div class="form-actions" style="justify-content:flex-start;">' +
+        '<button type="button" class="home-btn" id="setSyncBtn">🔄 ' + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
+        '</div>' +
+        '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
+      ) : '') +
+      (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '');
+  }
+
+  function helpTabHtml(r, selectedPlan, isImportedSelected, devUnlocked){
+    return '<p class="form-note" style="margin-top:0;">' + (r ? 'أعد تشغيل الجولة التوضيحية لأي شاشة.' : 'Replay the spotlight walkthrough for any screen.') + '</p>' +
+      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
+      '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 ' + (r ? 'جولة الرئيسية' : 'Home tour') + '</button>' +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 ' + (r ? 'جولة اللوحة' : 'Dashboard tour') + '</button>' : '') +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 ' + (r ? 'جولة الخطة الدراسية' : 'Study Plan tour') + '</button>' : '') +
+      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
+      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
+      '</div>';
+  }
+
   function renderSettingsBody(body){
     var accounts = window.AAUP_ACCOUNTS ? window.AAUP_ACCOUNTS.listAccounts() : [];
     var current = window.AAUP_ACCOUNTS ? window.AAUP_ACCOUNTS.currentAccount() : 'Default';
@@ -134,64 +208,40 @@
     // otherwise. Everything user-facing below is bilingual.
     var r = isRtlNow;
     body.setAttribute('dir', r ? 'rtl' : 'ltr');
+
+    var tabContent = activeSettingsTab === 'prefs' ? prefsTabHtml(r, selectedPlan, isRtlNow)
+      : activeSettingsTab === 'data' ? dataTabHtml(r)
+      : activeSettingsTab === 'help' ? helpTabHtml(r, selectedPlan, isImportedSelected, devUnlocked)
+      : accountTabHtml(r, current, others);
+
     body.innerHTML =
       '<h2 style="margin-top:0;">⚙️ ' + (r ? 'الإعدادات' : 'Settings') + '</h2>' +
-      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setThemeBtn">🌙 ' + (r ? 'تبديل السمة' : 'Toggle Theme') + '</button>' +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">🌐 ' + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
-      '<button type="button" class="home-btn" id="setExportBtn">📤 ' + (r ? 'تصدير التقدّم' : 'Export Progress') + '</button>' +
-      '<button type="button" class="home-btn" id="setImportBtn">📥 ' + (r ? 'استيراد التقدّم' : 'Import Progress') + '</button>' +
-      '<button type="button" class="home-btn" id="setResetBtn">🗑 ' + (r ? 'مسح كل البيانات' : 'Reset All Data') + '</button>' +
+      '<div class="settings-tabbar">' +
+      SETTINGS_TABS.map(function(t){
+        return '<div class="settings-tab' + (t.key === activeSettingsTab ? ' active' : '') + '" data-settings-tab="' + t.key + '">' +
+          '<span class="settings-tab-icon">' + t.icon + '</span><span>' + (r ? t.ar : t.en) + '</span></div>';
+      }).join('') +
       '</div>' +
-      (window.APP_PLANS_FEED_URL ? (
-        '<h3 style="margin-bottom:6px;">🌐 ' + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
-        '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
-        '<div class="form-actions" style="justify-content:flex-start;">' +
-        '<button type="button" class="home-btn" id="setSyncBtn">🔄 ' + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
-        '</div>' +
-        '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
-      ) : '') +
-      '<h3 style="margin-bottom:6px;">❓ ' + (r ? 'الجولات التعريفية' : 'Tours') + '</h3>' +
-      '<p class="form-note" style="margin-top:0;">' + (r ? 'أعد تشغيل الجولة التوضيحية لأي شاشة.' : 'Replay the spotlight walkthrough for any screen.') + '</p>' +
-      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 ' + (r ? 'جولة الرئيسية' : 'Home tour') + '</button>' +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 ' + (r ? 'جولة اللوحة' : 'Dashboard tour') + '</button>' : '') +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 ' + (r ? 'جولة الخطة الدراسية' : 'Study Plan tour') + '</button>' : '') +
-      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
-      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
-      '</div>' +
-      (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '') +
-      (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
-      '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
-      '<p class="form-note" style="margin-top:0;">' + (r
-        ? 'مختلف عن المزامنة السحابية أعلاه: كل ملف هنا يبقى على هذا الجهاز فقط ولا يُزامَن — مفيد إذا كان أكثر من شخص يشارك هذا الجهاز، أو أردت ملفًا محليًا ثانيًا.'
-        : 'Different from Cloud Sync above: each profile here stays on this device only and is never synced anywhere — useful if more than one person shares this device, or you want a second local profile of your own.') + '</p>' +
-      '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
-      (others.length
-        ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
-          others.map(function(a){
-            return '<span class="acct-row">' +
-              '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>' +
-              '<button type="button" class="home-btn acct-delete-btn" data-acct="' + window.__escapeHtml(a) + '" aria-label="' + (r ? 'حذف الحساب' : 'Delete account') + '">🗑</button>' +
-              '</span>';
-          }).join('') + '</div>'
-        : '') +
-      '<div class="form-field-row">' +
-      '<div class="form-field"><input type="text" id="newAcctName" maxlength="40" placeholder="' + (r ? 'اسم حساب جديد' : 'New account name') + '"></div>' +
-      '<button type="button" class="home-btn" id="newAcctBtn" style="border-color:var(--accent);color:var(--text);align-self:flex-start;">➕ ' + (r ? 'إنشاء' : 'Create') + '</button>' +
-      '</div>' +
-      '<div id="acctMsg"></div>' +
+      '<div id="settingsTabContent">' + tabContent + '</div>' +
       '<div class="form-actions"><button type="button" class="home-btn" id="setClose">' + (r ? 'إغلاق' : 'Close') + '</button></div>' +
-      '<p class="form-note" style="text-align:center;opacity:.6;">v' + (window.APP_VERSION || '?') + ' \u00b7 ' + (r ? '\u0645\u0634\u0631\u0648\u0639 \u0637\u0644\u0627\u0628\u064a \u0645\u0641\u062a\u0648\u062d' : 'an open student project') + '</p>';
+      '<p class="form-note" style="text-align:center;opacity:.6;">v' + (window.APP_VERSION || '?') + ' · ' + (r ? 'مشروع طلابي مفتوح' : 'an open student project') + '</p>';
 
     document.getElementById('setClose').addEventListener('click', function(){ document.getElementById('devModalOverlay').classList.remove('open'); });
+    body.querySelectorAll('[data-settings-tab]').forEach(function(tabEl){
+      tabEl.addEventListener('click', function(){
+        activeSettingsTab = tabEl.getAttribute('data-settings-tab');
+        renderSettingsBody(body);
+      });
+    });
     if(window.AAUP_ORPHANS){
       window.AAUP_ORPHANS.bindSection(body, function(){ renderSettingsBody(body); });
     }
     if(window.AAUP_CLOUD){
       window.AAUP_CLOUD.bindSection(body);
     }
-    document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
+    if(document.getElementById('setThemeBtn')){
+      document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
+    }
     if(document.getElementById('setLangBtn')){
       document.getElementById('setLangBtn').addEventListener('click', function(){
         var isImported = !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[selectedPlan]);
@@ -200,12 +250,18 @@
         renderSettingsBody(body); // refresh so the button label reflects the new state
       });
     }
-    document.getElementById('setExportBtn').addEventListener('click', function(){ if(window.AAUP_DATA) window.AAUP_DATA.exportData(); });
-    document.getElementById('setImportBtn').addEventListener('click', function(){ if(window.AAUP_DATA) window.AAUP_DATA.triggerImport(); });
-    document.getElementById('setResetBtn').addEventListener('click', function(){
-      document.getElementById('devModalOverlay').classList.remove('open');
-      if(window.AAUP_DATA) window.AAUP_DATA.confirmResetAll();
-    });
+    if(document.getElementById('setExportBtn')){
+      document.getElementById('setExportBtn').addEventListener('click', function(){ if(window.AAUP_DATA) window.AAUP_DATA.exportData(); });
+    }
+    if(document.getElementById('setImportBtn')){
+      document.getElementById('setImportBtn').addEventListener('click', function(){ if(window.AAUP_DATA) window.AAUP_DATA.triggerImport(); });
+    }
+    if(document.getElementById('setResetBtn')){
+      document.getElementById('setResetBtn').addEventListener('click', function(){
+        document.getElementById('devModalOverlay').classList.remove('open');
+        if(window.AAUP_DATA) window.AAUP_DATA.confirmResetAll();
+      });
+    }
     if(document.getElementById('setSyncBtn')){
       document.getElementById('setSyncBtn').addEventListener('click', function(){
         var btn = document.getElementById('setSyncBtn');
@@ -285,13 +341,15 @@
         }, r);
       });
     });
-    document.getElementById('newAcctBtn').addEventListener('click', function(){
-      if(!window.AAUP_ACCOUNTS) return;
-      var name = document.getElementById('newAcctName').value;
-      var msg = document.getElementById('acctMsg');
-      var result = window.AAUP_ACCOUNTS.createAccount(name);
-      if(!result.ok){ msg.innerHTML = '<p class="dev-error-msg">' + result.error + '</p>'; }
-    });
+    if(document.getElementById('newAcctBtn')){
+      document.getElementById('newAcctBtn').addEventListener('click', function(){
+        if(!window.AAUP_ACCOUNTS) return;
+        var name = document.getElementById('newAcctName').value;
+        var msg = document.getElementById('acctMsg');
+        var result = window.AAUP_ACCOUNTS.createAccount(name);
+        if(!result.ok){ msg.innerHTML = '<p class="dev-error-msg">' + result.error + '</p>'; }
+      });
+    }
   }
 
   // Catches direct navigation to a real major page that doesn't go through
