@@ -816,6 +816,11 @@
           '</section>';
       }).join('') + '</div>' +
       '<div class="form-actions"><button type="button" class="home-btn admin-mini" id="acAdd">+ Add course (unscheduled)</button></div>' +
+      // One shared set of lists for every row. Per-row copies would put five
+      // hundred options in the DOM once per course.
+      '<datalist id="acCodeList"></datalist>' +
+      '<datalist id="acNameList"></datalist>' +
+      '<datalist id="acArList"></datalist>' +
       saveBar();
   }
 
@@ -863,9 +868,13 @@
 
   function courseRow(c, i, years){
     return '<tr data-course="' + i + '">' +
-      '<td><input type="text" class="cc-num" value="' + esc(c.courseNumber || '') + '"></td>' +
-      '<td><input type="text" class="cc-name" value="' + esc(c.name || '') + '"></td>' +
-      '<td><input type="text" class="cc-namear" value="' + esc(c.nameAr || '') + '" dir="rtl"></td>' +
+      // Code, name and Arabic name each offer the courses that already exist,
+      // the same way Category, Year and Sem offer their choices. Picking one
+      // fills the rest of the row, so a course that is already written down
+      // somewhere is never typed out a second time.
+      '<td><input type="text" class="cc-num" list="acCodeList" autocomplete="off" value="' + esc(c.courseNumber || '') + '"></td>' +
+      '<td><input type="text" class="cc-name" list="acNameList" autocomplete="off" value="' + esc(c.name || '') + '"></td>' +
+      '<td><input type="text" class="cc-namear" list="acArList" autocomplete="off" value="' + esc(c.nameAr || '') + '" dir="rtl"></td>' +
       '<td><input type="number" class="cc-ch" min="0" max="20" step="1" value="' + esc(c.creditHours) + '"></td>' +
       '<td><select class="cc-cat">' + CATS.map(function(k){
         return '<option value="' + k[0] + '"' + (c.category === k[0] ? ' selected' : '') + '>' + k[1] + '</option>';
@@ -1409,10 +1418,87 @@
     toast('Added ' + (c.courseNumber ? c.courseNumber + ' · ' : '') + c.name + '.');
   }
 
+  // Populates the three shared datalists. The label carries the rest of the
+  // course, so the browser's own dropdown shows "040111001 · 2 CH · skills"
+  // next to the name and the choice is made on sight rather than on memory.
+  function fillDatalists(pool){
+    var fill = function(id, valueOf, labelOf){
+      var el = document.getElementById(id);
+      if(!el) return;
+      var seen = {}, html = '';
+      (pool || []).forEach(function(c){
+        var v = valueOf(c);
+        if(!v || seen[v]) return;      // a duplicate value is unpickable anyway
+        seen[v] = true;
+        html += '<option value="' + esc(v) + '" label="' + esc(labelOf(c)) + '"></option>';
+      });
+      el.innerHTML = html;
+    };
+    fill('acCodeList', function(c){ return c.courseNumber; },
+                       function(c){ return c.name + ' · ' + c.creditHours + ' CH'; });
+    fill('acNameList', function(c){ return c.name; },
+                       function(c){ return (c.courseNumber || '—') + ' · ' + c.creditHours + ' CH · ' + c.category; });
+    fill('acArList',   function(c){ return c.nameAr; },
+                       function(c){ return (c.courseNumber || '—') + ' · ' + c.name; });
+  }
+
+  function poolMatch(field, value){
+    var v = String(value || '').trim();
+    if(!v) return null;
+    var lower = v.toLowerCase();
+    return (coursePool || []).filter(function(c){
+      return String(c[field] || '').trim().toLowerCase() === lower;
+    })[0] || null;
+  }
+
+  // Only fires on an exact match, which in practice means a pick from the list
+  // rather than half-typed text — so it cannot overwrite a row while someone is
+  // still in the middle of describing a course that does not exist yet.
+  function autofillRow(row, hit, from){
+    if(!hit) return false;
+    var set = function(sel, v){
+      var el = row.querySelector(sel);
+      if(el && String(el.value) !== String(v)) el.value = v;
+    };
+    if(from !== 'code') set('.cc-num', hit.courseNumber || '');
+    if(from !== 'name') set('.cc-name', hit.name || '');
+    if(from !== 'ar')   set('.cc-namear', hit.nameAr || '');
+    set('.cc-ch', hit.creditHours);
+    var cat = row.querySelector('.cc-cat');
+    if(cat && hit.category) cat.value = hit.category;
+    // Four boxes changing at once is a lot to do silently; the flash says which
+    // row did it. Purely cosmetic — the class is gone before the next save.
+    row.classList.add('is-autofilled');
+    setTimeout(function(){ row.classList.remove('is-autofilled'); }, 1200);
+    return true;
+  }
+
   function bindCourses(){
     document.querySelectorAll('[data-course] input').forEach(function(i){
       i.addEventListener('change', markDirty);
     });
+
+    // The lists are what make Code and Name behave like the Category, Year and
+    // Sem dropdowns beside them: a set of real choices rather than an empty box.
+    loadCoursePool().then(fillDatalists).catch(function(){ /* offline: rows still type freely */ });
+
+    [['.cc-num', 'courseNumber', 'code'], ['.cc-name', 'name', 'name'], ['.cc-namear', 'nameAr', 'ar']]
+      .forEach(function(spec){
+        document.querySelectorAll('[data-course] ' + spec[0]).forEach(function(inp){
+          var apply = function(){
+            var row = inp.closest('[data-course]');
+            if(!row) return;
+            if(autofillRow(row, poolMatch(spec[1], inp.value), spec[2])){
+              harvestCourses();
+              markDirty();
+            }
+          };
+          // 'input' catches a click on the browser's suggestion list, which does
+          // not always fire 'change' until focus leaves.
+          inp.addEventListener('input', apply);
+          inp.addEventListener('change', apply);
+        });
+      });
     document.querySelectorAll('[data-course] .cc-cat').forEach(function(s){
       s.addEventListener('change', markDirty);
     });
