@@ -115,7 +115,8 @@
 <meta property="og:title" content="AAUP Academic Planner">
 <meta property="og:description" content="Plan your degree and track your progress — courses, prerequisites, GPA and audit for every AAUP major. Free, and works offline.">
 <meta property="og:url" content="https://jo0dile.github.io/MyMenuPack/">
-<meta property="og:image" content="https://jo0dile.github.io/MyMenuPack/assets/og-image.png">
+<meta property="og:image" content="https://jo0dile.github.io/MyMenuPack/assets/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="AAUP Academic Planner — courses, prerequisites, GPA and progress for every AAUP major.">
@@ -124,18 +125,18 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AAUP Academic Planner">
 <meta name="twitter:description" content="Courses, prerequisites, GPA and progress for every AAUP major. Free, and works offline.">
-<meta name="twitter:image" content="https://jo0dile.github.io/MyMenuPack/assets/og-image.png">
+<meta name="twitter:image" content="https://jo0dile.github.io/MyMenuPack/assets/og-image.jpg">
 
 <!-- The tab icon. There was no rel="icon" here at all, so every browser fell
      back to a blank page glyph — the site had icons the whole time, declared
      in manifest.json, but a manifest only tells an *installed* app what to
      use. A tab in an ordinary browser reads these links and nothing else,
      which is why the site appeared to have no picture anywhere.
-     SVG first for a sharp icon at any size, PNG behind it for browsers that
-     do not take an SVG favicon, and the 180px one for an iOS home screen. -->
-<link rel="icon" href="assets/icons/icon-any.svg" type="image/svg+xml">
-<link rel="icon" href="assets/icons/icon-any-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="assets/icons/icon-any-192.png">
+     48px for the tab and 180px for an iOS home screen — the two sizes those
+     two jobs actually use. Both are precached, so the icon survives offline
+     like the rest of the shell. -->
+<link rel="icon" href="assets/icons/favicon.png" sizes="48x48" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <!-- First script in the document on purpose: it records errors, failed file
      loads, and failed requests, and can only record what happens after it is
      listening. A module that throws on the way in is exactly the case the
