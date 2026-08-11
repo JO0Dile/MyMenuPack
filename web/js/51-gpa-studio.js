@@ -1,9 +1,11 @@
 // ==========================
 // GPA STUDIO
 // ==========================
-// Adds an editable grade table and a reach-your-target projection to the
-// Degree Audit modal (js/19-audit.js), between the three summary cards it
-// already draws and the semester-by-semester breakdown below them.
+// Replaces the Degree Audit modal's flat row of three summary cards
+// (Cumulative / Major / Standing) with a two-column layout — an editable
+// grade table on one side, a GPA dial and a reach-a-target tool on the
+// other — matching the approved mockup rather than a looser reskin of the
+// old three-card row.
 //
 // Before this, the modal said outright that grades are set from each
 // course's own info popup — correct, but it meant checking your GPA and
@@ -34,7 +36,7 @@
 
   var T = {
     en: {
-      title: 'Your grades', hint: 'Change any grade below and the cards above update immediately.',
+      title: 'Your grades', hint: 'Change any grade below and the dial updates immediately.',
       term: 'Term', course: 'Course', ch: 'CH', grade: 'Grade', pts: 'Points',
       excluded: 'excluded — retaken', none: 'Not counted',
       empty: 'No graded courses yet. Grades are entered from each course’s own info popup once it is marked done.',
@@ -43,10 +45,13 @@
       need: function(grade, n){ return 'Average at least ' + grade + ' across the remaining ' + n + ' CH.'; },
       already: 'Already on track — even a weak average the rest of the way keeps you above this target.',
       unreachable: 'Not reachable by averaging a single letter grade across the remaining hours.',
-      done: 'Nothing left — this plan’s credit hours are already accounted for.'
+      done: 'Nothing left — this plan’s credit hours are already accounted for.',
+      cumulative: 'Cumulative', outOf: 'OUT OF 4.00', thisSemester: 'This semester',
+      majorGpa: 'Major GPA', gradedHours: 'Graded hours', qualityPoints: 'Quality points',
+      standing: 'Class standing', noGrades: 'No grades yet'
     },
     ar: {
-      title: 'علاماتك', hint: 'غيّر أي علامة أدناه وستتحدث البطاقات أعلاه فوراً.',
+      title: 'علاماتك', hint: 'غيّر أي علامة أدناه وستتحدث الدائرة فوراً.',
       term: 'الفصل', course: 'المساق', ch: 'س.م', grade: 'العلامة', pts: 'النقاط',
       excluded: 'مستبعدة — أُعيد أخذه', none: 'غير محتسبة',
       empty: 'لا توجد علامات بعد. تُدخَل العلامات من نافذة معلومات كل مساق بعد إنجازه.',
@@ -55,7 +60,10 @@
       need: function(grade, n){ return 'حافظ على معدل ' + grade + ' على الأقل خلال الساعات المتبقية (' + n + ' س.م).'; },
       already: 'أنت على المسار الصحيح بالفعل — حتى بمعدل ضعيف فيما تبقى ستبقى فوق هذا الهدف.',
       unreachable: 'غير قابل للتحقيق بمعدل علامة واحدة عبر الساعات المتبقية.',
-      done: 'لم يتبق شيء — ساعات هذه الخطة مكتملة العدد بالفعل.'
+      done: 'لم يتبق شيء — ساعات هذه الخطة مكتملة العدد بالفعل.',
+      cumulative: 'التراكمي', outOf: 'من أصل 4.00', thisSemester: 'هذا الفصل',
+      majorGpa: 'معدل التخصص', gradedHours: 'الساعات المُقيَّمة', qualityPoints: 'نقاط الجودة',
+      standing: 'الوضع الأكاديمي', noGrades: 'لا توجد علامات بعد'
     }
   };
 
@@ -152,7 +160,7 @@
       .reduce(function(sum, r){ return sum + r.total; }, 0);
     var remaining = Math.max(0, Math.round((totalReq - (cum.credits || 0)) * 100) / 100);
 
-    return '<div class="gs-block gs-project">' +
+    return '<div class="gs-card gs-project">' +
       '<div class="gs-lbl">' + t.project + '</div>' +
       '<p class="gs-hint">' + t.projectHint + '</p>' +
       '<div class="gs-project-row">' +
@@ -162,6 +170,59 @@
       '</div>' +
       '<p class="gs-project-result" id="gsProjectResult" data-cum-gpa="' + (cum.gpa == null ? '' : cum.gpa) + '" ' +
         'data-cum-credits="' + (cum.credits || 0) + '" data-remaining="' + remaining + '"></p>' +
+      '</div>';
+  }
+
+  // The dial card — the right-hand column of the mockup this replaces. The
+  // ring itself is CSS, not an image or a canvas: a conic-gradient stopped
+  // at gpa/4 of the circle, same technique used for the progress rings
+  // elsewhere in the app (Achievements, the home-screen preview), so it
+  // matches how a "percentage as a ring" already looks in this codebase
+  // rather than introducing a second visual language for the same idea.
+  function dialCardHTML(prefix, rtl){
+    var t = T[rtl ? 'ar' : 'en'];
+    var cum = window.AAUP_GPA.gpaFor(prefix, null);
+    var major = window.AAUP_GPA.gpaFor(prefix, function(el){
+      return el.classList.contains('core') || el.classList.contains('dept');
+    });
+    var standing = window.AAUP_GPA.standingFor(cum.gpa);
+    var sems = window.AAUP_GPA.semesterGpas ? window.AAUP_GPA.semesterGpas(prefix) : [];
+    // Chronological order, same as the panel below this one — the last
+    // entry with hours in it is the most recently graded term, used as a
+    // stand-in for "this semester" rather than assuming today's date.
+    var current = sems.length ? sems[sems.length - 1] : null;
+    var fmt = function(g){ return g === null || g === undefined ? '—' : g.toFixed(2); };
+    var pct = cum.gpa == null ? 0 : Math.max(0, Math.min(100, cum.gpa / 4 * 100));
+    var points = cum.gpa == null ? 0 : cum.gpa * cum.credits;
+
+    var rows = [
+      [t.thisSemester, current ? fmt(current.gpa) : '—'],
+      [t.majorGpa, fmt(major.gpa)],
+      [t.gradedHours, cum.credits || 0],
+      [t.qualityPoints, points.toFixed(1)]
+    ];
+
+    return '<div class="gs-card gs-dial-card">' +
+      '<div class="gs-lbl">' + t.cumulative + '</div>' +
+      '<div class="gs-dial" style="background:conic-gradient(var(--accent) 0% ' + pct + '%, rgba(255,255,255,.09) ' + pct + '% 100%);">' +
+        '<div class="gs-dial-inner"><b>' + fmt(cum.gpa) + '</b><span>' + t.outOf + '</span></div>' +
+      '</div>' +
+      rows.map(function(r){
+        return '<div class="gs-kv"><span>' + r[0] + '</span><b>' + esc(r[1]) + '</b></div>';
+      }).join('') +
+      '<div class="gs-kv"><span>' + t.standing + '</span>' +
+        '<span class="standing-badge ' + standing.cls + '">' + (rtl ? standing.ar : standing.label) + '</span></div>' +
+      '</div>';
+  }
+
+  // Table (left) + dial and projection (right), in that order in the
+  // markup so a screen reader or a narrow viewport meets the grades before
+  // the summary of them — the grid only reorders them side by side once
+  // there is room.
+  function layoutHTML(prefix, rtl){
+    return '<div class="gs-layout">' +
+      '<div class="gs-col-main">' + tableHTML(prefix, rtl) + '</div>' +
+      '<div class="gs-col-side">' + dialCardHTML(prefix, rtl) + projectionHTML(prefix, rtl) + '</div>' +
       '</div>';
   }
 
@@ -217,8 +278,7 @@
   }
 
   window.AAUP_GPA_STUDIO = {
-    render: tableHTML,
-    renderProjection: projectionHTML,
+    layout: layoutHTML,
     bind: function(prefix, rtl){ bindTable(prefix); bindProjection(rtl); }
   };
 })();

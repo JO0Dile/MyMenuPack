@@ -199,12 +199,16 @@
           ? 'العلامات وحالة التخطيط (قيد الإنجاز / مخطط له) تُحدَّد من نافذة كل مساق.'
           : 'Grades and planning status (in progress / planned) are set from each course\u2019s own info popup.');
 
+    // The dial-and-table layout (js/51-gpa-studio.js) replaces the old flat
+    // row of three cards outright rather than sitting next to it — showing
+    // the cumulative number twice, in two different-looking widgets on the
+    // same screen, is not what was approved and reads as unfinished. If
+    // that module is missing for any reason, the original three-card
+    // summary is the fallback, not a blank space.
     body.innerHTML =
       '<h2 style="margin-top:0;">📋 ' + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
       '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' +
-      renderGpaDashboard(prefix, rtl) +
-      (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.render(prefix, rtl) : '') +
-      (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.renderProjection(prefix, rtl) : '') +
+      (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.layout(prefix, rtl) : renderGpaDashboard(prefix, rtl)) +
       renderSemesterGpas(prefix, rtl) +
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');

@@ -43,9 +43,13 @@
       },
       reasonNone: 'Nothing else in this plan waits on it yet, but it still counts toward the degree.',
       more: function(n){ return '+' + n + ' more available'; },
-      sim: 'If you take these', simCh: function(a,b){ return a + ' of ' + b + ' CH'; },
-      simPct: function(a,b){ return a + '% → ' + b + '%'; },
-      simLabel: 'Credit hours', simPctLabel: 'Degree progress after'
+      ifYouTake: 'If you take these',
+      barCh: 'Credit hours', barChSub: function(a,b){ return a + ' of ' + b + ' CH currently available'; },
+      barDept: 'Department requirement', barDegree: 'Degree completion after', barLab: 'Courses with a lab',
+      worth: 'Worth knowing',
+      oweDept: function(n){ return 'You still need ' + n + ' more department elective hours.'; },
+      oweFree: function(n){ return 'You still owe ' + n + ' free elective hours.'; },
+      deadEnds: function(n){ return n + ' other unlocked course' + (n === 1 ? '' : 's') + ' nothing else depends on — good to fit in whenever it suits you.'; }
     },
     ar: {
       empty: 'لا توجد مساقات جديدة متاحة الآن — أكمل بعض المتطلبات السابقة أولاً.',
@@ -55,9 +59,13 @@
       },
       reasonNone: 'لا يوجد مساق آخر بانتظاره الآن، لكنه لا يزال يُحتسب ضمن الخطة.',
       more: function(n){ return '+' + n + ' مساقًا إضافيًا متاحًا'; },
-      sim: 'إذا أخذت هذه المساقات', simCh: function(a,b){ return a + ' من ' + b + ' س.م'; },
-      simPct: function(a,b){ return a + '٪ ← ' + b + '٪'; },
-      simLabel: 'الساعات المعتمدة', simPctLabel: 'نسبة الإنجاز بعدها'
+      ifYouTake: 'إذا أخذت هذه المساقات',
+      barCh: 'الساعات المعتمدة', barChSub: function(a,b){ return a + ' من ' + b + ' س.م المتاحة حالياً'; },
+      barDept: 'متطلب التخصص الاختياري', barDegree: 'نسبة الإنجاز بعدها', barLab: 'مساقات بها مختبر',
+      worth: 'يستحق المعرفة',
+      oweDept: function(n){ return 'ما زلت بحاجة إلى ' + n + ' ساعة تخصص اختياري إضافية.'; },
+      oweFree: function(n){ return 'ما زلت مديناً بـ ' + n + ' ساعة متطلب حر.'; },
+      deadEnds: function(n){ return n + ' مساقاً آخر متاحاً لا ينتظره أي مساق آخر — مناسب لأخذه في أي وقت يناسبك.'; }
     }
   };
 
@@ -146,6 +154,7 @@
     var cat = c.category ? (CAT_LABEL[rtl ? 'ar' : 'en'][c.category] || '') : '';
     return '<button type="button" class="wn-card' + (rank === 0 ? ' is-top' : '') +
       '" data-wn-id="' + esc(c.id) + '">' +
+      '<span class="wn-rank" aria-hidden="true">' + (rank + 1) + '</span>' +
       '<div class="wn-card-head"><h4>' + esc(name) + '</h4>' +
         (c.opens ? '<span class="wn-tag wn-tag-hot">' + esc(t.opensN(c.opens)) + '</span>' : '') + '</div>' +
       '<div class="wn-sub">' + [c.code, c.cr ? c.cr + ' CH' : '', cat].filter(Boolean).map(esc).join(' · ') + '</div>' +
@@ -160,6 +169,74 @@
       '</button>';
   }
 
+  function bar(label, pct, sub){
+    var p = Math.max(0, Math.min(100, pct));
+    return '<div class="wn-bar-row"><div class="wn-bar-top"><span>' + label + '</span>' +
+      (sub ? '<b>' + sub + '</b>' : '<b>' + Math.round(p) + '%</b>') + '</div>' +
+      '<div class="wn-bar-track"><i style="width:' + p + '%"></i></div></div>';
+  }
+
+  // Four bars, matching the approved layout — but every denominator here is
+  // something the app already has, not the mockup's "12-18 CH advised" (no
+  // plan declares a recommended per-term load, so that number would have
+  // been invented). Credit hours are measured against everything currently
+  // available to pick from, not an assumed full course load; the lab count
+  // reads the same theoretical/practical split js/49-course-detail.js's
+  // Details panel already shows for a single course.
+  function simulationHTML(prefix, top, list, totals, rtl, t){
+    var deptRoomLeft = Math.max(0, totals.deptNeeded - totals.deptDone);
+    var simDone = totals.done, deptUsed = 0, simCh = 0, labCount = 0;
+    var info = ((window.__PLAN_DATA[prefix] || {}).courseInfo) || {};
+    top.forEach(function(c){
+      simCh += c.cr;
+      if(c.category === 'dept'){
+        if(deptUsed < deptRoomLeft){ simDone++; deptUsed++; }
+      } else {
+        simDone++;
+      }
+      var meta = c.slug && info[c.slug];
+      if(meta && parseFloat(meta.pr) > 0) labCount++;
+    });
+    var beforePct = totals.total ? (totals.done / totals.total * 100) : 0;
+    var afterPct = totals.total ? (Math.min(simDone, totals.total) / totals.total * 100) : 0;
+    var availableCh = list.reduce(function(s, c){ return s + c.cr; }, 0) || 1;
+
+    var deptStat = totals.deptNeeded
+      ? bar(t.barDept, Math.min(100, (deptUsed + totals.deptDone) / totals.deptNeeded * 100))
+      : '';
+
+    return '<div class="wn-panel wn-sim">' +
+      '<div class="wn-lbl">' + t.ifYouTake + '</div>' +
+      bar(t.barCh, simCh / availableCh * 100, t.barChSub(simCh, availableCh)) +
+      deptStat +
+      bar(t.barDegree, afterPct, Math.round(beforePct) + '% → ' + Math.round(afterPct) + '%') +
+      bar(t.barLab, top.length ? (labCount / top.length * 100) : 0, labCount + ' / ' + top.length) +
+      '</div>';
+  }
+
+  // Real, checkable facts rather than the mockup's illustrative ones — an
+  // elective-hours reminder from the same category totals js/51-gpa-studio.js
+  // reads, and how many of the OTHER unlocked courses are dead ends (nothing
+  // depends on them), which is exactly the "safe to take anytime" signal a
+  // ranked list otherwise leaves implicit.
+  function worthKnowingHTML(prefix, rest, rtl, t){
+    var lines = [];
+    if(window.AAUP_AUDIT && window.AAUP_AUDIT.computeAudit){
+      window.AAUP_AUDIT.computeAudit(prefix).forEach(function(r){
+        if(r.missing <= 0) return;
+        if(r.cat === 'dept') lines.push(t.oweDept(r.missing));
+        if(r.cat === 'free') lines.push(t.oweFree(r.missing));
+      });
+    }
+    var deadEnds = rest.filter(function(c){ return !c.opens; }).length;
+    if(deadEnds) lines.push(t.deadEnds(deadEnds));
+    if(!lines.length) return '';
+    return '<div class="wn-panel wn-worth">' +
+      '<div class="wn-lbl">' + t.worth + '</div>' +
+      lines.map(function(l){ return '<p class="wn-worth-line">' + esc(l) + '</p>'; }).join('') +
+      '</div>';
+  }
+
   var TOP_N = 3, TOTAL_CAP = 8;
 
   function render(prefix){
@@ -167,7 +244,8 @@
     if(!body) return;
     var rtl = isRtl(prefix);
     var t = T[rtl ? 'ar' : 'en'];
-    var list = candidates(prefix).slice(0, TOTAL_CAP);
+    var all = candidates(prefix);
+    var list = all.slice(0, TOTAL_CAP);
 
     if(!list.length){
       body.innerHTML = '<p class="ncp-empty">' + t.empty + '</p>';
@@ -183,30 +261,18 @@
       html += '<div class="next-courses-list wn-rest">' +
         rest.map(function(c){ return chipHTML(c, rtl); }).join('') + '</div>';
     }
-    var overflow = candidates(prefix).length - list.length;
+    var overflow = all.length - list.length;
     if(overflow > 0){
       html += '<p class="ncp-empty" style="margin-top:8px;">' + esc(t.more(overflow)) + '</p>';
     }
 
-    // The simulation only means something once there is a real total to
-    // compare against — an imported plan with no page rendered has none.
+    // Both cards only mean something once there is a real total to compare
+    // against — an imported plan with no page rendered has none.
     var totals = planTotals(prefix);
     if(totals && totals.total){
-      var deptRoomLeft = Math.max(0, totals.deptNeeded - totals.deptDone);
-      var simDone = totals.done, deptUsed = 0, simCh = 0;
-      top.forEach(function(c){
-        simCh += c.cr;
-        if(c.category === 'dept'){
-          if(deptUsed < deptRoomLeft){ simDone++; deptUsed++; }
-        } else {
-          simDone++;
-        }
-      });
-      var beforePct = Math.round(totals.done / totals.total * 100);
-      var afterPct = Math.round(Math.min(simDone, totals.total) / totals.total * 100);
-      html += '<div class="wn-sim">' +
-        '<div class="wn-sim-row"><span>' + t.simLabel + '</span><b>' + simCh + ' CH</b></div>' +
-        '<div class="wn-sim-row"><span>' + t.simPctLabel + '</span><b>' + t.simPct(beforePct, afterPct) + '</b></div>' +
+      html += '<div class="wn-grid">' +
+        simulationHTML(prefix, top, list, totals, rtl, t) +
+        worthKnowingHTML(prefix, rest, rtl, t) +
         '</div>';
     }
 
