@@ -161,8 +161,11 @@
       (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
       '</div>' +
       (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '') +
-      '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'الحسابات' : 'Accounts') + '</h3>' +
-      '<p class="form-note" style="margin-top:0;">' + (r ? '\u0643\u0644 \u062d\u0633\u0627\u0628 \u064a\u062d\u062a\u0641\u0638 \u0628\u062e\u0637\u0637\u0647 \u0648\u062a\u0642\u062f\u0651\u0645\u0647 \u0648\u0645\u0639\u062f\u0651\u0644\u0647 \u0628\u0634\u0643\u0644 \u0645\u0646\u0641\u0635\u0644 \u2014 \u0645\u0641\u064a\u062f \u0625\u0630\u0627 \u0643\u0627\u0646 \u0623\u0643\u062b\u0631 \u0645\u0646 \u0634\u062e\u0635 \u064a\u0634\u0627\u0631\u0643 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632\u060c \u0623\u0648 \u0623\u0631\u062f\u062a \u0645\u0644\u0641\u064b\u0627 \u0634\u062e\u0635\u064a\u064b\u0627 \u062b\u0627\u0646\u064a\u064b\u0627.' : 'Each account keeps its own separate plans, progress, and GPA \u2014 useful if more than one person shares this device, or you want a second profile of your own.') + '</p>' +
+      (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
+      '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' + (r
+        ? 'مختلف عن المزامنة السحابية أعلاه: كل ملف هنا يبقى على هذا الجهاز فقط ولا يُزامَن — مفيد إذا كان أكثر من شخص يشارك هذا الجهاز، أو أردت ملفًا محليًا ثانيًا.'
+        : 'Different from Cloud Sync above: each profile here stays on this device only and is never synced anywhere — useful if more than one person shares this device, or you want a second local profile of your own.') + '</p>' +
       '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
       (others.length
         ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
@@ -184,6 +187,9 @@
     document.getElementById('setClose').addEventListener('click', function(){ document.getElementById('devModalOverlay').classList.remove('open'); });
     if(window.AAUP_ORPHANS){
       window.AAUP_ORPHANS.bindSection(body, function(){ renderSettingsBody(body); });
+    }
+    if(window.AAUP_CLOUD){
+      window.AAUP_CLOUD.bindSection(body, function(){ renderSettingsBody(body); });
     }
     document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
     if(document.getElementById('setLangBtn')){
