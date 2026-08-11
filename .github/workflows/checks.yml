@@ -64,7 +64,25 @@ jobs:
       - name: Offline file list matches the page
         run: python3 tools/check-precache.py
 
+      # On a pull request this is a real guard: Publish catalogue only runs on
+      # main, so a PR that edits data/ without committing the rebuild would
+      # merge a plans.json that disagrees with its own source.
+      #
+      # On main it is a race it always loses. An admin save commits to data/,
+      # and Publish catalogue rebuilds plans.json in a *separate* commit
+      # moments later — so this check runs against the admin commit, correctly
+      # observes that plans.json has not caught up yet, and fails. The next
+      # commit passes. The result was a red X on every single admin edit for
+      # something that was already fixing itself, which is precisely how a CI
+      # signal gets tuned out — and this repo could not afford that, because a
+      # genuinely broken publish had been sitting in the same tab for hours.
+      #
+      # Nothing is lost by skipping it there. Publish catalogue rebuilds
+      # plans.json on main and fails loudly if it cannot, so it is both the
+      # mechanism and the alarm; this step would only be repeating its answer a
+      # few seconds too early.
       - name: web/plans.json matches data/
+        if: "!(github.event_name == 'push' && github.ref == 'refs/heads/main')"
         run: |
           python3 tools/build-catalogue.py
           git diff --exit-code web/plans.json || {
