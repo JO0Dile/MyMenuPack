@@ -31,7 +31,14 @@
     majorSlug: null,
     dirty: false,
     assets: [],
-    status: null
+    status: null,
+    // The Majors browser groups by faculty, which needs two things the tree
+    // does not carry: the university's faculty list and each major's faculty.
+    // Both are fetched per university rather than for the whole catalogue.
+    browseUni: null,
+    browseFaculties: null,
+    browseMajors: null,
+    browseLoading: false
   };
 
   function esc(s){ return window.__escapeHtml(s == null ? '' : String(s)); }
@@ -346,6 +353,36 @@
     return api('GET', '/api/tree').then(function(res){ state.tree = res.universities || []; });
   }
 
+  // Faculties and major metadata for one university, for the Majors browser.
+  // Kept separate from loadTree so opening the dashboard stays one request:
+  // this is only paid when someone actually looks at a university's majors.
+  function loadBrowse(uniSlug){
+    state.browseUni = uniSlug;
+    state.browseLoading = true;
+    state.browseFaculties = null;
+    state.browseMajors = null;
+    return Promise.all([
+      api('GET', '/api/university/' + uniSlug),
+      api('GET', '/api/majors/' + uniSlug)
+    ]).then(function(res){
+      // A university edited in another tab can land here mid-flight; ignoring a
+      // reply for a university we are no longer looking at stops it painting
+      // over the current one.
+      if(state.browseUni !== uniSlug) return;
+      state.browseFaculties = (res[0].university || {}).colleges || [];
+      state.browseMajors = res[1].majors || [];
+      state.browseLoading = false;
+    }).catch(function(e){
+      if(state.browseUni !== uniSlug) return;
+      state.browseLoading = false;
+      // /api/majors is newer than some deployed Workers. Say which half failed
+      // rather than showing an empty browser with no explanation.
+      toast(/404|not found/i.test(e.message)
+        ? 'This Worker does not have /api/majors yet — redeploy admin/cloudflare-worker.js.'
+        : e.message);
+    });
+  }
+
   // ---------- sections ----------
 
   function sectionDashboard(){
@@ -552,24 +589,98 @@
     bindMarkPreview();
   }
 
+  // A major belongs to a faculty, and until now the browser could not show
+  // that. It listed bare slugs in one flat table per university, with a single
+  // "+ New major" that belonged to the university rather than to any faculty —
+  // so a new major was created with no faculty at all, and the only way to give
+  // it one was to type the exact slug into a free-text box from memory. Getting
+  // it wrong, or leaving it blank, silently produced a major that no student
+  // could ever reach, with nothing anywhere saying so.
+  //
+  // So the browser is the real hierarchy now: university, then its faculties,
+  // then the majors inside each, with the add button on the faculty it will
+  // actually add to.
   function sectionMajors(){
     var unis = state.tree || [];
-    return '<h2>Majors / Plans</h2>' +
+    if(!unis.length) return '<h2>Majors / Plans</h2><p class="admin-hint">No universities yet.</p>';
+
+    var uniSlug = state.browseUni || (unis[0] && unis[0].slug);
+    var picker = unis.length > 1
+      ? '<div class="form-field"><label for="amUni">University</label><select id="amUni">' +
+          unis.map(function(u){
+            return '<option value="' + esc(u.slug) + '"' + (u.slug === uniSlug ? ' selected' : '') + '>' +
+              esc(u.name) + (u.published ? '' : ' (hidden)') + '</option>';
+          }).join('') + '</select></div>'
+      : '';
+
+    var head = '<h2>Majors / Plans</h2>' +
+      '<p class="admin-hint">Majors are grouped by the faculty they belong to. ' +
+      'Add one from inside a faculty and it starts out in that faculty.</p>' + picker;
+
+    // Metadata arrives from /api/majors/:uni, which is a separate request from
+    // the tree. Say so rather than rendering an empty page that looks broken.
+    if(state.browseLoading) return head + '<p class="admin-hint">Loading majors…</p><div id="adminMajorEditor"></div>';
+    if(!state.browseMajors) return head + '<p class="admin-hint">Could not load this university\'s majors.</p><div id="adminMajorEditor"></div>';
+
+    var faculties = (state.browseFaculties || []).slice();
+    var majors = state.browseMajors || [];
+    var known = {};
+    faculties.forEach(function(f){ known[f.slug] = true; });
+
+    var groups = faculties.map(function(f){
+      return { slug: f.slug, name: f.name, icon: f.icon, iconKey: f.iconKey, imageUrl: f.imageUrl,
+               majors: majors.filter(function(m){ return m.college === f.slug; }) };
+    });
+
+    // Majors whose faculty is blank or points at a faculty that no longer
+    // exists. They were invisible before — listed with everything else and
+    // indistinguishable — which is how one gets created and then forgotten.
+    var orphans = majors.filter(function(m){ return !m.college || !known[m.college]; });
+
+    var body = groups.map(function(g){ return facultyGroup(uniSlug, g, false); }).join('') +
+      (orphans.length
+        ? facultyGroup(uniSlug, { slug: '', name: 'Not in any faculty', icon: '⚠️', majors: orphans }, true)
+        : '') +
+      (groups.length ? '' :
+        '<p class="admin-hint">This university has no faculties yet. Add one in ' +
+        '<strong>Universities → Edit → Faculties</strong>, then come back here to add majors to it.</p>');
+
+    return head +
       '<div class="form-field"><label for="amFilter">Search</label>' +
       '<input type="text" id="amFilter" placeholder="Filter by name or slug…"></div>' +
-      unis.map(function(u){
-        return '<h3>' + esc(u.name) + '</h3>' +
-          '<table class="admin-table admin-major-table"><tbody>' +
-          (u.majors || []).map(function(m){
-            return '<tr data-major-row="' + esc(m.slug) + '"><td><strong>' + esc(m.slug) + '</strong></td>' +
+      body + '<div id="adminMajorEditor"></div>';
+  }
+
+  function facultyGroup(uniSlug, g, isOrphan){
+    var mark = isOrphan ? '⚠️' : window.AAUP_ICONS.markup(g, { size: 20, fallback: '🏫' });
+    return '<section class="admin-facgroup' + (isOrphan ? ' is-orphan' : '') + '">' +
+      '<div class="admin-facgroup-head">' +
+        '<span class="admin-facgroup-mark">' + mark + '</span>' +
+        '<div><h3>' + esc(g.name) + '</h3>' +
+          (isOrphan
+            ? '<span class="admin-sub">These are not reachable by students until they are given a faculty.</span>'
+            : '<span class="admin-sub">' + esc(g.slug) + ' · ' + g.majors.length +
+              ' major' + (g.majors.length === 1 ? '' : 's') + '</span>') +
+        '</div>' +
+        (isOrphan ? '' :
+          '<button type="button" class="home-btn admin-mini admin-addhere" data-new-major="' + esc(uniSlug) +
+          '" data-faculty="' + esc(g.slug) + '">+ Add major here</button>') +
+      '</div>' +
+      (g.majors.length
+        ? '<table class="admin-table admin-major-table"><tbody>' + g.majors.map(function(m){
+            return '<tr data-major-row="' + esc(m.slug) + '">' +
+              '<td><strong>' + esc(m.name || m.slug) + '</strong>' +
+                (m.nameAr ? '<br><span class="admin-sub" dir="rtl">' + esc(m.nameAr) + '</span>' : '') +
+                '<br><span class="admin-sub">' + esc(m.slug) + ' · ' + (m.courseCount || 0) + ' courses</span>' +
+                (m.unreadable ? '<br><span class="admin-sub admin-warn">⚠️ this file could not be read</span>' : '') +
+              '</td>' +
               '<td style="text-align:right;">' +
-              '<button type="button" class="home-btn admin-mini" data-edit-major="' + esc(m.slug) + '" data-uni="' + esc(u.slug) + '">Edit</button> ' +
-              '<button type="button" class="home-btn admin-mini admin-danger" data-del-major="' + esc(m.slug) + '" data-uni="' + esc(u.slug) + '">Delete</button>' +
+              '<button type="button" class="home-btn admin-mini" data-edit-major="' + esc(m.slug) + '" data-uni="' + esc(uniSlug) + '">Edit</button> ' +
+              '<button type="button" class="home-btn admin-mini admin-danger" data-del-major="' + esc(m.slug) + '" data-uni="' + esc(uniSlug) + '">Delete</button>' +
               '</td></tr>';
-          }).join('') + '</tbody></table>' +
-          '<div class="form-actions"><button type="button" class="home-btn admin-mini" data-new-major="' + esc(u.slug) + '">+ New major</button></div>';
-      }).join('') +
-      '<div id="adminMajorEditor"></div>';
+          }).join('') + '</tbody></table>'
+        : '<p class="admin-hint admin-facgroup-empty">No majors in this faculty yet.</p>') +
+      '</section>';
   }
 
   function majorEditor(m){
@@ -579,7 +690,8 @@
       'they are all one file, saved together.</p>' +
       '<div class="form-field-row">' + field('amName', 'Name (English)', m.name) + field('amNameAr', 'Name (Arabic)', m.nameAr) + '</div>' +
       '<div class="form-field-row">' + field('amSub', 'Subtitle', m.subtitle) + field('amSubAr', 'Subtitle (Arabic)', m.subtitleAr) + '</div>' +
-      '<div class="form-field-row">' + field('amCollege', 'Faculty slug', m.college) + field('amIcon', 'Emoji fallback', m.icon) +
+      facultyField(m) +
+      '<div class="form-field-row">' + field('amIcon', 'Emoji fallback', m.icon) +
       field('amHours', 'Degree credit hours', m.degreeHours == null ? '' : m.degreeHours) + '</div>' +
       iconPicker('amIconKey', m.iconKey) +
       '<div class="form-field"><label for="amImage">Icon image (optional)</label>' +
@@ -590,6 +702,32 @@
       saveBar() + '</div>';
   }
 
+  // This was a free-text box labelled "Faculty slug". It required knowing that
+  // the Faculty of Information Technology is "aaup-it", and a typo produced a
+  // major filed under a faculty that does not exist — which looks exactly like
+  // a major that saved fine, right up until nobody can find it.
+  //
+  // A list cannot be mistyped. The one case a list cannot express is a value
+  // already stored that matches no faculty, so that is kept as an option and
+  // called out, rather than being silently corrected to something else.
+  function facultyField(m){
+    var list = state.browseFaculties || [];
+    var known = list.some(function(f){ return f.slug === m.college; });
+    var stray = m.college && !known;
+    return '<div class="form-field"><label for="amCollege">Faculty</label>' +
+      '<select id="amCollege">' + facultyOptions(m.college, true) +
+        (stray ? '<option value="' + esc(m.college) + '" selected>' + esc(m.college) + ' — not a faculty here</option>' : '') +
+      '</select>' +
+      (stray
+        ? '<p class="admin-hint admin-warn">⚠️ This major is filed under <code>' + esc(m.college) +
+          '</code>, which is not one of this university\'s faculties, so students cannot reach it. ' +
+          'Pick a real faculty, or add that one in Universities → Edit → Faculties.</p>'
+        : (!m.college
+            ? '<p class="admin-hint admin-warn">⚠️ No faculty set — students cannot reach this major.</p>'
+            : '')) +
+      '</div>';
+  }
+
   function saveBar(){
     return '<div class="form-actions admin-savebar">' +
       '<button type="button" class="home-btn admin-primary" id="amSave">💾 Save major</button>' +
@@ -597,15 +735,78 @@
       '</div><div id="adminMsg"></div>';
   }
 
+  // Courses, Prerequisites and Study Plan are three views of one major, reached
+  // from a nav that does not say which major, on top of a university and a
+  // faculty chosen two screens earlier. With fifty courses on screen that is
+  // very easy to lose — and every one of these screens can write to the file.
+  function crumbs(){
+    var m = state.major || {};
+    var uni = (state.tree || []).filter(function(u){ return u.slug === state.uni; })[0];
+    var fac = (state.browseFaculties || []).filter(function(f){ return f.slug === m.college; })[0];
+    return '<nav class="admin-crumbs">' +
+      '<span>' + esc(uni ? uni.name : (state.uni || '—')) + '</span>' +
+      '<span class="admin-crumb-sep">›</span>' +
+      '<span' + (fac ? '' : ' class="admin-warn"') + '>' +
+        esc(fac ? fac.name : (m.college ? m.college + ' (unknown faculty)' : 'no faculty')) + '</span>' +
+      '<span class="admin-crumb-sep">›</span>' +
+      '<strong>' + esc(m.name || m.slug || '—') + '</strong>' +
+      '</nav>';
+  }
+
+  var SEM_LABEL = { s1: 'Semester 1', s2: 'Semester 2', s3: 'Summer', summer: 'Summer' };
+
+  function semKey(c){
+    if(c.semester === 'summer') return 's3';
+    return c.semester || '';
+  }
+
+  // One table of every course in the degree, in file order, was unreadable —
+  // and it was also the only place the year/semester columns could be checked,
+  // so a course sitting in the wrong term was invisible unless you happened to
+  // scan the right row. Grouping by the structure the plan actually has makes
+  // a misplaced course obvious, and gives the credit-hour total per term for
+  // free. Unscheduled courses get their own group instead of being scattered.
   function sectionCourses(){
     var m = state.major;
     var years = m.years || [];
-    return '<h2>Courses <span class="admin-sub">' + esc(m.slug) + '</span></h2>' +
+    var all = m.courses || [];
+
+    var buckets = [];
+    years.forEach(function(y){
+      ['s1', 's2'].concat(y.hasSummer ? ['s3'] : []).forEach(function(sem){
+        buckets.push({
+          title: y.id.toUpperCase() + ' · ' + SEM_LABEL[sem],
+          rows: all.map(function(c, i){ return { c: c, i: i }; })
+                   .filter(function(r){ return r.c.yearId === y.id && semKey(r.c) === sem; })
+        });
+      });
+    });
+    var placed = {};
+    buckets.forEach(function(b){ b.rows.forEach(function(r){ placed[r.i] = true; }); });
+    var loose = all.map(function(c, i){ return { c: c, i: i }; }).filter(function(r){ return !placed[r.i]; });
+    if(loose.length){
+      buckets.push({ title: 'Not placed in a year or semester', rows: loose, warn: true });
+    }
+
+    return '<h2>Courses</h2>' + crumbs() +
+      '<p class="admin-hint">Grouped by where each course sits in the plan. ' +
+      'Changing a course\'s Year or Sem here moves it, and it lands in the matching group after Save.</p>' +
       '<div class="form-field"><label for="acFilter">Search</label><input type="text" id="acFilter" placeholder="Filter by name or code…"></div>' +
-      '<table class="admin-table admin-course-table"><thead><tr>' +
-      '<th>Code</th><th>Name</th><th>Arabic</th><th>CH</th><th>Category</th><th>Year</th><th>Sem</th><th></th></tr></thead><tbody id="acBody">' +
-      (m.courses || []).map(function(c, i){ return courseRow(c, i, years); }).join('') +
-      '</tbody></table>' +
+      '<div id="acBody">' + buckets.map(function(b){
+        var ch = b.rows.reduce(function(n, r){ return n + (Number(r.c.creditHours) || 0); }, 0);
+        return '<section class="admin-termgroup' + (b.warn ? ' is-orphan' : '') + '">' +
+          '<h4>' + (b.warn ? '⚠️ ' : '') + esc(b.title) +
+            ' <span class="admin-sub">' + b.rows.length + ' course' + (b.rows.length === 1 ? '' : 's') +
+            ' · ' + ch + ' CH</span></h4>' +
+          (b.rows.length
+            ? '<table class="admin-table admin-course-table"><thead><tr>' +
+              '<th>Code</th><th>Name</th><th>Arabic</th><th>CH</th><th>Category</th><th>Year</th><th>Sem</th><th></th>' +
+              '</tr></thead><tbody>' +
+              b.rows.map(function(r){ return courseRow(r.c, r.i, years); }).join('') +
+              '</tbody></table>'
+            : '<p class="admin-hint admin-facgroup-empty">Empty.</p>') +
+          '</section>';
+      }).join('') + '</div>' +
       '<div class="form-actions"><button type="button" class="home-btn admin-mini" id="acAdd">+ Add course</button></div>' +
       saveBar();
   }
@@ -636,10 +837,24 @@
   function sectionPrereqs(){
     var m = state.major;
     var courses = m.courses || [];
-    var opts = courses.map(function(c){
-      return '<option value="' + esc(c.id) + '">' + esc((c.courseNumber ? c.courseNumber + ' · ' : '') + c.name) + '</option>';
+    // Fifty courses in one flat dropdown, in file order, meant scrolling for a
+    // name you already knew the position of in the plan. Grouped by term, the
+    // list matches how the courses are actually thought about.
+    var byTerm = {};
+    courses.forEach(function(c){
+      var k = (c.yearId || '—') + '|' + (semKey(c) || '—');
+      (byTerm[k] = byTerm[k] || []).push(c);
+    });
+    var opts = Object.keys(byTerm).sort().map(function(k){
+      var parts = k.split('|');
+      var label = parts[0].toUpperCase() + ' · ' + (SEM_LABEL[parts[1]] || 'Unscheduled');
+      return '<optgroup label="' + esc(label) + '">' + byTerm[k].map(function(c){
+        return '<option value="' + esc(c.id) + '">' +
+          esc((c.courseNumber ? c.courseNumber + ' · ' : '') + c.name) + '</option>';
+      }).join('') + '</optgroup>';
     }).join('');
-    return '<h2>Prerequisites <span class="admin-sub">' + esc(m.slug) + '</span></h2>' +
+
+    return '<h2>Prerequisites</h2>' + crumbs() +
       '<p class="admin-hint">Each row is “must pass <strong>before</strong> → can then take <strong>after</strong>”. ' +
       'The server rejects a loop, so a plan can never be saved in a state where a course is impossible to reach.</p>' +
       '<table class="admin-table"><thead><tr><th>Before</th><th>After</th><th></th></tr></thead><tbody id="apBody">' +
@@ -661,7 +876,7 @@
   function sectionSchedule(){
     var m = state.major;
     var years = m.years || [];
-    return '<h2>Study Plan <span class="admin-sub">' + esc(m.slug) + '</span></h2>' +
+    return '<h2>Study Plan</h2>' + crumbs() +
       '<p class="admin-hint">Move a course to a different year or semester, or change the year layout. ' +
       'Same file as Courses — one Save covers both.</p>' +
       '<h4>Years</h4><div id="asYears">' + years.map(function(y, i){
@@ -744,6 +959,15 @@
 
     renderNav();
     var s = state.section;
+
+    // Opening Majors for the first time needs the faculty grouping data. Fetch
+    // it once and re-render when it lands, rather than making every caller of
+    // render() remember to do it.
+    if(s === 'majors' && !state.browseLoading && !state.browseMajors){
+      var want = state.browseUni || ((state.tree || [])[0] || {}).slug;
+      if(want) loadBrowse(want).then(render);
+    }
+
     if(s === 'dashboard') main.innerHTML = sectionDashboard();
     else if(s === 'universities') main.innerHTML = sectionUniversities();
     else if(s === 'majors') main.innerHTML = sectionMajors();
@@ -792,25 +1016,17 @@
         if(!confirm('Delete the major "' + slug + '"?\n\nIt stops being offered to students. The file is removed by a commit, so it can be restored with git revert.')) return;
         api('DELETE', '/api/major/' + b.getAttribute('data-uni') + '/' + slug)
           .then(function(){ toast('Removed ' + slug + '.'); return loadTree(); })
+          .then(function(){ return state.browseUni ? loadBrowse(state.browseUni) : null; })
           .then(render).catch(function(e){ toast(e.message); });
       });
     });
     main.querySelectorAll('[data-new-major]').forEach(function(b){
       b.addEventListener('click', function(){
-        var uni = b.getAttribute('data-new-major');
-        var slug = (prompt('Slug for the new major (lowercase, hyphens):') || '').trim().toLowerCase();
-        if(!slug) return;
-        if(!/^[a-z0-9][a-z0-9-]{1,48}$/.test(slug)){ toast('Slug must be lowercase letters, numbers and hyphens.'); return; }
-        state.uni = uni; state.majorSlug = slug;
-        state.majorSha = '';   // nothing to be stale against — this is a create
-        state.major = { schemaVersion: 1, slug: slug, university: uni, name: slug, college: '',
-                        icon: '🎓', iconKey: '', years: [{ id: 'y1', hasSummer: false }], courses: [], prerequisites: [] };
-        state.section = 'majors'; markDirty(); render();
-        var host = document.getElementById('adminMajorEditor');
-        if(host){ host.innerHTML = majorEditor(state.major); bindIconPickers(); bindMajorSave(); }
+        openNewMajorForm(b.getAttribute('data-new-major'), b.getAttribute('data-faculty') || '');
       });
     });
 
+    on('amUni', 'change', function(e){ loadBrowse(e.target.value).then(render); });
     on('amFilter', 'input', function(e){ filterRows(e.target.value, '[data-major-row]'); });
     on('acFilter', 'input', function(e){ filterRows(e.target.value, '[data-course]'); });
 
@@ -820,6 +1036,95 @@
     if(state.section === 'assets') bindAssets();
     if(document.getElementById('amSave')) bindMajorSave();
     on('adminReload', 'click', function(){ loadTree().then(render).catch(function(e){ toast(e.message); }); });
+  }
+
+  // Turns "AI and Robotics" into "ai-and-robotics". The slug is the filename
+  // and every reference to the major, so it is still editable — but nobody
+  // should have to invent one to create a major, which is what a bare prompt()
+  // for the slug demanded.
+  function slugify(s){
+    return String(s || '').toLowerCase().trim()
+      .replace(/['’]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 48);
+  }
+
+  function facultyOptions(selected, includeNone){
+    var list = state.browseFaculties || [];
+    return (includeNone ? '<option value="">— no faculty —</option>' : '') +
+      list.map(function(f){
+        return '<option value="' + esc(f.slug) + '"' + (f.slug === selected ? ' selected' : '') + '>' +
+          esc(f.name) + ' (' + esc(f.slug) + ')</option>';
+      }).join('');
+  }
+
+  // The old flow asked for a slug in a window.prompt and created the major with
+  // no faculty at all, no name, and no way to set either without knowing to go
+  // looking. Everything a major needs to exist somewhere a student can find it
+  // is asked for here, once, with the faculty already filled in from whichever
+  // group the button was pressed in.
+  function openNewMajorForm(uni, faculty){
+    var host = document.getElementById('adminMajorEditor');
+    if(!host) return;
+    host.innerHTML =
+      '<div class="admin-editor"><h3>New major</h3>' +
+      '<p class="admin-hint">This creates <code>data/' + esc(uni) + '/majors/&lt;slug&gt;.json</code>. ' +
+      'You can add courses, prerequisites and the year layout straight after.</p>' +
+      '<div class="form-field-row">' +
+        field('anName', 'Name (English)', '') +
+        field('anNameAr', 'Name (Arabic)', '') +
+      '</div>' +
+      '<div class="form-field"><label for="anFaculty">Faculty</label>' +
+      '<select id="anFaculty">' + facultyOptions(faculty, true) + '</select>' +
+      '<p class="admin-hint">A major with no faculty does not appear anywhere for students.</p></div>' +
+      '<div class="form-field"><label for="anSlug">Slug (the filename)</label>' +
+      '<input type="text" id="anSlug" value="" placeholder="filled in from the name">' +
+      '<p class="admin-hint">Lowercase letters, numbers and hyphens. Other majors and saved student ' +
+      'plans reference this, so it is worth getting right — renaming it later orphans them.</p></div>' +
+      '<div class="form-actions">' +
+        '<button type="button" class="home-btn admin-primary" id="anCreate">Create major</button> ' +
+        '<button type="button" class="home-btn admin-mini" id="anCancel">Cancel</button>' +
+      '</div><div id="adminMsg"></div></div>';
+    host.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    var slugEl = document.getElementById('anSlug');
+    var touched = false;
+    on('anSlug', 'input', function(){ touched = true; });
+    on('anName', 'input', function(e){ if(!touched) slugEl.value = slugify(e.target.value); });
+    on('anCancel', 'click', function(){ host.innerHTML = ''; });
+
+    on('anCreate', 'click', function(){
+      var name = val('anName').trim();
+      var slug = slugify(val('anSlug') || name);
+      if(!name){ setMsg('Give the major a name.', 'err'); return; }
+      if(!/^[a-z0-9][a-z0-9-]{1,48}$/.test(slug)){
+        setMsg('Slug must be lowercase letters, numbers and hyphens.', 'err'); return;
+      }
+      var clash = (state.browseMajors || []).filter(function(m){ return m.slug === slug; })[0];
+      if(clash){ setMsg('A major with the slug “' + esc(slug) + '” already exists here.', 'err'); return; }
+
+      state.uni = uni;
+      state.majorSlug = slug;
+      state.majorSha = '';   // nothing to be stale against — this is a create
+      state.major = {
+        schemaVersion: 1, slug: slug, university: uni,
+        name: name, nameAr: val('anNameAr').trim(),
+        college: val('anFaculty'),
+        icon: '🎓', iconKey: '',
+        years: [{ id: 'y1', hasSummer: false }], courses: [], prerequisites: []
+      };
+      state.section = 'majors';
+      markDirty();
+      render();
+      var h = document.getElementById('adminMajorEditor');
+      if(h){
+        h.innerHTML = majorEditor(state.major);
+        bindIconPickers(); bindMajorSave();
+        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      setMsg('Not created yet — press Save major to write the file.', 'ok');
+    });
   }
 
   function filterRows(q, sel){
@@ -833,7 +1138,13 @@
   }
 
   function openMajor(uni, slug){
-    api('GET', '/api/major/' + uni + '/' + slug).then(function(res){
+    // The editor's faculty list comes from the browse data. Opening a major
+    // belonging to a university we have not browsed would otherwise render an
+    // empty dropdown and look like the major has no faculty to choose from.
+    var ready = (state.browseUni === uni && state.browseFaculties)
+      ? Promise.resolve() : loadBrowse(uni);
+    return ready.then(function(){
+    return api('GET', '/api/major/' + uni + '/' + slug).then(function(res){
       state.uni = uni; state.majorSlug = slug; state.major = res.major; state.dirty = false;
       state.majorSha = res.sha || '';
       state.section = 'majors'; render();
@@ -843,6 +1154,7 @@
         bindIconPickers(); bindMajorSave();
         host.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    });
     }).catch(function(e){ toast(e.message); });
   }
 
@@ -1035,7 +1347,12 @@
           state.majorSha = res.sha || '';
           markClean();
           setMsg('Saved. Live for everyone in about a minute.', 'ok');
-          return loadTree();
+          // Refresh the browser too, not just the tree — a new major, a
+          // renamed one, or one moved to another faculty has to appear in its
+          // group, and the tree does not carry faculties.
+          return loadTree().then(function(){
+            return state.browseUni === state.uni ? loadBrowse(state.uni) : null;
+          });
         })
         .catch(function(e){ setMsg(esc(e.message), 'err'); });
     });

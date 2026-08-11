@@ -715,6 +715,49 @@ async function handleTree(env, request) {
   return json({ ok: true, universities }, 200, env, request);
 }
 
+// The tree lists major *slugs* and nothing else, which is all it can afford:
+// it walks every university, and reading each major file there would cost one
+// subrequest per major across the whole catalogue. That was fine while the
+// dashboard only ever showed a flat list — and it is exactly why the flat list
+// was all it could show. There was no way to display a major's real name, and
+// no way to group majors under the faculty they belong to, because the tree
+// did not know either.
+//
+// This reads the metadata for ONE university's majors, so the cost is bounded
+// by that university rather than by the catalogue, and it is only paid when
+// someone opens that university. Course lists are deliberately not included:
+// they are the bulk of a major file and the browser does not need them here.
+async function handleMajorsMeta(env, uni, request) {
+  if (!SLUG_RE.test(uni)) return json({ error: 'bad slug' }, 400, env, request);
+  const files = (await ghList(env, `data/${uni}/majors`)).filter((f) => f.name.endsWith('.json'));
+
+  const majors = [];
+  for (const f of files) {
+    const slug = f.name.replace(/\.json$/, '');
+    try {
+      const raw = await ghGet(env, f.path);
+      const m = raw.exists ? JSON.parse(raw.text) : {};
+      majors.push({
+        slug,
+        name: m.name || slug,
+        nameAr: m.nameAr || '',
+        college: m.college || '',
+        icon: m.icon || '',
+        iconKey: m.iconKey || '',
+        imageUrl: m.imageUrl || '',
+        courseCount: Array.isArray(m.courses) ? m.courses.length : 0,
+      });
+    } catch (e) {
+      // One malformed file must not blank the whole browser. Listing it under
+      // its slug keeps it reachable, which is the only way it can be fixed.
+      console.error(`majors meta ${uni}/${slug}:`, e && e.message ? e.message : e);
+      majors.push({ slug, name: slug, nameAr: '', college: '', icon: '', iconKey: '', imageUrl: '', courseCount: 0, unreadable: true });
+    }
+  }
+  majors.sort((a, b) => a.name.localeCompare(b.name));
+  return json({ ok: true, majors }, 200, env, request);
+}
+
 async function handleGetUniversity(env, slug, request) {
   if (!SLUG_RE.test(slug)) return json({ error: 'bad slug' }, 400, env, request);
   const f = await ghGet(env, `data/${slug}/university.json`);
@@ -961,6 +1004,13 @@ export default {
         }, 200, env);
       }
       if (path === '/api/tree' && request.method === 'GET') return handleTree(env, request);
+
+      // /api/majors/:university — names and faculties for one university's
+      // majors, so the browser can group them. Must be tested before the
+      // /api/major/ routes below, which are a different (singular) path.
+      if (seg[1] === 'majors' && seg[2] && request.method === 'GET') {
+        return handleMajorsMeta(env, seg[2], request);
+      }
 
       // /api/university/:slug
       if (seg[1] === 'university' && seg[2]) {
