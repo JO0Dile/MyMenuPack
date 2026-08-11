@@ -69,6 +69,11 @@
       if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'dashboard'); }
       window.scrollTo(0, 0);
       if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('dashboard'); }
+      // A one-time orientation screen — the whole degree laid out year by
+      // year — the first time this plan's Dashboard is ever opened. Never
+      // shown again after that; always reachable afterward from the
+      // sidebar's "My Path".
+      if(window.AAUP_ROADMAP){ window.AAUP_ROADMAP.openIfFirstVisit(prefix); }
     } catch(e){
       // A malformed/half-loaded plan must NEVER strand the student on a blank
       // screen (Home was already hidden). Fall back to the picker. This is the
@@ -163,6 +168,7 @@
             : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>')) +
       '</div>' +
       '<div class="dash-quicklinks">' +
+        (window.AAUP_ROADMAP ? '<div class="dash-quicklink" onclick="AAUP_ROADMAP.open(\'' + prefix + '\')"><span class="dq-icon">🧭</span>' + (rtl ? 'مساري الدراسي' : 'My Path') + '</div>' : '') +
         '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">📋</span>' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">🏆</span>' + (rtl ? 'الإنجازات' : 'Achievements') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">🧠</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +

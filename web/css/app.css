@@ -2043,6 +2043,50 @@
 
   .audit-table .col-missing{color:var(--prereq);}
 
+  /* ================= ROADMAP ("Your path through <major>") ================= */
+  .ro-head{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:6px;}
+  .ro-uni{font-size:11px; font-weight:700; color:var(--text-dim); white-space:nowrap; padding-top:4px;}
+  .ro-empty{font-size:12.5px; color:var(--text-dim);}
+
+  .ro-timeline{
+    display:flex; align-items:flex-start; margin:22px 0 18px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .ro-node-wrap{display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:92px; text-align:center;}
+  .ro-node{width:16px; height:16px; border-radius:50%; margin-top:2px; box-shadow:0 0 0 3px var(--panel);}
+  .ro-node-done{background:#2ecc71;}
+  .ro-node-current{background:var(--accent); box-shadow:0 0 0 3px var(--panel), 0 0 0 5px rgba(93,184,255,.35);}
+  .ro-node-future{background:var(--line);}
+  .ro-node-grad{border-radius:4px; transform:rotate(45deg);}
+  .ro-node-label{font-size:12px; font-weight:800; color:var(--text); margin-top:2px;}
+  .ro-node-sub{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.03em;}
+  .ro-connector{flex:1; height:2px; min-width:16px; margin-top:10px; background:var(--line);}
+  .ro-connector-done{background:#2ecc71;}
+  .ro-connector-current{background:linear-gradient(90deg,#2ecc71,var(--accent));}
+
+  .ro-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:20px;}
+  .ro-card{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px;}
+  .ro-card-current{border-color:var(--accent);}
+  .ro-card-done{opacity:.72;}
+  .ro-course{display:flex; justify-content:space-between; align-items:baseline; gap:6px; padding:6px 0; border-top:1px solid var(--line); font-size:12px;}
+  .ro-course:first-child{border-top:none; padding-top:0;}
+  .ro-course-name{color:var(--text); overflow-wrap:anywhere;}
+  .ro-course-cr{color:var(--text-dim); font-size:10.5px; white-space:nowrap; flex:none;}
+  .ro-more{font-size:11px; color:var(--accent); font-weight:700; padding-top:6px;}
+  .ro-card-grad{background:rgba(93,184,255,.06); border-color:var(--accent);}
+
+  .ro-summary{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px;
+  }
+  .ro-summary-pct, .ro-summary-stat{display:flex; flex-direction:column; gap:1px; flex:none;}
+  .ro-summary-pct b, .ro-summary-stat b{font-size:19px; font-weight:800; color:var(--text);}
+  .ro-summary-pct span, .ro-summary-stat span{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.03em;}
+  .ro-summary-bar{flex:1 1 100px; min-width:100px; height:8px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden;}
+  .ro-summary-bar span{display:block; height:100%; background:linear-gradient(90deg,#2ecc71,var(--accent));}
+
+  html[dir="rtl"] .ro-course, .plan-page.rtl-mode .ro-course{direction:rtl;}
+
   /* ==========================================================================
      13. ACHIEVEMENTS & AI ADVISOR — the achievement badge grid and the "plan my
      next semester" recommendation cards
