@@ -14,6 +14,17 @@
   "bioAr": "يا هلا",
   "degreeHours": 999,
   "freeElectiveSuggestions": [],
-  "courses": [],
+  "courses": [
+    {
+      "slug": "new-course-1",
+      "code": null,
+      "name": "New course",
+      "nameAr": "",
+      "credits": "3",
+      "category": "CORE",
+      "year": 2,
+      "semester": 3
+    }
+  ],
   "prerequisites": []
 }
