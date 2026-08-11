@@ -90,6 +90,17 @@ window.APP_ADMIN_URL = 'https://studyplan-admin.pmhtrfalab999.workers.dev';
 // did not come from this app. Not a login and it protects a free quota, not
 // money — so a simple value is fine. Leave '' to send none.
 window.APP_AI_SECRET = '';
+// Cloud Sync (cloud/cloudflare-worker.js) — lets a student sign in with an
+// email and password so their selected plan, progress, grades, and custom
+// plans follow them to a new device. The only Worker in this project backed
+// by a real database (Cloudflare D1) rather than GitHub, since "the same
+// account on a second phone" isn't something a device's own storage can do
+// alone. See cloud/README.md for the one-time setup.
+//
+// Leave '' and the app is unchanged: Settings still shows a "Cloud Sync"
+// section, says it isn't configured, and nothing else about the app is
+// different. Nobody's progress ever leaves their device until this is set.
+window.APP_CLOUD_URL = 'https://studyplan-cloud.pmhtrfalab999.workers.dev';
 // Hosted JSON manifest of official/community plans the app can pull updates
 // from when online (see "Check for updates" in Settings). A relative path
 // works once this file is served (GitHub Pages, any static host) alongside

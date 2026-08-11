@@ -167,6 +167,13 @@
         '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">🏆</span>' + (rtl ? 'الإنجازات' : 'Achievements') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">🧠</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">🗺️</span>' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</div>' +
+        (window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured()
+          ? '<div class="dash-quicklink" onclick="AAUP_SIDEBAR.openSettings()"><span class="dq-icon">☁️</span>' +
+            (window.AAUP_CLOUD.isSignedIn()
+              ? window.__escapeHtml(window.AAUP_CLOUD.getEmail())
+              : (rtl ? 'تسجيل الدخول — مزامنة سحابية' : 'Sign In — Cloud Sync')) +
+            '</div>'
+          : '') +
       '</div>';
     // Backup nudge: only when there IS meaningful progress to lose, and no
     // backup in the last 30 days (or ever). Quiet one-liner, not a popup —
