@@ -132,8 +132,7 @@
     var body = rows.map(function(r){
       var name = rtl && r.nameAr ? r.nameAr : r.name;
       return '<tr class="' + (r.excluded ? 'gs-row-excluded' : '') + '">' +
-        '<td class="gs-term">' + esc(r.term) + '</td>' +
-        '<td><strong>' + esc(name) + '</strong><br><span class="gs-code">' + esc(r.code) + '</span></td>' +
+        '<td><strong>' + esc(name) + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
         '<td>' + r.cr + '</td>' +
         '<td><select class="gs-grade-select" data-pid="' + esc(r.pid) + '">' + optsFor(r.grade) + '</select></td>' +
         '<td class="gs-pts">' + pointsCell(r, t) + '</td>' +
@@ -142,8 +141,10 @@
     return '<div class="gs-block">' +
       '<div class="gs-lbl">' + t.title + '</div>' +
       '<p class="gs-hint">' + t.hint + '</p>' +
-      '<div class="gs-table-wrap"><table class="gs-table"><thead><tr>' +
-        '<th>' + t.term + '</th><th>' + t.course + '</th><th>' + t.ch + '</th><th>' + t.grade + '</th><th>' + t.pts + '</th>' +
+      '<div class="gs-table-wrap"><table class="gs-table">' +
+        '<colgroup><col class="gs-col-course"><col class="gs-col-ch"><col class="gs-col-grade"><col class="gs-col-pts"></colgroup>' +
+        '<thead><tr>' +
+        '<th>' + t.course + '</th><th>' + t.ch + '</th><th>' + t.grade + '</th><th>' + t.pts + '</th>' +
       '</tr></thead><tbody>' + body + '</tbody></table></div></div>';
   }
 
