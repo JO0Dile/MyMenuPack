@@ -1437,6 +1437,7 @@
   .wn-cards{display:flex; flex-direction:column; gap:8px; margin-bottom:8px;}
 
   .wn-card{
+    position:relative; overflow:hidden;
     display:block; width:100%; text-align:left; font-family:inherit; cursor:pointer;
     background:var(--search-bg); border:1px solid var(--line); border-radius:10px;
     padding:10px 12px; color:var(--text);
@@ -1445,7 +1446,15 @@
   .wn-card:hover{border-color:var(--accent);}
   .wn-card.is-top{border-color:var(--accent); background:rgba(93,184,255,.06);}
 
-  .wn-card-head{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+  /* The ghost rank number — ink-on-ink, so it reads as texture rather than
+     competing with the course name for attention. */
+  .wn-rank{
+    position:absolute; top:2px; right:8px; font-size:34px; font-weight:800;
+    color:rgba(255,255,255,.05); line-height:1; pointer-events:none;
+  }
+  html[dir="rtl"] .wn-rank, .plan-page.rtl-mode .wn-rank{right:auto; left:8px;}
+
+  .wn-card-head{position:relative; display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
   .wn-card-head h4{font-size:13px; font-weight:700; margin:0; line-height:1.35;}
 
   .wn-tag{
@@ -1454,25 +1463,39 @@
   }
   .wn-tag-hot{background:rgba(255,182,72,.14); color:#ffb648; border:1px solid rgba(255,182,72,.4);}
 
-  .wn-sub{font-size:10.5px; color:var(--text-dim); margin-top:3px;}
-  .wn-reason{font-size:11.5px; color:var(--text); line-height:1.55; margin:6px 0 0;}
+  .wn-sub{position:relative; font-size:10.5px; color:var(--text-dim); margin-top:3px;}
+  .wn-reason{position:relative; font-size:11.5px; color:var(--text); line-height:1.55; margin:6px 0 0;}
   .wn-reason strong{font-weight:700;}
 
   .wn-rest{margin-top:2px;}
 
-  /* Credit hours and the before/after progress figure for taking the top
-     picks — two facts, not a chart, because this lives in a dashboard card
-     next to three other cards and has to earn its space. */
-  .wn-sim{
-    margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);
-    display:flex; flex-direction:column; gap:5px;
+  .wn-grid{display:flex; flex-direction:column; gap:10px; margin-top:10px;}
+
+  .wn-panel{
+    background:var(--search-bg); border:1px solid var(--line); border-radius:10px; padding:11px 13px;
   }
-  .wn-sim-row{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim);}
-  .wn-sim-row b{color:var(--text); font-weight:700;}
+  .wn-lbl{font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px;}
+
+  .wn-bar-row{margin-bottom:9px;}
+  .wn-bar-row:last-child{margin-bottom:0;}
+  .wn-bar-top{display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim); margin-bottom:4px;}
+  .wn-bar-top b{color:var(--text); font-weight:700;}
+  .wn-bar-track{height:6px; border-radius:99px; background:rgba(255,255,255,.06); overflow:hidden;}
+  .wn-bar-track i{display:block; height:100%; background:var(--accent); border-radius:99px;}
+
+  .wn-worth-line{
+    display:flex; gap:7px; font-size:11.5px; color:var(--text); line-height:1.55; margin:0 0 7px;
+  }
+  .wn-worth-line:last-child{margin-bottom:0;}
+  .wn-worth-line:before{content:'—'; color:var(--text-dim); flex:0 0 auto;}
 
   @media (min-width:600px){
     .wn-cards{flex-direction:row; flex-wrap:wrap;}
     .wn-card{flex:1 1 220px; min-width:0;}
+  }
+  @media (min-width:720px){
+    .wn-grid{flex-direction:row;}
+    .wn-grid .wn-panel{flex:1 1 0; min-width:0;}
   }
 
   /* ==========================================================================
@@ -1871,12 +1894,49 @@
 
   .standing-none{background:rgba(255,255,255,.06);color:var(--text-dim);}
 
-  /* js/51-gpa-studio.js — the editable grade table and the target-GPA
-     projection inserted into the Degree Audit modal. The table scrolls
+  /* js/51-gpa-studio.js — the editable grade table, the GPA dial and the
+     target-GPA projection inserted into the Degree Audit modal in place of
+     the old flat three-card row. Written mobile-first: the table and the
+     side column stack in document order (table first, since that is what a
+     screen reader or a narrow phone should meet before the summary of it),
+     and only become side by side once there is room. The table scrolls
      inside its own wrapper on a narrow screen rather than the columns
      being squeezed, so a long course name and its grade dropdown both
      stay legible on a phone. */
-  .gs-block{margin:18px 0;}
+  .gs-layout{display:flex; flex-direction:column; gap:18px; margin:16px 0 20px;}
+  .gs-col-main{min-width:0;}
+  .gs-col-side{display:flex; flex-direction:column; gap:14px; min-width:0;}
+
+  @media (min-width:720px){
+    .gs-layout{flex-direction:row; align-items:flex-start;}
+    .gs-col-main{flex:1.4 1 0;}
+    .gs-col-side{flex:1 1 0;}
+  }
+
+  .gs-card{
+    background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px;
+  }
+
+  .gs-dial{
+    width:132px; height:132px; border-radius:50%; margin:6px auto 14px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .gs-dial-inner{
+    width:104px; height:104px; border-radius:50%; background:var(--panel);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .gs-dial-inner b{font-size:28px; font-weight:800; color:var(--text); line-height:1.15;}
+  .gs-dial-inner span{font-size:9.5px; color:var(--text-dim); letter-spacing:.06em; margin-top:2px;}
+
+  .gs-kv{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:8px 0; border-bottom:1px solid var(--line); font-size:12.5px; color:var(--text-dim);
+  }
+  .gs-kv:last-child{border-bottom:0;}
+  .gs-kv b{color:var(--text); font-weight:700;}
+
+  .gs-block{margin:0;}
 
   .gs-lbl{font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
 
