@@ -63,6 +63,34 @@
     return out;
   }
 
+  // Up to a few real majors from inside a college, for the picker tile's
+  // preview rows — every plan (built-in and community) lives in the same
+  // AAUP_IMPORTED store, so this is one lookup, not two. Distinct majors
+  // stay distinct entries here even when several share a college (e.g. AI &
+  // Robotics and Data Science both under "AI and Data Science") — nothing
+  // here collapses two majors into one row.
+  function majorsForCollege(uniId, collegeId){
+    var imported = importedPlans();
+    var keyFn = window.AAUP_IMPORTED && window.AAUP_IMPORTED.collegeKeyForPlan;
+    var nameFn = window.AAUP_IMPORTED && window.AAUP_IMPORTED.nameParts;
+    var out = [];
+    Object.keys(imported).forEach(function(id){
+      var p = imported[id];
+      if(!p || !p.majorName || (p.university || 'aaup') !== uniId) return;
+      if((keyFn ? keyFn(p) : 'custom:' + uniId + ':unspecified') !== collegeId) return;
+      var courses = Array.isArray(p.courses) ? p.courses : [];
+      var cr = courses.length ? courses.reduce(function(sum, c){ return sum + (parseFloat(c.creditHours) || 0); }, 0) : null;
+      var en = nameFn ? nameFn(p.majorName.en) : { big: p.majorName.en || '', small: '' };
+      var ar = nameFn ? nameFn(p.majorName.ar) : { big: p.majorName.ar || '', small: '' };
+      out.push({
+        en: en.big + (en.small ? ' ' + en.small : ''),
+        ar: (ar.big || en.big) + (ar.small ? ' ' + ar.small : ''),
+        cr: cr
+      });
+    });
+    return out;
+  }
+
   function collegeDisplayName(college){
     if(college && college.name && (college.name.en || college.name.ar)){
       return { en: college.name.en || college.name.ar, ar: college.name.ar || college.name.en };
@@ -129,14 +157,24 @@
     }).join('');
   }
 
+  var COLLEGE_PREVIEW_N = 3;
+
   function renderColleges(uniId){
     var grid = document.getElementById('homeCollegeGrid');
     if(!grid) return;
     var colleges = collegesForUniversity(uniId);
     var ids = Object.keys(colleges);
+    var esc = window.__escapeHtml;
     var tiles = ids.map(function(cid){
       var c = colleges[cid];
       var name = collegeDisplayName(c);
+      var majors = majorsForCollege(uniId, cid);
+      var shown = majors.slice(0, COLLEGE_PREVIEW_N);
+      var rest = majors.length - shown.length;
+      var previewHTML = shown.map(function(m){
+        return '<div class="pc-major-row"><span class="pc-major-name">' + esc(m.en) + '</span>' +
+          '<span class="pc-major-cr">' + (m.cr != null ? m.cr + 'H' : '') + '</span></div>';
+      }).join('') + (rest > 0 ? '<div class="pc-major-more">+ ' + rest + ' more →</div>' : '');
       // Registered colleges (APP_COLLEGES) carry their own icon; a college
       // that only exists because a student's custom plan named it (no
       // registered entry) falls back to a plain building.
@@ -145,6 +183,7 @@
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(c, { size: 26, fallback: '🏫' }) + '</div>' +
         '<h2 style="font-size:14.5px;">' + name.en + '</h2>' +
         '<p style="direction:rtl;">' + name.ar + '</p>' +
+        (previewHTML ? '<div class="pc-major-list">' + previewHTML + '</div>' : '') +
         (c.count ? '<div class="pc-cta">View plans →</div>' : '<div class="pc-cta home-tile-empty">No plans yet</div>') +
         '</div>';
     }).join('');
