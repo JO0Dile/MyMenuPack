@@ -138,7 +138,7 @@
     var byPlan = {};
     items.forEach(function(o){ (byPlan[o.prefix] = byPlan[o.prefix] || []).push(o); });
 
-    return '<h3 style="margin-bottom:6px;">⚠️ ' + (r ? 'بيانات من نسخة أقدم من الخطة' : 'Data from an older version of your plan') + '</h3>' +
+    return '<h3 style="margin:18px 0 6px;">⚠️ ' + (r ? 'بيانات من نسخة أقدم من الخطة' : 'Data from an older version of your plan') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + (r
         ? 'حدّثنا هذه الخطط، وبعض المساقات التي سجّلت عليها بيانات لم تعد موجودة فيها. لم نحذف شيئًا — بياناتك ما زالت محفوظة كما تركتها. راجعها: إمّا أن تبقيها، أو تزيلها، أو تُدخلها من جديد على المساق الذي حلّ محلّها.'
         : 'These plans were updated, and some courses you recorded data against are no longer in them. Nothing was deleted — your data is still saved exactly as you left it. Review it: keep it, remove it, or re-enter it on whatever course replaced it.') + '</p>' +
