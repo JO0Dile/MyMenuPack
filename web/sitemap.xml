@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  One URL, because that is honestly all there is: the app is a single page and
+  every screen inside it is a state, not an address. A sitemap listing invented
+  fragment URLs would not help.
+
+  This is not auto-discovered. A crawler looks for a sitemap at the ROOT of the
+  domain (jo0dile.github.io/robots.txt), and this is a project page under
+  /MyMenuPack/, so nothing under here can point at it. It has to be submitted
+  by hand, once, in Google Search Console — which is the step that actually
+  gets the site indexed at all.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://jo0dile.github.io/MyMenuPack/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://jo0dile.github.io/MyMenuPack/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://jo0dile.github.io/MyMenuPack/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jo0dile.github.io/MyMenuPack/"/>
+  </url>
+</urlset>
