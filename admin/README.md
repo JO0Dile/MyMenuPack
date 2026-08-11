@@ -198,7 +198,7 @@ cosmetic Easter-egg gate on a panel that only touches your own browser — it is
 |---|---|
 | **Dashboard** | Counts, which repo and branch, how updates propagate |
 | **Universities** | Name, Arabic name, short name, description, website, logo, icon, faculties, publish/unpublish |
-| **Majors / Plans** | Name, subtitle, faculty, description, icon, image, degree hours; add and delete |
+| **Majors / Plans** | Grouped by faculty. Name, subtitle, faculty, description, icon, image, degree hours; add and delete |
 | **Courses** | Code, name, Arabic name, credit hours, category, year, semester; add and delete |
 | **Prerequisites** | Add and remove pairs, with a server-side loop check |
 | **Study Plan** | Move courses between years and semesters; add and remove years and summer terms |
@@ -209,6 +209,32 @@ A major's metadata, courses, prerequisites and semester layout are all one file
 (`data/<uni>/majors/<slug>.json`), so those four sections are views of a single
 object and one **Save major** writes all of them together. A course move and a
 prerequisite change can never land half-applied.
+
+### Adding a whole programme, in order
+
+The dashboard follows the same shape the data has, so there is one path and it
+runs downwards:
+
+```
+Universities → Edit → Faculties → + Add faculty → Save university
+Majors       → pick the faculty → + Add major here → Create → Save major
+Study Plan   → years, and which of them have a summer term
+Courses      → + Add course, grouped by the term it sits in
+Prerequisites→ before → after, checked for loops on the server
+```
+
+**A major belongs to a faculty, and the browser groups them that way.** The
+add button lives on the faculty it adds to, so a new major starts out in the
+right place instead of nowhere.
+
+Anything whose faculty is blank, or points at a faculty that no longer exists,
+is collected under **Not in any faculty** and marked. Those majors are real and
+saved — but students cannot reach them, and before this they looked exactly
+like every other row. The faculty field in the major editor is a list of that
+university's actual faculties rather than a slug typed from memory.
+
+Majors, Courses, Prerequisites and Study Plan are all one file, so **Save
+major** on any of them writes all four together.
 
 ### Icons and logos
 
