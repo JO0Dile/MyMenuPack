@@ -1,6 +1,6 @@
 {
-  "name": "AAUP Academic Planner",
-  "short_name": "AAUP Planner",
+  "name": "AAUPath — AAUP Academic Planner",
+  "short_name": "AAUPath",
   "description": "Plan your degree and track your progress — courses, prerequisites, GPA and audit for every AAUP major. Works offline.",
   "lang": "en",
   "dir": "auto",
@@ -15,12 +15,6 @@
     "productivity"
   ],
   "icons": [
-    {
-      "src": "assets/icons/icon-any.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
     {
       "src": "assets/icons/icon-any-192.png",
       "sizes": "192x192",
