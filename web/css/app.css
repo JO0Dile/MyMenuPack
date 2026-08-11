@@ -2970,6 +2970,35 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 .admin-savebar{align-items:center; gap:10px; flex-wrap:wrap;}
 .admin-savebar .admin-hint{margin:0;}
 
+/* The app themes .form-field inputs, but the admin tables and rows are neither
+   — so every input inside a course row rendered as a raw browser control: white
+   box, white dropdown, on a dark panel. Styling them one selector at a time is
+   how that happened in the first place, so this covers the whole overlay and
+   anything added to it later inherits it. */
+#adminOverlay input[type="text"],
+#adminOverlay input[type="number"],
+#adminOverlay input[type="search"],
+#adminOverlay input[type="password"],
+#adminOverlay select,
+#adminOverlay textarea{
+  background:var(--search-bg); border:1px solid var(--line);
+  border-radius:8px; padding:8px 10px; color:var(--text);
+  font-size:13px; font-family:inherit; box-sizing:border-box;
+}
+#adminOverlay textarea{resize:vertical; min-height:70px;}
+#adminOverlay input:focus,
+#adminOverlay select:focus,
+#adminOverlay textarea:focus{
+  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(93,184,255,.15);
+}
+/* Dropdown lists are painted by the OS, which does not read the page's theme —
+   naming both sides keeps an open <select> from flashing white. */
+#adminOverlay select option{background:var(--panel); color:var(--text);}
+#adminOverlay input::placeholder{color:var(--text-dim); opacity:.7;}
+/* Table cells are tight; the overlay padding above is too generous for them. */
+#adminOverlay .admin-table input,
+#adminOverlay .admin-table select{padding:6px 8px; font-size:12.5px;}
+
 /* Faculty and term groups. Both exist so structure is visible rather than
    implied: a major sits inside a faculty, a course sits inside a term, and a
    flat list said neither. The orphan variant is deliberately loud — it marks
@@ -2988,7 +3017,37 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 .admin-facgroup-mark{display:flex; align-items:center; justify-content:center; width:30px; height:30px; flex:0 0 auto;}
 .admin-facgroup .admin-addhere{flex:0 0 auto;}
 .admin-facgroup-empty{margin:2px 0 0; font-style:italic;}
-.admin-termgroup h4{margin:0 0 6px; font-size:13px;}
+.admin-termgroup h4{margin:0; font-size:13px;}
+.admin-termgroup-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+.admin-termgroup-head h4{flex:1 1 auto;}
+
+/* Picking an existing course rather than retyping one. Collapsed by default —
+   it is an occasional action sitting above a list people scroll constantly. */
+.admin-picker{
+  margin:12px 0; border:1px solid var(--line); border-radius:12px;
+  background:var(--panel); overflow:hidden;
+}
+.admin-picker > summary{
+  cursor:pointer; padding:10px 14px; font-size:13px; font-weight:700; color:var(--text);
+  list-style:none; user-select:none;
+}
+.admin-picker > summary::-webkit-details-marker{display:none;}
+.admin-picker > summary:hover{background:rgba(255,255,255,.04);}
+.admin-picker[open] > summary{border-bottom:1px solid var(--line);}
+.admin-picker-body{padding:12px 14px;}
+.admin-picker-results{max-height:320px; overflow-y:auto; margin-top:8px;}
+.admin-pickhit{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:8px 10px; margin-bottom:4px; border-radius:8px; cursor:pointer;
+  background:rgba(255,255,255,.03); border:1px solid transparent; color:var(--text);
+  font-family:inherit; font-size:12.5px;
+}
+.admin-pickhit:hover{border-color:var(--accent); background:rgba(93,184,255,.10);}
+.admin-pickhit-code{
+  flex:0 0 auto; min-width:70px; font-variant-numeric:tabular-nums;
+  font-weight:700; color:var(--text-dim);
+}
+.admin-pickhit-name{flex:1 1 auto; min-width:0;}
 .admin-warn{color:var(--danger, #ff6b6b);}
 
 /* Which university, which faculty, which major — the three sections that can

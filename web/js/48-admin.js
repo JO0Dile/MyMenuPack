@@ -776,6 +776,7 @@
       ['s1', 's2'].concat(y.hasSummer ? ['s3'] : []).forEach(function(sem){
         buckets.push({
           title: y.id.toUpperCase() + ' · ' + SEM_LABEL[sem],
+          term: y.id + '|' + sem,
           rows: all.map(function(c, i){ return { c: c, i: i }; })
                    .filter(function(r){ return r.c.yearId === y.id && semKey(r.c) === sem; })
         });
@@ -790,14 +791,21 @@
 
     return '<h2>Courses</h2>' + crumbs() +
       '<p class="admin-hint">Grouped by where each course sits in the plan. ' +
-      'Changing a course\'s Year or Sem here moves it, and it lands in the matching group after Save.</p>' +
-      '<div class="form-field"><label for="acFilter">Search</label><input type="text" id="acFilter" placeholder="Filter by name or code…"></div>' +
+      'Add straight into a term with its own button, or change a row\'s Year or Sem ' +
+      'and it moves to the matching group immediately.</p>' +
+      '<div class="form-field"><label for="acFilter">Search this plan</label><input type="text" id="acFilter" placeholder="Filter by name or code…"></div>' +
+      coursePicker() +
       '<div id="acBody">' + buckets.map(function(b){
         var ch = b.rows.reduce(function(n, r){ return n + (Number(r.c.creditHours) || 0); }, 0);
         return '<section class="admin-termgroup' + (b.warn ? ' is-orphan' : '') + '">' +
-          '<h4>' + (b.warn ? '⚠️ ' : '') + esc(b.title) +
-            ' <span class="admin-sub">' + b.rows.length + ' course' + (b.rows.length === 1 ? '' : 's') +
-            ' · ' + ch + ' CH</span></h4>' +
+          '<div class="admin-termgroup-head">' +
+            '<h4>' + (b.warn ? '⚠️ ' : '') + esc(b.title) +
+              ' <span class="admin-sub">' + b.rows.length + ' course' + (b.rows.length === 1 ? '' : 's') +
+              ' · ' + ch + ' CH</span></h4>' +
+            (b.term
+              ? '<button type="button" class="home-btn admin-mini" data-add-term="' + esc(b.term) + '">+ Add here</button>'
+              : '') +
+          '</div>' +
           (b.rows.length
             ? '<table class="admin-table admin-course-table"><thead><tr>' +
               '<th>Code</th><th>Name</th><th>Arabic</th><th>CH</th><th>Category</th><th>Year</th><th>Sem</th><th></th>' +
@@ -807,12 +815,51 @@
             : '<p class="admin-hint admin-facgroup-empty">Empty.</p>') +
           '</section>';
       }).join('') + '</div>' +
-      '<div class="form-actions"><button type="button" class="home-btn admin-mini" id="acAdd">+ Add course</button></div>' +
+      '<div class="form-actions"><button type="button" class="home-btn admin-mini" id="acAdd">+ Add course (unscheduled)</button></div>' +
       saveBar();
+  }
+
+  // Adding "Arabic Language" to a new major meant retyping its code, its
+  // English name, its Arabic name, its credit hours and its category — for a
+  // course that is already written down in another plan, identically. 112 of
+  // AAUP's courses appear in more than one plan, so this is the common case,
+  // not the rare one, and every retyping is a chance to disagree with the
+  // course the students already have.
+  //
+  // The pool is read from plans.json, which the app already ships and caches:
+  // the same catalogue the search on the study plans searches. It lags data/ by
+  // about a minute after an edit, which does not matter for what this is — a
+  // source of course definitions to copy, not a source of truth.
+  function coursePicker(){
+    var years = (state.major || {}).years || [];
+    var termOpts = years.map(function(y){
+      return ['s1', 's2'].concat(y.hasSummer ? ['s3'] : []).map(function(s){
+        return '<option value="' + esc(y.id + '|' + s) + '">' + esc(y.id.toUpperCase()) + ' · ' + SEM_LABEL[s] + '</option>';
+      }).join('');
+    }).join('');
+    return '<details class="admin-picker" id="acPicker">' +
+      '<summary>🔍 Add a course that already exists</summary>' +
+      '<div class="admin-picker-body">' +
+        '<p class="admin-hint">Search every course in this university\'s published plans. ' +
+        'Picking one copies its code, names, credit hours and category into this plan — ' +
+        'it does not link the two, so editing it here does not change any other major.</p>' +
+        '<div class="admin-row">' +
+          '<input type="text" id="acPickQuery" placeholder="Course name, Arabic name, or code…">' +
+          '<select id="acPickTerm">' + (termOpts || '<option value="">unscheduled</option>') + '</select>' +
+        '</div>' +
+        '<div id="acPickResults" class="admin-picker-results"></div>' +
+      '</div></details>';
   }
 
   var CATS = [['skills', 'Skills'], ['core', 'Core'], ['math', 'Math'], ['dept', 'Department'],
               ['eng', 'English'], ['uni', 'University'], ['free', 'Free elective']];
+
+  // Offering Summer for a year that has none produced a course filed in a term
+  // that does not exist, which then vanished into "not placed" with no clue why.
+  function semestersFor(years, yearId){
+    var y = (years || []).filter(function(x){ return x.id === yearId; })[0];
+    return y && y.hasSummer ? ['s1', 's2', 's3'] : ['s1', 's2'];
+  }
 
   function courseRow(c, i, years){
     return '<tr data-course="' + i + '">' +
@@ -823,12 +870,18 @@
       '<td><select class="cc-cat">' + CATS.map(function(k){
         return '<option value="' + k[0] + '"' + (c.category === k[0] ? ' selected' : '') + '>' + k[1] + '</option>';
       }).join('') + '</select></td>' +
-      '<td><select class="cc-year">' + years.map(function(y){
-        return '<option value="' + esc(y.id) + '"' + (c.yearId === y.id ? ' selected' : '') + '>' + esc(y.id) + '</option>';
-      }).join('') + '</select></td>' +
+      // "Unscheduled" is a real state — a course can exist in the file with no
+      // year — and leaving it out of the list meant the dropdown silently
+      // disagreed with the row it was describing.
+      '<td><select class="cc-year">' +
+        '<option value=""' + (!c.yearId ? ' selected' : '') + '>—</option>' +
+        years.map(function(y){
+          return '<option value="' + esc(y.id) + '"' + (c.yearId === y.id ? ' selected' : '') + '>' + esc(y.id).toUpperCase() + '</option>';
+        }).join('') + '</select></td>' +
       '<td><select class="cc-sem">' +
-        ['s1', 's2', 's3'].map(function(s){
-          return '<option value="' + s + '"' + (c.semester === s || (s === 's3' && c.semester === 'summer') ? ' selected' : '') + '>' +
+        '<option value=""' + (!semKey(c) ? ' selected' : '') + '>—</option>' +
+        semestersFor(years, c.yearId).map(function(s){
+          return '<option value="' + s + '"' + (semKey(c) === s ? ' selected' : '') + '>' +
             (s === 's3' ? 'Summer' : s.toUpperCase()) + '</option>';
         }).join('') + '</select></td>' +
       '<td><button type="button" class="home-btn admin-mini admin-danger" data-del-course="' + i + '">✕</button></td></tr>';
@@ -1246,10 +1299,147 @@
     var h = val('amHours'); m.degreeHours = h === '' ? null : Number(h);
   }
 
+  // Every course in the university's published plans, deduplicated. Loaded once
+  // per session, lazily — nobody pays for it unless they open the picker.
+  var coursePool = null;
+  function loadCoursePool(){
+    if(coursePool) return Promise.resolve(coursePool);
+    return fetch('plans.json', { cache: 'no-store' })
+      .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(feed){
+        var uni = state.uni;
+        var seen = {};
+        (feed.plans || []).forEach(function(p){
+          if(p.university !== uni) return;
+          (p.courses || []).forEach(function(c){
+            // Code first: it is the registrar's identity for a course. Falling
+            // back to the name keeps courses that have never been given one.
+            var key = (c.courseNumber || '').trim() || ('name:' + (c.name || '').trim().toLowerCase());
+            if(!key || seen[key]) { if(seen[key]) seen[key].plans++; return; }
+            seen[key] = {
+              courseNumber: c.courseNumber || '',
+              name: c.name || '',
+              nameAr: c.ar || c.nameAr || '',
+              creditHours: Number(c.creditHours) || 0,
+              category: c.category || 'core',
+              plans: 1
+            };
+          });
+        });
+        coursePool = Object.keys(seen).map(function(k){ return seen[k]; });
+        return coursePool;
+      });
+  }
+
+  function renderPickResults(q){
+    var box = document.getElementById('acPickResults');
+    if(!box) return;
+    var needle = String(q || '').trim().toLowerCase();
+    if(needle.length < 2){
+      box.innerHTML = '<p class="admin-hint admin-facgroup-empty">Type at least two characters.</p>';
+      return;
+    }
+    // Courses already in this plan are excluded rather than shown greyed out:
+    // adding one twice is never what anyone meant, and the list is long enough.
+    var have = {};
+    ((state.major || {}).courses || []).forEach(function(c){
+      have[(c.courseNumber || '').trim() || ('name:' + (c.name || '').trim().toLowerCase())] = true;
+    });
+    var hits = (coursePool || []).filter(function(c){
+      var key = (c.courseNumber || '').trim() || ('name:' + c.name.trim().toLowerCase());
+      if(have[key]) return false;
+      return c.name.toLowerCase().indexOf(needle) !== -1 ||
+             (c.nameAr || '').toLowerCase().indexOf(needle) !== -1 ||
+             (c.courseNumber || '').toLowerCase().indexOf(needle) !== -1;
+    }).slice(0, 40);
+
+    box.innerHTML = hits.length
+      ? hits.map(function(c, i){
+          return '<button type="button" class="admin-pickhit" data-pick="' + i + '">' +
+            '<span class="admin-pickhit-code">' + esc(c.courseNumber || '—') + '</span>' +
+            '<span class="admin-pickhit-name">' + esc(c.name) +
+              (c.nameAr ? '<br><span class="admin-sub" dir="rtl">' + esc(c.nameAr) + '</span>' : '') + '</span>' +
+            '<span class="admin-sub">' + c.creditHours + ' CH · ' + esc(c.category) +
+              (c.plans > 1 ? ' · in ' + c.plans + ' plans' : '') + '</span>' +
+            '</button>';
+        }).join('')
+      : '<p class="admin-hint admin-facgroup-empty">Nothing matches — or it is already in this plan.</p>';
+
+    box.querySelectorAll('[data-pick]').forEach(function(b){
+      b.addEventListener('click', function(){
+        addCourseFromPool(hits[Number(b.getAttribute('data-pick'))]);
+      });
+    });
+  }
+
+  function newCourseId(){
+    // Must not collide with an existing id: prerequisites are stored as pairs
+    // of ids, so a duplicate would silently attach this course to another's
+    // prerequisite lines.
+    var used = {};
+    ((state.major || {}).courses || []).forEach(function(c){ used[c.id] = true; });
+    var n = 1;
+    while(used['new-course-' + n]) n++;
+    return 'new-course-' + n;
+  }
+
+  function addCourseAt(term, base){
+    harvestCourses();
+    var parts = String(term || '').split('|');
+    var c = {
+      id: newCourseId(),
+      courseNumber: (base && base.courseNumber) || '',
+      name: (base && base.name) || 'New course',
+      nameAr: (base && base.nameAr) || '',
+      creditHours: base ? base.creditHours : 3,
+      category: (base && base.category) || 'core',
+      yearId: parts[0] || '',
+      semester: parts[1] || ''
+    };
+    state.major.courses.push(c);
+    markDirty();
+    render();
+    return c;
+  }
+
+  function addCourseFromPool(c){
+    if(!c) return;
+    var term = val('acPickTerm');
+    addCourseAt(term, c);
+    toast('Added ' + (c.courseNumber ? c.courseNumber + ' · ' : '') + c.name + '.');
+  }
+
   function bindCourses(){
-    document.querySelectorAll('[data-course] input, [data-course] select').forEach(function(i){
+    document.querySelectorAll('[data-course] input').forEach(function(i){
       i.addEventListener('change', markDirty);
     });
+    document.querySelectorAll('[data-course] .cc-cat').forEach(function(s){
+      s.addEventListener('change', markDirty);
+    });
+    // Year and semester decide which group the row belongs to, so re-render
+    // rather than just marking dirty. Before this the value changed and the row
+    // stayed put until a save and a reopen, which read as "it cannot be moved".
+    document.querySelectorAll('[data-course] .cc-year, [data-course] .cc-sem').forEach(function(s){
+      s.addEventListener('change', function(){ harvestCourses(); markDirty(); render(); });
+    });
+    document.querySelectorAll('[data-add-term]').forEach(function(b){
+      b.addEventListener('click', function(){ addCourseAt(b.getAttribute('data-add-term'), null); });
+    });
+
+    var q = document.getElementById('acPickQuery');
+    if(q){
+      var run = function(){ renderPickResults(q.value); };
+      q.addEventListener('input', function(){
+        loadCoursePool().then(run).catch(function(e){
+          var box = document.getElementById('acPickResults');
+          if(box) box.innerHTML = '<p class="admin-hint admin-warn">Could not read the catalogue (' + esc(e.message) + ').</p>';
+        });
+      });
+      // Warm the pool when the panel is opened, so the first keystroke is not
+      // the thing that waits on a network read.
+      var det = document.getElementById('acPicker');
+      if(det) det.addEventListener('toggle', function(){ if(det.open) loadCoursePool().catch(function(){}); });
+    }
     document.querySelectorAll('[data-del-course]').forEach(function(b){
       b.addEventListener('click', function(){
         harvestCourses();
@@ -1272,14 +1462,11 @@
         markDirty(); render();
       });
     });
-    on('acAdd', 'click', function(){
-      harvestCourses();
-      var n = state.major.courses.length + 1;
-      var years = state.major.years || [{ id: 'y1' }];
-      state.major.courses.push({ id: 'new-course-' + n, courseNumber: '', name: 'New course',
-        nameAr: '', creditHours: 3, category: 'core', yearId: years[0].id, semester: 's1' });
-      markDirty(); render();
-    });
+    // Deliberately unscheduled. This used to hard-code the first year and first
+    // semester, so every course arrived in Y1 S1 no matter which term you were
+    // looking at — the per-term buttons above are the answer to "where does it
+    // go", and this one is for a course whose term is not decided yet.
+    on('acAdd', 'click', function(){ addCourseAt('', null); });
   }
 
   function bindPrereqs(){
