@@ -1871,6 +1871,56 @@
 
   .standing-none{background:rgba(255,255,255,.06);color:var(--text-dim);}
 
+  /* js/51-gpa-studio.js — the editable grade table and the target-GPA
+     projection inserted into the Degree Audit modal. The table scrolls
+     inside its own wrapper on a narrow screen rather than the columns
+     being squeezed, so a long course name and its grade dropdown both
+     stay legible on a phone. */
+  .gs-block{margin:18px 0;}
+
+  .gs-lbl{font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
+
+  .gs-hint{font-size:11.5px;color:var(--text-dim);margin:0 0 10px;line-height:1.55;}
+
+  .gs-empty{font-size:12.5px;color:var(--text-dim);}
+
+  .gs-table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:10px;}
+
+  .gs-table{width:100%; min-width:480px; border-collapse:collapse; font-size:12.5px;}
+
+  .gs-table th{
+    text-align:left; color:var(--text-dim); font-weight:700; font-size:10.5px;
+    text-transform:uppercase; letter-spacing:.03em; padding:8px 10px;
+    border-bottom:1px solid var(--line); background:rgba(255,255,255,.02);
+  }
+  html[dir="rtl"] .gs-table th, .plan-page.rtl-mode .gs-table th{text-align:right;}
+
+  .gs-table td{padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:middle;}
+  .gs-table tr:last-child td{border-bottom:0;}
+
+  .gs-term{color:var(--text-dim); font-size:11.5px; white-space:nowrap;}
+  .gs-code{color:var(--text-dim); font-size:10.5px;}
+  .gs-pts{font-weight:700; text-align:right; white-space:nowrap;}
+  html[dir="rtl"] .gs-pts{text-align:left;}
+  .gs-excluded{color:var(--text-dim); font-size:11px; font-style:italic;}
+  .gs-row-excluded{opacity:.6;}
+
+  .gs-grade-select{
+    background:var(--search-bg); border:1px solid var(--line); border-radius:7px;
+    padding:5px 7px; color:var(--text); font-size:12px; font-family:inherit; max-width:100%;
+  }
+  .gs-grade-select:focus{outline:none; border-color:var(--accent);}
+
+  .gs-project-row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;}
+  .gs-remaining{font-size:12px; color:var(--text-dim); display:flex; flex-direction:column; gap:3px;}
+  .gs-remaining b{font-size:18px; color:var(--text); font-weight:800;}
+  .gs-project-result{
+    font-size:12.5px; color:var(--text); line-height:1.6; min-height:1.6em;
+    padding:10px 12px; border-radius:9px;
+    background:rgba(93,184,255,.06); border:1px solid var(--line);
+  }
+  .gs-project-result:empty{display:none;}
+
   .audit-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
 
   .audit-table th{

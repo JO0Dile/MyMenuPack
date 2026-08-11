@@ -185,17 +185,30 @@
     var overlay = document.getElementById('auditModalOverlay');
     if(!body || !overlay) return;
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+    // Planning status (in progress / planned) and a course's FIRST grade
+    // still only come from that course's own info popup -- marking something
+    // done and picking its assessment marks is a bigger action than belongs
+    // in a summary table. Once a grade exists, though, js/51-gpa-studio.js
+    // gives a second place to correct it, writing the exact same stored
+    // value -- so the sentence below only claims what is still actually true.
+    var studioNote = window.AAUP_GPA_STUDIO
+      ? (rtl
+          ? 'حالة التخطيط والعلامة الأولى تُحدَّدان من نافذة كل مساق؛ يمكنك تعديل العلامات المُدخلة من الجدول أدناه مباشرة.'
+          : 'Planning status and a course\u2019s first grade are set from that course\u2019s own info popup; grades already entered can be edited directly below.')
+      : (rtl
+          ? 'العلامات وحالة التخطيط (قيد الإنجاز / مخطط له) تُحدَّد من نافذة كل مساق.'
+          : 'Grades and planning status (in progress / planned) are set from each course\u2019s own info popup.');
+
     body.innerHTML =
       '<h2 style="margin-top:0;">📋 ' + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
-      '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' +
-      (rtl
-        ? 'العلامات وحالة التخطيط (قيد الإنجاز / مخطط له) تُحدَّد من نافذة كل مساق.'
-        : 'Grades and planning status (in progress / planned) are set from each course\u2019s own info popup.') +
-      '</p>' +
+      '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' +
       renderGpaDashboard(prefix, rtl) +
+      (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.render(prefix, rtl) : '') +
+      (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.renderProjection(prefix, rtl) : '') +
       renderSemesterGpas(prefix, rtl) +
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');
+    if(window.AAUP_GPA_STUDIO) window.AAUP_GPA_STUDIO.bind(prefix, rtl);
   }
 
   // Mirrors a real transcript's structure: each semester's own GPA (which
