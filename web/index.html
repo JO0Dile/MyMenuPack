@@ -335,6 +335,16 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- Cloud Sync: sign in/up and account management live entirely in this one
+     dedicated popup (js/52-cloud.js), not spread across the general
+     Settings modal above. -->
+<div class="modal-overlay" id="cloudModalOverlay">
+  <div class="modal-card dev-modal-card">
+    <button class="modal-close" id="cloudModalClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="cloudModalBody"></div>
+  </div>
+</div>
+
 <!-- Shared course-details popup for every imported/feed plan — one instance
      reused for any plan id, since (unlike the 4 built-in majors) there's no
      way to have a static per-plan overlay for a plan that doesn't exist

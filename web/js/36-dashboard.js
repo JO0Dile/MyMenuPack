@@ -168,10 +168,10 @@
         '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">🧠</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">🗺️</span>' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</div>' +
         (window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured()
-          ? '<div class="dash-quicklink" onclick="AAUP_SIDEBAR.openSettings()"><span class="dq-icon">☁️</span>' +
+          ? '<div class="dash-quicklink" onclick="AAUP_CLOUD.open()"><span class="dq-icon">🗄️</span>' +
             (window.AAUP_CLOUD.isSignedIn()
-              ? window.__escapeHtml(window.AAUP_CLOUD.getEmail())
-              : (rtl ? 'تسجيل الدخول — مزامنة سحابية' : 'Sign In — Cloud Sync')) +
+              ? window.__escapeHtml(window.AAUP_CLOUD.displayName())
+              : (rtl ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up')) +
             '</div>'
           : '') +
       '</div>';

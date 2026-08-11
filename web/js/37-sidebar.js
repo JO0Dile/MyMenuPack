@@ -189,7 +189,7 @@
       window.AAUP_ORPHANS.bindSection(body, function(){ renderSettingsBody(body); });
     }
     if(window.AAUP_CLOUD){
-      window.AAUP_CLOUD.bindSection(body, function(){ renderSettingsBody(body); });
+      window.AAUP_CLOUD.bindSection(body);
     }
     document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
     if(document.getElementById('setLangBtn')){

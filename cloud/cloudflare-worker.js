@@ -54,6 +54,10 @@ const MIN_PASSWORD_LEN = 8;
 const MAX_PASSWORD_LEN = 200;
 const MAX_EMAIL_LEN = 200;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Letters, digits, underscore, 3-24 chars. No @ or . allowed, so a login
+// identifier can always be classified as "looks like an email" or "looks
+// like a username" without ambiguity.
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,24}$/;
 
 // ---------------------------------------------------------------------------
 // small helpers — identical to admin/cloudflare-worker.js on purpose; two
@@ -245,7 +249,7 @@ async function requireUser(request, env) {
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   const claims = await verifyToken(token, env);
   if (!claims) return { error: json({ error: 'unauthorized' }, 401, env, request) };
-  const row = await env.DB.prepare('SELECT id, email, token_version, created_at FROM users WHERE id = ?')
+  const row = await env.DB.prepare('SELECT id, email, username, token_version, created_at FROM users WHERE id = ?')
     .bind(claims.uid).first();
   if (!row || row.token_version !== claims.tv) {
     return { error: json({ error: 'session expired — please sign in again' }, 401, env, request) };
@@ -266,6 +270,11 @@ async function handleSignup(request, env) {
   const body = await readJson(request, 4096);
   const email = normalizeEmail(body.email);
   const password = String(body.password || '');
+  // Optional: a friendlier sign-in identifier than a full email address.
+  // '' means "not set," not "set to empty" — normalizeUsername below keeps
+  // that distinction so an unset username never collides with another
+  // unset one under a UNIQUE index.
+  const usernameRaw = body.username == null ? '' : String(body.username).trim();
 
   if (!email || email.length > MAX_EMAIL_LEN || !EMAIL_RE.test(email)) {
     return json({ error: 'enter a valid email address' }, 400, env, request);
@@ -276,42 +285,74 @@ async function handleSignup(request, env) {
   if (password.length > MAX_PASSWORD_LEN) {
     return json({ error: 'password is too long' }, 400, env, request);
   }
+  if (usernameRaw && !USERNAME_RE.test(usernameRaw)) {
+    return json({ error: 'username must be 3-24 characters: letters, numbers, underscore only' }, 400, env, request);
+  }
+  const username = usernameRaw || null;
 
   const existing = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first();
   if (existing) return json({ error: 'an account with that email already exists — sign in instead' }, 409, env, request);
+  if (username) {
+    const takenUsername = await env.DB.prepare('SELECT id FROM users WHERE username = ?').bind(username).first();
+    if (takenUsername) return json({ error: 'that username is already taken' }, 409, env, request);
+  }
 
   const id = crypto.randomUUID();
   const passwordHash = await hashPassword(password);
   const createdAt = Date.now();
-  await env.DB.prepare('INSERT INTO users (id, email, password_hash, token_version, created_at) VALUES (?, ?, ?, 1, ?)')
-    .bind(id, email, passwordHash, createdAt).run();
+  await env.DB.prepare('INSERT INTO users (id, email, username, password_hash, token_version, created_at) VALUES (?, ?, ?, ?, 1, ?)')
+    .bind(id, email, username, passwordHash, createdAt).run();
 
-  return json({ ok: true, token: await issueToken(id, 1, env), email, createdAt }, 200, env, request);
+  return json({ ok: true, token: await issueToken(id, 1, env), email, username, createdAt }, 200, env, request);
 }
 
 async function handleLogin(request, env) {
   await sleep(LOGIN_DELAY_MS);
   if (!env.SESSION_SECRET) return json({ error: 'cloud sync is not configured on the server' }, 500, env, request);
   const body = await readJson(request, 4096);
-  const email = normalizeEmail(body.email);
+  // One field does double duty: a student can type either their email or
+  // their username to sign in. Deciding which lookup to run from the
+  // SHAPE of the text (contains '@' and a dot => email) rather than trying
+  // both queries keeps this to one DB read either way.
+  const identifier = String(body.email != null ? body.email : body.identifier || '').trim();
   const password = String(body.password || '');
+  const looksLikeEmail = EMAIL_RE.test(identifier);
+  const lookupValue = looksLikeEmail ? normalizeEmail(identifier) : identifier;
+  const lookupColumn = looksLikeEmail ? 'email' : 'username';
 
-  const row = await env.DB.prepare('SELECT id, password_hash, token_version, created_at FROM users WHERE email = ?')
-    .bind(email).first();
+  const row = await env.DB.prepare(`SELECT id, email, username, password_hash, token_version, created_at FROM users WHERE ${lookupColumn} = ?`)
+    .bind(lookupValue).first();
   const passOk = await verifyPassword(password, row ? row.password_hash : DUMMY_HASH);
 
-  if (!row || !passOk) return json({ error: 'invalid email or password' }, 401, env, request);
+  if (!row || !passOk) return json({ error: 'invalid email/username or password' }, 401, env, request);
 
   return json({
     ok: true,
     token: await issueToken(row.id, row.token_version, env),
-    email,
+    email: row.email,
+    username: row.username,
     createdAt: row.created_at,
   }, 200, env, request);
 }
 
 async function handleMe(env, request, user) {
-  return json({ ok: true, email: user.email, createdAt: user.created_at }, 200, env, request);
+  return json({ ok: true, email: user.email, username: user.username, createdAt: user.created_at }, 200, env, request);
+}
+
+async function handleSetUsername(request, env, user) {
+  const body = await readJson(request, 4096);
+  const usernameRaw = body.username == null ? '' : String(body.username).trim();
+  if (!usernameRaw) {
+    await env.DB.prepare('UPDATE users SET username = NULL WHERE id = ?').bind(user.id).run();
+    return json({ ok: true, username: null }, 200, env, request);
+  }
+  if (!USERNAME_RE.test(usernameRaw)) {
+    return json({ error: 'username must be 3-24 characters: letters, numbers, underscore only' }, 400, env, request);
+  }
+  const taken = await env.DB.prepare('SELECT id FROM users WHERE username = ? AND id != ?').bind(usernameRaw, user.id).first();
+  if (taken) return json({ error: 'that username is already taken' }, 409, env, request);
+  await env.DB.prepare('UPDATE users SET username = ? WHERE id = ?').bind(usernameRaw, user.id).run();
+  return json({ ok: true, username: usernameRaw }, 200, env, request);
 }
 
 async function handleChangePassword(request, env, user) {
@@ -406,6 +447,7 @@ export default {
       const user = gate.user;
 
       if (path === '/api/me' && request.method === 'GET') return handleMe(env, request, user);
+      if (path === '/api/username' && request.method === 'POST') return handleSetUsername(request, env, user);
       if (path === '/api/password/change' && request.method === 'POST') return handleChangePassword(request, env, user);
       if (path === '/api/account' && request.method === 'DELETE') return handleDeleteAccount(env, request, user);
       if (path === '/api/sync' && request.method === 'GET') return handleGetSync(env, request, user);

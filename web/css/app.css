@@ -2559,6 +2559,7 @@
     background:var(--panel);border:1px solid var(--line);border-radius:10px;
     padding:16px;text-align:center;cursor:pointer;transition:border-color .15s ease,transform .15s ease;
     color:var(--text);text-decoration:none;display:block;
+    overflow-wrap:anywhere; min-width:0;
   }
   .dash-quicklink:hover{border-color:var(--accent);transform:translateY(-2px);}
   .dash-quicklink .dq-icon{font-size:22px;display:block;margin-bottom:6px;}
