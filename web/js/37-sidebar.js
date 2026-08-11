@@ -25,6 +25,7 @@
   var ITEMS = [
     { key: 'dashboard', icon: '🏠', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
     { key: 'studyplan', icon: '🗺️', label: 'My Study Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'roadmap', icon: '🧭', label: 'My Path', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
     { key: 'audit', icon: '📋', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
     { key: 'achievements', icon: '🏆', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
     { key: 'advisor', icon: '🧠', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
