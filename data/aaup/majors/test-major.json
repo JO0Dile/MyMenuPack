@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "slug": "test-major",
+  "university": "aaup",
+  "college": "test-major",
+  "name": "test-major",
+  "nameAr": "تست تست",
+  "subtitle": "hi",
+  "subtitleAr": "هلو",
+  "icon": "✨",
+  "iconKey": "infinity",
+  "imageUrl": "",
+  "bio": "hello there",
+  "bioAr": "يا هلا",
+  "degreeHours": 999,
+  "freeElectiveSuggestions": [],
+  "courses": [],
+  "prerequisites": []
+}
