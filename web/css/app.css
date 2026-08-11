@@ -404,6 +404,15 @@
   .home-tile-empty{
     font-size:11px; color:var(--text-dim); opacity:.7; font-style:italic;
   }
+  .pc-major-list{margin:-2px 0 0;}
+  .pc-major-row{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    padding:7px 0; border-top:1px solid var(--line); font-size:12px;
+  }
+  .pc-major-name{color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .pc-major-cr{color:var(--text-dim); font-size:10.5px; white-space:nowrap; flex:none;}
+  .pc-major-more{font-size:11px; color:var(--accent); font-weight:700; padding-top:6px;}
+  html[dir="rtl"] .pc-major-row, .plan-page.rtl-mode .pc-major-row{direction:rtl;}
   .home-step-empty-note{
     grid-column:1 / -1; font-size:13px; color:var(--text-dim);
     text-align:center; padding:30px 10px; border:1px dashed var(--line);
