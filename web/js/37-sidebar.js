@@ -132,7 +132,7 @@
 
   function accountTabHtml(r, current, others){
     return (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
-      '<h3 style="margin-bottom:6px;">👤 ' + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
+      '<h3 style="margin:18px 0 6px;">👤 ' + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + (r
         ? 'مختلف عن المزامنة السحابية أعلاه: كل ملف هنا يبقى على هذا الجهاز فقط ولا يُزامَن — مفيد إذا كان أكثر من شخص يشارك هذا الجهاز، أو أردت ملفًا محليًا ثانيًا.'
         : 'Different from Cloud Sync above: each profile here stays on this device only and is never synced anywhere — useful if more than one person shares this device, or you want a second local profile of your own.') + '</p>' +
@@ -167,7 +167,7 @@
       '<button type="button" class="home-btn" id="setResetBtn">🗑 ' + (r ? 'مسح كل البيانات' : 'Reset All Data') + '</button>' +
       '</div>' +
       (window.APP_PLANS_FEED_URL ? (
-        '<h3 style="margin-bottom:6px;">🌐 ' + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
+        '<h3 style="margin:18px 0 6px;">🌐 ' + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
         '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
         '<button type="button" class="home-btn" id="setSyncBtn">🔄 ' + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
