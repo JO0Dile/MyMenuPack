@@ -904,7 +904,7 @@
       cardButtons +
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
       '<div class="name">' + displayName + (done ? ' ✓' : '') + '</div>' +
-      '<div style="font-size:10px;opacity:.8;margin-top:2px;">' + c.creditHours + 'H</div>' +
+      '<div class="course-cr">' + c.creditHours + 'H</div>' +
       '</div>';
   }
 
@@ -1185,6 +1185,19 @@
       (bioEn ? '<p style="font-size:12px;color:var(--text-dim);opacity:.85;">' + (rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
       '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
+
+    // Edit mode is where a student is actively rearranging their plan and
+    // most wants a quick read on where they stand — the normal view already
+    // has this via Degree Audit/GPA one tap away, so these chips are kept
+    // out of it rather than shown twice.
+    if(editing){
+      var editGpa = window.AAUP_GPA ? window.AAUP_GPA.gpaFor(id) : { gpa: null };
+      html += '<div class="imp-stat-chips">' +
+        '<div class="imp-stat-chip"><span class="imp-stat-num">' + (editGpa && editGpa.gpa != null ? editGpa.gpa.toFixed(2) : '—') + '</span><span class="imp-stat-label">' + (rtl ? 'المعدل التراكمي' : 'GPA') + '</span></div>' +
+        '<div class="imp-stat-chip"><span class="imp-stat-num">' + doneCr + '</span><span class="imp-stat-label">' + (rtl ? 'ساعات مكتسبة' : 'Credits Earned') + '</span></div>' +
+        '<div class="imp-stat-chip"><span class="imp-stat-num">' + Math.max(0, totalCr - doneCr) + '</span><span class="imp-stat-label">' + (rtl ? 'ساعات متبقية' : 'Remaining') + '</span></div>' +
+        '</div>';
+    }
 
     if(canEdit){
       html += '<div class="panel-action-row">' +
