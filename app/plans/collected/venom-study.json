@@ -1,0 +1,39 @@
+{
+  "id": "venom-study",
+  "plan": {
+    "id": "venom-study",
+    "majorName": {
+      "en": {
+        "big": "Venom Study",
+        "small": ""
+      },
+      "ar": {
+        "big": "دراسة السموم",
+        "small": ""
+      }
+    },
+    "icon": "⚕️",
+    "bio": {
+      "en": "",
+      "ar": ""
+    },
+    "structure": {
+      "years": [
+        {
+          "id": "y1",
+          "hasSummer": false
+        }
+      ]
+    },
+    "courses": [],
+    "prerequisites": [],
+    "university": "aaup",
+    "college": {
+      "en": "test faculty",
+      "ar": "كلية تجريبية"
+    }
+  },
+  "appVersion": "5.5",
+  "submittedAt": "2026-08-12T19:52:14.160Z",
+  "collectedAt": "2026-08-12T19:52:14.529Z"
+}
