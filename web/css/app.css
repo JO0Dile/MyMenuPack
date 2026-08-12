@@ -2087,6 +2087,48 @@
 
   html[dir="rtl"] .ro-course, .plan-page.rtl-mode .ro-course{direction:rtl;}
 
+  /* ================= PREREQUISITE MAP (what course search opens now) ================= */
+  .pg-modal-card{max-width:1200px; width:94vw; max-height:88vh; overflow-y:auto; overflow-x:hidden;}
+  .pg-head{margin-bottom:8px;}
+  .pg-truncated{background:rgba(255,255,255,.04); border-radius:8px; padding:8px 10px; margin:0 0 14px;}
+
+  .pg-body{display:flex; flex-direction:column; gap:16px;}
+  /* 860px, same reasoning as the GPA table's own breakpoint: this lives
+     inside a card capped at 94vw, so the viewport width a media query sees
+     is never the width this layout actually has to work with. */
+  @media (min-width:860px){
+    .pg-body{flex-direction:row; align-items:flex-start;}
+    .pg-graph-wrap{flex:2.2 1 0; min-width:0;}
+    .pg-side{flex:1 1 0; max-width:280px; min-width:0;}
+  }
+
+  .pg-graph-wrap{overflow:auto; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.02); max-height:60vh;}
+  .pg-graph{position:relative;}
+  .pg-svg{position:absolute; top:0; left:0; pointer-events:none;}
+  .pg-edge{fill:none; stroke:var(--accent); stroke-width:2;}
+  .pg-edge-dashed{stroke:var(--line); stroke-dasharray:5 4;}
+
+  .pg-node{
+    position:relative; background:var(--panel); border:1.5px solid var(--line); border-radius:10px;
+    padding:8px 10px; cursor:pointer; transition:border-color .15s ease, transform .15s ease;
+  }
+  .pg-node:hover{transform:translateY(-1px);}
+  .pg-node-name{font-size:12.5px; font-weight:700; color:var(--text); overflow-wrap:anywhere;}
+  .pg-node-sub{font-size:10px; color:var(--text-dim); margin-top:2px; text-transform:uppercase; letter-spacing:.02em;}
+  .pg-node-passed{border-color:#2ecc71;}
+  .pg-node-in_progress{border-color:var(--accent); box-shadow:0 0 0 2px rgba(93,184,255,.18);}
+  .pg-node-unlocked{border-color:#f5a623;}
+  .pg-node-locked{opacity:.62;}
+  .pg-node-selected{box-shadow:0 0 0 3px rgba(93,184,255,.35);}
+
+  .pg-side{display:flex; flex-direction:column; gap:12px;}
+  .pg-selected, .pg-legend, .pg-route{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px 14px;}
+  .pg-panel-label{font-size:10.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+  .pg-legend-row{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); padding:4px 0;}
+  .pg-legend-dot{width:10px; height:10px; border-radius:50%; flex:none;}
+
+  html[dir="rtl"] .pg-node-sub, .plan-page.rtl-mode .pg-node-sub{direction:rtl;}
+
   /* ==========================================================================
      13. ACHIEVEMENTS & AI ADVISOR — the achievement badge grid and the "plan my
      next semester" recommendation cards

@@ -355,6 +355,16 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- Prerequisite Map: what course search opens now — js/54-prereq-graph.js.
+     Widest of the modals (a node graph needs real horizontal room), its
+     own max-width rather than reusing audit-modal-card's 720px cap. -->
+<div class="modal-overlay" id="prereqGraphModalOverlay">
+  <div class="modal-card pg-modal-card">
+    <button class="modal-close" id="prereqGraphModalClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="prereqGraphModalBody"></div>
+  </div>
+</div>
+
 <!-- Shared course-details popup for every imported/feed plan — one instance
      reused for any plan id, since (unlike the 4 built-in majors) there's no
      way to have a static per-plan overlay for a plan that doesn't exist
@@ -490,6 +500,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/51-gpa-studio.js"></script>
 <script src="js/52-cloud.js"></script>
 <script src="js/53-roadmap.js"></script>
+<script src="js/54-prereq-graph.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 
