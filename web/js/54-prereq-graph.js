@@ -9,17 +9,45 @@
 // course's real prerequisite chain, colored by real status, with a
 // legend and a "what's actually left" callout computed from real data —
 // not a fabricated term/calendar estimate.
+//
+// Clicking a node does not replace the map with a fresh one centered on
+// that course — it EXPANDS the same canvas to also include that course's
+// own context (its prerequisites and what it unlocks), the same way a
+// mind-map grows, and scrolls so the newly-clicked course lands centered
+// in view. Nothing already drawn is ever removed. This is why the module
+// keeps an accumulating set of "expanded" courses across clicks instead of
+// recomputing everything from one fixed anchor on every render.
 (function(){
   var MAX_ANCESTOR_DEPTH = 4; // matches the mockup's visible depth; deep curricula get "closest N levels," not an unreadable wall
-  var NODE_W = 168, NODE_H = 54, COL_GAP = 52, ROW_GAP = 16, PAD = 20;
+  var NODE_W = 168, NODE_H = 66, COL_GAP = 52, ROW_GAP = 16, PAD = 20;
 
   function esc(s){ return window.__escapeHtml ? window.__escapeHtml(String(s)) : String(s); }
 
-  function isPassed(prefix, slug){
-    var pid = window.AAUP_GPA.primaryId(prefix, slug);
-    var progress = window.__getProgress ? window.__getProgress() : {};
+  // A retaken course's real outcome lives on the RETAKE's own grade, not
+  // the original attempt's — the original is whatever non-passing grade
+  // (F/FA/W) triggered the retake in the first place, so checking it alone
+  // showed an already-passed-by-retake course as still "locked behind
+  // something" or, worse, its own prerequisites as merely "unlocked"
+  // instead of "passed". Same retake lookup 18-gpa.js's cumulative GPA
+  // calc already uses to decide whether to exclude the original attempt.
+  function effectiveGrade(prefix, slug){
     var grades = window.AAUP_GPA.loadGrades();
-    return !!progress[pid] && !window.AAUP_GPA.isNonPassing(grades[pid]);
+    var progress = window.__getProgress ? window.__getProgress() : {};
+    if(window.AAUP_RETAKES && window.AAUP_RETAKES.isSuperseded(prefix, slug)){
+      // Retake exists — its own grade decides the outcome, even if it has
+      // none yet (still pending, not settled by the original's old failing
+      // grade). Never fall through to the original's grade once a retake
+      // is on record.
+      var retakePid = prefix + '-c-' + window.AAUP_RETAKES.retakeSlugFor(prefix, slug);
+      return progress[retakePid] ? (grades[retakePid] || '') : '';
+    }
+    var pid = window.AAUP_GPA.primaryId(prefix, slug);
+    return progress[pid] ? (grades[pid] || '') : '';
+  }
+
+  function isPassed(prefix, slug){
+    var g = effectiveGrade(prefix, slug);
+    return !!g && !window.AAUP_GPA.isNonPassing(g);
   }
 
   function statusFor(prefix, slug){
@@ -33,56 +61,80 @@
   }
 
   function gradeFor(prefix, slug){
-    var pid = window.AAUP_GPA.primaryId(prefix, slug);
-    return window.AAUP_GPA.loadGrades()[pid] || '';
+    var g = effectiveGrade(prefix, slug);
+    return window.AAUP_GPA.isNonPassing(g) ? '' : g;
   }
 
-  // Ancestors up to MAX_ANCESTOR_DEPTH levels back (BFS, depth-limited —
-  // a capstone course's true transitive closure can be dozens of courses
-  // deep; a graph nobody can read isn't more useful than none), plus the
-  // selected course's own direct unlocks (one level forward, matching what
-  // the mockup shows — full transitive descendants would be the whole rest
-  // of the degree for an early course).
-  function collectNodes(prefix, slug){
+  // Every course reachable from `roots`: each root's own prerequisites (BFS
+  // backward, depth-limited — a capstone's true transitive closure can be
+  // dozens of courses deep) plus its direct unlocks (one hop forward,
+  // matching what the mockup shows for the searched course itself).
+  // Multiple roots simply union together, which is what lets the graph grow
+  // by merging in a newly-clicked node's own context.
+  function collectNodes(prefix, roots){
     var data = window.__PLAN_DATA[prefix] || {};
     var needsMap = data.needsMap || {};
     var unlocksMap = data.unlocksMap || {};
-    var depth = {};
-    depth[slug] = 0;
-    var queue = [slug];
+    var include = {};
     var truncated = false;
-    while(queue.length){
-      var cur = queue.shift();
-      if(depth[cur] >= MAX_ANCESTOR_DEPTH){ truncated = truncated || (needsMap[cur] || []).length > 0; continue; }
-      (needsMap[cur] || []).forEach(function(p){
-        if(depth[p] !== undefined) return;
-        depth[p] = depth[cur] + 1;
-        queue.push(p);
-      });
-    }
-    var children = (unlocksMap[slug] || []).slice();
-    return { ancestorDepth: depth, children: children, truncated: truncated };
+    roots.forEach(function(root){
+      include[root] = true;
+      var depth = {}; depth[root] = 0;
+      var queue = [root];
+      while(queue.length){
+        var cur = queue.shift();
+        if(depth[cur] >= MAX_ANCESTOR_DEPTH){ truncated = truncated || (needsMap[cur] || []).length > 0; continue; }
+        (needsMap[cur] || []).forEach(function(p){
+          include[p] = true;
+          if(depth[p] !== undefined) return;
+          depth[p] = depth[cur] + 1;
+          queue.push(p);
+        });
+      }
+      (unlocksMap[root] || []).forEach(function(c){ include[c] = true; });
+    });
+    return { slugs: Object.keys(include), truncated: truncated };
   }
 
-  function layout(prefix, slug){
-    var collected = collectNodes(prefix, slug);
+  // Column = how deep this course sits in the visible set's own prerequisite
+  // chain (longest path from anything with no visible prerequisite), not a
+  // hop-distance from one fixed anchor. A plain hop-count-from-the-anchor
+  // scheme falls apart the moment a second root merges in — two anchors
+  // disagree about what "column 1" means. Longest-path-within-the-set stays
+  // coherent no matter how many roots have been merged in so far, and it's
+  // the standard layered-DAG layout technique for exactly this reason.
+  function layerAssign(prefix, slugs){
+    var needsMap = ((window.__PLAN_DATA[prefix] || {}).needsMap) || {};
+    var slugSet = {};
+    slugs.forEach(function(s){ slugSet[s] = true; });
+    var layer = {};
+    function depthOf(s){
+      if(layer[s] !== undefined) return layer[s];
+      layer[s] = 0; // cycle guard: a real prereq graph has none, but never hang if data is ever malformed
+      var needs = (needsMap[s] || []).filter(function(n){ return slugSet[n]; });
+      var d = needs.length ? Math.max.apply(null, needs.map(depthOf)) + 1 : 0;
+      layer[s] = d;
+      return d;
+    }
+    slugs.forEach(depthOf);
+    return layer;
+  }
+
+  function layout(prefix, roots){
+    var collected = collectNodes(prefix, roots);
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
-    var ancestorSlugs = Object.keys(collected.ancestorDepth).filter(function(s){ return s !== slug; });
-    // Column = distance from the selected course: ancestorDepth is BFS hops
-    // BACKWARD from the selected course, so a deeper ancestor (more hops)
-    // belongs FURTHER left — negate it directly. The selected course sits
-    // at 0, its direct unlocks at +1.
-    var columns = {}; // level -> [slug]
-    function place(s, level){ (columns[level] = columns[level] || []).push(s); }
-    ancestorSlugs.forEach(function(s){ place(s, -collected.ancestorDepth[s]); });
-    place(slug, 0);
-    collected.children.forEach(function(s){ place(s, 1); });
+    var layer = layerAssign(prefix, collected.slugs);
+
+    var columns = {}; // layer -> [slug], stable order so re-renders don't jitter
+    collected.slugs.slice().sort().forEach(function(s){
+      (columns[layer[s]] = columns[layer[s]] || []).push(s);
+    });
 
     var levels = Object.keys(columns).map(Number).sort(function(a, b){ return a - b; });
-    var pos = {}; // slug -> {x, y, level}
+    var pos = {}; // slug -> {x, y}
     levels.forEach(function(level, colIndex){
       columns[level].forEach(function(s, rowIndex){
-        pos[s] = { x: PAD + colIndex * (NODE_W + COL_GAP), y: PAD + rowIndex * (NODE_H + ROW_GAP), level: level };
+        pos[s] = { x: PAD + colIndex * (NODE_W + COL_GAP), y: PAD + rowIndex * (NODE_H + ROW_GAP) };
       });
     });
 
@@ -226,13 +278,68 @@
     }
   };
 
-  function render(prefix, slug, selectedSlug){
+  // Per-open-session state: which courses have been "expanded" into the
+  // canvas so far (starts with just the searched one) and which is
+  // currently selected (drives the side panel + which node gets centered).
+  // Reset every time the modal is freshly opened via a new search.
+  var expandedSlugs = [];
+  var currentSelected = null;
+
+  function scrollToCenter(wrapEl, pos, slug, animate){
+    if(!wrapEl || !pos[slug]) return;
+    var centerX = pos[slug].x + NODE_W / 2;
+    var centerY = pos[slug].y + NODE_H / 2;
+    var targetLeft = Math.max(0, centerX - wrapEl.clientWidth / 2);
+    var targetTop = Math.max(0, centerY - wrapEl.clientHeight / 2);
+    if(wrapEl.scrollTo){
+      wrapEl.scrollTo({ left: targetLeft, top: targetTop, behavior: animate ? 'smooth' : 'auto' });
+    } else {
+      wrapEl.scrollLeft = targetLeft;
+      wrapEl.scrollTop = targetTop;
+    }
+  }
+
+  // Click-and-drag panning on desktop (mouse only — touch already gets
+  // native finger-drag scrolling from the wrap's own overflow:auto, and
+  // handling both at once just means fighting the browser's own gesture).
+  // Bound once per modal open rather than once per render, since the wrap
+  // element itself is never replaced — only its contents are.
+  var dragBound = false;
+  function bindDragPan(wrapEl){
+    if(dragBound || !wrapEl) return;
+    dragBound = true;
+    var dragging = false, startX, startY, startLeft, startTop;
+    wrapEl.addEventListener('pointerdown', function(e){
+      if(e.pointerType !== 'mouse' || e.button !== 0) return;
+      if(e.target.closest && e.target.closest('.pg-node')) return; // let a click on a node stay a click
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      startLeft = wrapEl.scrollLeft; startTop = wrapEl.scrollTop;
+      wrapEl.classList.add('pg-dragging');
+      wrapEl.setPointerCapture && wrapEl.setPointerCapture(e.pointerId);
+    });
+    wrapEl.addEventListener('pointermove', function(e){
+      if(!dragging) return;
+      wrapEl.scrollLeft = startLeft - (e.clientX - startX);
+      wrapEl.scrollTop = startTop - (e.clientY - startY);
+    });
+    function endDrag(){
+      dragging = false;
+      wrapEl.classList.remove('pg-dragging');
+    }
+    wrapEl.addEventListener('pointerup', endDrag);
+    wrapEl.addEventListener('pointercancel', endDrag);
+    wrapEl.addEventListener('pointerleave', function(){ if(dragging) endDrag(); });
+  }
+
+  function render(prefix, selectedSlug, animateScroll){
     var body = document.getElementById('prereqGraphModalBody');
     if(!body) return;
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     var t = T[rtl ? 'ar' : 'en'];
-    var g = layout(prefix, slug);
-    var sel = selectedSlug || slug;
+    var sel = selectedSlug || currentSelected;
+    currentSelected = sel;
+    var g = layout(prefix, expandedSlugs);
 
     var nodesHTML = Object.keys(g.pos).map(function(s){
       return '<div style="position:absolute; left:' + g.pos[s].x + 'px; top:' + g.pos[s].y + 'px; width:' + NODE_W + 'px;">' +
@@ -256,15 +363,15 @@
       return '<path class="' + cls + '" d="' + edgePath(g.pos[e[0]], g.pos[e[1]]) + '"></path>';
     }).join('');
 
-    var meta = g.info[slug] || {};
-    var name = rtl && meta.ar ? meta.ar : (meta.name || slug);
+    var meta = g.info[sel] || {};
+    var name = rtl && meta.ar ? meta.ar : (meta.name || sel);
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
       '<div class="pg-head"><div><h2 style="margin:0;">' + t.title(name) + '</h2>' +
       '<p class="form-note" style="margin-top:4px;">' + esc(t.subtitle(g.edges.length)) + '</p></div></div>' +
       (g.truncated ? '<p class="form-note pg-truncated">' + esc(t.truncated) + '</p>' : '') +
       '<div class="pg-body">' +
-        '<div class="pg-graph-wrap"><div class="pg-graph" style="width:' + g.width + 'px; height:' + g.height + 'px;">' +
+        '<div class="pg-graph-wrap" id="pgGraphWrap"><div class="pg-graph" style="width:' + g.width + 'px; height:' + g.height + 'px;">' +
           '<svg width="' + g.width + '" height="' + g.height + '" class="pg-svg">' + edgesHTML + '</svg>' +
           nodesHTML +
         '</div></div>' +
@@ -277,16 +384,28 @@
 
     body.querySelectorAll('[data-pg-slug]').forEach(function(el){
       el.addEventListener('click', function(){
-        render(prefix, slug, el.getAttribute('data-pg-slug'));
+        var clicked = el.getAttribute('data-pg-slug');
+        if(expandedSlugs.indexOf(clicked) === -1){ expandedSlugs.push(clicked); }
+        render(prefix, clicked, true);
       });
     });
+
+    var wrapEl = document.getElementById('pgGraphWrap');
+    dragBound = false; // the wrap is a fresh element every render; rebind against it
+    bindDragPan(wrapEl);
+    scrollToCenter(wrapEl, g.pos, sel, !!animateScroll);
   }
 
   function open(prefix, slug){
     var overlay = document.getElementById('prereqGraphModalOverlay');
     if(!overlay) return;
-    render(prefix, slug, slug);
+    expandedSlugs = [slug];
+    // The modal must actually be visible BEFORE render() computes the
+    // centering scroll position — .pg-graph-wrap has zero width/height
+    // while display:none, so centering math run first has nothing real to
+    // center against and silently does nothing useful.
     overlay.classList.add('open');
+    render(prefix, slug, false);
   }
   function close(){
     var overlay = document.getElementById('prereqGraphModalOverlay');
