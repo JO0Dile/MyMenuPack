@@ -2107,6 +2107,9 @@
   .pg-svg{position:absolute; top:0; left:0; pointer-events:none;}
   .pg-edge{fill:none; stroke:var(--accent); stroke-width:2;}
   .pg-edge-dashed{stroke:var(--line); stroke-dasharray:5 4;}
+  .pg-edge-passed{stroke:#2ecc71;}
+  .pg-edge-progress{stroke:var(--accent);}
+  .pg-edge-unlocked{stroke:#f5a623;}
 
   .pg-node{
     position:relative; background:var(--panel); border:1.5px solid var(--line); border-radius:10px;
@@ -2115,9 +2118,23 @@
   .pg-node:hover{transform:translateY(-1px);}
   .pg-node-name{font-size:12.5px; font-weight:700; color:var(--text); overflow-wrap:anywhere;}
   .pg-node-sub{font-size:10px; color:var(--text-dim); margin-top:2px; text-transform:uppercase; letter-spacing:.02em;}
-  .pg-node-passed{border-color:#2ecc71;}
-  .pg-node-in_progress{border-color:var(--accent); box-shadow:0 0 0 2px rgba(93,184,255,.18);}
-  .pg-node-unlocked{border-color:#f5a623;}
+  /* Solid status-color fills (not just a colored border) — this is the exact
+     look from the approved mockup: a course's state reads at a glance from
+     across the room, not just from the thin edge of its card. */
+  /* Fixed (not theme-variable) dark fills with light text, same convention
+     as the category colors (.core/.skills/etc) elsewhere — a solid color
+     that reads correctly whether the surrounding page is in dark or light
+     mode, rather than a translucent tint over the (theme-dependent) panel
+     background. */
+  .pg-node-passed{background:#1e5c3a; border-color:#2ecc71;}
+  .pg-node-passed .pg-node-name{color:#eafff2;}
+  .pg-node-passed .pg-node-sub{color:#8ff0bd;}
+  .pg-node-in_progress{background:#1c3f66; border-color:var(--accent); box-shadow:0 0 0 2px rgba(93,184,255,.18);}
+  .pg-node-in_progress .pg-node-name{color:#eaf6ff;}
+  .pg-node-in_progress .pg-node-sub{color:#a8dcff;}
+  .pg-node-unlocked{background:#5c3d14; border-color:#f5a623;}
+  .pg-node-unlocked .pg-node-name{color:#fff6ea;}
+  .pg-node-unlocked .pg-node-sub{color:#ffcf8a;}
   .pg-node-locked{opacity:.62;}
   .pg-node-selected{box-shadow:0 0 0 3px rgba(93,184,255,.35);}
 

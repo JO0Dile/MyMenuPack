@@ -234,12 +234,13 @@
 
     var info = dash.planDisplayInfo ? dash.planDisplayInfo(prefix) : { icon: '🎓', name: prefix };
     var pct = dash.planPercent ? dash.planPercent(prefix) : null;
-    var esc = window.__escapeHtml;
     card.innerHTML =
       '<div class="hr-icon">' + window.AAUP_ICONS.markup(info, { size: 24 }) + '</div>' +
       '<div class="hr-body">' +
         '<div class="hr-kicker">Continue · تابع</div>' +
-        '<div class="hr-name">' + esc(info.name || prefix) + '</div>' +
+        // info.name (from planDisplayInfo) is already HTML-escaped once by
+        // the sync sanitizer — esc()'ing it again would show a literal "&amp;".
+        '<div class="hr-name">' + (info.name || prefix) + '</div>' +
         (pct !== null
           ? '<div class="hr-sub">' + pct + '% complete · مكتمل</div><div class="hr-progress"><span style="width:' + pct + '%;"></span></div>'
           : '<div class="hr-sub">Jump back in · العودة إلى خطتك</div>') +

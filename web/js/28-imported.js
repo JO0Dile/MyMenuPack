@@ -696,7 +696,14 @@
       onSelect: function(r){
         input.value = '';
         document.getElementById(planId + '-courseSearchBox').classList.remove('has-value');
-        if(window.__selectCourse){ window.__selectCourse(planId, r.slug); }
+        // Same reasoning as the built-in-major search wiring in 03-search.js:
+        // a search result now opens the interactive prerequisite map instead
+        // of the old scroll-to-and-highlight popup. This is the renderer
+        // every real plan (built-in majors included) actually goes through,
+        // so this handler — not the one in 03-search.js's initCourseSearch —
+        // is the one that fires for a real search in the app.
+        if(window.AAUP_PREREQ_GRAPH){ window.AAUP_PREREQ_GRAPH.open(planId, r.slug); }
+        else if(window.__selectCourse){ window.__selectCourse(planId, r.slug); }
       }
     });
   }

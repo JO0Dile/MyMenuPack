@@ -85,6 +85,10 @@
     return !!progress[pid];
   }
 
+  // Returns HTML-safe text: courseInfo (name/ar) already passed through the
+  // shared sanitizer's clean()/__cleanText when the plan was registered, so
+  // callers must NOT esc() this again — that turned a real "&" into a
+  // literal "&amp;" on screen (e.g. "Elementary Probability &amp; Statistics").
   function courseName(prefix, slug, rtl){
     var info = ((window.__PLAN_DATA[prefix] || {}).courseInfo || {})[slug] || {};
     if(rtl && info.ar) return info.ar;
@@ -107,15 +111,15 @@
     var chips = needs.map(function(n){
       var ok = isPassed(prefix, n);
       return '<button type="button" class="cd-chip' + (ok ? ' is-ok' : ' is-missing') + '"' +
-        ' data-goto="' + esc(n) + '">' + esc(courseName(prefix, n, rtl)) +
+        ' data-goto="' + esc(n) + '">' + courseName(prefix, n, rtl) +
         (ok ? ' ✓' : '') + '</button>';
     }).join('');
     return '<p class="cd-note">' + (missing.length
-        ? t.needAll + ' <strong>' + missing.map(function(n){ return esc(courseName(prefix, n, rtl)); }).join('، ') + '</strong>'
+        ? t.needAll + ' <strong>' + missing.map(function(n){ return courseName(prefix, n, rtl); }).join('، ') + '</strong>'
         : t.haveAll) + '</p>' +
       '<div class="cd-chain">' + chips +
       '<span class="cd-arrow">' + (rtl ? '←' : '→') + '</span>' +
-      '<span class="cd-chip is-self">' + esc(courseName(prefix, slug, rtl)) + '</span></div>';
+      '<span class="cd-chip is-self">' + courseName(prefix, slug, rtl) + '</span></div>';
   }
 
   function opensHTML(prefix, slug, rtl, t){
@@ -124,7 +128,7 @@
     return '<p class="cd-note">' + t.opensCount(unlocks.length) + '</p>' +
       '<div class="cd-chain">' + unlocks.map(function(u){
         return '<button type="button" class="cd-chip" data-goto="' + esc(u) + '">' +
-          esc(courseName(prefix, u, rtl)) + '</button>';
+          courseName(prefix, u, rtl) + '</button>';
       }).join('') + '</div>';
   }
 
@@ -152,7 +156,7 @@
 
     return '<div class="cd" dir="' + (rtl ? 'rtl' : 'ltr') + '">' +
       '<div class="cd-head">' +
-        '<div class="cd-title"><h3>' + esc(name) + '</h3>' +
+        '<div class="cd-title"><h3>' + name + '</h3>' +
           '<div class="cd-sub">' +
             [info.num || (course && course.courseNumber),
              (course && course.creditHours != null ? course.creditHours + ' ' + t.chShort : ''),
