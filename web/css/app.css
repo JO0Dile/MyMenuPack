@@ -2383,6 +2383,59 @@
   .imp-edit-course-btn:hover{background:var(--accent);}
   .imp-structure-actions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
 
+  /* ---- Edit-mode stat chips (GPA / Credits / Remaining) — shown only
+     while editing, right under the progress bar. Reuses the same numbers
+     the progress bar and Degree Audit already compute; nothing here is
+     invented. ---- */
+  .imp-stat-chips{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;}
+  .imp-stat-chip{
+    flex:1 1 130px;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:10px 14px;display:flex;flex-direction:column;gap:2px;
+  }
+  .imp-stat-num{font-size:19px;font-weight:800;color:var(--accent);}
+  .imp-stat-label{font-size:10.5px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
+
+  .course-cr{font-size:10px;opacity:.8;margin-top:2px;}
+
+  /* ---- Edit-mode grid restyle — card-style semester columns sitting
+     side by side within a year, instead of the normal stacked list. Scoped
+     entirely to .editing so the regular student-facing view (and every
+     other .imp-year-block/.imp-semester-block/.course consumer, like
+     Degree Audit exports) is completely untouched. ---- */
+  .editing .imp-year-block{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;}
+  .editing .imp-year-header{flex:1 1 100%;margin-bottom:4px;}
+  .editing .imp-semester-block{
+    flex:1 1 220px;min-width:200px;max-width:280px;margin-bottom:0;
+    background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;
+    padding:12px;
+  }
+  .editing .imp-semester-block .course-row{
+    display:flex;flex-direction:column;flex-wrap:nowrap;gap:8px;
+  }
+  .editing .imp-semester-block .course-row .course,
+  .editing .imp-semester-block .course-row .imp-add-course-card{
+    flex:0 0 auto;max-width:none;min-width:0;width:100%;
+  }
+  .editing .imp-semester-block .course-row .imp-add-course-card{min-height:36px;}
+
+  .editing .course{
+    background:var(--panel);color:var(--text);
+    border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--line);
+  }
+  .editing .course.core{border-left-color:var(--core);}
+  .editing .course.skills{border-left-color:var(--skills);}
+  .editing .course.math{border-left-color:var(--math);}
+  .editing .course.dept{border-left-color:var(--dept);}
+  .editing .course.eng{border-left-color:var(--eng);}
+  .editing .course.uni{border-left-color:var(--uni);}
+  .editing .course.free{border-left-color:var(--free);}
+  .editing .course.misc{border-left-color:var(--misc);}
+  .editing .course-cr{
+    display:inline-block;margin-top:6px;padding:1px 7px;border-radius:999px;
+    border:1px solid var(--line);font-weight:700;opacity:1;
+  }
+
   /* ---- icon picker (New Study Plan dialog) ---- */
   .icon-picker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
   .icon-picker-option{
