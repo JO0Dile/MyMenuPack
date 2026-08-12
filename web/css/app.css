@@ -69,6 +69,63 @@
 
   html[data-theme="light"] .watermark-layer{color:rgba(27,42,63,.22);}
 
+  /* Four more themes beyond the original dark/light pair — same nine
+     variables every time, so every component that already themes itself
+     correctly (by reading var(--text)/var(--accent)/etc rather than a
+     hardcoded color) picks these up with no further changes anywhere else
+     in this file. Two lean light, two lean dark, so there's a genuine
+     option in both families rather than only reskinning one. */
+
+  html[data-theme="cranberry"]{
+    --page-bg:#f3e9dd;
+    --surface-bg:#faf3ea;
+    --header-bg:#efe0cd;
+    --panel:#f7eee1;
+    --line:#d9c4a8;
+    --text:#3a1f1a;
+    --text-dim:#7a5c4a;
+    --accent:#8c1f3d;
+    --search-bg:#f7ece0;
+  }
+  html[data-theme="cranberry"] .watermark-layer{color:rgba(58,31,26,.22);}
+
+  html[data-theme="botanical"]{
+    --page-bg:#eef1e6;
+    --surface-bg:#f7f9f2;
+    --header-bg:#e6ead9;
+    --panel:#f2f5ec;
+    --line:#c9d2b8;
+    --text:#263424;
+    --text-dim:#5c6b52;
+    --accent:#b3702f;
+    --search-bg:#f2f5ec;
+  }
+  html[data-theme="botanical"] .watermark-layer{color:rgba(38,52,36,.22);}
+
+  html[data-theme="indigo"]{
+    --page-bg:#150f2e;
+    --surface-bg:#1c1440;
+    --header-bg:#241a52;
+    --panel:#201753;
+    --line:#3c2e72;
+    --text:#ede9fb;
+    --text-dim:#a99fd6;
+    --accent:#a56bff;
+    --search-bg:#1a1240;
+  }
+
+  html[data-theme="amber"]{
+    --page-bg:#1c1410;
+    --surface-bg:#241a14;
+    --header-bg:#2c1f17;
+    --panel:#261c15;
+    --line:#4a3527;
+    --text:#f5ece0;
+    --text-dim:#c2a688;
+    --accent:#ff9f43;
+    --search-bg:#201712;
+  }
+
   /* ==========================================================================
      2. GLOBAL RESET & BASE — box-sizing, body background/font, outer .sheet frame
      ========================================================================== */
@@ -2325,6 +2382,31 @@
   }
   .settings-tab.active{background:var(--accent); color:#04122b;}
   .settings-tab-icon{font-size:14px;}
+
+  /* ---- theme picker (Settings > Preferences) ---- */
+  .theme-picker-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;
+    margin-bottom:6px;
+  }
+  .theme-swatch{
+    display:flex; flex-direction:column; gap:8px; align-items:stretch;
+    padding:8px; border-radius:12px; border:1.5px solid var(--line);
+    background:rgba(255,255,255,.03); cursor:pointer; font-family:inherit;
+    transition:border-color .15s ease, transform .12s ease;
+  }
+  .theme-swatch:hover{transform:translateY(-1px); border-color:var(--accent);}
+  .theme-swatch-active{border-color:var(--accent); box-shadow:0 0 0 2px rgba(93,184,255,.18);}
+  .theme-swatch-preview{
+    height:34px; border-radius:8px; border:1px solid rgba(0,0,0,.15);
+    background:linear-gradient(135deg, var(--sw-bg) 0%, var(--sw-bg) 52%, var(--sw-accent) 52%, var(--sw-accent) 100%);
+  }
+  .theme-swatch-label{
+    display:flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:700; color:var(--text);
+  }
+  .theme-swatch-check{margin-left:auto; opacity:0; color:var(--accent); font-weight:800;}
+  .theme-swatch-active .theme-swatch-check{opacity:1;}
+  html[dir="rtl"] .theme-swatch-check{margin-left:0; margin-right:auto;}
 
   .dev-wrong-pass{color:var(--prereq);font-size:12.5px;font-weight:700;margin-top:8px;}
 

@@ -167,10 +167,16 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 </script>
 <script>
   // Applied as early as possible (before the stylesheet paints) so a saved
-  // light-mode preference doesn't flash dark for a frame on load.
+  // non-default theme doesn't flash Midnight (the default/no-attribute
+  // theme) for a frame on load. js/17-theme.js is the source of truth for
+  // which ids are real themes and loads later, so this only needs to know
+  // "dark" is the one that means "no attribute" — an unrecognized stored
+  // value harmlessly matches no html[data-theme] override and just renders
+  // as the default, same as "dark" would.
   try{
-    if(localStorage.getItem('aaup_theme') === 'light'){
-      document.documentElement.setAttribute('data-theme','light');
+    var savedTheme = localStorage.getItem('aaup_theme');
+    if(savedTheme && savedTheme !== 'dark'){
+      document.documentElement.setAttribute('data-theme', savedTheme);
     }
   }catch(e){ /* localStorage unavailable (e.g. file:// restrictions) */ }
 </script>
