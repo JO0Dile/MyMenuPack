@@ -34,6 +34,66 @@
       "category": "MATH",
       "year": 1,
       "semester": 2
+    },
+    {
+      "slug": "new-course-3",
+      "code": "100411010",
+      "name": "Calculus I",
+      "nameAr": "",
+      "credits": "3",
+      "category": "MATH",
+      "year": 1,
+      "semester": 1
+    },
+    {
+      "slug": "new-course-4",
+      "code": "100411020",
+      "name": "Calculus II",
+      "nameAr": "",
+      "credits": "3",
+      "category": "MATH",
+      "year": 1,
+      "semester": 2
+    },
+    {
+      "slug": "new-course-5",
+      "code": "110111030",
+      "name": "Introduction to Information Technology Lab",
+      "nameAr": "مختبر مقدمة في تكنولوجيا المعلومات",
+      "credits": "1",
+      "category": "CORE",
+      "year": 1,
+      "semester": 1
+    },
+    {
+      "slug": "new-course-6",
+      "code": "240211013",
+      "name": "Introduction to Information Technology",
+      "nameAr": "مقدمة في تكنولوجيا المعلومات",
+      "credits": "2",
+      "category": "CORE",
+      "year": 1,
+      "semester": 1
+    },
+    {
+      "slug": "new-course-7",
+      "code": "240111011",
+      "name": "Programming Fundamentals (C++)",
+      "nameAr": "أساسيات البرمجة (سي++)",
+      "credits": "3",
+      "category": "CORE",
+      "year": 1,
+      "semester": 2
+    },
+    {
+      "slug": "new-course-8",
+      "code": "240111021",
+      "name": "Programming Fundamentals I (Lab)",
+      "nameAr": "مختبر أساسيات البرمجة 1",
+      "credits": "1",
+      "category": "CORE",
+      "year": 1,
+      "semester": 2
     }
   ],
   "prerequisites": []
