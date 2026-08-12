@@ -154,9 +154,26 @@
       '<div id="acctMsg"></div>';
   }
 
+  function themePickerHtml(r){
+    if(!window.AAUP_THEME) return '';
+    var current = window.AAUP_THEME.current();
+    var themes = window.AAUP_THEME.list();
+    return '<h3 style="margin:0 0 6px;">🎨 ' + (r ? 'السمة' : 'Theme') + '</h3>' +
+      '<div class="theme-picker-grid" role="group" aria-label="' + (r ? 'السمة' : 'Theme') + '">' +
+      themes.map(function(t){
+        var active = t.id === current;
+        return '<button type="button" class="theme-swatch' + (active ? ' theme-swatch-active' : '') +
+          '" data-theme-swatch="' + t.id + '" style="--sw-bg:' + t.bg + ';--sw-accent:' + t.accent + ';" aria-pressed="' + active + '">' +
+          '<span class="theme-swatch-preview"></span>' +
+          '<span class="theme-swatch-label"><span>' + t.icon + ' ' + (r ? t.ar : t.en) + '</span><span class="theme-swatch-check">✓</span></span>' +
+          '</button>';
+      }).join('') +
+      '</div>';
+  }
+
   function prefsTabHtml(r, selectedPlan, isRtlNow){
-    return '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setThemeBtn">🌙 ' + (r ? 'تبديل السمة' : 'Toggle Theme') + '</button>' +
+    return themePickerHtml(r) +
+      '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;margin-top:14px;">' +
       (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">🌐 ' + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
       '</div>';
   }
@@ -240,9 +257,11 @@
     if(window.AAUP_CLOUD){
       window.AAUP_CLOUD.bindSection(body);
     }
-    if(document.getElementById('setThemeBtn')){
-      document.getElementById('setThemeBtn').addEventListener('click', function(){ if(window.AAUP_THEME) window.AAUP_THEME.toggle(); });
-    }
+    body.querySelectorAll('[data-theme-swatch]').forEach(function(el){
+      el.addEventListener('click', function(){
+        if(window.AAUP_THEME) window.AAUP_THEME.setTheme(el.getAttribute('data-theme-swatch'));
+      });
+    });
     if(document.getElementById('setLangBtn')){
       document.getElementById('setLangBtn').addEventListener('click', function(){
         var isImported = !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[selectedPlan]);
