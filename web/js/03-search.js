@@ -204,7 +204,14 @@
       onSelect: function(r){
         input.value = '';
         box.classList.remove('has-value');
-        selectCourse(prefix, r.slug);
+        // Searching a course now opens its prerequisite map (js/54-prereq-
+        // graph.js) — the approved mockup for what a search result looks
+        // like — instead of the old scroll-to-and-highlight-on-the-page
+        // behavior. selectCourse() itself is untouched and still exposed
+        // as window.__selectCourse for other callers (What's Next) that
+        // want that original behavior, not this one.
+        if(window.AAUP_PREREQ_GRAPH){ window.AAUP_PREREQ_GRAPH.open(prefix, r.slug); }
+        else { selectCourse(prefix, r.slug); }
       }
     });
   }
