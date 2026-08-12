@@ -132,7 +132,7 @@
     var body = rows.map(function(r){
       var name = rtl && r.nameAr ? r.nameAr : r.name;
       return '<tr class="' + (r.excluded ? 'gs-row-excluded' : '') + '">' +
-        '<td><strong>' + esc(name) + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
+        '<td><strong>' + name + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
         '<td>' + r.cr + '</td>' +
         '<td><select class="gs-grade-select" data-pid="' + esc(r.pid) + '">' + optsFor(r.grade) + '</select></td>' +
         '<td class="gs-pts">' + pointsCell(r, t) + '</td>' +

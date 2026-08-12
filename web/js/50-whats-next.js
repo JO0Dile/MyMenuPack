@@ -143,7 +143,10 @@
   function reasonFor(c, rtl, t){
     if(!c.opens) return t.reasonNone;
     var names = rtl ? c.opensNamesAr : c.opensNames;
-    var shown = names.slice(0, 2).map(function(n){ return '<strong>' + esc(n) + '</strong>'; });
+    // n is a course name straight from courseInfo, already HTML-escaped once
+    // by the shared sanitizer when the plan was registered — esc()'ing it
+    // again turned a real "&" into a literal "&amp;" on screen.
+    var shown = names.slice(0, 2).map(function(n){ return '<strong>' + n + '</strong>'; });
     var extra = names.length > 2 ? (names.length - 2) : 0;
     var joiner = rtl ? '، ' : ', ';
     return t.reasonMany(shown.join(joiner), extra || '');
@@ -155,7 +158,7 @@
     return '<button type="button" class="wn-card' + (rank === 0 ? ' is-top' : '') +
       '" data-wn-id="' + esc(c.id) + '">' +
       '<span class="wn-rank" aria-hidden="true">' + (rank + 1) + '</span>' +
-      '<div class="wn-card-head"><h4>' + esc(name) + '</h4>' +
+      '<div class="wn-card-head"><h4>' + name + '</h4>' +
         (c.opens ? '<span class="wn-tag wn-tag-hot">' + esc(t.opensN(c.opens)) + '</span>' : '') + '</div>' +
       '<div class="wn-sub">' + [c.code, c.cr ? c.cr + ' CH' : '', cat].filter(Boolean).map(esc).join(' · ') + '</div>' +
       '<p class="wn-reason">' + reasonFor(c, rtl, t) + '</p>' +
@@ -165,7 +168,7 @@
   function chipHTML(c, rtl){
     var name = rtl && c.nameAr ? c.nameAr : c.name;
     return '<button type="button" class="next-course-chip" data-wn-id="' + esc(c.id) + '">' +
-      '<span>' + esc(name) + '</span>' + (c.cr ? '<span class="ncc-cr">' + esc(c.cr) + 'H</span>' : '') +
+      '<span>' + name + '</span>' + (c.cr ? '<span class="ncc-cr">' + esc(c.cr) + 'H</span>' : '') +
       '</button>';
   }
 

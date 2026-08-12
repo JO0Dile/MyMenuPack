@@ -142,12 +142,15 @@
       }).join('') +
       '<div class="ro-card ro-card-grad">' +
         '<div class="ro-course"><span class="ro-course-name" style="font-weight:800;">' + esc(totalCr ? Math.round(totalCr) : '?') + ' ' + (rtl ? 'ساعة معتمدة' : 'credit hours') + '</span></div>' +
-        '<div class="ro-course"><span class="ro-course-name">' + esc(info.name || prefix) + '</span></div>' +
+        '<div class="ro-course"><span class="ro-course-name">' + (info.name || prefix) + '</span></div>' +
       '</div>' +
     '</div>';
 
+    // info.name (from planDisplayInfo) is already HTML-escaped once by the
+    // sync sanitizer — esc()'ing it again turned a real "&" into a literal
+    // "&amp;" for majors like "Game Design & Development".
     return '<div class="ro-head">' +
-      '<div><h2 style="margin:0;">' + (rtl ? ('مسارك عبر ' + esc(info.name || prefix)) : ('Your path through ' + esc(info.name || prefix))) + '</h2>' +
+      '<div><h2 style="margin:0;">' + (rtl ? ('مسارك عبر ' + (info.name || prefix)) : ('Your path through ' + (info.name || prefix))) + '</h2>' +
       '<p class="form-note" style="margin-top:4px;">' + (rtl
         ? 'كل مساق، بالترتيب الذي تتطلبه الدرجة — وأين أنت منه الآن.'
         : 'Every course, in the order the degree expects — and where you are on it right now.') + '</p></div>' +

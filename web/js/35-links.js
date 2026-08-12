@@ -129,7 +129,9 @@
       return nameFor(prefix, a, rtl).localeCompare(nameFor(prefix, b, rtl));
     }).map(function(slug){
       var num = info[slug] && info[slug].num && info[slug].num !== '-' ? ' (' + info[slug].num + ')' : '';
-      return '<option value="' + esc(slug) + '">' + esc(nameFor(prefix, slug, rtl) + num) + '</option>';
+      // nameFor()/num both come from courseInfo, already HTML-escaped once
+      // by the sync sanitizer — esc()'ing again would show a literal "&amp;".
+      return '<option value="' + esc(slug) + '">' + nameFor(prefix, slug, rtl) + num + '</option>';
     }).join('');
   }
 
@@ -170,7 +172,7 @@
           ? lines.map(function(p){
               var added = isUserAdded(prefix, p[0], p[1]);
               return '<div class="line-item">' +
-                '<span class="line-text">' + esc(nameFor(prefix, p[0], rtl)) + ' <b>→</b> ' + esc(nameFor(prefix, p[1], rtl)) + '</span>' +
+                '<span class="line-text">' + nameFor(prefix, p[0], rtl) + ' <b>→</b> ' + nameFor(prefix, p[1], rtl) + '</span>' +
                 (added ? '<span class="line-badge">' + (rtl ? 'مضاف' : 'added by you') + '</span>' : '') +
                 '<button type="button" class="line-remove" data-from="' + esc(p[0]) + '" data-to="' + esc(p[1]) + '" aria-label="' + (rtl ? 'إزالة' : 'Remove') + '">✕</button>' +
                 '</div>';

@@ -113,8 +113,14 @@
       : st === 'in_progress' ? t.inProgress
       : st === 'unlocked' ? t.unlocked
       : t.locked;
+    // name comes from courseInfo, which every plan (built-in or imported)
+    // already ran through the shared sanitizer's clean()/__cleanText before
+    // it landed here — it's HTML-safe text, already escaped once. Escaping
+    // it again turned a real "&" into a literal "&amp;" on screen (e.g.
+    // "Elementary Probability &amp; Statistics"); num/slug/status text below
+    // are NOT pre-escaped, so those still need esc().
     return '<div class="pg-node pg-node-' + st + (isSelected ? ' pg-node-selected' : '') + '" data-pg-slug="' + esc(slug) + '" tabindex="0" role="button">' +
-      '<div class="pg-node-name">' + esc(name) + '</div>' +
+      '<div class="pg-node-name">' + name + '</div>' +
       '<div class="pg-node-sub">' + esc(meta.num || '') + (meta.num ? ' · ' : '') + esc(sub) + '</div>' +
     '</div>';
   }
@@ -173,7 +179,7 @@
       body = t.needsList(needNames);
     }
     return '<div class="pg-selected"><div class="pg-panel-label">' + t.selectedLabel + '</div>' +
-      '<h3 style="margin:2px 0 6px;">' + esc(name) + '</h3>' +
+      '<h3 style="margin:2px 0 6px;">' + name + '</h3>' +
       '<p class="form-note" style="margin:0;">' + body + '</p></div>';
   }
 
@@ -232,16 +238,29 @@
       return '<div style="position:absolute; left:' + g.pos[s].x + 'px; top:' + g.pos[s].y + 'px; width:' + NODE_W + 'px;">' +
         nodeHTML(prefix, s, s === sel, rtl, t) + '</div>';
     }).join('');
+    // Matches the mockup: a solid edge is colored by what it leads to (green
+    // into a passed course, blue into one you're taking now, orange into one
+    // you can take now) — except when the destination is itself still locked
+    // by some OTHER prerequisite, in which case this specific link is green
+    // because the course it comes FROM is already passed.
     var edgesHTML = g.edges.map(function(e){
-      var solid = statusFor(prefix, e[1]) !== 'locked' || statusFor(prefix, e[0]) === 'passed';
-      return '<path class="pg-edge' + (solid ? '' : ' pg-edge-dashed') + '" d="' + edgePath(g.pos[e[0]], g.pos[e[1]]) + '"></path>';
+      var toStatus = statusFor(prefix, e[1]);
+      var fromStatus = statusFor(prefix, e[0]);
+      var solid = toStatus !== 'locked' || fromStatus === 'passed';
+      var cls = 'pg-edge';
+      if(!solid){ cls += ' pg-edge-dashed'; }
+      else if(toStatus === 'passed'){ cls += ' pg-edge-passed'; }
+      else if(toStatus === 'in_progress'){ cls += ' pg-edge-progress'; }
+      else if(toStatus === 'unlocked'){ cls += ' pg-edge-unlocked'; }
+      else if(fromStatus === 'passed'){ cls += ' pg-edge-passed'; }
+      return '<path class="' + cls + '" d="' + edgePath(g.pos[e[0]], g.pos[e[1]]) + '"></path>';
     }).join('');
 
     var meta = g.info[slug] || {};
     var name = rtl && meta.ar ? meta.ar : (meta.name || slug);
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<div class="pg-head"><div><h2 style="margin:0;">' + esc(t.title(name)) + '</h2>' +
+      '<div class="pg-head"><div><h2 style="margin:0;">' + t.title(name) + '</h2>' +
       '<p class="form-note" style="margin-top:4px;">' + esc(t.subtitle(g.edges.length)) + '</p></div></div>' +
       (g.truncated ? '<p class="form-note pg-truncated">' + esc(t.truncated) + '</p>' : '') +
       '<div class="pg-body">' +
