@@ -112,7 +112,7 @@
         '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">🗑 Delete</button>' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(p, { size: 30 }) + '</div>' +
         '<h2>' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</h2>' +
-        '<p>' + bio + '</p>' +
+        '<p class="pc-bio">' + bio + '</p>' +
         '<div class="pc-cta">' + (pending
           ? (rtl ? 'قريبًا' : 'Coming soon')
           : (rtl ? 'عرض الخطة ←' : 'View plan →')) + '</div></div>';
