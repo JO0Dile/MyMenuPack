@@ -70,13 +70,23 @@
       if(card) card.addEventListener('click', function(e){ e.stopPropagation(); });
     }
 
-    var dismissed = false;
-    try{ dismissed = localStorage.getItem(DISMISS_KEY) === '1'; }catch(e){}
-    if(!load() && !dismissed){ openDialog(); }
     if(window.__renderWelcomeMessages) window.__renderWelcomeMessages();
   }
 
-  window.AAUP_STUDENT = { get: load, openDialog: openDialog };
+  function isDismissed(){
+    try{ return localStorage.getItem(DISMISS_KEY) === '1'; }catch(e){ return false; }
+  }
+
+  // The first-run wizard (js/55-onboarding.js) is now the sole place this
+  // "is this a brand-new student?" signal auto-opens anything — this dialog
+  // no longer pops itself open on load. openDialog() stays available for the
+  // "✏️ Edit" link in the My Progress panel, and markSeen()/isFirstRun() are
+  // exposed so the wizard can share the same "seen it" flag this module owns
+  // instead of tracking a second one.
+  window.AAUP_STUDENT = {
+    get: load, openDialog: openDialog, markSeen: markSeen,
+    isFirstRun: function(){ return !load() && !isDismissed(); }
+  };
 
   if(document.readyState === 'complete'){ bind(); }
   else { window.addEventListener('load', bind); }

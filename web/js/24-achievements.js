@@ -427,11 +427,45 @@
     return { unlocked: unlockedCount, total: applicableCount };
   }
 
+  // The locked-but-applicable achievement with the highest done/total ratio —
+  // "closest to unlocking" — so the modal can lead with something concrete
+  // to chase instead of a wall of badges. null when nothing has a countable
+  // goal yet (or everything's already unlocked).
+  function findNextUp(prefix, unlocked){
+    var best = null, bestPct = -1;
+    ACHIEVEMENTS.forEach(function(a){
+      var applies = !a.appliesTo || a.appliesTo(prefix);
+      var key = a.global ? a.id : (prefix + ':' + a.id);
+      if(!applies || unlocked[key] || typeof a.prog !== 'function') return;
+      var pr = null;
+      try{ pr = a.prog(prefix); }catch(e){ pr = null; }
+      if(!pr || !pr.total || pr.done >= pr.total) return;
+      var pct = pr.done / pr.total;
+      if(pct > bestPct){ bestPct = pct; best = { a: a, pr: pr, pct: pct }; }
+    });
+    return best;
+  }
+
   function render(prefix){
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     var unlocked = refreshUnlocks(prefix);
     var gender = studentGender();
     var unlockedCount = 0, applicableCount = 0;
+
+    var nextUp = findNextUp(prefix, unlocked);
+    var heroHtml = '';
+    if(nextUp){
+      var nt = resolveTitle(nextUp.a, gender);
+      var heroPct = Math.round(nextUp.pct * 100);
+      heroHtml = '<div class="ach-next">' +
+        '<div class="ach-next-icon">' + nextUp.a.icon + '</div>' +
+        '<div class="ach-next-body">' +
+          '<div class="ach-next-kicker">' + (rtl ? 'التالي' : 'Next up') + '</div>' +
+          '<div class="ach-next-title">' + (rtl ? nt.ar : nt.en) + '</div>' +
+          '<div class="ach-next-track"><span style="width:' + heroPct + '%;"></span></div>' +
+        '</div>' +
+      '</div>';
+    }
 
     var badges = ACHIEVEMENTS.map(function(a){
       var applies = !a.appliesTo || a.appliesTo(prefix);
@@ -487,6 +521,7 @@
     return '<h2 style="margin-top:0;">🏆 ' + (rtl ? 'الإنجازات' : 'Achievements') + '</h2>' +
       '<p class="achievements-summary">' + unlockedCount + ' / ' + applicableCount + ' ' +
       (rtl ? 'إنجازًا محقَّقًا لهذا التخصص' : 'unlocked for this major') + '</p>' +
+      heroHtml +
       '<div class="achievement-grid">' + badges + '</div>';
   }
 

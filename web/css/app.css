@@ -253,7 +253,6 @@
 
   .home-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:var(--accent);}
 
-  .home-header .mark-icon{width:32px;height:32px;object-fit:contain;}
   /* Theme toggle / export / import / reset-all reuse .home-btn styling as-is
      so nothing about the header's look changes — these are just more pills. */
 
@@ -291,28 +290,37 @@
   .home-wrap{max-width:1100px;margin:0 auto;padding:20px;}
 
   .home-header{
-    background:var(--header-bg);
+    background:linear-gradient(120deg, var(--header-bg), var(--surface-bg));
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:26px 32px;
-    display:flex;align-items:center;gap:16px;
+    border-radius:16px;
+    padding:22px 28px;
+    display:flex;align-items:center;gap:18px;
     margin-bottom:22px;
   }
 
-  .home-header .mark{
-    width:52px;height:52px;border-radius:12px;
-    background:linear-gradient(135deg,#1c2a5e,#0b1330);
-    border:1px solid var(--accent);
-    display:flex;align-items:center;justify-content:center;
-    flex:0 0 auto;
+  .home-header-mascot{
+    width:96px;height:96px;object-fit:contain;flex:0 0 auto;border-radius:16px;
   }
 
-  .home-header h1{margin:0;font-size:19px;font-weight:800;letter-spacing:.02em;}
+  .home-header-body{flex:1 1 auto;min-width:0;}
+
+  .home-header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.02em;}
 
   .home-header p{margin:4px 0 0;font-size:13px;color:var(--text-dim);}
 
+  .home-header-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+
+  .home-header-stats span{
+    font-size:11px;font-weight:700;color:var(--text);
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 12px;
+    white-space:nowrap;
+  }
+
   .home-header .ar{
-    margin-left:auto;text-align:right;direction:rtl;
+    margin-left:auto;text-align:right;direction:rtl;flex:0 0 auto;
   }
 
   .home-header .ar .ar1{font-size:15px;font-weight:700;}
@@ -414,6 +422,9 @@
   @media (max-width:900px){
     .plan-grid{grid-template-columns:1fr;}
     .home-header .ar{display:none;}
+    .home-header{padding:16px 18px;gap:12px;}
+    .home-header-mascot{width:56px;height:56px;border-radius:12px;}
+    .home-header-stats span{font-size:10px;padding:4px 9px;}
   }
 
   .plan-card{position:relative;}
@@ -2209,6 +2220,13 @@
   .pg-side{display:flex; flex-direction:column; gap:12px;}
   .pg-selected, .pg-legend, .pg-route{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px 14px;}
   .pg-panel-label{font-size:10.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+
+  .pg-why-locked-btn{
+    display:block;margin-top:10px;background:rgba(93,184,255,.12);border:1px solid var(--accent);color:var(--accent);
+    font-family:inherit;font-size:11.5px;font-weight:800;border-radius:999px;padding:6px 14px;cursor:pointer;
+  }
+  .pg-why-locked-btn:hover{background:var(--accent);color:var(--navy-900);}
+
   .pg-legend-row{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); padding:4px 0;}
   .pg-legend-dot{width:10px; height:10px; border-radius:50%; flex:none;}
 
@@ -2255,6 +2273,27 @@
 
   .achievements-summary{font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;}
 
+  /* "Next Up" hero — the locked-but-applicable achievement closest to being
+     unlocked, so the modal leads with something concrete to chase instead of
+     a wall of badges. Uses the same fixed gold as .achievement-badge.unlocked
+     (achievement color stays constant across themes, like other category
+     colors in this app) rather than the per-theme --accent. */
+  .ach-next{
+    display:flex;align-items:center;gap:12px;
+    background:linear-gradient(180deg, rgba(242,185,61,.16), rgba(242,185,61,.04));
+    border:1px solid #f2b93d;border-radius:14px;
+    padding:13px 15px;margin-bottom:14px;
+  }
+  .ach-next-icon{
+    font-size:22px;flex:0 0 auto;width:44px;height:44px;border-radius:12px;
+    background:rgba(242,185,61,.16);display:flex;align-items:center;justify-content:center;
+  }
+  .ach-next-body{flex:1 1 auto;min-width:0;}
+  .ach-next-kicker{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#f2b93d;}
+  .ach-next-title{font-size:13px;font-weight:800;margin-top:2px;color:var(--text);}
+  .ach-next-track{margin-top:7px;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;}
+  .ach-next-track > span{display:block;height:100%;background:#f2b93d;border-radius:3px;transition:width .4s ease;}
+
   .achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
 
   .achievement-badge{
@@ -2270,7 +2309,13 @@
 
   .achievement-badge.na{opacity:.22;}
 
-  .achievement-badge .ab-icon{font-size:26px;margin-bottom:6px;}
+  .achievement-badge .ab-icon{
+    font-size:20px;margin:0 auto 8px;width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.05);border:2px solid var(--line);
+  }
+
+  .achievement-badge.unlocked .ab-icon{border-color:#f2b93d;background:rgba(242,185,61,.16);}
 
   .achievement-badge .ab-title{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;}
 
@@ -2355,6 +2400,141 @@
   .community-notes-popover .cnp-note{color:var(--text-dim);margin-bottom:6px;line-height:1.5;font-style:italic;}
 
   .community-notes-popover .cnp-close{float:right;cursor:pointer;color:var(--text-dim);background:none;border:none;font-size:14px;}
+
+  /* ==========================================================================
+     14b. FIRST-RUN WIZARD — the one guided flow a brand-new student sees
+     (js/55-onboarding.js): welcome, optional name/GPA/gender, theme, ready.
+     Full-bleed card (no padding of its own) so the progress bar can sit
+     flush against the top edge; .wiz-body carries the actual padding.
+     ========================================================================== */
+
+  .onboarding-modal-card{max-width:440px;padding:0;overflow:hidden;}
+
+  .wiz-progress{height:3px;background:rgba(255,255,255,.08);}
+  .wiz-progress > span{display:block;height:100%;background:var(--accent);transition:width .3s ease;}
+
+  .wiz-skip-link{
+    position:absolute;top:14px;right:16px;background:none;border:none;
+    color:var(--text-dim);font-size:11.5px;font-weight:700;cursor:pointer;
+    font-family:inherit;padding:4px;
+  }
+  .wiz-skip-link:hover{color:var(--text);}
+
+  .wiz-body{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:34px 26px 22px;gap:6px;
+  }
+  .wiz-ic{font-size:34px;line-height:1;margin-bottom:4px;}
+  .wiz-mascot{width:64px;height:64px;object-fit:contain;border-radius:14px;}
+  .wiz-title{font-size:16px;font-weight:800;color:var(--text);}
+  .wiz-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
+  .wiz-content{width:100%;text-align:left;margin-top:14px;}
+  .plan-page.rtl-mode .wiz-content{text-align:right;}
+  .wiz-content .theme-picker-grid{margin-top:0;}
+
+  .wiz-foot{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 20px;border-top:1px solid var(--line);
+  }
+  .wiz-back{
+    background:none;border:none;color:var(--text-dim);font-size:12px;font-weight:700;
+    cursor:pointer;font-family:inherit;padding:4px;
+  }
+  .wiz-back:hover{color:var(--text);}
+  .wiz-continue{
+    background:var(--accent);color:var(--navy-900);border:none;border-radius:999px;
+    padding:10px 22px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;
+  }
+
+  /* ==========================================================================
+     14c. STORY STACK — the shared swipeable card sequence (js/56-story-
+     stack.js) behind both the semester recap and the prerequisite "why is
+     this locked?" walkthrough. Segmented top progress bar (Instagram-
+     Stories style) instead of the wizard's single continuous fill, since
+     these are N ad-hoc cards rather than a fixed set of onboarding steps.
+     ========================================================================== */
+
+  /* Higher than the base .modal-overlay's z-index:1000 — the story stack can
+     legitimately open ON TOP OF another already-open modal (the prereq
+     graph opens "why is this locked?" from inside itself, on purpose), and
+     with two overlays tied on z-index the one later in the DOM would win
+     regardless of which one the student actually means to interact with. */
+  #storyStackOverlay{z-index:1100;}
+
+  .story-stack-card{max-width:420px;padding:0;overflow:hidden;}
+
+  .story-progress{display:flex;gap:4px;padding:12px 14px 0;}
+  .story-progress span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.14);}
+  .story-progress span.filled{background:var(--accent);}
+
+  .story-close{
+    position:absolute;top:8px;right:10px;background:none;border:none;
+    color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1;padding:6px;
+  }
+  .story-close:hover{color:var(--text);}
+
+  .story-crumb{padding:10px 30px 0;font-size:10.5px;color:var(--text-dim);text-align:center;}
+
+  .story-body{
+    position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:26px 24px 18px;gap:8px;min-height:170px;justify-content:center;touch-action:pan-y;
+  }
+  .story-ic{
+    width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.06);
+    display:flex;align-items:center;justify-content:center;font-size:30px;line-height:1;
+  }
+  .story-title{font-size:17px;font-weight:800;color:var(--text);}
+  .story-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
+  .story-content{width:100%;margin-top:8px;}
+
+  /* Status pill under a story card's title — colored per status so a card
+     reads at a glance without needing the icon above it to double as a
+     status indicator too (the icon is the course's subject instead). */
+  .story-badge{
+    display:inline-block;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
+    border-radius:999px;padding:4px 12px;
+  }
+  .story-badge-locked{background:rgba(255,255,255,.06);color:var(--text-dim);border:1px solid var(--line);}
+  .story-badge-unlocked{background:rgba(93,184,255,.14);color:var(--accent);border:1px solid var(--accent);}
+  .story-badge-passed{background:rgba(47,191,113,.14);color:#8ff0bd;border:1px solid var(--unlock);}
+
+  .story-foot{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 20px;border-top:1px solid var(--line);
+  }
+  .story-stack-card[dir="rtl"] .story-foot{flex-direction:row-reverse;}
+  .story-back{
+    background:none;border:none;color:var(--text-dim);font-size:12px;font-weight:700;
+    cursor:pointer;font-family:inherit;padding:4px;
+  }
+  .story-back:hover{color:var(--text);}
+  .story-continue{
+    background:var(--accent);color:var(--navy-900);border:none;border-radius:999px;
+    padding:10px 22px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;
+  }
+
+  /* Semester-recap-specific card content: a chip list of finished courses
+     and a big GPA reveal number — generic enough to belong here rather than
+     a whole separate stylesheet section for one feature's two card types. */
+  .story-course-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+  .story-course-chip{
+    font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--line);
+    border-radius:999px;padding:5px 12px;
+  }
+  .story-gpa-big{font-size:40px;font-weight:800;color:var(--accent);line-height:1;margin-top:4px;}
+
+  /* Prerequisite "why is this locked?" card content — one chip per direct
+     prerequisite of the course the current card is about, so a branch (two
+     or more prereqs) doesn't get lost: done ones read as already-solved,
+     the one actually being followed next is highlighted. */
+  .story-why-note{font-size:12px;color:var(--text-dim);margin:0 0 6px;}
+  .story-chip-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+  .story-chip{
+    font-size:11px;font-weight:700;border-radius:999px;padding:5px 12px;
+    border:1.5px solid var(--line);background:rgba(255,255,255,.04);
+  }
+  .story-chip-done{border-color:var(--unlock);color:#8ff0bd;}
+  .story-chip-focus{border-color:var(--accent);color:var(--accent);}
 
   /* ==========================================================================
      15. DEVELOPER MODE & PLAN EDITOR — everything gated behind the hidden

@@ -505,6 +505,12 @@
   window.AAUP_CLOUD = {
     isConfigured: isConfigured, isSignedIn: isSignedIn, getEmail: getEmail, getUsername: getUsername, displayName: displayName,
     sectionHtml: sectionHtml, bindSection: bindSection,
-    open: open, close: close
+    open: open, close: close,
+    // Exposed so the first-run wizard (js/55-onboarding.js) can offer sign
+    // in/up inline without duplicating this module's auth or conflict-
+    // resolution logic — reconcileAfterSignIn is the one place a genuine
+    // "two real copies of data" choice has to be made, and it's worth
+    // reusing rather than re-deciding differently in a second place.
+    signIn: signIn, signUp: signUp, reconcileAfterSignIn: reconcileAfterSignIn, startAutoSync: startAutoSync
   };
 })();
