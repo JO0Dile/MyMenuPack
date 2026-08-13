@@ -80,11 +80,11 @@
   // The first-run wizard (js/55-onboarding.js) is now the sole place this
   // "is this a brand-new student?" signal auto-opens anything — this dialog
   // no longer pops itself open on load. openDialog() stays available for the
-  // "✏️ Edit" link in the My Progress panel, and save()/markSeen() are
-  // exposed so the wizard's own "about you" step can write through the same
-  // storage this module owns instead of duplicating its shape elsewhere.
+  // "✏️ Edit" link in the My Progress panel, and markSeen()/isFirstRun() are
+  // exposed so the wizard can share the same "seen it" flag this module owns
+  // instead of tracking a second one.
   window.AAUP_STUDENT = {
-    get: load, openDialog: openDialog, save: save, markSeen: markSeen,
+    get: load, openDialog: openDialog, markSeen: markSeen,
     isFirstRun: function(){ return !load() && !isDismissed(); }
   };
 

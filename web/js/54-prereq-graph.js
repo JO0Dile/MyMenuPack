@@ -238,14 +238,36 @@
       '<p class="form-note" style="margin:0;">' + body + '</p>' + whyBtn + '</div>';
   }
 
+  // Icon per course reflects its category (same classes the achievement
+  // system already reads off each .course element), not its lock state —
+  // status is conveyed by the badge pill next to the title instead, so a
+  // "Calculus 1" card and a "Computer Vision" card don't look identical.
+  var CATEGORY_ICONS = { core: '📘', math: '📐', dept: '💻', eng: '🔤', uni: '🏛️', free: '✨', skills: '🖥️' };
+  function courseIcon(prefix, slug){
+    var el = document.getElementById(prefix + '-c-' + slug);
+    if(el){
+      var cats = Object.keys(CATEGORY_ICONS);
+      for(var i = 0; i < cats.length; i++){ if(el.classList.contains(cats[i])) return CATEGORY_ICONS[cats[i]]; }
+    }
+    return '📖';
+  }
+
+  function statusBadgeHtml(status, t){
+    var label = status === 'passed' ? t.whyPassedBadge : status === 'unlocked' ? t.whyUnlockedBadge : t.whyLockedBadge;
+    return '<span class="story-badge story-badge-' + status + '">' + esc(label) + '</span>';
+  }
+
   // ---------- "why is this locked?" story mode ----------
   // A linear, swipeable alternative to reading the graph: one card per
   // course, walking backward along the SAME longest-remaining-chain
   // remainingChain() already computes for the "shortest route" panel — just
   // presented one step at a time instead of as a single arrow-joined line.
-  // The last card is always genuinely actionable (remainingChain's chain
-  // only ever contains not-yet-passed courses, and its root entry is, by
-  // construction, one whose own prerequisites are already met).
+  // remainingChain's own chain only ever contains not-yet-passed courses, so
+  // its last entry is always genuinely actionable (its own prerequisites are
+  // already met) — one more card beyond that, showing one of ITS
+  // prerequisites that's actually passed (when it has any), gives the
+  // sequence the same satisfying "root cause, solved" ending the approved
+  // mockup had, instead of stopping one beat early.
   function whyLockedCards(prefix, slug, rtl, t){
     var r = remainingChain(prefix, slug);
     if(!r || !r.hops) return null;
@@ -254,7 +276,7 @@
     var path = r.chain.slice().reverse(); // [target, ..., next actionable course]
     var nameOf = function(s){ var m = info[s] || {}; return rtl && m.ar ? m.ar : (m.name || s); };
 
-    return path.map(function(s, i){
+    var cards = path.map(function(s, i){
       var st = statusFor(prefix, s);
       var isLast = i === path.length - 1;
       var needs = needsMap[s] || [];
@@ -266,19 +288,39 @@
         return '<span class="story-chip' + (cls ? ' ' + cls : '') + '">' + (passed ? '✓ ' : '') + esc(nameOf(n)) + (isNext ? ' →' : '') + '</span>';
       }).join('') + '</div>' : '';
       var crumb = i > 0 ? path.slice(0, i + 1).map(nameOf).join(' ← ') : '';
-      var note = isLast
-        ? (needs.length ? t.whyResolved : t.whyNoPrereqs)
-        : t.whyNeeds;
+      var note = isLast ? (needs.length ? t.whyResolved : t.whyNoPrereqs) : t.whyNeeds;
 
       return {
-        icon: st === 'unlocked' ? '🟢' : '🔒',
+        icon: courseIcon(prefix, s),
         crumb: crumb,
         title: nameOf(s),
-        sub: st === 'unlocked' ? t.whyUnlockedNow : t.whyLockedBadge,
+        sub: statusBadgeHtml(st, t),
         content: '<p class="story-why-note">' + note + '</p>' + chipsHtml,
-        primary: isLast ? t.whyDone : undefined
+        primary: (isLast && !needs.length) ? t.whyDone : undefined
       };
     });
+
+    var rootSlug = path[path.length - 1];
+    var rootNeeds = needsMap[rootSlug] || [];
+    if(rootNeeds.length){
+      // Any of these is already passed (that's WHY rootSlug is unlocked) —
+      // the one with an actual grade recorded makes the best closing beat.
+      var closer = rootNeeds.filter(function(n){ return isPassed(prefix, n); })[0];
+      if(closer){
+        var grade = gradeFor(prefix, closer);
+        var fullCrumb = path.map(nameOf).concat([nameOf(closer)]).join(' ← ');
+        cards.push({
+          icon: courseIcon(prefix, closer),
+          crumb: fullCrumb,
+          title: nameOf(closer),
+          sub: statusBadgeHtml('passed', t),
+          content: '<p class="story-why-note">' + (grade ? t.whyGrade(grade) : '') + t.whyRootSolved + '</p>',
+          primary: t.whyDone
+        });
+      }
+    }
+
+    return cards;
   }
 
   function openWhyLocked(prefix, slug){
@@ -320,9 +362,11 @@
       routeStats: function(hops, ch){ return hops + (hops === 1 ? ' course' : ' courses') + ' · ' + Math.round(ch) + ' credit hours'; },
       truncated: 'Showing your closest prerequisites — this chain goes back further.',
       whyLocked: '❓ Why is this locked?',
-      whyLockedBadge: 'Locked', whyUnlockedNow: 'Unlocked — nothing stopping this one',
+      whyLockedBadge: 'locked', whyUnlockedBadge: 'unlocked', whyPassedBadge: 'passed',
       whyNeeds: 'Needs:', whyResolved: 'Everything it needs is already done — you can take it now.',
-      whyNoPrereqs: 'No prerequisites at all.', whyDone: 'Got it!'
+      whyNoPrereqs: 'No prerequisites at all.', whyDone: 'Got it!',
+      whyGrade: function(g){ return 'Grade: ' + g + '. '; },
+      whyRootSolved: 'Nothing blocking this — end of the chain.'
     },
     ar: {
       title: function(name){ return 'خريطة المتطلبات السابقة · ' + name; },
@@ -334,9 +378,11 @@
       routeStats: function(hops, ch){ return hops + ' مساق · ' + Math.round(ch) + ' ساعة معتمدة'; },
       truncated: 'يُعرض أقرب المتطلبات فقط — هذه السلسلة تمتد أبعد من ذلك.',
       whyLocked: '❓ لماذا هذا مغلق؟',
-      whyLockedBadge: 'مغلق', whyUnlockedNow: 'متاح — لا شيء يمنعه الآن',
+      whyLockedBadge: 'مغلق', whyUnlockedBadge: 'متاح', whyPassedBadge: 'منجز',
       whyNeeds: 'يتطلب:', whyResolved: 'كل متطلباته مُنجزة بالفعل — يمكنك أخذه الآن.',
-      whyNoPrereqs: 'لا متطلبات سابقة له إطلاقًا.', whyDone: 'فهمت!'
+      whyNoPrereqs: 'لا متطلبات سابقة له إطلاقًا.', whyDone: 'فهمت!',
+      whyGrade: function(g){ return 'العلامة: ' + g + '. '; },
+      whyRootSolved: 'لا شيء يمنع هذا — نهاية السلسلة.'
     }
   };
 
