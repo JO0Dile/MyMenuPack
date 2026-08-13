@@ -100,6 +100,77 @@
   // course-row id, so a fully-completed semester fires exactly once — and
   // becomes eligible to fire again only if it's later made incomplete and
   // re-completed.
+  // ---------- semester recap ----------
+  // A short swipeable story (js/56-story-stack.js) instead of a bare confetti
+  // burst: which courses just got finished, the plan's new GPA, and how many
+  // achievements are unlocked so far — then confetti as the payoff on the
+  // last card, same moment it used to fire alone.
+  function semesterRecapCards(prefix, row){
+    var semEl = row.closest('.sem');
+    var semLabel = (semEl && semEl.querySelector('.sem-label') && semEl.querySelector('.sem-label').textContent || '').trim();
+    var yearEl = row.closest('.year-row');
+    var yearLabel = (yearEl && yearEl.querySelector('.year-badge .label') && yearEl.querySelector('.year-badge .label').textContent || '').trim();
+    var courseEls = Array.prototype.slice.call(row.querySelectorAll('.course[id]:not(.course-removed)'));
+    var courseNames = courseEls.map(function(el){
+      var nameEl = el.querySelector('.name');
+      return nameEl ? nameEl.textContent.replace(/\s*✓\s*$/, '').trim() : el.id;
+    });
+
+    var cards = [
+      {
+        icon: '🎉',
+        title: 'Semester complete!',
+        sub: (yearLabel || semLabel) ? [yearLabel, semLabel].filter(Boolean).join(' · ') : 'Every course here is done.',
+        content: ''
+      },
+      {
+        icon: '📚',
+        title: courseNames.length + ' course' + (courseNames.length === 1 ? '' : 's') + ' finished',
+        sub: '',
+        content: '<div class="story-course-chips">' +
+          courseNames.map(function(n){ return '<span class="story-course-chip">' + window.__escapeHtml(n) + '</span>'; }).join('') +
+          '</div>'
+      }
+    ];
+
+    var gpaInfo = (window.AAUP_GPA && window.AAUP_GPA.gpaFor) ? window.AAUP_GPA.gpaFor(prefix) : null;
+    if(gpaInfo && gpaInfo.gpa !== null){
+      cards.push({
+        icon: '📈',
+        title: 'Your GPA now',
+        sub: '',
+        content: '<div class="story-gpa-big">' + gpaInfo.gpa.toFixed(2) + '</div>'
+      });
+    }
+
+    var achCount = (window.AAUP_ACHIEVEMENTS && window.AAUP_ACHIEVEMENTS.getUnlockedCount) ? window.AAUP_ACHIEVEMENTS.getUnlockedCount(prefix) : null;
+    cards.push({
+      icon: '🏆',
+      title: 'Keep going!',
+      sub: achCount ? (achCount.unlocked + ' / ' + achCount.total + ' achievements unlocked so far') : '',
+      content: '',
+      primary: 'Nice work!'
+    });
+
+    return cards;
+  }
+
+  // A semester can finish on a student's very first visit to a plan (e.g.
+  // most courses already ticked off elsewhere, one click here finishes the
+  // set) — the exact moment the roadmap's own first-visit popup can also be
+  // open. Same wait-until-clear pattern AAUP_TUTORIAL uses for the same
+  // reason: don't fight another modal for the top of the stack.
+  function celebrateSemester(prefix, row){
+    if(!window.AAUP_STORY || prefersReducedMotion){ confettiBurst(row); return; }
+    var tries = 0;
+    (function attempt(){
+      tries++;
+      var blocked = document.querySelector('.modal-overlay.open');
+      if(blocked && tries < 20){ setTimeout(attempt, 400); return; }
+      window.AAUP_STORY.open(semesterRecapCards(prefix, row), { onFinish: function(){ confettiBurst(row); } });
+    })();
+  }
+
   var celebrated = {};
   function celebrateCheck(prefix){
     var root = document.getElementById('page-' + prefix);
@@ -113,7 +184,7 @@
       if(allDone){
         if(!celebrated[row.id]){
           celebrated[row.id] = true;
-          confettiBurst(row);
+          celebrateSemester(prefix, row);
         }
       } else {
         delete celebrated[row.id];

@@ -2440,6 +2440,61 @@
   }
 
   /* ==========================================================================
+     14c. STORY STACK — the shared swipeable card sequence (js/56-story-
+     stack.js) behind both the semester recap and the prerequisite "why is
+     this locked?" walkthrough. Segmented top progress bar (Instagram-
+     Stories style) instead of the wizard's single continuous fill, since
+     these are N ad-hoc cards rather than a fixed set of onboarding steps.
+     ========================================================================== */
+
+  .story-stack-card{max-width:420px;padding:0;overflow:hidden;}
+
+  .story-progress{display:flex;gap:4px;padding:12px 14px 0;}
+  .story-progress span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.14);}
+  .story-progress span.filled{background:var(--accent);}
+
+  .story-close{
+    position:absolute;top:8px;right:10px;background:none;border:none;
+    color:var(--text-dim);font-size:22px;cursor:pointer;line-height:1;padding:6px;
+  }
+  .story-close:hover{color:var(--text);}
+
+  .story-crumb{padding:10px 30px 0;font-size:10.5px;color:var(--text-dim);text-align:center;}
+
+  .story-body{
+    position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:26px 24px 18px;gap:8px;min-height:170px;justify-content:center;touch-action:pan-y;
+  }
+  .story-ic{font-size:36px;line-height:1;}
+  .story-title{font-size:17px;font-weight:800;color:var(--text);}
+  .story-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
+  .story-content{width:100%;margin-top:8px;}
+
+  .story-foot{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 20px;border-top:1px solid var(--line);
+  }
+  .story-back{
+    background:none;border:none;color:var(--text-dim);font-size:12px;font-weight:700;
+    cursor:pointer;font-family:inherit;padding:4px;
+  }
+  .story-back:hover{color:var(--text);}
+  .story-continue{
+    background:var(--accent);color:var(--navy-900);border:none;border-radius:999px;
+    padding:10px 22px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;
+  }
+
+  /* Semester-recap-specific card content: a chip list of finished courses
+     and a big GPA reveal number — generic enough to belong here rather than
+     a whole separate stylesheet section for one feature's two card types. */
+  .story-course-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+  .story-course-chip{
+    font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid var(--line);
+    border-radius:999px;padding:5px 12px;
+  }
+  .story-gpa-big{font-size:40px;font-weight:800;color:var(--accent);line-height:1;margin-top:4px;}
+
+  /* ==========================================================================
      15. DEVELOPER MODE & PLAN EDITOR — everything gated behind the hidden
      developer login: the panel itself, imported-plan cards and their
      simplified viewer, and the drag-and-drop semester editor
