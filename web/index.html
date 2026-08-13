@@ -288,6 +288,12 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<div class="modal-overlay" id="onboardingWizardOverlay">
+  <div class="modal-card onboarding-modal-card">
+    <div class="modal-body" id="onboardingWizardBody"></div>
+  </div>
+</div>
+
 <div class="toast-msg" id="globalToast"></div>
 <div class="toast-action" id="globalActionToast" style="display:none;">
   <span class="ta-text" id="globalActionToastText"></span>
@@ -503,6 +509,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/52-cloud.js"></script>
 <script src="js/53-roadmap.js"></script>
 <script src="js/54-prereq-graph.js"></script>
+<script src="js/55-onboarding.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 
