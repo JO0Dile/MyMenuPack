@@ -435,6 +435,18 @@
     .home-header-stats span{font-size:10px;padding:4px 9px;}
   }
 
+  /* Phone-width screens: .home-wrap's 20px padding plus .home-header's own
+     16-18px on top of it compounded into ~35-40px of dead space per side —
+     18-20% of a typical phone's width. Tighten both so the header, search
+     bar, and plan/college cards reach close to the screen edges instead. */
+  @media (max-width:480px){
+    .home-wrap{padding:10px;}
+    .home-header{padding:14px;border-radius:12px;gap:10px;}
+    .search-wrap{margin-left:0;margin-right:0;}
+    .plan-grid{gap:10px;}
+    .plan-card{padding:16px 14px 14px;}
+  }
+
   .plan-card{position:relative;}
 
   .imp-origin-badge{
