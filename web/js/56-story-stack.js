@@ -10,6 +10,7 @@
   var cards = [];
   var index = 0;
   var onFinish = null;
+  var rtl = false;
 
   function overlay(){ return document.getElementById('storyStackOverlay'); }
   function body(){ return document.getElementById('storyStackBody'); }
@@ -48,6 +49,10 @@
     if(!b) return;
     var c = cards[index] || {};
     var segs = cards.map(function(_, i){ return '<span class="' + (i <= index ? 'filled' : '') + '"></span>'; }).join('');
+    var backLabel = rtl ? 'رجوع →' : '← Back';
+    var continueLabel = c.primary || (index >= cards.length - 1 ? (rtl ? 'تم' : 'Done') : (rtl ? '← متابعة' : 'Continue →'));
+    var card = overlay().querySelector('.modal-card');
+    if(card) card.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     b.innerHTML =
       '<div class="story-progress">' + segs + '</div>' +
       '<button type="button" class="story-close" id="storyClose" aria-label="Close">&times;</button>' +
@@ -59,10 +64,8 @@
         (c.content ? '<div class="story-content">' + c.content + '</div>' : '') +
       '</div>' +
       '<div class="story-foot">' +
-        (index > 0 ? '<button type="button" class="story-back" id="storyBack">← Back</button>' : '<span></span>') +
-        '<button type="button" class="story-continue" id="storyContinue">' +
-          (c.primary || (index >= cards.length - 1 ? 'Done' : 'Continue →')) +
-        '</button>' +
+        (index > 0 ? '<button type="button" class="story-back" id="storyBack">' + backLabel + '</button>' : '<span></span>') +
+        '<button type="button" class="story-continue" id="storyContinue">' + continueLabel + '</button>' +
       '</div>';
     var closeBtn = document.getElementById('storyClose');
     var back = document.getElementById('storyBack');
@@ -74,15 +77,18 @@
   }
 
   // cards: [{ icon, title, sub, content, crumb, primary }, ...]
-  // opts: { onFinish() } — called once, after the stack closes (via the
-  // last card's primary button or the ✕), never on an early abandon that
-  // isn't the natural end — same "only celebrate a real finish" spirit as
-  // the rest of this app's celebration hooks.
+  // opts: { onFinish(), rtl } — onFinish is called once, after the stack
+  // closes (via the last card's primary button or the ✕), never on an early
+  // abandon that isn't the natural end — same "only celebrate a real finish"
+  // spirit as the rest of this app's celebration hooks. rtl only flips the
+  // stack's own chrome (Back/Continue labels, footer order) — card text
+  // direction is whatever the caller already put in icon/title/sub/content.
   function open(list, opts){
     cards = list || [];
     if(!cards.length) return;
     index = 0;
     onFinish = (opts && opts.onFinish) || null;
+    rtl = !!(opts && opts.rtl);
     var ov = overlay();
     if(!ov) return;
     ov.classList.add('open');

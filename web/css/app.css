@@ -2220,6 +2220,13 @@
   .pg-side{display:flex; flex-direction:column; gap:12px;}
   .pg-selected, .pg-legend, .pg-route{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px 14px;}
   .pg-panel-label{font-size:10.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+
+  .pg-why-locked-btn{
+    display:block;margin-top:10px;background:rgba(93,184,255,.12);border:1px solid var(--accent);color:var(--accent);
+    font-family:inherit;font-size:11.5px;font-weight:800;border-radius:999px;padding:6px 14px;cursor:pointer;
+  }
+  .pg-why-locked-btn:hover{background:var(--accent);color:var(--navy-900);}
+
   .pg-legend-row{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); padding:4px 0;}
   .pg-legend-dot{width:10px; height:10px; border-radius:50%; flex:none;}
 
@@ -2447,6 +2454,13 @@
      these are N ad-hoc cards rather than a fixed set of onboarding steps.
      ========================================================================== */
 
+  /* Higher than the base .modal-overlay's z-index:1000 — the story stack can
+     legitimately open ON TOP OF another already-open modal (the prereq
+     graph opens "why is this locked?" from inside itself, on purpose), and
+     with two overlays tied on z-index the one later in the DOM would win
+     regardless of which one the student actually means to interact with. */
+  #storyStackOverlay{z-index:1100;}
+
   .story-stack-card{max-width:420px;padding:0;overflow:hidden;}
 
   .story-progress{display:flex;gap:4px;padding:12px 14px 0;}
@@ -2474,6 +2488,7 @@
     display:flex;justify-content:space-between;align-items:center;
     padding:14px 20px;border-top:1px solid var(--line);
   }
+  .story-stack-card[dir="rtl"] .story-foot{flex-direction:row-reverse;}
   .story-back{
     background:none;border:none;color:var(--text-dim);font-size:12px;font-weight:700;
     cursor:pointer;font-family:inherit;padding:4px;
@@ -2493,6 +2508,19 @@
     border-radius:999px;padding:5px 12px;
   }
   .story-gpa-big{font-size:40px;font-weight:800;color:var(--accent);line-height:1;margin-top:4px;}
+
+  /* Prerequisite "why is this locked?" card content — one chip per direct
+     prerequisite of the course the current card is about, so a branch (two
+     or more prereqs) doesn't get lost: done ones read as already-solved,
+     the one actually being followed next is highlighted. */
+  .story-why-note{font-size:12px;color:var(--text-dim);margin:0 0 6px;}
+  .story-chip-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+  .story-chip{
+    font-size:11px;font-weight:700;border-radius:999px;padding:5px 12px;
+    border:1.5px solid var(--line);background:rgba(255,255,255,.04);
+  }
+  .story-chip-done{border-color:var(--unlock);color:#8ff0bd;}
+  .story-chip-focus{border-color:var(--accent);color:var(--accent);}
 
   /* ==========================================================================
      15. DEVELOPER MODE & PLAN EDITOR — everything gated behind the hidden

@@ -230,9 +230,63 @@
     } else {
       body = t.needsList(needNames);
     }
+    var whyBtn = (st === 'locked' && window.AAUP_STORY)
+      ? '<button type="button" class="pg-why-locked-btn" data-pg-why="' + esc(slug) + '">' + t.whyLocked + '</button>'
+      : '';
     return '<div class="pg-selected"><div class="pg-panel-label">' + t.selectedLabel + '</div>' +
       '<h3 style="margin:2px 0 6px;">' + name + '</h3>' +
-      '<p class="form-note" style="margin:0;">' + body + '</p></div>';
+      '<p class="form-note" style="margin:0;">' + body + '</p>' + whyBtn + '</div>';
+  }
+
+  // ---------- "why is this locked?" story mode ----------
+  // A linear, swipeable alternative to reading the graph: one card per
+  // course, walking backward along the SAME longest-remaining-chain
+  // remainingChain() already computes for the "shortest route" panel — just
+  // presented one step at a time instead of as a single arrow-joined line.
+  // The last card is always genuinely actionable (remainingChain's chain
+  // only ever contains not-yet-passed courses, and its root entry is, by
+  // construction, one whose own prerequisites are already met).
+  function whyLockedCards(prefix, slug, rtl, t){
+    var r = remainingChain(prefix, slug);
+    if(!r || !r.hops) return null;
+    var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
+    var needsMap = (window.__PLAN_DATA[prefix] || {}).needsMap || {};
+    var path = r.chain.slice().reverse(); // [target, ..., next actionable course]
+    var nameOf = function(s){ var m = info[s] || {}; return rtl && m.ar ? m.ar : (m.name || s); };
+
+    return path.map(function(s, i){
+      var st = statusFor(prefix, s);
+      var isLast = i === path.length - 1;
+      var needs = needsMap[s] || [];
+      var nextInPath = !isLast ? path[i + 1] : null;
+      var chipsHtml = needs.length ? '<div class="story-chip-row">' + needs.map(function(n){
+        var passed = isPassed(prefix, n);
+        var isNext = n === nextInPath;
+        var cls = passed ? 'story-chip-done' : (isNext ? 'story-chip-focus' : '');
+        return '<span class="story-chip' + (cls ? ' ' + cls : '') + '">' + (passed ? '✓ ' : '') + esc(nameOf(n)) + (isNext ? ' →' : '') + '</span>';
+      }).join('') + '</div>' : '';
+      var crumb = i > 0 ? path.slice(0, i + 1).map(nameOf).join(' ← ') : '';
+      var note = isLast
+        ? (needs.length ? t.whyResolved : t.whyNoPrereqs)
+        : t.whyNeeds;
+
+      return {
+        icon: st === 'unlocked' ? '🟢' : '🔒',
+        crumb: crumb,
+        title: nameOf(s),
+        sub: st === 'unlocked' ? t.whyUnlockedNow : t.whyLockedBadge,
+        content: '<p class="story-why-note">' + note + '</p>' + chipsHtml,
+        primary: isLast ? t.whyDone : undefined
+      };
+    });
+  }
+
+  function openWhyLocked(prefix, slug){
+    var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+    var t = T[rtl ? 'ar' : 'en'];
+    var cards = whyLockedCards(prefix, slug, rtl, t);
+    if(!cards || !window.AAUP_STORY) return;
+    window.AAUP_STORY.open(cards, { rtl: rtl });
   }
 
   function legendHTML(t){
@@ -264,7 +318,11 @@
       alreadyDone: 'Already completed.', noPrereqs: 'No prerequisites — open to take now.',
       needsList: function(names){ return 'Needs ' + names.join(' and ') + '.'; },
       routeStats: function(hops, ch){ return hops + (hops === 1 ? ' course' : ' courses') + ' · ' + Math.round(ch) + ' credit hours'; },
-      truncated: 'Showing your closest prerequisites — this chain goes back further.'
+      truncated: 'Showing your closest prerequisites — this chain goes back further.',
+      whyLocked: '❓ Why is this locked?',
+      whyLockedBadge: 'Locked', whyUnlockedNow: 'Unlocked — nothing stopping this one',
+      whyNeeds: 'Needs:', whyResolved: 'Everything it needs is already done — you can take it now.',
+      whyNoPrereqs: 'No prerequisites at all.', whyDone: 'Got it!'
     },
     ar: {
       title: function(name){ return 'خريطة المتطلبات السابقة · ' + name; },
@@ -274,7 +332,11 @@
       alreadyDone: 'أُنجز بالفعل.', noPrereqs: 'لا متطلبات سابقة — متاح الآن.',
       needsList: function(names){ return 'يتطلب ' + names.join(' و') + '.'; },
       routeStats: function(hops, ch){ return hops + ' مساق · ' + Math.round(ch) + ' ساعة معتمدة'; },
-      truncated: 'يُعرض أقرب المتطلبات فقط — هذه السلسلة تمتد أبعد من ذلك.'
+      truncated: 'يُعرض أقرب المتطلبات فقط — هذه السلسلة تمتد أبعد من ذلك.',
+      whyLocked: '❓ لماذا هذا مغلق؟',
+      whyLockedBadge: 'مغلق', whyUnlockedNow: 'متاح — لا شيء يمنعه الآن',
+      whyNeeds: 'يتطلب:', whyResolved: 'كل متطلباته مُنجزة بالفعل — يمكنك أخذه الآن.',
+      whyNoPrereqs: 'لا متطلبات سابقة له إطلاقًا.', whyDone: 'فهمت!'
     }
   };
 
@@ -389,6 +451,10 @@
         render(prefix, clicked, true);
       });
     });
+    var whyBtnEl = body.querySelector('[data-pg-why]');
+    if(whyBtnEl){
+      whyBtnEl.addEventListener('click', function(){ openWhyLocked(prefix, whyBtnEl.getAttribute('data-pg-why')); });
+    }
 
     var wrapEl = document.getElementById('pgGraphWrap');
     dragBound = false; // the wrap is a fresh element every render; rebind against it
