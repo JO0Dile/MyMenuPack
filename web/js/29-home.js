@@ -252,10 +252,22 @@
     card.onkeydown = function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } };
   }
 
+  function renderHeaderStats(){
+    var el = document.getElementById('homeHeaderStats');
+    if(!el) return;
+    var uniCount = Object.keys(window.APP_UNIVERSITIES || {}).length;
+    var planCount = allPlanMeta().length;
+    el.innerHTML =
+      '<span>📚 ' + planCount + ' study plan' + (planCount === 1 ? '' : 's') + '</span>' +
+      '<span>🎓 ' + uniCount + ' universit' + (uniCount === 1 ? 'y' : 'ies') + '</span>' +
+      '<span>🆓 Free &amp; offline</span>';
+  }
+
   function showUniversities(){
     state.university = null; state.college = null;
     renderResumeCard();
     renderUniversities();
+    renderHeaderStats();
     renderBreadcrumb();
     showStep('universities');
     if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('home'); }
@@ -291,6 +303,7 @@
     refreshCounts: function(){
       if(document.getElementById('homeStepUniversities').style.display !== 'none'){ renderUniversities(); }
       if(state.university && document.getElementById('homeStepColleges').style.display !== 'none'){ renderColleges(state.university); }
+      renderHeaderStats();
     }
   };
 

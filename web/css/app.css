@@ -253,7 +253,6 @@
 
   .home-btn:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:var(--accent);}
 
-  .home-header .mark-icon{width:32px;height:32px;object-fit:contain;}
   /* Theme toggle / export / import / reset-all reuse .home-btn styling as-is
      so nothing about the header's look changes — these are just more pills. */
 
@@ -291,28 +290,37 @@
   .home-wrap{max-width:1100px;margin:0 auto;padding:20px;}
 
   .home-header{
-    background:var(--header-bg);
+    background:linear-gradient(120deg, var(--header-bg), var(--surface-bg));
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:26px 32px;
-    display:flex;align-items:center;gap:16px;
+    border-radius:16px;
+    padding:22px 28px;
+    display:flex;align-items:center;gap:18px;
     margin-bottom:22px;
   }
 
-  .home-header .mark{
-    width:52px;height:52px;border-radius:12px;
-    background:linear-gradient(135deg,#1c2a5e,#0b1330);
-    border:1px solid var(--accent);
-    display:flex;align-items:center;justify-content:center;
-    flex:0 0 auto;
+  .home-header-mascot{
+    width:96px;height:96px;object-fit:contain;flex:0 0 auto;border-radius:16px;
   }
 
-  .home-header h1{margin:0;font-size:19px;font-weight:800;letter-spacing:.02em;}
+  .home-header-body{flex:1 1 auto;min-width:0;}
+
+  .home-header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.02em;}
 
   .home-header p{margin:4px 0 0;font-size:13px;color:var(--text-dim);}
 
+  .home-header-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+
+  .home-header-stats span{
+    font-size:11px;font-weight:700;color:var(--text);
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:5px 12px;
+    white-space:nowrap;
+  }
+
   .home-header .ar{
-    margin-left:auto;text-align:right;direction:rtl;
+    margin-left:auto;text-align:right;direction:rtl;flex:0 0 auto;
   }
 
   .home-header .ar .ar1{font-size:15px;font-weight:700;}
@@ -414,6 +422,9 @@
   @media (max-width:900px){
     .plan-grid{grid-template-columns:1fr;}
     .home-header .ar{display:none;}
+    .home-header{padding:16px 18px;gap:12px;}
+    .home-header-mascot{width:56px;height:56px;border-radius:12px;}
+    .home-header-stats span{font-size:10px;padding:4px 9px;}
   }
 
   .plan-card{position:relative;}
@@ -2255,6 +2266,27 @@
 
   .achievements-summary{font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;}
 
+  /* "Next Up" hero — the locked-but-applicable achievement closest to being
+     unlocked, so the modal leads with something concrete to chase instead of
+     a wall of badges. Uses the same fixed gold as .achievement-badge.unlocked
+     (achievement color stays constant across themes, like other category
+     colors in this app) rather than the per-theme --accent. */
+  .ach-next{
+    display:flex;align-items:center;gap:12px;
+    background:linear-gradient(180deg, rgba(242,185,61,.16), rgba(242,185,61,.04));
+    border:1px solid #f2b93d;border-radius:14px;
+    padding:13px 15px;margin-bottom:14px;
+  }
+  .ach-next-icon{
+    font-size:22px;flex:0 0 auto;width:44px;height:44px;border-radius:12px;
+    background:rgba(242,185,61,.16);display:flex;align-items:center;justify-content:center;
+  }
+  .ach-next-body{flex:1 1 auto;min-width:0;}
+  .ach-next-kicker{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#f2b93d;}
+  .ach-next-title{font-size:13px;font-weight:800;margin-top:2px;color:var(--text);}
+  .ach-next-track{margin-top:7px;height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;}
+  .ach-next-track > span{display:block;height:100%;background:#f2b93d;border-radius:3px;transition:width .4s ease;}
+
   .achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
 
   .achievement-badge{
@@ -2270,7 +2302,13 @@
 
   .achievement-badge.na{opacity:.22;}
 
-  .achievement-badge .ab-icon{font-size:26px;margin-bottom:6px;}
+  .achievement-badge .ab-icon{
+    font-size:20px;margin:0 auto 8px;width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.05);border:2px solid var(--line);
+  }
+
+  .achievement-badge.unlocked .ab-icon{border-color:#f2b93d;background:rgba(242,185,61,.16);}
 
   .achievement-badge .ab-title{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;}
 
