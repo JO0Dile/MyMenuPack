@@ -1,0 +1,39 @@
+{
+  "id": "venom-study",
+  "plan": {
+    "id": "venom-study",
+    "majorName": {
+      "en": {
+        "big": "Venom Study",
+        "small": ""
+      },
+      "ar": {
+        "big": "علم السموم ودراستها",
+        "small": ""
+      }
+    },
+    "icon": "⚕️",
+    "bio": {
+      "en": "Specialized in Aunt and relative studies. Scorpions included.",
+      "ar": "تخصص عمات واقارب"
+    },
+    "structure": {
+      "years": [
+        {
+          "id": "y1",
+          "hasSummer": false
+        }
+      ]
+    },
+    "courses": [],
+    "prerequisites": [],
+    "university": "aaup",
+    "college": {
+      "en": "Faculty of medicine",
+      "ar": "كلية الادوية والعقاقير"
+    }
+  },
+  "appVersion": "5.5",
+  "submittedAt": "2026-08-12T20:00:49.393Z",
+  "collectedAt": "2026-08-12T20:00:54.300Z"
+}
