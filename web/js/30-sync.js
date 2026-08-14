@@ -71,6 +71,10 @@
       imageUrl: window.AAUP_ICONS ? window.AAUP_ICONS.safeImageUrl(fp.imageUrl) : '',
       bio: { en: esc(fp.bio && fp.bio.en), ar: esc(fp.bio && fp.bio.ar) },
       college: { en: esc(fp.college && fp.college.en), ar: esc(fp.college && fp.college.ar) },
+      // Where this plan sits among its faculty's tiles. A number or null, never
+      // text — it is only ever compared, so it does not go through esc().
+      sortOrder: (fp.sortOrder == null || fp.sortOrder === '' || !isFinite(Number(fp.sortOrder)))
+        ? null : Number(fp.sortOrder),
       university: university,
       structure: { years: years },
       courses: courses,
@@ -143,7 +147,7 @@
   // even on a customized plan, with no prompt. This is what keeps a rebranded
   // icon from being held hostage by an unrelated pending decision about
   // courses.
-  var COSMETIC = ['icon', 'iconKey', 'imageUrl', 'bio', 'college', 'majorName', 'feedVersion'];
+  var COSMETIC = ['icon', 'iconKey', 'imageUrl', 'bio', 'college', 'majorName', 'sortOrder', 'feedVersion'];
   function applyCosmetic(existing, sanitized){
     var changed = false;
     COSMETIC.forEach(function(f){

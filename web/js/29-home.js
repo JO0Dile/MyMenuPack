@@ -85,15 +85,24 @@
       out.push({
         en: en.big + (en.small ? ' ' + en.small : ''),
         ar: (ar.big || en.big) + (ar.small ? ' ' + ar.small : ''),
-        cr: cr
+        cr: cr,
+        sortOrder: p.sortOrder
       });
     });
     // Majors with a real course list (cr set) come before "coming soon" ones
     // (cr null, per the same 0-courses check 28-imported.js uses) — otherwise
     // a coming-soon major that happens to sit earlier in storage can fill the
     // tile's 3-item preview and bury every actually-available plan behind
-    // "+N more".
-    out.sort(function(a, b){ return (b.cr != null) - (a.cr != null); });
+    // "+N more". Within each of those two groups the admin's chosen display
+    // order applies, matching the full plan list one tap deeper.
+    out.sort(function(a, b){
+      var byAvailability = (b.cr != null) - (a.cr != null);
+      if(byAvailability) return byAvailability;
+      return window.AAUP_IMPORTED.compareByDisplayOrder(
+        { sortOrder: a.sortOrder, majorName: { en: { big: a.en } } },
+        { sortOrder: b.sortOrder, majorName: { en: { big: b.en } } }
+      );
+    });
     return out;
   }
 

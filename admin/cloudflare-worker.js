@@ -403,6 +403,28 @@ function fail(msg) {
   return e;
 }
 
+// An empty box means "unplaced", not zero — zero is a real position that would
+// jump the major to the front. Anything that is not a finite number (a typo, a
+// pasted word) is treated as unplaced rather than rejected, so a bad keystroke
+// in one field cannot block saving an otherwise valid plan.
+function sortOrderOf(v) {
+  if (v == null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+// Placed majors first in the admin's chosen order, then everything unplaced
+// alphabetically — the order students see on the home page, so what the
+// dashboard lists top to bottom is what the tiles do.
+function byDisplayOrder(a, b) {
+  const ao = sortOrderOf(a.sortOrder);
+  const bo = sortOrderOf(b.sortOrder);
+  if (ao !== null && bo !== null && ao !== bo) return ao - bo;
+  if (ao !== null && bo === null) return -1;
+  if (ao === null && bo !== null) return 1;
+  return String(a.name || '').localeCompare(String(b.name || ''));
+}
+
 // Save posts the *whole* object, so a form rendered from an out-of-date read
 // does not merely fail to add something — it actively reverts everything saved
 // since. There is no way to detect that from the payload alone: a description
@@ -526,6 +548,10 @@ function validMajor(m) {
     bio: str(m.bio, 2000),
     bioAr: str(m.bioAr, 2000),
     degreeHours: m.degreeHours == null ? null : Number(m.degreeHours) || null,
+    // Where this major sits among its faculty's tiles on the home page. Null
+    // means "unplaced", which sorts alphabetically after everything numbered,
+    // so adding an order to one major never scrambles the rest.
+    sortOrder: sortOrderOf(m.sortOrder),
     freeElectiveSuggestions: Array.isArray(m.freeElectiveSuggestions) ? m.freeElectiveSuggestions : [],
     years: years.map((y) => ({ id: y.id, hasSummer: !!y.hasSummer })),
     courses: courses.map((c) => ({
@@ -598,6 +624,7 @@ function toEditable(stored) {
     bio: stored.bio || '',
     bioAr: stored.bioAr || '',
     degreeHours: stored.degreeHours == null ? null : stored.degreeHours,
+    sortOrder: sortOrderOf(stored.sortOrder),
     freeElectiveSuggestions: stored.freeElectiveSuggestions || [],
     years: Object.keys(years)
       .sort((a, b) => parseInt(a.slice(1), 10) - parseInt(b.slice(1), 10))
@@ -648,6 +675,7 @@ function toStored(edited, original) {
     bio: edited.bio,
     bioAr: edited.bioAr,
     degreeHours: edited.degreeHours,
+    sortOrder: edited.sortOrder,
     freeElectiveSuggestions: edited.freeElectiveSuggestions,
     courses: edited.courses.map((c) => ({
       ...(prev[c.id] || {}),
@@ -745,16 +773,17 @@ async function handleMajorsMeta(env, uni, request) {
         icon: m.icon || '',
         iconKey: m.iconKey || '',
         imageUrl: m.imageUrl || '',
+        sortOrder: sortOrderOf(m.sortOrder),
         courseCount: Array.isArray(m.courses) ? m.courses.length : 0,
       });
     } catch (e) {
       // One malformed file must not blank the whole browser. Listing it under
       // its slug keeps it reachable, which is the only way it can be fixed.
       console.error(`majors meta ${uni}/${slug}:`, e && e.message ? e.message : e);
-      majors.push({ slug, name: slug, nameAr: '', college: '', icon: '', iconKey: '', imageUrl: '', courseCount: 0, unreadable: true });
+      majors.push({ slug, name: slug, nameAr: '', college: '', icon: '', iconKey: '', imageUrl: '', sortOrder: null, courseCount: 0, unreadable: true });
     }
   }
-  majors.sort((a, b) => a.name.localeCompare(b.name));
+  majors.sort(byDisplayOrder);
   return json({ ok: true, majors }, 200, env, request);
 }
 

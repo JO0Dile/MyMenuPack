@@ -34,6 +34,26 @@
   }
   function hasStructure(p){ return !!(p.structure && Array.isArray(p.structure.years) && p.structure.years.length); }
 
+  // Where a plan sits among its faculty's tiles. Empty means unplaced, not
+  // zero — zero is a real position that would move the plan to the front.
+  function sortOrderOf(p){
+    var v = p && p.sortOrder;
+    if(v == null || v === '') return null;
+    var n = Number(v);
+    return isFinite(n) ? n : null;
+  }
+  // Plans the admin has placed come first, in that order; everything else
+  // follows alphabetically. Mirrors the same comparator in the admin Worker
+  // and the catalogue build, so all three agree on what students see.
+  function compareByDisplayOrder(a, b){
+    var ao = sortOrderOf(a), bo = sortOrderOf(b);
+    if(ao !== null && bo !== null && ao !== bo) return ao - bo;
+    if(ao !== null && bo === null) return -1;
+    if(ao === null && bo !== null) return 1;
+    return nameParts((a && a.majorName && a.majorName.en) || '').big
+      .localeCompare(nameParts((b && b.majorName && b.majorName.en) || '').big);
+  }
+
   function collegeKeyForPlan(p){
     var uniId = p.university || 'aaup';
     // A published plan carries its college's id. Prefer it: matching on the
@@ -77,6 +97,7 @@
       var p = plans[id];
       return (p.university || 'aaup') === sel.university && collegeKeyForPlan(p) === sel.college;
     });
+    ids.sort(function(a, b){ return compareByDisplayOrder(plans[a], plans[b]); });
     if(ids.length === 0){ container.innerHTML = ''; if(window.AAUP_HOME){ window.AAUP_HOME.refreshPlanEmptyState(); window.AAUP_HOME.refreshCounts(); } return; }
     container.innerHTML = '<div class="plan-grid" style="margin-top:14px;">' + ids.map(function(id){
      try {
@@ -1694,6 +1715,7 @@
     saveImportedPlans: saveImportedPlans, toggle: toggle, toggleEdit: toggleEdit,
     addYear: addYear, removeYear: removeYear, addSummer: addSummer, removeSummer: removeSummer,
     addCoursePrompt: openCourseCreatePopup, ICONS: ICONS, nameParts: nameParts, hasStructure: hasStructure,
+    compareByDisplayOrder: compareByDisplayOrder,
     confirmDelete: confirmDelete, deletePlan: deletePlan,
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
