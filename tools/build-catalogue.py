@@ -40,6 +40,21 @@ def read(path):
     return json.loads(path.read_text(encoding='utf-8'))
 
 
+def sort_order_of(v):
+    """Where a major sits among its faculty's tiles, or None for unplaced.
+
+    Empty means unplaced, not zero — zero is a real position that would move
+    the major to the front. Anything unparseable is treated as unplaced rather
+    than raising, so one bad field cannot fail the whole catalogue build.
+    """
+    if v is None or v == '':
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def shape_plan(major, scales_by_college, colleges):
     # Years and summers are derived from where the courses actually sit, so the
     # structure can never disagree with the courses it describes.
@@ -99,6 +114,7 @@ def shape_plan(major, scales_by_college, colleges):
         },
         'bio': {'en': major.get('bio') or '', 'ar': major.get('bioAr') or ''},
         'degreeHours': major.get('degreeHours'),
+        'sortOrder': sort_order_of(major.get('sortOrder')),
         'freeElectiveSuggestions': major.get('freeElectiveSuggestions') or [],
         'gradingScale': scale,
         'structure': structure,
@@ -165,8 +181,18 @@ def main():
         majors_dir = uni_dir / 'majors'
         if not majors_dir.is_dir():
             continue
-        for f in sorted(majors_dir.glob('*.json')):
-            plans.append(shape_plan(read(f), scales_by_college, colleges))
+        # Emitted in the order students see: majors the admin has placed come
+        # first in that order, then everything unplaced alphabetically. The
+        # app sorts too — this just keeps the file's own order meaningful, so
+        # a reordering shows up as a readable diff rather than a silent one.
+        shaped = [shape_plan(read(f), scales_by_college, colleges)
+                  for f in sorted(majors_dir.glob('*.json'))]
+        shaped.sort(key=lambda p: (
+            p['sortOrder'] is None,
+            p['sortOrder'] if p['sortOrder'] is not None else 0,
+            p['majorName']['en']['big'],
+        ))
+        plans.extend(shaped)
 
     # A plan's version must increase when its content changes, or a student who
     # already has the old copy never receives the fix. Content-derived rather

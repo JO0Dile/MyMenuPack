@@ -615,7 +615,9 @@
 
     var head = '<h2>Majors / Plans</h2>' +
       '<p class="admin-hint">Majors are grouped by the faculty they belong to. ' +
-      'Add one from inside a faculty and it starts out in that faculty.</p>' + picker;
+      'Add one from inside a faculty and it starts out in that faculty. ' +
+      'They are listed here in the order students see them on the home page — ' +
+      'set a major\'s <strong>Display order</strong> in its editor to move it.</p>' + picker;
 
     // Metadata arrives from /api/majors/:uni, which is a separate request from
     // the tree. Say so rather than rendering an empty page that looks broken.
@@ -671,7 +673,8 @@
             return '<tr data-major-row="' + esc(m.slug) + '">' +
               '<td><strong>' + esc(m.name || m.slug) + '</strong>' +
                 (m.nameAr ? '<br><span class="admin-sub" dir="rtl">' + esc(m.nameAr) + '</span>' : '') +
-                '<br><span class="admin-sub">' + esc(m.slug) + ' · ' + (m.courseCount || 0) + ' courses</span>' +
+                '<br><span class="admin-sub">' + esc(m.slug) + ' · ' + (m.courseCount || 0) + ' courses · ' +
+                  (m.sortOrder == null ? 'unplaced' : 'order ' + esc(m.sortOrder)) + '</span>' +
                 (m.unreadable ? '<br><span class="admin-sub admin-warn">⚠️ this file could not be read</span>' : '') +
               '</td>' +
               '<td style="text-align:right;">' +
@@ -693,6 +696,11 @@
       facultyField(m) +
       '<div class="form-field-row">' + field('amIcon', 'Emoji fallback', m.icon) +
       field('amHours', 'Degree credit hours', m.degreeHours == null ? '' : m.degreeHours) + '</div>' +
+      '<div class="form-field"><label for="amOrder">Display order ' +
+        '<span class="admin-sub">— lower numbers show first on the home page. ' +
+        'Leave empty to sit after the numbered ones, alphabetically.</span></label>' +
+        '<input type="number" id="amOrder" step="1" value="' +
+        esc(m.sortOrder == null ? '' : m.sortOrder) + '" placeholder="unplaced"></div>' +
       iconPicker('amIconKey', m.iconKey) +
       '<div class="form-field"><label for="amImage">Icon image (optional)</label>' +
       '<input type="text" id="amImage" value="' + esc(m.imageUrl || '') + '" placeholder="assets/uploads/…"></div>' +
@@ -1306,6 +1314,7 @@
     m.college = val('amCollege'); m.icon = val('amIcon'); m.iconKey = val('amIconKey');
     m.imageUrl = val('amImage'); m.bio = val('amBio'); m.bioAr = val('amBioAr');
     var h = val('amHours'); m.degreeHours = h === '' ? null : Number(h);
+    var o = val('amOrder'); m.sortOrder = o === '' ? null : Number(o);
   }
 
   // Every course in the university's published plans, deduplicated. Loaded once

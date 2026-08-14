@@ -34,6 +34,26 @@
   }
   function hasStructure(p){ return !!(p.structure && Array.isArray(p.structure.years) && p.structure.years.length); }
 
+  // Where a plan sits among its faculty's tiles. Empty means unplaced, not
+  // zero — zero is a real position that would move the plan to the front.
+  function sortOrderOf(p){
+    var v = p && p.sortOrder;
+    if(v == null || v === '') return null;
+    var n = Number(v);
+    return isFinite(n) ? n : null;
+  }
+  // Plans the admin has placed come first, in that order; everything else
+  // follows alphabetically. Mirrors the same comparator in the admin Worker
+  // and the catalogue build, so all three agree on what students see.
+  function compareByDisplayOrder(a, b){
+    var ao = sortOrderOf(a), bo = sortOrderOf(b);
+    if(ao !== null && bo !== null && ao !== bo) return ao - bo;
+    if(ao !== null && bo === null) return -1;
+    if(ao === null && bo !== null) return 1;
+    return nameParts((a && a.majorName && a.majorName.en) || '').big
+      .localeCompare(nameParts((b && b.majorName && b.majorName.en) || '').big);
+  }
+
   function collegeKeyForPlan(p){
     var uniId = p.university || 'aaup';
     // A published plan carries its college's id. Prefer it: matching on the
@@ -77,6 +97,7 @@
       var p = plans[id];
       return (p.university || 'aaup') === sel.university && collegeKeyForPlan(p) === sel.college;
     });
+    ids.sort(function(a, b){ return compareByDisplayOrder(plans[a], plans[b]); });
     if(ids.length === 0){ container.innerHTML = ''; if(window.AAUP_HOME){ window.AAUP_HOME.refreshPlanEmptyState(); window.AAUP_HOME.refreshCounts(); } return; }
     container.innerHTML = '<div class="plan-grid" style="margin-top:14px;">' + ids.map(function(id){
      try {
@@ -1161,7 +1182,11 @@
     // title with the plan's own icon standing in for the hand-drawn
     // per-major artwork, Arabic block, action buttons) rather than a
     // simplified look-alike.
-    var html = '<div class="sheet' + (editing ? ' editing' : '') + (rtl ? ' rtl-mode' : '') + '" id="page-' + id + '"' + (rtl ? ' dir="rtl"' : '') + ' style="max-width:1200px;margin:20px auto;">' +
+    // Width and margin live in CSS (.sheet-plan), not in a style attribute:
+    // an inline margin beats every stylesheet rule, which is exactly how this
+    // page used to slide underneath the fixed sidebar on a laptop-width screen
+    // — body.has-sidebar's 230px offset could never win against it.
+    var html = '<div class="sheet sheet-plan' + (editing ? ' editing' : '') + (rtl ? ' rtl-mode' : '') + '" id="page-' + id + '"' + (rtl ? ' dir="rtl"' : '') + '>' +
       '<header>' +
       '<div class="brand"><div class="mark" style="display:flex;align-items:center;justify-content:center;font-size:20px;">' + window.AAUP_ICONS.markup(p, { size: 22 }) + '</div>' +
       '<div><h1>' + (function(){ var u = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'] || { name: { en: 'The Arab American University', ar: 'الجامعة العربية الأمريكية' } }; return rtl ? u.name.ar : u.name.en; })() + '</h1><p>' + (rtl ? (p.college && p.college.ar ? p.college.ar : 'كلية غير محددة') : (p.college && p.college.en ? p.college.en : 'Faculty not specified')) + '</p></div></div>' +
@@ -1336,7 +1361,7 @@
     var pct = totalCr ? Math.round(doneCr / totalCr * 100) : 0;
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
 
-    var html = '<div class="sheet" style="max-width:1100px;margin:20px auto;">' +
+    var html = '<div class="sheet sheet-plan sheet-plan-simple">' +
       '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>🏠</span><span>Home</span></button></div>' +
       '<h1>' + en.big + (en.small ? ' ' + en.small : '') + ' <em style="opacity:.6;font-size:.6em;">' + ar.big + (ar.small ? ' ' + ar.small : '') + '</em></h1></header>' +
       '<div class="imp-body-pad">' +
@@ -1694,6 +1719,7 @@
     saveImportedPlans: saveImportedPlans, toggle: toggle, toggleEdit: toggleEdit,
     addYear: addYear, removeYear: removeYear, addSummer: addSummer, removeSummer: removeSummer,
     addCoursePrompt: openCourseCreatePopup, ICONS: ICONS, nameParts: nameParts, hasStructure: hasStructure,
+    compareByDisplayOrder: compareByDisplayOrder,
     confirmDelete: confirmDelete, deletePlan: deletePlan,
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,

@@ -2999,6 +2999,14 @@
   }
   .sb-overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:899;}
 
+  /* A rendered plan page's own width and vertical rhythm. This used to be a
+     style attribute on the element, which quietly won against the sidebar
+     offset below — inline styles outrank every stylesheet rule — so on a
+     laptop-width screen the page sat at margin-left:20px and the first ~190px
+     of it disappeared behind the fixed 230px sidebar. */
+  .sheet-plan{max-width:1200px;margin:20px auto;}
+  .sheet-plan-simple{max-width:1100px;}
+
   body.has-sidebar .dashboard-page,
   body.has-sidebar .sheet{margin-left:230px;}
 
