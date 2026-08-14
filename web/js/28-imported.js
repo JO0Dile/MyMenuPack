@@ -1182,7 +1182,11 @@
     // title with the plan's own icon standing in for the hand-drawn
     // per-major artwork, Arabic block, action buttons) rather than a
     // simplified look-alike.
-    var html = '<div class="sheet' + (editing ? ' editing' : '') + (rtl ? ' rtl-mode' : '') + '" id="page-' + id + '"' + (rtl ? ' dir="rtl"' : '') + ' style="max-width:1200px;margin:20px auto;">' +
+    // Width and margin live in CSS (.sheet-plan), not in a style attribute:
+    // an inline margin beats every stylesheet rule, which is exactly how this
+    // page used to slide underneath the fixed sidebar on a laptop-width screen
+    // — body.has-sidebar's 230px offset could never win against it.
+    var html = '<div class="sheet sheet-plan' + (editing ? ' editing' : '') + (rtl ? ' rtl-mode' : '') + '" id="page-' + id + '"' + (rtl ? ' dir="rtl"' : '') + '>' +
       '<header>' +
       '<div class="brand"><div class="mark" style="display:flex;align-items:center;justify-content:center;font-size:20px;">' + window.AAUP_ICONS.markup(p, { size: 22 }) + '</div>' +
       '<div><h1>' + (function(){ var u = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'] || { name: { en: 'The Arab American University', ar: 'الجامعة العربية الأمريكية' } }; return rtl ? u.name.ar : u.name.en; })() + '</h1><p>' + (rtl ? (p.college && p.college.ar ? p.college.ar : 'كلية غير محددة') : (p.college && p.college.en ? p.college.en : 'Faculty not specified')) + '</p></div></div>' +
@@ -1357,7 +1361,7 @@
     var pct = totalCr ? Math.round(doneCr / totalCr * 100) : 0;
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
 
-    var html = '<div class="sheet" style="max-width:1100px;margin:20px auto;">' +
+    var html = '<div class="sheet sheet-plan sheet-plan-simple">' +
       '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>🏠</span><span>Home</span></button></div>' +
       '<h1>' + en.big + (en.small ? ' ' + en.small : '') + ' <em style="opacity:.6;font-size:.6em;">' + ar.big + (ar.small ? ' ' + ar.small : '') + '</em></h1></header>' +
       '<div class="imp-body-pad">' +
