@@ -193,6 +193,8 @@
     var overlay = document.getElementById('roadmapModalOverlay');
     if(closeBtn){ closeBtn.addEventListener('click', close); }
     if(overlay){ overlay.addEventListener('click', function(e){ if(e.target === overlay){ close(); } }); }
+    // Same keyboard escape hatch the other modals have.
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && overlay && overlay.classList.contains('open')){ close(); } });
   }
   if(document.readyState === 'complete'){ initModalClose(); }
   else { window.addEventListener('load', initModalClose); }

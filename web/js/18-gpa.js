@@ -30,6 +30,17 @@
     'C+': 2.33, 'C': 2.00, 'C-': 1.67, 'D+': 1.33, 'D': 1.00, 'F': 0.35, 'FA': 0.35
   };
   var GRADE_ORDER = ['A','A-','B+','B','B-','C+','C','C-','D+','D','F','FA','W'];
+  // `g in GRADE_POINTS` walked the prototype chain, so a stored grade of
+  // "constructor", "toString", "valueOf", "__proto__", "hasOwnProperty" (or any
+  // other inherited name) passed the guard and then multiplied a credit-hour
+  // count by a FUNCTION. The result was a NaN GPA shown on the dashboard and in
+  // the audit, with the standing silently reading "Probation" because every
+  // NaN comparison is false. Grades reach this code from localStorage, which a
+  // student can edit, an import can write, and a sync can rewrite — so the
+  // check has to be own-property only.
+  function isRealGrade(g){
+    return typeof g === 'string' && Object.prototype.hasOwnProperty.call(GRADE_POINTS, g);
+  }
   // Official numeric-score -> letter-grade ranges (AAUP's own published
   // table). Used only for the optional "enter your numeric score" input in
   // the grade UI — a student who knows their exact percentage (e.g. their
@@ -125,8 +136,14 @@
   // Grades that count as a failure against academic standing (F and FA hit the
   // GPA; W is a clean withdrawal, so it isn't a "fail").
   var FAIL_GRADES = { 'F': true, 'FA': true };
-  function isNonPassing(g){ return !!NON_PASSING[g]; }
-  function isFailGrade(g){ return !!FAIL_GRADES[g]; }
+  // Same prototype-chain trap as isRealGrade above: NON_PASSING['constructor']
+  // is a function, so `!!NON_PASSING[g]` reported a garbage grade as a failed
+  // course and held its dependents locked.
+  function own(map, k){
+    return typeof k === 'string' && Object.prototype.hasOwnProperty.call(map, k);
+  }
+  function isNonPassing(g){ return own(NON_PASSING, g); }
+  function isFailGrade(g){ return own(FAIL_GRADES, g); }
   // Dropdown label: the two special grades get a short descriptor so students
   // know what they mean; ordinary letter grades show as-is.
   function gradeLabel(g){
@@ -196,7 +213,7 @@
       if(categoryFilter && !categoryFilter(el)) return;
       if(!progress[pid]) return;
       var g = grades[pid];
-      if(!g || !(g in GRADE_POINTS)) return;
+      if(!isRealGrade(g)) return;
 
       // AAUP's repeat policy: once a course has been retaken AND the
       // retake has its own grade, the ORIGINAL attempt is excluded from
@@ -210,7 +227,7 @@
       if(window.AAUP_RETAKES && window.AAUP_RETAKES.isSuperseded(prefix, parts.slug)){
         var retakeSlug = window.AAUP_RETAKES.retakeSlugFor(prefix, parts.slug);
         var retakeGrade = grades[prefix + '-c-' + retakeSlug];
-        if(retakeGrade && (retakeGrade in GRADE_POINTS)) return;
+        if(isRealGrade(retakeGrade)) return;
       }
 
       var cr = parseFloat(meta.cr) || 0;
@@ -250,7 +267,7 @@
         seenNum[dedupeKey] = true;
         if(!progress[pid]) return;
         var g = grades[pid];
-        if(!g || !(g in GRADE_POINTS)) return;
+        if(!isRealGrade(g)) return;
         var cr = parseFloat(meta.cr) || 0;
         points += GRADE_POINTS[g] * cr;
         credits += cr;
@@ -269,7 +286,10 @@
   }
 
   function standingFor(gpa){
-    if(gpa === null) return { label: 'No grades yet', cls: 'standing-none', ar: 'لا توجد علامات بعد' };
+    // NaN fails every comparison below, so an unguarded NaN used to fall
+    // through to "Probation" — the worst possible label, invented from data
+    // that simply wasn't a number. Treat it as "no grades" instead.
+    if(gpa === null || typeof gpa !== 'number' || !isFinite(gpa)) return { label: 'No grades yet', cls: 'standing-none', ar: 'لا توجد علامات بعد' };
     if(gpa >= 3.0) return { label: 'Good Standing', cls: 'standing-good', ar: 'وضع أكاديمي جيد' };
     if(gpa >= 2.0) return { label: 'Warning', cls: 'standing-warning', ar: 'إنذار' };
     return { label: 'Probation', cls: 'standing-probation', ar: 'فصل / إنذار أكاديمي' };
@@ -278,6 +298,9 @@
   window.AAUP_GPA = {
     GRADE_POINTS: GRADE_POINTS, GRADE_ORDER: GRADE_ORDER,
     isNonPassing: isNonPassing, isFailGrade: isFailGrade, gradeLabel: gradeLabel,
+    // Exported so no caller has to write `g in GRADE_POINTS` again — that
+    // check is prototype-chain unsafe for grades that came from storage.
+    isRealGrade: isRealGrade,
     letterForScore: letterForScore, NUMERIC_GRADE_RANGES: NUMERIC_GRADE_RANGES,
     ENGINEERING_NUMERIC_GRADE_RANGES: ENGINEERING_NUMERIC_GRADE_RANGES,
     AI_NUMERIC_GRADE_RANGES: AI_NUMERIC_GRADE_RANGES,

@@ -22,7 +22,23 @@
   var legendOpen = {};
   var currentOpenPlanId = null;
 
-  function loadImportedPlans(){ return window.AAUP_STORAGE.getJSON('aaup_importedPlans', {}); }
+  // Every one of the ~55 readers below assumes each value here is a plan
+  // OBJECT. A single null (or number, or string) entry — which an import, a
+  // half-written sync, or a student poking at localStorage can produce — threw
+  // "Cannot read properties of null (reading 'university')" out of the home
+  // screen's plan walk and took the ENTIRE card grid with it: every other
+  // perfectly valid plan disappeared because of one bad sibling. Dropping the
+  // unusable entries here, at the single point they are all read from, keeps
+  // one corrupt record from costing a student every plan they have.
+  function loadImportedPlans(){
+    var raw = window.AAUP_STORAGE.getJSON('aaup_importedPlans', {});
+    var out = {};
+    Object.keys(raw).forEach(function(id){
+      var p = raw[id];
+      if(p && typeof p === 'object' && !Array.isArray(p)) out[id] = p;
+    });
+    return out;
+  }
   function saveImportedPlans(m){ window.AAUP_STORAGE.setJSON('aaup_importedPlans', m); renderHomeCards(); }
 
   // Old plans stored majorName.en as a plain string; new ones store
@@ -150,11 +166,16 @@
   // is done. Keep only the "closest" one(s): any selected course that is
   // itself a (direct or transitive) prerequisite of another selected
   // course gets dropped from the direct-edge set.
+  // Same two traps as __registerPlanData in 02-shared-cross.js: `pairs` may not
+  // be an array at all, and a course slug of "constructor"/"__proto__"/
+  // "toString" collides with an inherited name on a plain {} map, so
+  // `needs[b] || []` hands back a function and .push() throws.
   function computeNeedsFromPairs(pairs){
-    var needs = {};
-    (pairs || []).forEach(function(pair){
+    var needs = Object.create(null);
+    (Array.isArray(pairs) ? pairs : []).forEach(function(pair){
+      if(!pair || typeof pair !== 'object') return;
       var a = pair[0], b = pair[1];
-      if(!a || !b) return;
+      if(typeof a !== 'string' || typeof b !== 'string' || !a || !b) return;
       (needs[b] = needs[b] || []).push(a);
     });
     return needs;
@@ -1332,10 +1353,11 @@
   // ---------- legacy renderer (plans imported before this update — free-text
   // semester labels, no window.__registerPlanData registration) ----------
   function computeNeedsLegacy(prereqPairs){
-    var needs = {};
-    (prereqPairs || []).forEach(function(pair){
+    var needs = Object.create(null);
+    (Array.isArray(prereqPairs) ? prereqPairs : []).forEach(function(pair){
+      if(!pair || typeof pair !== 'object') return;
       var a = pair[0], b = pair[1];
-      if(!a || !b) return;
+      if(typeof a !== 'string' || typeof b !== 'string' || !a || !b) return;
       (needs[b] = needs[b] || []).push(a);
     });
     return needs;

@@ -185,6 +185,10 @@ window.__savePrereqEdits = function(m){
   try{ localStorage.setItem(window.__PREREQ_EDITS_KEY, JSON.stringify(m)); }catch(e){}
 };
 window.__applyPrereqEdits = function(prefix, basePrereqs){
+  // basePrereqs arrives from stored/imported plan data, so it is not
+  // guaranteed to be an array at all — `.slice`/`.filter` on an object threw
+  // and took the whole plan render down with it.
+  if(!Array.isArray(basePrereqs)) basePrereqs = [];
   var edits = window.__loadPrereqEdits()[prefix];
   if(!edits) return basePrereqs.slice();
   var removed = {};
@@ -205,11 +209,21 @@ window.__applyPrereqEdits = function(prefix, basePrereqs){
 };
 
 window.__registerPlanData = function(prefix, courseInfo, prereqs){
-  var base = prereqs || [];
+  var base = Array.isArray(prereqs) ? prereqs : [];
   var effective = window.__applyPrereqEdits(prefix, base);
-  var needsMap = {}, unlocksMap = {};
+  // Object.create(null), not {}. Course slugs are data — an imported plan can
+  // name a course "constructor", "__proto__", "toString" or "valueOf", and on a
+  // normal object `needsMap[b] || []` then returned the INHERITED function
+  // instead of a fresh array, so `.push()` threw and the entire study plan
+  // rendered zero courses. A prototype-less map has no inherited names to
+  // collide with. Every reader here uses `map[key] || []`, which is unaffected.
+  var needsMap = Object.create(null), unlocksMap = Object.create(null);
   effective.forEach(function(pair){
+    // Non-pair junk (strings, numbers, nulls, objects) survives inside an
+    // otherwise valid array; indexing those yields undefined rather than a slug.
+    if(!pair || typeof pair !== 'object') return;
     var a = pair[0], b = pair[1];
+    if(typeof a !== 'string' || typeof b !== 'string' || !a || !b) return;
     (unlocksMap[a] = unlocksMap[a] || []).push(b);
     (needsMap[b] = needsMap[b] || []).push(a);
   });

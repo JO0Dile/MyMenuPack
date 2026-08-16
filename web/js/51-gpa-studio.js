@@ -100,7 +100,7 @@
         if(window.__isSupersededByRetake && window.__isSupersededByRetake(prefix, parts.slug)){
           var retakeSlug = window.AAUP_RETAKES ? window.AAUP_RETAKES.retakeSlugFor(prefix, parts.slug) : null;
           var retakeGrade = retakeSlug ? grades[prefix + '-c-' + retakeSlug] : null;
-          excluded = !!(retakeGrade && (retakeGrade in window.AAUP_GPA.GRADE_POINTS));
+          excluded = window.AAUP_GPA.isRealGrade(retakeGrade);
         }
         rows.push({
           pid: pid, name: meta.name, nameAr: meta.ar, code: meta.num,
@@ -113,7 +113,9 @@
 
   function pointsCell(row, t){
     if(row.excluded) return '<span class="gs-excluded">' + t.excluded + '</span>';
-    if(!(row.grade in window.AAUP_GPA.GRADE_POINTS)) return '<span class="gs-excluded">' + t.none + '</span>';
+    // `in` here matched inherited names like "constructor", which then
+    // multiplied credit hours by a function and printed NaN into the table.
+    if(!window.AAUP_GPA.isRealGrade(row.grade)) return '<span class="gs-excluded">' + t.none + '</span>';
     return (window.AAUP_GPA.GRADE_POINTS[row.grade] * row.cr).toFixed(2);
   }
 
@@ -228,7 +230,7 @@
   }
 
   function nearestGradeAtLeast(points){
-    var order = window.AAUP_GPA.GRADE_ORDER.filter(function(g){ return g in window.AAUP_GPA.GRADE_POINTS; });
+    var order = window.AAUP_GPA.GRADE_ORDER.filter(function(g){ return window.AAUP_GPA.isRealGrade(g); });
     var best = null;
     order.forEach(function(g){
       var p = window.AAUP_GPA.GRADE_POINTS[g];

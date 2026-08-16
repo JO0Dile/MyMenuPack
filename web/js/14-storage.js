@@ -7,8 +7,25 @@
 // Editor/etc. modules below — same behavior (see the equivalence check run
 // before this consolidation), one definition.
 (function(){
+  // The old body was `JSON.parse(raw) || fallback`, which only rejected values
+  // that happened to be falsy. Anything else parsed was handed straight back —
+  // so a key holding `[true,null,0]`, `"text"`, `12345` or `true` was returned
+  // where every single caller expects an object map. Downstream that became
+  // `Object.keys(arr)` -> ["0","1","2"] and then `plans["1"].university` on a
+  // null, an uncaught TypeError that took the home screen's plan list with it.
+  // localStorage is user-writable, an import writes it, and a half-finished
+  // write can truncate it, so the shape has to be checked here rather than at
+  // each of the ~9 call sites.
   function getJSON(key, fallback){
-    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) || fallback; }
+    try{
+      var raw = localStorage.getItem(key);
+      if(raw == null) return fallback;
+      var parsed = JSON.parse(raw);
+      if(parsed === null || parsed === undefined) return fallback;
+      if(Array.isArray(parsed) !== Array.isArray(fallback)) return fallback;
+      if(typeof parsed !== typeof fallback) return fallback;
+      return parsed;
+    }
     catch(e){ return fallback; }
   }
   function setJSON(key, value){
