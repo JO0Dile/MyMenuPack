@@ -133,6 +133,8 @@
     overlay.addEventListener('click', function(e){ if(e.target === overlay){ overlay.classList.remove('open'); } });
     overlay.querySelector('.modal-card').addEventListener('click', function(e){ e.stopPropagation(); });
     document.getElementById('planOverviewClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
+    // Same keyboard escape hatch the audit and course modals already had.
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && overlay.classList.contains('open')) overlay.classList.remove('open'); });
     // The print stylesheet (see @media print in the <style> block) hides
     // everything except #planOverviewPrintRoot, so window.print() yields a
     // clean one-page plan with none of the app chrome around it.

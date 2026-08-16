@@ -201,7 +201,11 @@
   .rtl-mode .title-block{display:none;}
   .rtl-mode .ar-block{display:block;}
 
-  .header-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+  /* flex-shrink stays available: with 0 0 auto this row kept its full content
+     width (~604px) on a 360px phone, so Course Library, Export Plan and
+     Contribute sat off the right edge with nothing able to scroll to them.
+     Allowing it to shrink is what lets the flex-wrap below actually wrap. */
+  .header-actions{display:flex;align-items:center;gap:10px;flex:0 1 auto;min-width:0;}
 
   .lang-toggle{
     display:flex;align-items:center;gap:6px;

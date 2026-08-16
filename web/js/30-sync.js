@@ -343,8 +343,21 @@
     return 'Last checked ' + Math.round(hrs / 24) + 'd ago.';
   }
 
-  function checkForUpdates(manual){
-    return fetchFeed().then(function(feed){
+  // Two startup paths reach checkForUpdates(false): the catalogue boot chain
+  // hands the freshly read plans over (01-catalogue.js), and this module's own
+  // load init fires independently. That meant three plans.json downloads per
+  // cold start and two applyFeed passes over identical data. An automatic check
+  // is only worth doing once per page load, so the first one is shared; a
+  // manual check from Settings always runs fresh, because the whole point of
+  // pressing the button is to ask again.
+  var autoCheck = null;
+
+  // presetFeed lets the catalogue hand over the plans it has already
+  // downloaded and parsed, instead of making this module fetch the same file a
+  // second time on a student's mobile data.
+  function checkForUpdates(manual, presetFeed){
+    if(!manual && autoCheck) return autoCheck;
+    var run = (presetFeed ? Promise.resolve(presetFeed) : fetchFeed()).then(function(feed){
       if(!feed){
         if(manual && window.__showToast){ window.__showToast('⚠️ Could not reach the plans feed — check your connection.'); }
         return { added: 0, updated: 0, pending: 0, cosmetic: 0 };
@@ -365,6 +378,8 @@
       }
       return result;
     });
+    if(!manual) autoCheck = run;
+    return run;
   }
 
   window.AAUP_SYNC = {
@@ -377,12 +392,9 @@
     __applyFeedForTest: applyFeed
   };
 
-  function init(){
-    // Quiet on startup — only speaks up if it actually found something new,
-    // or (via the Settings button) if someone asked it to.
-    if(navigator.onLine === false) return;
-    checkForUpdates(false);
-  }
-  if(document.readyState === 'complete'){ init(); }
-  else { window.addEventListener('load', init); }
+  // No startup check is scheduled here. 01-catalogue.js already downloads the
+  // very same plans.json to build the catalogue and hands the parsed feed to
+  // checkForUpdates() the moment it lands, so a second listener on window load
+  // only raced it into re-downloading the file. If that download fails there is
+  // nothing to retry either — it is the same URL.
 })();
