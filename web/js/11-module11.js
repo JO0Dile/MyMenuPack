@@ -43,14 +43,56 @@
     }catch(e){ return {}; }
   }
   var progress = loadProgress();
+  // What storage held the last time this tab read or wrote it. The difference
+  // between this and `progress` is exactly the set of courses THIS tab has
+  // changed since then — which is what makes the merge below possible.
+  var baseline = JSON.parse(JSON.stringify(progress));
   // Exposed read/save access so the GPA Calculator and Degree Audit module
   // (which needs to know completion state, but lives in its own IIFE) always
   // reads the exact same live data instead of keeping a second copy.
   window.__getProgress = function(){ return progress; };
 
+  // saveProgress used to write this tab's whole in-memory blob over whatever
+  // was in storage. Two tabs open (a completely ordinary thing — the plan in
+  // one, the dashboard in another) meant the second tab to save silently
+  // erased every course the first had ticked, because its snapshot was taken
+  // before those ticks existed. Verified: tab A completed 3 courses, tab B
+  // then completed 3 others, and after a reload ALL of tab A's were gone.
+  //
+  // So a save now asserts only what this tab actually changed. Re-read the
+  // current stored value, replay just our own additions and removals onto it,
+  // and keep every key we never touched exactly as the other tab left it.
   function saveProgress(){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){ /* storage unavailable; continue silently */ }
+    var merged = loadProgress();
+    Object.keys(progress).forEach(function(k){
+      if(progress[k] && !baseline[k]) merged[k] = progress[k];   // we added it
+    });
+    Object.keys(baseline).forEach(function(k){
+      if(baseline[k] && !progress[k]) delete merged[k];          // we removed it
+    });
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(merged)); }
+    catch(e){ /* storage unavailable; continue silently */ }
+    // Adopt the merged result in place — `progress` is handed out by reference
+    // through __getProgress(), so it must be mutated, never reassigned.
+    Object.keys(progress).forEach(function(k){ if(!(k in merged)) delete progress[k]; });
+    Object.keys(merged).forEach(function(k){ progress[k] = merged[k]; });
+    baseline = JSON.parse(JSON.stringify(merged));
   }
+
+  // A sibling tab writing progress used to leave this one showing stale state
+  // until it was reloaded by hand. Adopt their change and repaint instead.
+  window.addEventListener('storage', function(e){
+    if(e.key !== STORAGE_KEY) return;
+    var incoming = loadProgress();
+    Object.keys(progress).forEach(function(k){ if(!(k in incoming)) delete progress[k]; });
+    Object.keys(incoming).forEach(function(k){ progress[k] = incoming[k]; });
+    baseline = JSON.parse(JSON.stringify(incoming));
+    if(window.__redraw){
+      Object.keys(window.__redraw).forEach(function(p){
+        try{ window.__redraw[p](); }catch(err){}
+      });
+    }
+  });
 
   // ---------- badge / availability helpers ----------
   function isRtl(prefix){
