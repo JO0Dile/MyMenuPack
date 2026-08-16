@@ -1480,7 +1480,11 @@
   function submitPlan(id){
     exportPlan(id);
     if(window.APP_SUBMIT_URL){
-      window.open(window.APP_SUBMIT_URL, '_blank');
+      // 'noopener' matters even for a developer-configured URL: without it the
+      // opened page gets a live window.opener handle back into this one. The
+      // app's own Fix analyzer flags exactly this for <a target="_blank">, so
+      // the same standard applies here.
+      window.open(window.APP_SUBMIT_URL, '_blank', 'noopener');
       if(window.__showToast){ window.__showToast('\ud83d\udce8 Your plan file just downloaded \u2014 attach it in the form that opened.'); }
       return;
     }
@@ -1519,7 +1523,7 @@
     overlay.classList.add('open');
     document.getElementById('submitClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
     if(document.getElementById('submitOpenIssue')){
-      document.getElementById('submitOpenIssue').addEventListener('click', function(){ window.open(issueUrl, '_blank'); });
+      document.getElementById('submitOpenIssue').addEventListener('click', function(){ window.open(issueUrl, '_blank', 'noopener'); });
     }
   }
 
