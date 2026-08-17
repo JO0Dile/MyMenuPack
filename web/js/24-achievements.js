@@ -4,10 +4,31 @@
 (function(){
   var CATS = ['core','math','dept','eng','uni','free','skills'];
 
+  // Which year of the plan a course sits in.
+  //
+  // This used to look only for .year-row — the built-in majors' markup. Every
+  // plan in the app today is an imported one and uses .imp-year-block, so no
+  // course had a year, no year was ever "all completed", and the five year
+  // achievements could never unlock: a student with all 14 Year 1 courses
+  // passed still saw "No Longer a Smurf" locked, Years 2–5 read "Not
+  // applicable here" for majors that plainly have them, and the typewriter
+  // year-completion overlay further down this file had never once run.
+  //
+  // Imported years carry their number in the block's own order on the page
+  // (the elective pool is not a year and is skipped), which is also what the
+  // "Year N" heading shows.
   function yearOf(el){
     var row = el.closest('.year-row');
-    var span = row && row.querySelector('.year-badge .num span');
-    return span ? span.textContent.trim() : null;
+    if(row){
+      var span = row.querySelector('.year-badge .num span');
+      return span ? span.textContent.trim() : null;
+    }
+    var block = el.closest('.imp-year-block');
+    if(!block || block.classList.contains('imp-elective-block')) return null;
+    var page = block.closest('#importedPlanView, .plan-page, .sheet') || document;
+    var blocks = Array.prototype.slice.call(page.querySelectorAll('.imp-year-block:not(.imp-elective-block)'));
+    var idx = blocks.indexOf(block);
+    return idx < 0 ? null : String(idx + 1);
   }
   function categoryOf(el){
     for(var i = 0; i < CATS.length; i++){ if(el.classList.contains(CATS[i])) return CATS[i]; }
@@ -113,6 +134,37 @@
     if(!anyArabic) return;
     try{ localStorage.setItem('aaup_arabicTimeMs', String(getArabicMs() + 5000)); }catch(e){}
   }, 5000);
+
+  // How many A / A+ grades this plan has on record, and the plan's GPA with
+  // the number of graded courses behind it — both read straight from the GPA
+  // module so a badge can never disagree with the GPA screen.
+  function countTopGrades(prefix){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return { done: 0 };
+    var grades = window.AAUP_GPA.loadGrades();
+    var n = 0;
+    page.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
+      var parts = window.__splitCourseId(el.id);
+      if(!parts) return;
+      var g = grades[window.AAUP_GPA.primaryId(prefix, parts.slug)];
+      if(g === 'A' || g === 'A+') n++;
+    });
+    return { done: n };
+  }
+  function gradedGpa(prefix){
+    var page = document.getElementById('page-' + prefix);
+    if(!page) return { gpa: 0, count: 0 };
+    var grades = window.AAUP_GPA.loadGrades();
+    var count = 0;
+    page.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
+      var parts = window.__splitCourseId(el.id);
+      if(!parts) return;
+      if(window.AAUP_GPA.isRealGrade(grades[window.AAUP_GPA.primaryId(prefix, parts.slug)])) count++;
+    });
+    var g = window.AAUP_GPA.gpaFor(prefix);
+    var val = (g && typeof g.gpa === 'number') ? g.gpa : (typeof g === 'number' ? g : 0);
+    return { gpa: isFinite(val) ? val : 0, count: count };
+  }
 
   function studentGender(){
     var info = window.AAUP_STUDENT ? window.AAUP_STUDENT.get() : null;
@@ -225,6 +277,52 @@
       desc: { en: 'Meet 100% of the graduation requirements.', ar: 'أكمل 100٪ من متطلبات التخرج.' },
       check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.doneCredits >= s.totalCredits; },
       prog: function(prefix){ return creditProgressToward(prefix, 100); }
+    },
+    // ---- Rungs for the long middle of a degree. Before these, a student at
+    // 42% of their plan had earned one badge out of nine and had nothing else
+    // in reach for two years: almost everything was end-of-degree. Each of
+    // these is computed from data the app already keeps — no new tracking. ----
+    {
+      id: 'firstcourse', icon: '🌱',
+      title: { en: 'Off the Mark', ar: 'الانطلاقة' },
+      desc: { en: 'Pass your first course.', ar: 'انجح في أول مساق لك.' },
+      check: function(prefix){ var s = window.__computeStats(prefix); return s.doneCourses >= 1; },
+      prog: function(prefix){ var s = window.__computeStats(prefix); return { done: Math.min(s.doneCourses, 1), total: 1, unit: 'courses' }; }
+    },
+    {
+      id: 'quarter', icon: '🧭',
+      title: { en: 'A Quarter Down', ar: 'ربع الطريق' },
+      desc: { en: 'Complete 25% of required credit hours.', ar: 'أكمل 25٪ من الساعات المعتمدة المطلوبة.' },
+      check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 25; },
+      prog: function(prefix){ return creditProgressToward(prefix, 25); }
+    },
+    {
+      id: 'threequarters', icon: '🏔️',
+      title: { en: 'Home Straight', ar: 'الخط الأخير' },
+      desc: { en: 'Complete 75% of required credit hours.', ar: 'أكمل 75٪ من الساعات المعتمدة المطلوبة.' },
+      check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 75; },
+      prog: function(prefix){ return creditProgressToward(prefix, 75); }
+    },
+    {
+      id: 'firsta', icon: '🅰️',
+      title: { en: 'First A', ar: 'أول امتياز' },
+      desc: { en: 'Record an A in any course.', ar: 'سجّل علامة A في أي مساق.' },
+      check: function(prefix){ return countTopGrades(prefix).done >= 1; },
+      prog: function(prefix){ var c = countTopGrades(prefix); return { done: Math.min(c.done, 1), total: 1, unit: 'A grades' }; }
+    },
+    {
+      id: 'gpa3', icon: '📈',
+      title: { en: 'Solid Standing', ar: 'وضع متين' },
+      desc: { en: 'Hold a 3.0 GPA across at least 10 graded courses.', ar: 'حافظ على معدل 3.0 عبر 10 مساقات مُقيَّمة على الأقل.' },
+      check: function(prefix){ var g = gradedGpa(prefix); return g.count >= 10 && g.gpa >= 3; },
+      prog: function(prefix){ var g = gradedGpa(prefix); return { done: Math.min(g.count, 10), total: 10, unit: 'graded courses' }; }
+    },
+    {
+      id: 'gpa35', icon: '🏅',
+      title: { en: 'Honours Pace', ar: 'مسار التفوّق' },
+      desc: { en: 'Hold a 3.5 GPA across at least 10 graded courses.', ar: 'حافظ على معدل 3.5 عبر 10 مساقات مُقيَّمة على الأقل.' },
+      check: function(prefix){ var g = gradedGpa(prefix); return g.count >= 10 && g.gpa >= 3.5; },
+      prog: function(prefix){ var g = gradedGpa(prefix); return { done: Math.min(g.count, 10), total: 10, unit: 'graded courses' }; }
     },
     {
       id: 'goodstudent', icon: '🌟',

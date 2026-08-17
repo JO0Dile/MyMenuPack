@@ -171,8 +171,28 @@
       '</div>';
   }
 
+  // How big the course cards read. Six themes shipped without any way to
+  // make the text bigger, which left the plan grid at 12.5px for everyone.
+  function sizePickerHtml(r){
+    if(!window.AAUP_THEME || !window.AAUP_THEME.sizes) return '';
+    var current = window.AAUP_THEME.currentSize();
+    return '<h3 style="margin:18px 0 6px;">🔠 ' + (r ? 'حجم النص' : 'Reading size') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' +
+      (r ? 'يكبّر بطاقات المساقات في الخطة الدراسية.' : 'Makes the course cards in the study plan bigger or tighter.') +
+      '</p>' +
+      '<div class="size-picker" role="group" aria-label="' + (r ? 'حجم النص' : 'Reading size') + '">' +
+      window.AAUP_THEME.sizes().map(function(sz){
+        var active = sz.id === current;
+        return '<button type="button" class="size-pick' + (active ? ' size-pick-active' : '') +
+          '" data-size-pick="' + sz.id + '" aria-pressed="' + active + '">' +
+          '<span style="font-size:' + Math.round(11 * sz.scale) + 'px;">Aa</span>' +
+          '<span>' + (r ? sz.ar : sz.en) + '</span></button>';
+      }).join('') +
+      '</div>';
+  }
+
   function prefsTabHtml(r, selectedPlan, isRtlNow){
-    return themePickerHtml(r) +
+    return themePickerHtml(r) + sizePickerHtml(r) +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;margin-top:14px;">' +
       (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">🌐 ' + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
       '</div>';
@@ -260,6 +280,14 @@
     body.querySelectorAll('[data-theme-swatch]').forEach(function(el){
       el.addEventListener('click', function(){
         if(window.AAUP_THEME) window.AAUP_THEME.setTheme(el.getAttribute('data-theme-swatch'));
+      });
+    });
+    body.querySelectorAll('[data-size-pick]').forEach(function(el){
+      el.addEventListener('click', function(){
+        if(window.AAUP_THEME && window.AAUP_THEME.setSize){
+          window.AAUP_THEME.setSize(el.getAttribute('data-size-pick'));
+          renderSettingsBody(body);   // repaint so the chosen size shows as picked
+        }
       });
     });
     if(document.getElementById('setLangBtn')){

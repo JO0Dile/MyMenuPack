@@ -939,7 +939,7 @@
     });
   }
 
-  function courseCardHtml(planId, c, rtl){
+  function courseCardHtml(planId, c, rtl, yearNum){
     var done = isDone(planId, c.id);
     var avail = isAvailable(planId, c.id);
     var editing = document.getElementById('page-' + planId) && document.getElementById('page-' + planId).classList.contains('editing');
@@ -961,12 +961,30 @@
       '<span class="course-check" role="checkbox" tabindex="0" aria-checked="' + (done ? 'true' : 'false') + '" ' +
       'aria-label="Mark course as completed" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
       'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">✓</span>';
-    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
+    // The line under the name answers the three things a student checks on
+    // every card: which year the plan puts it in, whether they can register
+    // for it today, and how many hours it carries. The official course code
+    // sits under them because that — not the name — is what gets typed into
+    // the registration system.
+    var statusTx = done ? (rtl ? 'مُنجز' : 'passed')
+      : avail ? (rtl ? 'متاح لك' : 'open to you')
+      : (rtl ? 'مغلق لك' : 'closed to you');
+    var yearTx = yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum)
+      : (rtl ? 'اختياري' : 'Elective');
+    var meta = window.__escapeHtml(yearTx + ' · ' + statusTx + ' · ' + c.creditHours + 'H');
+    // Focusable so the plan can be worked from a keyboard: the card itself is
+    // a button (Enter opens the details) and the tick inside it is its own
+    // control (Space toggles completion) — see js/57-card-input.js.
+    var a11y = editing ? '' :
+      ' tabindex="0" role="button" aria-label="' +
+      window.__escapeHtml(displayName + ' — ' + yearTx + ', ' + statusTx + ', ' + c.creditHours + 'H') + '"';
+    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + a11y + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
       checkboxHtml +
       cardButtons +
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
-      '<div class="name">' + displayName + (done ? ' ✓' : '') + '</div>' +
-      '<div class="course-cr">' + c.creditHours + 'H</div>' +
+      '<div class="name">' + displayName + '</div>' +
+      '<div class="course-meta">' + meta + '</div>' +
+      '<div class="course-code">' + window.__escapeHtml(String(c.id)) + '</div>' +
       '</div>';
   }
 
@@ -1124,13 +1142,13 @@
   // into one pool block under the years (see electivePoolHtml below).
   function isPoolElective(c){ return c && c.category === 'dept'; }
 
-  function semesterHtml(planId, plan, yearId, semester, editing, rtl){
+  function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
     var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester && !isPoolElective(c); });
     var addCard = editing ? '<div class="imp-add-course-card" onclick="AAUP_IMPORTED.addCoursePrompt(\'' + planId + '\',\'' + yearId + '\',\'' + semester + '\')">+</div>' : '';
     return '<div class="imp-semester-block"><div class="imp-semester-title">' + (rtl ? SEMESTER_LABEL_AR[semester] : SEMESTER_LABEL[semester]) + '</div>' +
       '<div class="course-row" id="' + containerId + '">' +
-      courses.map(function(c){ return courseCardHtml(planId, c, rtl); }).join('') + addCard +
+      courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum); }).join('') + addCard +
       '</div></div>';
   }
 
@@ -1300,9 +1318,9 @@
           '</div>';
       }
       html += '</div>';
-      html += semesterHtml(id, p, y.id, 's1', editing, rtl);
-      html += semesterHtml(id, p, y.id, 's2', editing, rtl);
-      if(y.hasSummer){ html += semesterHtml(id, p, y.id, 's3', editing, rtl); }
+      html += semesterHtml(id, p, y.id, 's1', editing, rtl, i + 1);
+      html += semesterHtml(id, p, y.id, 's2', editing, rtl, i + 1);
+      if(y.hasSummer){ html += semesterHtml(id, p, y.id, 's3', editing, rtl, i + 1); }
       html += '</div>';
     });
 
@@ -1332,8 +1350,41 @@
   }
 
   function toggle(planId, slug){
+    // What was open to the student before, so the announcement below can name
+    // what this tick actually changed rather than just saying "done".
+    var before = {};
+    (window.__openCourses ? window.__openCourses(planId) : []).forEach(function(el){ before[el.id] = true; });
     toggleCourse(planId, slug);
     render(planId);
+    announceToggle(planId, slug, before);
+  }
+
+  // A tick silently unlocks other courses: the grid repaints, and a screen
+  // reader user is told nothing at all. Say the consequence, not the click.
+  function announceToggle(planId, slug, before){
+    var node = document.getElementById('a11yAnnouncer');
+    if(!node) return;
+    var plan = loadImportedPlans()[planId];
+    var course = plan && (plan.courses || []).filter(function(c){ return c.id === slug; })[0];
+    if(!course) return;
+    var rtl = window.__isRtl ? window.__isRtl(planId) : false;
+    var done = isDone(planId, slug);
+    var info = (window.__PLAN_DATA[planId] || {}).courseInfo || {};
+    var opened = (window.__openCourses ? window.__openCourses(planId) : []).filter(function(el){
+      return !before[el.id];
+    }).map(function(el){
+      var parts = window.__splitCourseId(el.id);
+      var meta = parts && info[parts.slug];
+      return meta ? (rtl && meta.ar ? meta.ar : meta.name) : '';
+    }).filter(Boolean);
+
+    var name = (rtl && course.ar) ? course.ar : course.name;
+    var msg = name + ' — ' + (done ? (rtl ? 'مُنجز' : 'marked passed') : (rtl ? 'غير مُنجز' : 'marked not passed'));
+    if(opened.length){
+      msg += '. ' + (rtl ? 'أصبح متاحًا الآن: ' : 'Now open to you: ') + opened.slice(0, 4).join(', ') +
+        (opened.length > 4 ? (rtl ? ' وغيرها' : ' and more') : '');
+    }
+    node.textContent = msg;
   }
 
   // Called by the Plan Editor's applyMove() right after a successful drag —
@@ -1649,6 +1700,7 @@
       body.innerHTML =
         '<h2 style="margin-top:0;">📚 Course Library</h2>' +
         '<p class="form-note" style="margin-top:-6px;">Choose a study plan to browse its courses.</p>' +
+        (currentPlanId ? '<p class="form-note" style="margin-top:-2px;">Currently in <b>' + window.__escapeHtml(planLabel(currentPlanId)) + '</b>.</p>' : '') +
         '<div class="form-field"><label for="libPlanSelect">Study plan</label><select id="libPlanSelect">' +
         '<option value="">— choose a plan —</option>' +
         prefixList.map(function(pref){ return '<option value="' + pref + '">' + planLabel(pref) + '</option>'; }).join('') +
@@ -1661,17 +1713,30 @@
       });
     }
 
+    // Opening the Library from inside a plan used to land on an empty "choose
+    // a study plan" dropdown — asking a question the student had already
+    // answered by being there. Go straight to their plan's courses; the
+    // "Choose a different plan" button at the top is how they get to another.
+    function start(){
+      if(currentPlanId && prefixes[currentPlanId]){ showBrowse(currentPlanId); }
+      else { showPicker(); }
+    }
+
     function showBrowse(browsePrefix){
       var list = courses.filter(function(c){ return c.prefix === browsePrefix; });
       var currentIsSame = browsePrefix === currentPlanId;
 
       function renderList(filterText){
         var f = (filterText || '').toLowerCase();
-        var filtered = list.filter(function(c){ return !f || c.name.toLowerCase().indexOf(f) !== -1; });
+        // Match the course code as well as the name — the code is what a
+        // student has in front of them on a registration screen.
+        var filtered = list.filter(function(c){
+          return !f || c.name.toLowerCase().indexOf(f) !== -1 || String(c.slug).toLowerCase().indexOf(f) !== -1;
+        });
         if(filtered.length === 0){ return '<p class="ex-note">No matching courses.</p>'; }
         return filtered.map(function(c){
           return '<div style="font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
-            '<span>' + c.name + ' <span style="color:var(--text-dim);">(' + c.cr + 'H)</span></span>' +
+            '<span>' + c.name + ' <span style="color:var(--text-dim);">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
             (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '" style="padding:3px 10px;font-size:11px;">➕ Add</button>') +
             '</div>';
         }).join('');
@@ -1679,9 +1744,9 @@
 
       body.innerHTML =
         '<h2 style="margin-top:0;">📚 ' + planLabel(browsePrefix) + '</h2>' +
-        '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">← Choose a different plan</button>' +
+        '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">🔀 Change plan</button>' +
         (currentIsSame ? '<p class="form-note">This is the plan you\u2019re already editing.</p>' : '') +
-        '<div class="form-field"><input type="text" id="libSearch" placeholder="Search courses…"></div>' +
+        '<div class="form-field"><input type="text" id="libSearch" placeholder="Search by name or course code…"></div>' +
         '<div id="libList" style="max-height:300px;overflow-y:auto;"></div>' +
         '<div class="form-actions"><button type="button" class="home-btn" id="libClose">Close</button></div>';
       document.getElementById('libList').innerHTML = renderList('');
@@ -1762,7 +1827,7 @@
       return 'core';
     }
 
-    showPicker();
+    start();
   }
 
   window.AAUP_IMPORTED = {

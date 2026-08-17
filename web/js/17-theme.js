@@ -67,11 +67,60 @@
     setTheme(ids[(idx + 1) % ids.length]);
   }
 
-  function init(){ apply(current()); }
+  // ---------------------------------------------------------------------
+  // READING SIZE — how big the plan grid's course cards are.
+  //
+  // Six themes and no way to make the text bigger: course names sit at
+  // 12.5px, and a student who has enlarged their phone's system font gets no
+  // benefit from it inside the grid. This scales the cards' type and their
+  // minimum height together (--card-scale in css/app.css) rather than zooming
+  // the whole page, so the year and semester structure stays where it was.
+  var SIZE_KEY = 'aaup_cardScale';
+  var SIZES = [
+    { id: 'compact', scale: 0.92, en: 'Compact', ar: 'مضغوط' },
+    { id: 'normal', scale: 1, en: 'Normal', ar: 'عادي' },
+    { id: 'large', scale: 1.16, en: 'Large', ar: 'كبير' },
+    { id: 'xlarge', scale: 1.34, en: 'Extra large', ar: 'كبير جدًا' }
+  ];
+  var SIZE_DEFAULT = 'normal';
+
+  function sizeById(id){
+    for(var i = 0; i < SIZES.length; i++){ if(SIZES[i].id === id) return SIZES[i]; }
+    return null;
+  }
+  function currentSize(){
+    try{
+      var v = localStorage.getItem(SIZE_KEY);
+      return sizeById(v) ? v : SIZE_DEFAULT;
+    }catch(e){ return SIZE_DEFAULT; }
+  }
+  function applySize(id){
+    var s = sizeById(id) || sizeById(SIZE_DEFAULT);
+    document.documentElement.style.setProperty('--card-scale', String(s.scale));
+    document.querySelectorAll('[data-size-pick]').forEach(function(el){
+      el.classList.toggle('size-pick-active', el.getAttribute('data-size-pick') === s.id);
+    });
+    // Cards grew or shrank, so the prerequisite lines drawn over them are
+    // measuring the old geometry.
+    if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.redrawConnectors){
+      Object.keys(window.__PLAN_DATA || {}).forEach(function(prefix){
+        try{ window.AAUP_IMPORTED.redrawConnectors(prefix); }catch(e){}
+      });
+    }
+  }
+  function setSize(id){
+    if(!sizeById(id)) return;
+    try{ localStorage.setItem(SIZE_KEY, id); }catch(e){}
+    applySize(id);
+  }
+
+  function init(){ apply(current()); applySize(currentSize()); }
 
   window.AAUP_THEME = {
     toggle: toggle, setTheme: setTheme, current: current,
-    list: function(){ return THEMES.slice(); }
+    list: function(){ return THEMES.slice(); },
+    setSize: setSize, currentSize: currentSize,
+    sizes: function(){ return SIZES.slice(); }
   };
 
   if(document.readyState === 'complete'){ init(); }

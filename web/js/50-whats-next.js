@@ -47,6 +47,13 @@
       barCh: 'Credit hours', barChSub: function(a,b){ return a + ' of ' + b + ' CH currently available'; },
       barDept: 'Department requirement', barDegree: 'Degree completion after', barLab: 'Courses with a lab',
       worth: 'Worth knowing',
+      doNext: 'Do this next',
+      doNextWhy: function(name, n){
+        return n
+          ? 'Of everything open to you, ' + name + ' unlocks the most of what is left — ' + n + ' course' + (n === 1 ? '' : 's') + '.'
+          : name + ' is the strongest thing you can take right now.';
+      },
+      doNextAdd: 'Show me why',
       oweDept: function(n){ return 'You still need ' + n + ' more department elective hours.'; },
       oweFree: function(n){ return 'You still owe ' + n + ' free elective hours.'; },
       deadEnds: function(n){ return n + ' other unlocked course' + (n === 1 ? '' : 's') + ' nothing else depends on — good to fit in whenever it suits you.'; }
@@ -63,6 +70,13 @@
       barCh: 'الساعات المعتمدة', barChSub: function(a,b){ return a + ' من ' + b + ' س.م المتاحة حالياً'; },
       barDept: 'متطلب التخصص الاختياري', barDegree: 'نسبة الإنجاز بعدها', barLab: 'مساقات بها مختبر',
       worth: 'يستحق المعرفة',
+      doNext: 'ابدأ بهذا',
+      doNextWhy: function(name, n){
+        return n
+          ? 'من بين كل المتاح لك، ' + name + ' يفتح أكبر قدر مما تبقّى — ' + n + ' مساقات.'
+          : name + ' هو أقوى ما يمكنك أخذه الآن.';
+      },
+      doNextAdd: 'اعرض السبب',
       oweDept: function(n){ return 'ما زلت بحاجة إلى ' + n + ' ساعة تخصص اختياري إضافية.'; },
       oweFree: function(n){ return 'ما زلت مديناً بـ ' + n + ' ساعة متطلب حر.'; },
       deadEnds: function(n){ return n + ' مساقاً آخر متاحاً لا ينتظره أي مساق آخر — مناسب لأخذه في أي وقت يناسبك.'; }
@@ -110,7 +124,11 @@
     var data = window.__PLAN_DATA[prefix] || {};
     var info = data.courseInfo || {};
     var progress = window.__getProgress ? window.__getProgress() : {};
-    var els = Array.prototype.slice.call(page.querySelectorAll('.course.available[id]'));
+    // "Available" on its own includes courses already passed — this list was
+    // offering 5 finished courses out of 12 as things to take next, and the
+    // "+N more available" / "x of y CH" numbers underneath counted them too.
+    // Same shared definition the advisor uses: unlocked AND not yet passed.
+    var els = window.__openCourses(prefix);
 
     return els.map(function(el){
       var parts = splitId(el.id);
@@ -263,7 +281,24 @@
 
     var top = list.slice(0, TOP_N);
     var rest = list.slice(TOP_N);
-    var html = '<div class="wn-cards">' +
+
+    // One recommendation, first, in a sentence. The three stat tiles, the
+    // ranked cards, the chips and the two meters below are all useful, but
+    // none of them says what to do in the next five minutes — so a student
+    // who opens the dashboard for thirty seconds leaves with nothing.
+    var lead = top[0];
+    var html = '';
+    if(lead){
+      var leadName = rtl && lead.nameAr ? lead.nameAr : lead.name;
+      html += '<button type="button" class="wn-lead" data-wn-id="' + esc(lead.id) + '">' +
+        '<span class="wn-lead-label">' + esc(t.doNext) + '</span>' +
+        '<span class="wn-lead-name">' + leadName +
+        (lead.cr ? ' <span class="wn-lead-cr">' + esc(lead.cr) + 'H</span>' : '') + '</span>' +
+        '<span class="wn-lead-why">' + esc(t.doNextWhy(leadName, lead.opens || 0)) + '</span>' +
+        '<span class="wn-lead-cta">' + esc(t.doNextAdd) + ' →</span>' +
+        '</button>';
+    }
+    html += '<div class="wn-cards">' +
       top.map(function(c, i){ return cardHTML(c, rtl, t, i); }).join('') + '</div>';
 
     if(rest.length){

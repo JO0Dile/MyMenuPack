@@ -301,6 +301,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 </div>
 
 <div class="toast-msg" id="globalToast"></div>
+<!-- Spoken by screen readers when ticking a course changes what is open to
+     the student. Visually hidden: the same news is already on screen in the
+     cards themselves. -->
+<div id="a11yAnnouncer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 <div class="toast-action" id="globalActionToast" style="display:none;">
   <span class="ta-text" id="globalActionToastText"></span>
   <button type="button" class="ta-btn" id="globalActionToastBtn"></button>
@@ -517,6 +521,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/54-prereq-graph.js"></script>
 <script src="js/55-onboarding.js"></script>
 <script src="js/56-story-stack.js"></script>
+<script src="js/57-card-input.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 
