@@ -389,5 +389,16 @@
     };
   }
 
+  // #devModalOverlay is the one overlay several unrelated features share —
+  // Settings, the Course Library, the new-plan and course forms. Each of them
+  // renders its own body into it and wires its own Close button, so none of
+  // them owned the keyboard path and Escape did nothing in any of them. One
+  // handler on the shared element covers every current and future user of it.
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    var overlay = document.getElementById('devModalOverlay');
+    if(overlay && overlay.classList.contains('open')) overlay.classList.remove('open');
+  });
+
   window.AAUP_SIDEBAR = { show: show, hide: hide, setActive: setActive, toggleMobile: toggleMobile, closeMobile: closeMobile, openSettings: openSettings };
 })();

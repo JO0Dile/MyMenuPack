@@ -240,7 +240,7 @@ window.APP_VERSION = '6.0';
         repaintHomeIfIdle();
         // Hand the plans to the module that has always merged them, so a
         // student's own edits are still protected from being overwritten.
-        if(window.AAUP_SYNC) return window.AAUP_SYNC.checkForUpdates(false);
+        if(window.AAUP_SYNC) return window.AAUP_SYNC.checkForUpdates(false, feed);
       })
       .then(function(){ repaintHomeIfIdle(); })
       .catch(function(){

@@ -125,7 +125,10 @@
     var standingLabel = null;
     if(gpaResult.gpa != null && window.AAUP_GPA.standingFor){
       var standing = window.AAUP_GPA.standingFor(gpaResult.gpa);
-      standingLabel = standing ? (rtl ? standing.ar : standing.en) : null;
+      // standingFor() returns { label, cls, ar } — reading .en gave undefined,
+      // so the card fell through to "No grades entered yet" while displaying a
+      // real GPA right above it. The audit and GPA Studio already use .label.
+      standingLabel = standing ? (rtl ? standing.ar : standing.label) : null;
     }
 
     var achv = window.AAUP_ACHIEVEMENTS ? window.AAUP_ACHIEVEMENTS.getUnlockedCount(prefix) : { unlocked: 0, total: 0 };

@@ -148,6 +148,9 @@
     var close = function(){ overlay.classList.remove('open'); };
     if(closeBtn) closeBtn.addEventListener('click', close);
     overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+    // Escape works on the audit and course modals, so a keyboard user
+    // reasonably expects it here too. Guarded on .open so it stays inert.
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && overlay.classList.contains('open')) close(); });
     var card = overlay.querySelector('.modal-card');
     if(card) card.addEventListener('click', function(e){ e.stopPropagation(); });
   }

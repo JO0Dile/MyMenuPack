@@ -540,6 +540,10 @@
     var close = function(){ overlay.classList.remove('open'); };
     if(closeBtn) closeBtn.addEventListener('click', close);
     overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+    // Escape closed the audit and course modals but not this one, so a keyboard
+    // user who opened Achievements had no way out except the mouse. Guarded on
+    // .open so the listener is inert while the modal is closed.
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && overlay.classList.contains('open')) close(); });
     // NOTE: the modal card deliberately does NOT stopPropagation on clicks.
     // The close handler above only fires when e.target === overlay (the
     // backdrop itself), so inner clicks never close the modal anyway — and a

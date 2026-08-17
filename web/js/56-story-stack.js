@@ -71,6 +71,13 @@
     var back = document.getElementById('storyBack');
     var cont = document.getElementById('storyContinue');
     if(closeBtn) closeBtn.addEventListener('click', close);
+    // This deck deliberately ignores backdrop clicks so a stray tap while
+    // swiping doesn't dismiss it — which left the X as the only way out.
+    // Escape gives keyboard users the same exit without weakening that.
+    document.addEventListener('keydown', function(e){
+      var ov = overlay();
+      if(e.key === 'Escape' && ov && ov.classList.contains('open')) close();
+    });
     if(back) back.addEventListener('click', goBack);
     if(cont) cont.addEventListener('click', goNext);
     bindSwipe(document.getElementById('storyBodyArea'));
