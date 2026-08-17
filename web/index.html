@@ -346,6 +346,15 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- Student thoughts: one line, live for everyone on the same plan.
+     js/59-thoughts.js renders the body, including its own back bar. -->
+<div class="modal-overlay" id="thoughtsModalOverlay">
+  <div class="modal-card audit-modal-card">
+    <button class="modal-close" id="thoughtsModalClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="thoughtsModalBody"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="devModalOverlay">
   <div class="modal-card dev-modal-card">
     <button class="modal-close" id="devModalClose" aria-label="Close">&times;</button>
@@ -522,6 +531,9 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/55-onboarding.js"></script>
 <script src="js/56-story-stack.js"></script>
 <script src="js/57-card-input.js"></script>
+<script src="js/58-wordfilter.js"></script>
+<script src="js/59-thoughts.js"></script>
+<script src="js/60-backbar.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 
