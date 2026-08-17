@@ -1191,12 +1191,14 @@
   }
   .collapse-hint .ch-expand{margin-left:auto;color:var(--unlock);font-weight:800;}
   .plan-page.rtl-mode .collapse-hint .ch-expand, .sheet.rtl-mode .collapse-hint .ch-expand{margin-left:0;margin-right:auto;}
-  /* Prerequisite connectors are absolutely positioned over the full grid;
-     collapsing years reflows it, so hide the layer while collapse mode is on
-     to avoid lines pointing at now-hidden courses. It's a navigation view,
-     not a tracing one — the layer (and tracing) return when it's toggled off. */
-  .plan-page.finished-collapsed .connector-layer,
-  .sheet.finished-collapsed .connector-layer{display:none;}
+  /* Prerequisite connectors used to be hidden outright while collapse mode
+     was on (the layer reflows when years fold, and stale lines pointed at
+     now-hidden courses). That threw away every line between two courses that
+     were still on screen, and pressing "Show ▾" did not bring them back —
+     so collapsing one finished year silently disabled prerequisite tracing
+     for the whole plan. The layer now stays visible; js/05-collapse-finished-
+     years.js redraws it on every fold/unfold and drawConnectors() skips any
+     course whose box has collapsed to zero size. */
 
   /* ---------- per-semester workload roll-up ---------- */
   .sem-workload{
