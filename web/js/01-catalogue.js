@@ -44,6 +44,18 @@ window.APP_COLLECT_URL = 'https://plan-collector.pmhtrfalab999.workers.dev';
 // it and can POST plan JSON to your collector, same as using the app — so a
 // simple value is fine. Leave '' to send none.
 window.APP_COLLECT_SECRET = 'Winston';
+// ---------------------------------------------------------------------------
+// Student Thoughts (js/59-thoughts.js) — the shared wall, on its OWN Worker.
+//
+// Deliberately not the admin Worker and not the collector: this endpoint
+// accepts writes from anyone holding the app, so it must never sit behind the
+// key that can commit to the repository. Deploy workers/thoughts-worker.js,
+// put its URL here, and the wall goes live.
+//
+// Left empty, the whole feature still works — thoughts are written, read and
+// deleted on the student's own device and nothing leaves the phone. That is
+// the honest default: no silent half-broken network state.
+window.APP_THOUGHTS_URL = '';
 // Which collector you're pointing at, so the app sends in the shape that host
 // accepts. Only two values:
 //   'cloudflare'  (default) — sends JSON with the secret in a header, and

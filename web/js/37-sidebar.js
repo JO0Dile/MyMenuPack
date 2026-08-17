@@ -29,7 +29,11 @@
     { key: 'audit', icon: '📋', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
     { key: 'achievements', icon: '🏆', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
     { key: 'advisor', icon: '🧠', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
-    { key: 'overview', icon: '🖨️', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } }
+    { key: 'overview', icon: '🖨️', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
+    // The one place in the app where students talk to each other rather than
+    // to their own data — so it sits with the rest of the plan's screens, not
+    // hidden behind a floating button nobody presses.
+    { key: 'thoughts', icon: '💭', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } }
   ];
 
   var currentPrefix = null;
