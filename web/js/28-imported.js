@@ -759,6 +759,11 @@
     // use. Feed plans can be the biggest (Pharmacy is 86 cards), so this is
     // where it matters most.
     var cRect = container.getBoundingClientRect();
+    // The whole plan can be off screen — the student navigated Home while a
+    // window resize was still pending, say. Every card would then measure as
+    // zero-sized and we would wipe a perfectly good set of lines that nothing
+    // redraws on the way back. Nothing to measure means nothing to do.
+    if(cRect.width <= 0 || cRect.height <= 0) return;
     var w = container.scrollWidth, h = container.scrollHeight;
     var prereqs = data.prereqs || [];
     var rects = {};
