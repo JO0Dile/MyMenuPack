@@ -247,6 +247,24 @@ window.__rebuildPlanData = function(prefix){
   else if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
 };
 
+// The courses a student could actually register for right now: prerequisites
+// satisfied AND not already passed.
+//
+// This exists because ".course.available" does NOT mean that. A completed
+// course keeps the available class (it is, after all, still unlocked), so
+// every feature that recommended "what's next" by reading that class alone
+// recommended work the student had already finished — the advisor filled a
+// whole 18-hour semester with it, and the dashboard's next-up list and its
+// "N more available" / "x of y CH" counters were inflated the same way.
+// One definition, one place to fix, three call sites that agree.
+window.__openCourses = function(prefix){
+  var page = document.getElementById('page-' + prefix);
+  if(!page) return [];
+  var progress = window.__getProgress ? window.__getProgress() : {};
+  return Array.prototype.slice.call(page.querySelectorAll('.course.available[id]:not(.course-removed)'))
+    .filter(function(el){ return !progress[el.id]; });
+};
+
 // What the arrow-drawing code should iterate. Falls back to the plan's own
 // hard-coded list if registration hasn't happened yet for any reason.
 window.__livePrereqs = function(prefix, fallback){

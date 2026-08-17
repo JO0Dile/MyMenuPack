@@ -18,7 +18,10 @@
     var info = data.courseInfo || {};
     var needsMap = data.needsMap || {};
     var unlocksMap = data.unlocksMap || {};
-    var available = page ? Array.prototype.slice.call(page.querySelectorAll('.course.available[id]')) : [];
+    // Not `.course.available` — a passed course keeps that class, so reading
+    // it directly recommended courses the student had already finished (7 of
+    // 9 on a real plan). __openCourses means unlocked AND not yet passed.
+    var available = page ? window.__openCourses(prefix) : [];
 
     var candidates = available.map(function(el){
       var parts = window.__splitCourseId(el.id);

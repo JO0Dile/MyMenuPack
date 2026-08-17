@@ -946,6 +946,9 @@
     -webkit-user-select:none;
     user-select:none;
     -webkit-touch-callout:none;
+    /* --card-scale is the reading-size preference (Settings -> Preferences);
+       it defaults to 1, so nothing moves until a student chooses otherwise. */
+    min-height:calc(58px * var(--card-scale, 1));
   }
 
   .course:hover{transform:translateY(-2px);}
@@ -955,7 +958,16 @@
     transition:box-shadow .35s cubic-bezier(.4,0,.2,1);
   }
 
-  .course .name{font-size:12.5px;font-weight:700;line-height:1.28;}
+  /* The tick badge sits in the top-right corner ON TOP of the card, so a
+     long course name ran underneath it — "Beginning English" read as
+     "Beginning Englis". Keep the first line clear of it. */
+  .course .name{
+    font-size:calc(12.5px * var(--card-scale, 1));font-weight:700;line-height:1.28;
+    padding-right:24px;
+  }
+  .plan-page.rtl-mode .course .name,
+  .sheet.rtl-mode .course .name{padding-right:0;padding-left:24px;}
+  .editing .course .name{padding-right:0;padding-left:0;}
   /* ---------- My Progress: completion checkbox on each course ---------- */
 
   .course-check{
@@ -982,7 +994,13 @@
     background:#2ecc71; border-color:#2ecc71; color:#0b1330;
   }
 
-  .course.completed{opacity:.5;}
+  /* A finished course used to be dimmed to 50% AND struck through AND
+     badged — three signals stacked, which pushed the name and hour line to
+     2.8-3.7:1 contrast (AA asks 4.5:1) and made a completed plan genuinely
+     hard to read. One signal is enough: the solid green tick. The card keeps
+     a slightly softer surface so the eye still separates done from not, and
+     the text stays at full strength. */
+  .course.completed{opacity:.86;}
 
   .course.retake-course{box-shadow:0 0 0 2px var(--prereq) inset;}
   .retake-badge{
@@ -991,7 +1009,7 @@
     margin-bottom:4px; width:fit-content;
   }
 
-  .course.completed .name{text-decoration:line-through; text-decoration-thickness:1.5px;}
+  .course.completed .name{text-decoration:none;}
 
   .plan-page.rtl-mode .course-check,
   .sheet.rtl-mode .course-check{right:auto; left:5px; margin:-5px;}
@@ -2799,6 +2817,82 @@
   .imp-stat-label{font-size:10.5px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
 
   .course-cr{font-size:10px;opacity:.8;margin-top:2px;}
+
+  /* Year, whether it is open to this student, and the hours — the three
+     things checked on every card — plus the official registration code,
+     which is what actually gets typed into the university's system. */
+  .course-meta{
+    font-size:calc(10px * var(--card-scale, 1));
+    margin-top:3px;line-height:1.35;font-weight:600;
+    color:rgba(255,255,255,.92);
+  }
+  .course-code{
+    font-size:calc(9.5px * var(--card-scale, 1));
+    margin-top:1px;letter-spacing:.03em;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:rgba(255,255,255,.78);
+  }
+  .course.completed .course-meta,
+  .course.completed .course-code{color:rgba(255,255,255,.9);}
+
+  /* The card is a real button now, so it needs a real focus ring. */
+  .course:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* Swipe right to mark passed, left to undo (js/57-card-input.js). The card
+     follows the finger and colours the edge it is heading toward, so the
+     gesture explains itself the first time it is tried by accident. */
+  .course.swipe-pass{box-shadow:-6px 0 0 0 var(--unlock);}
+  .course.swipe-undo{box-shadow:6px 0 0 0 var(--prereq);}
+
+  /* Reading-size picker (Settings -> Preferences), same shape as the theme
+     swatches beside it so the two read as one set of appearance controls. */
+  .size-picker{display:flex;gap:8px;flex-wrap:wrap;}
+  .size-pick{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    min-width:76px;padding:9px 12px;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);border-radius:9px;
+    color:var(--text-dim);font-size:11px;font-weight:700;font-family:inherit;
+  }
+  .size-pick:hover{border-color:var(--accent);color:var(--text);}
+  .size-pick-active{border-color:var(--accent);color:var(--text);box-shadow:0 0 0 1px var(--accent) inset;}
+  .size-pick:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* "Do this next" — the single recommendation above the dashboard's ranked
+     list. Deliberately the widest, quietest thing on the screen: one label,
+     one name, one sentence of reason. */
+  .wn-lead{
+    display:block;width:100%;text-align:left;cursor:pointer;font-family:inherit;
+    background:var(--panel);border:1px solid var(--accent);border-radius:12px;
+    padding:14px 16px;margin:0 0 14px;color:var(--text);
+  }
+  .wn-lead:hover{background:var(--header-bg);}
+  .wn-lead:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .plan-page.rtl-mode .wn-lead, .sheet.rtl-mode .wn-lead{text-align:right;}
+  .wn-lead-label{
+    display:block;font-size:10.5px;font-weight:800;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;
+  }
+  .wn-lead-name{display:block;font-size:17px;font-weight:800;line-height:1.25;}
+  .wn-lead-cr{font-size:12px;font-weight:700;color:var(--accent);}
+  .wn-lead-why{display:block;font-size:12.5px;color:var(--text-dim);margin-top:5px;line-height:1.5;}
+  .wn-lead-cta{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;color:var(--accent);}
+
+  /* Announced by screen readers, never drawn — the sighted equivalent of
+     these messages is the plan repainting itself. */
+  .sr-only{
+    position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  }
+
+  /* Phones: the tick was 29x29 including its padding, under the 44px every
+     touch guideline asks for, and 13 cards were 43px tall. */
+  @media (max-width:720px){
+    .course-check{width:22px;height:22px;padding:11px;margin:-11px;font-size:13px;}
+    .course .name{padding-right:28px;}
+    .plan-page.rtl-mode .course .name,
+    .sheet.rtl-mode .course .name{padding-right:0;padding-left:28px;}
+    .course{min-height:calc(64px * var(--card-scale, 1));}
+  }
 
   /* ---- Edit-mode grid restyle — card-style semester columns sitting
      side by side within a year, instead of the normal stacked list. Scoped
