@@ -199,10 +199,24 @@ const ALWAYS = [
   'خرا', 'معرص', 'يلعن', 'انعل',
 ];
 
+// Explicit sexual words: abuse in every sentence, including one about
+// studying. Matched EXACTLY — no clitic prefixes — because they are two and
+// three letters long and would otherwise hit "بكس" (box), "كسب" (earn),
+// "زبدة" (butter), "الزبون", "كساء" and "نيكولا". Every spelling anyone
+// writes is listed instead.
+const ALWAYS_EXACT = [
+  'كس', 'الكس', 'وكس', 'كسك', 'كسه', 'كسها', 'كسهم', 'كسختك',
+  'زب', 'الزب', 'وزب', 'زبك', 'زبه', 'زبر', 'الزبر', 'زبري',
+  'نيك', 'النيك', 'ونيك', 'ينيك', 'بينيك', 'تنيك', 'متناك',
+  'نياكه', 'منيوكه', 'عرص', 'العرص',
+  'kus', 'kess', 'kos', 'teez', 'tiz', 'neek', 'nayek', 'nik',
+];
+
 const CONTEXTUAL = [
   'ass', 'idiot', 'stupid', 'dumb', 'moron', 'loser', 'trash', 'filthy',
   'donkey', 'pig', 'dog', 'monkey', 'swine',
   'kelev', 'kelef', 'kalb', 'kelb', 'hmar', 'himar', 'jahsh', 'khanzeer',
+  // kus/kess/teez/tiz live in ALWAYS_EXACT now — context must not excuse them.
   'حمار', 'حمير', 'جحش', 'كلب', 'كلاب', 'خنزير', 'خنازير', 'قرد', 'مونكي',
   'وسخ', 'قذر', 'نجس', 'زباله', 'غبي', 'تافه', 'حقير', 'فاشل', 'كيليف',
 ];
@@ -292,7 +306,12 @@ function pattern(raw) {
   return { raw, re: new RegExp(src, 'u') };
 }
 
-const P_ALWAYS = ALWAYS.map(pattern);
+function exactPattern(raw) {
+  const w = normalize(raw);
+  return { raw, re: new RegExp('(?:^|[^\\p{L}\\p{N}])' + elongate(w) + '(?:$|[^\\p{L}\\p{N}])', 'u') };
+}
+
+const P_ALWAYS = ALWAYS.map(pattern).concat(ALWAYS_EXACT.map(exactPattern));
 const P_CONTEXT = CONTEXTUAL.map(pattern);
 const P_TARGET = TARGETING.map(pattern);
 const P_PEOPLE = PEOPLE.map(pattern);

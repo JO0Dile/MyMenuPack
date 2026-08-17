@@ -48,7 +48,28 @@
         'شرموط', 'شرموطه', 'شرموتا', 'قحبه', 'عاهره', 'زانيه', 'منيوك', 'منيك',
         'خول', 'لوطي', 'كسم', 'كسمك', 'طيز', 'طيزك', 'خرا', 'خره',
         'زبي', 'معرص', 'ابن الحرام', 'يلعن', 'انعل'
-      ]
+      ],
+
+      // EXACT — matched as the whole word with no clitics attached.
+      //
+      // Explicit sexual words are abuse in every sentence, including a
+      // sentence about studying: "درسنا عن كس الانسان" is not anatomy, it is
+      // someone finding out whether the filter reads context. So these are
+      // ALWAYS, and no context can excuse them.
+      //
+      // Matched exactly because they are two and three letters long, and the
+      // clitic prefixes that make "وكلبك" work would also hit "بكس" (box),
+      // "كسب" (earn), "زبدة" (butter), "الزبون" (the customer), "كساء"
+      // (clothing) and "نيكولا". Every spelling anyone actually writes is
+      // listed instead — a longer list is a cheap price for not rejecting a
+      // sentence about butter.
+      exact: {
+        ar: ['كس', 'الكس', 'وكس', 'كسك', 'كسه', 'كسها', 'كسهم', 'كسختك',
+             'زب', 'الزب', 'وزب', 'زبك', 'زبه', 'زبر', 'الزبر', 'زبري',
+             'نيك', 'النيك', 'ونيك', 'ينيك', 'بينيك', 'تنيك', 'متناك',
+             'نياكه', 'منيوكه', 'عرص', 'العرص'],
+        en: ['kus', 'kess', 'kos', 'teez', 'tiz', 'neek', 'nayek', 'nik']
+      }
     },
 
     // ---- blocked only when aimed at a person ------------------------------
@@ -62,7 +83,9 @@
         // is a bad trade for a word nobody insults anyone with here.
         'donkey', 'pig', 'dog', 'monkey', 'swine',
         'kelev', 'kelef', 'kalb', 'kelb', 'hmar', '7mar', 'himar', 'jahsh',
-        'khanzeer', 'khanzir', 'kus', 'kess', 'teez', 'tiz', 'zbala'
+        // kus / kess / teez / tiz moved to always.exact — explicit words are
+        // abuse in every sentence, and context must not be able to excuse them.
+        'khanzeer', 'khanzir', 'zbala'
       ],
       ar: [
         'حمار', 'حماره', 'حمير', 'جحش', 'جحشه', 'حيمار', 'كلب', 'كلبه', 'كلاب',
