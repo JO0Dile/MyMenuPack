@@ -142,9 +142,25 @@
       });
     });
 
+    // An elective pool offers more than the degree requires — this plan lists 4
+    // specialization electives but you only take 2. Counting all four made the
+    // whole-plan total read 135 CH against a 129 CH degree. Cap the bucket at
+    // what is actually required, using the same per-plan count the Degree Audit
+    // uses, so the two screens cannot disagree.
+    var deptRequired = (window.__DEPT_REQUIRED || {})[prefix];
+    if(typeof deptRequired === 'number' && acc.specElec.courses > deptRequired){
+      var unit = acc.specElec.hours / acc.specElec.courses;   // even pools: one credit value
+      acc.specElec.hours = unit * deptRequired;
+      acc.specElec.requiredCount = deptRequired;
+      // Earned can never exceed what the requirement is worth.
+      if(acc.specElec.earned > acc.specElec.hours) acc.specElec.earned = acc.specElec.hours;
+      if(acc.specElec.done > deptRequired) acc.specElec.done = deptRequired;
+    }
+
     return BUCKET_ORDER.filter(function(k){ return acc[k].courses > 0; }).map(function(k){
       var a = acc[k];
       return {
+        pickOf: a.requiredCount != null ? { need: a.requiredCount, from: a.courses } : null,
         key: k, meta: BUCKET_META[k],
         hours: a.hours, earned: a.earned,
         remaining: Math.max(0, a.hours - a.earned),
@@ -185,13 +201,18 @@
           '<span class="ro-bd-cat-tag' + (r.meta.optional ? ' ro-bd-cat-tag-opt' : '') + '">' +
             (r.meta.optional ? (rtl ? '(اختياري)' : '(Optional)') : (rtl ? '(إجباري)' : '(Mandatory)')) +
           '</span>' +
+          (r.pickOf
+            ? '<span class="ro-bd-cat-pick">' + (rtl
+                ? ('اختر ' + r.pickOf.need + ' من ' + r.pickOf.from)
+                : ('pick ' + r.pickOf.need + ' of ' + r.pickOf.from)) + '</span>'
+            : '') +
         '</div>' +
         '<div class="ro-bd-bar"><span style="width:' + r.pct + '%;"></span></div>' +
         '<div class="ro-bd-stats">' +
           '<div><b>' + Math.round(r.hours) + '</b><span>' + (rtl ? 'ساعات' : 'Hours') + '</span></div>' +
           '<div><b>' + Math.round(r.earned) + '</b><span>' + (rtl ? 'مكتسبة' : 'Earned') + '</span></div>' +
           '<div><b>' + Math.round(r.remaining) + '</b><span>' + (rtl ? 'متبقية' : 'Remaining') + '</span></div>' +
-          '<div><b>' + r.done + '/' + r.courses + '</b><span>' + (rtl ? 'مساقات' : 'Courses') + '</span></div>' +
+          '<div><b>' + r.done + '/' + (r.pickOf ? r.pickOf.need : r.courses) + '</b><span>' + (rtl ? 'مساقات' : 'Courses') + '</span></div>' +
         '</div>' +
       '</div>';
     }).join('');

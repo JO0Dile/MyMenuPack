@@ -4126,3 +4126,91 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .cd-head h3{font-size:17px;}
   .cd-arrow{transform:rotate(90deg); display:inline-block;}
 }
+
+/* ==========================================================================
+   MODALS BECOME PAGES ON A PHONE
+   On a desktop a dialog is a big popup over the app. On a phone that shape is
+   wrong: measured on a 390px screen, every dialog rendered as a 350px card
+   with 40px of the screen wasted down the sides, and My Path's content ran
+   309px past its own card. A phone has no room to spare for a frame around a
+   frame, so below 720px each dialog fills the screen like a page and gets a
+   back arrow in a bar across the top — the same shape as the university's own
+   app, and what a phone user expects to press.
+
+   Deliberately last in this file, and written with three-class specificity,
+   so it wins against the per-dialog sizing rules above (.modal-card.cd-card,
+   .pg-modal-card, .audit-modal-card ...) without any of them needing to know
+   this exists. Everything stays one .modal-overlay/.modal-card structure — no
+   dialog needed new markup to take part.
+   ========================================================================== */
+@media (max-width:720px){
+  .modal-overlay{
+    padding:0;
+    align-items:stretch; justify-content:stretch;
+    /* Opaque: it is a page now, not something floating over the app. */
+    background:var(--bg);
+  }
+  .modal-overlay .modal-card,
+  .modal-overlay .modal-card.cd-card{
+    width:100%; max-width:none;
+    height:100dvh; max-height:100dvh;
+    margin:0; border:0; border-radius:0; box-shadow:none;
+    /* 56px clears the fixed back bar below. Cards that carry their own
+       .modal-body keep scrolling inside it; the ones that do not scroll here. */
+    padding:56px 16px 24px;
+    overflow-y:auto; overscroll-behavior:contain;
+  }
+  /* The few cards that deliberately run edge-to-edge (course detail, the
+     onboarding wizard) keep that, minus the space for the bar. */
+  .modal-overlay .modal-card.cd-card,
+  .modal-overlay .onboarding-modal-card{padding:56px 0 0;}
+
+  .modal-overlay .modal-card > .modal-body{
+    max-height:none;          /* the card owns the height on a phone */
+    padding-inline-end:0;
+  }
+
+  /* The existing ✕ becomes the page's back control: a full-width bar with a
+     left arrow, pinned to the top of the screen. font-size:0 hides the ✕
+     glyph without every dialog's markup having to change. */
+  .modal-overlay .modal-card .modal-close,
+  .modal-overlay .modal-card.cd-card .modal-close{
+    position:fixed; inset:0 0 auto 0;
+    width:100%; height:56px;
+    display:flex; align-items:center; justify-content:flex-start;
+    gap:10px; padding:0 14px; margin:0;
+    background:var(--panel); border:0; border-bottom:1px solid var(--line);
+    border-radius:0; color:var(--text); font-size:0; z-index:10;
+  }
+  .modal-overlay .modal-card .modal-close::before{
+    content:'\2190'; font-size:26px; line-height:1; font-weight:400;
+  }
+  /* In Arabic the page reads right-to-left, so "back" points the other way. */
+  html[dir="rtl"] .modal-overlay .modal-card .modal-close,
+  .modal-overlay .modal-card[dir="rtl"] .modal-close{justify-content:flex-end;}
+  html[dir="rtl"] .modal-overlay .modal-card .modal-close::before,
+  .modal-overlay .modal-card[dir="rtl"] .modal-close::before{content:'\2192';}
+}
+
+/* A dialog whose whole job is to show a lot at once should use the room a
+   desktop actually has. */
+@media (min-width:721px){
+  #roadmapModalOverlay .modal-card{max-width:1100px;}
+  #achievementsModalOverlay .modal-card{max-width:900px;}
+  #planOverviewOverlay .modal-card{max-width:1100px;}
+}
+
+/* "pick 2 of 4" beside an elective category — without it the capped hours
+   figure looks like a mistake rather than the requirement it represents. */
+.ro-bd-cat-pick{
+  font-size:10.5px; font-weight:700; color:var(--text-dim);
+  background:rgba(93,184,255,.14); border-radius:99px; padding:1px 8px;
+}
+
+/* The floating assistant and Fix buttons sit above everything, which on a
+   phone put them on top of a dialog that is now a full page. Hide them while
+   one is open — the page has its own back arrow and does not need them. */
+@media (max-width:720px){
+  body:has(.modal-overlay.open) .asst-launcher,
+  body:has(.modal-overlay.open) .fix-launcher{display:none !important;}
+}
