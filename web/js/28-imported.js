@@ -759,19 +759,32 @@
     // use. Feed plans can be the biggest (Pharmacy is 86 cards), so this is
     // where it matters most.
     var cRect = container.getBoundingClientRect();
+    // The whole plan can be off screen — the student navigated Home while a
+    // window resize was still pending, say. Every card would then measure as
+    // zero-sized and we would wipe a perfectly good set of lines that nothing
+    // redraws on the way back. Nothing to measure means nothing to do.
+    if(cRect.width <= 0 || cRect.height <= 0) return;
     var w = container.scrollWidth, h = container.scrollHeight;
     var prereqs = data.prereqs || [];
     var rects = {};
+    // A course can be in the DOM but have no box on screen: it was removed
+    // from the plan (.course-removed), or it sits inside a year that is
+    // folded away by "Collapse finished years". Either way its bounding rect
+    // collapses to 0,0,0,0 rather than becoming null, and treating that as a
+    // real position drew a stray line from the top-left corner of the page to
+    // whatever it was still connected to. Measure once, then treat a
+    // zero-sized box exactly like a missing element: the edge is dropped and
+    // every edge between two courses that ARE on screen still draws.
+    function boxOf(id){
+      var el = document.getElementById(id);
+      if(!el) return null;
+      var r = el.getBoundingClientRect();
+      return (r.width > 0 && r.height > 0) ? r : null;
+    }
     prereqs.forEach(function(pair){
       var a = planId + '-c-' + pair[0], b = planId + '-c-' + pair[1];
-      // A removed course stays in the DOM (display:none, so its edges can
-      // come back if it's restored) but its bounding rect collapses to
-      // 0,0,0,0 rather than becoming null — treating that as a real
-      // position drew a stray line from the top-left corner of the page to
-      // whatever it was still connected to. Skip it the same way a missing
-      // element already was.
-      if(!(a in rects)){ var ea = document.getElementById(a); rects[a] = (ea && !ea.classList.contains('course-removed')) ? ea.getBoundingClientRect() : null; }
-      if(!(b in rects)){ var eb = document.getElementById(b); rects[b] = (eb && !eb.classList.contains('course-removed')) ? eb.getBoundingClientRect() : null; }
+      if(!(a in rects)){ rects[a] = boxOf(a); }
+      if(!(b in rects)){ rects[b] = boxOf(b); }
     });
 
     svg.setAttribute('width', w);
@@ -1775,6 +1788,11 @@
     },
     exportPlan: exportPlan, submitPlan: submitPlan, editCoursePrompt: openCourseEditPopup, runAutoLink: runAutoLink,
     refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan,
+    // Re-measure and redraw the prerequisite lines without rebuilding the
+    // plan. Folding/unfolding a year (js/05-collapse-finished-years.js)
+    // reflows the grid under the connector layer, and a full render() there
+    // would throw away scroll position and the search box's state.
+    redrawConnectors: drawConnectors,
     openCourseModal: openCourseModal,
     notePending: notePending
   };

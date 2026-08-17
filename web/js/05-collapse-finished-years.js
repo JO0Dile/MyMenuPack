@@ -30,6 +30,27 @@
     if(built.length) return Array.prototype.slice.call(built);
     return Array.prototype.slice.call(root.querySelectorAll('.imp-year-block'));
   }
+  // Folding or unfolding a year reflows the grid the prerequisite connector
+  // layer is drawn over, so every line has to be re-measured — otherwise the
+  // lines point at where courses used to be. Redraw in place rather than
+  // re-rendering the plan: a render() would reset scroll position and the
+  // course-search box.
+  function redrawConnectors(prefix){
+    try{
+      if(isImported(prefix) && window.AAUP_IMPORTED && window.AAUP_IMPORTED.redrawConnectors){
+        window.AAUP_IMPORTED.redrawConnectors(prefix);
+      } else if(window.__redraw && window.__redraw[prefix]){
+        window.__redraw[prefix]();
+      }
+    }catch(e){}
+  }
+  // Which years are currently folded, as a string, so refresh() can tell
+  // whether it actually changed the layout and only redraw when it did.
+  function collapseSignature(root){
+    return yearContainers(root).map(function(y){
+      return y.classList.contains('year-collapsed') ? '1' : '0';
+    }).join('');
+  }
   function yearIsFinished(yearEl){
     var courses = yearEl.querySelectorAll('.course[id]:not(.course-removed)');
     if(!courses.length) return false;
@@ -76,6 +97,7 @@
             manuallyExpanded[key] = true;
             yearEl.classList.remove('year-collapsed');
             if(hint) hint.remove();
+            redrawConnectors(prefix); // the year just came back — so must its lines
           };
           hint.addEventListener('click', expand);
           hint.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); expand(); } });
@@ -105,13 +127,11 @@
         var turningOn = !isOn();
         setOn(turningOn);
         manuallyExpanded = {}; // a fresh flip re-evaluates every year
+        // refresh() redraws the connectors itself whenever the set of folded
+        // years actually changed — in BOTH directions. It used to redraw only
+        // on the way out of collapse mode, which is why turning collapse on
+        // left the lines behind.
         refresh(prefix);
-        // Restore prerequisite connectors when leaving collapse mode: their
-        // geometry is stale after years folded/unfolded, so force a redraw.
-        if(!turningOn){
-          if(isImported(prefix) && window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
-          else if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
-        }
       });
     }
     var on = isOn();
@@ -130,8 +150,13 @@
     // Only offer the control once there's actually something to fold —
     // otherwise it's a button that does nothing.
     toggle.classList.toggle('available', anyFinished(root) || isOn());
+    var before = collapseSignature(root);
     if(isOn()){ applyCollapse(prefix, root, rtl); }
     else { clearCollapse(root); }
+    // Folding/unfolding moved every card below it. render() draws the
+    // connectors BEFORE calling us, so this also covers opening a plan with
+    // collapse mode already on.
+    if(collapseSignature(root) !== before){ redrawConnectors(prefix); }
   }
 
   window.__refreshCollapse = refresh;
