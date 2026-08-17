@@ -192,6 +192,17 @@
   var ANYWHERE_SET = Object.create(null);
   ANYWHERE.forEach(function(w){ ANYWHERE_SET[normalize(w)] = true; });
 
+  // Whole word, nothing attached — for entries too short to survive the
+  // clitic prefixes without hitting ordinary words.
+  function exactPatternFor(raw){
+    var w = normalize(raw);
+    if(!w) return null;
+    try{
+      return { word: raw,
+        re: new RegExp('(?:^|[^\\p{L}\\p{N}])' + elongate(w) + '(?:$|[^\\p{L}\\p{N}])', 'u') };
+    }catch(e){ return null; }
+  }
+
   function patternFor(raw){
     var w = normalize(raw);
     if(!w) return null;
@@ -227,7 +238,10 @@
         .concat((d.comparatives && d.comparatives.en) || [])
         .map(function(ph){ return normalize(ph); })
         .filter(Boolean),
-      always: mk((d.always && d.always.en) || []).concat(mk((d.always && d.always.ar) || [])),
+      always: mk((d.always && d.always.en) || [])
+        .concat(mk((d.always && d.always.ar) || []))
+        .concat((((d.always || {}).exact || {}).ar || []).map(exactPatternFor).filter(Boolean))
+        .concat((((d.always || {}).exact || {}).en || []).map(exactPatternFor).filter(Boolean)),
       contextual: mk((d.contextual && d.contextual.en) || []).concat(mk((d.contextual && d.contextual.ar) || [])),
       markers: (d.markers || CORE.markers)
     };
