@@ -2161,7 +2161,15 @@
     display:flex; align-items:flex-start; margin:22px 0 18px;
     overflow-x:auto; -webkit-overflow-scrolling:touch;
   }
-  .ro-node-wrap{display:flex; flex-direction:column; align-items:center; gap:4px; flex:none; width:92px; text-align:center;}
+  .ro-node-wrap{
+    display:flex; flex-direction:column; align-items:center; gap:4px; flex:none;
+    width:92px; text-align:center;
+    /* It is a <button> now: pressing one scopes the breakdown below to that
+       year (or the whole plan). Reset the UA chrome so it still reads as part
+       of the track. */
+    background:none; border:0; padding:2px 0; margin:0; cursor:pointer;
+    font:inherit; color:inherit; border-radius:10px;
+  }
   .ro-node{width:16px; height:16px; border-radius:50%; margin-top:2px; box-shadow:0 0 0 3px var(--panel);}
   .ro-node-done{background:#2ecc71;}
   .ro-node-current{background:var(--accent); box-shadow:0 0 0 3px var(--panel), 0 0 0 5px rgba(93,184,255,.35);}
@@ -2193,6 +2201,67 @@
   .ro-summary-pct span, .ro-summary-stat span{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.03em;}
   .ro-summary-bar{flex:1 1 100px; min-width:100px; height:8px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden;}
   .ro-summary-bar span{display:block; height:100%; background:linear-gradient(90deg,#2ecc71,var(--accent));}
+
+  .ro-node-wrap:hover .ro-node-label{color:var(--accent);}
+  .ro-node-wrap:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .ro-node-active .ro-node-label{color:var(--accent);}
+  .ro-node-active .ro-node{box-shadow:0 0 0 3px var(--panel), 0 0 0 6px rgba(93,184,255,.45);}
+
+  /* Requirement-category breakdown, mirroring the shape a student already
+     knows from the university's own portal. */
+  .ro-breakdown{
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:14px; padding:16px 18px; margin:4px 0 18px;
+  }
+  .ro-bd-head h3{margin:0; font-size:15px;}
+  .ro-bd-summary{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap; margin-top:14px;
+  }
+  .ro-bd-figures{display:flex; gap:22px; flex-wrap:wrap;}
+  .ro-bd-fig{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .ro-bd-fig b{font-size:20px; font-weight:800; color:var(--text);}
+  .ro-bd-fig-label{font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.03em;}
+  .ro-bd-ring{
+    flex:none; width:78px; height:78px; border-radius:50%;
+    display:grid; place-items:center;
+    background:conic-gradient(var(--accent) calc(var(--ro-pct) * 1%), var(--line) 0);
+  }
+  .ro-bd-ring span{
+    width:60px; height:60px; border-radius:50%; background:var(--panel);
+    display:grid; place-items:center; font-size:16px; font-weight:800; color:var(--text);
+  }
+  .ro-bd-totals{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  .ro-bd-total{
+    flex:1 1 140px; min-width:0; border-radius:12px; padding:10px 14px;
+    display:flex; flex-direction:column; gap:1px;
+  }
+  .ro-bd-total b{font-size:19px; font-weight:800; color:var(--text);}
+  .ro-bd-total span{font-size:11px; color:var(--text-dim);}
+  .ro-bd-total-earned{background:rgba(46,204,113,.12);}
+  .ro-bd-total-left{background:rgba(93,184,255,.10);}
+
+  .ro-bd-cats{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+  .ro-bd-cat{border:1px solid var(--line); border-radius:12px; padding:12px 14px;}
+  .ro-bd-cat-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+  .ro-bd-cat-name{font-size:13.5px; font-weight:800; color:var(--text);}
+  .ro-bd-cat-tag{font-size:11px; font-weight:700; color:var(--text-dim);}
+  .ro-bd-cat-tag-opt{color:var(--accent);}
+  .ro-bd-bar{
+    height:8px; border-radius:99px; background:rgba(255,255,255,.08);
+    overflow:hidden; margin:9px 0 10px;
+  }
+  .ro-bd-bar span{display:block; height:100%; background:linear-gradient(90deg,#2ecc71,var(--accent));}
+  .ro-bd-stats{display:flex; gap:10px; flex-wrap:wrap;}
+  .ro-bd-stats > div{flex:1 1 66px; min-width:0; display:flex; flex-direction:column; gap:1px;}
+  .ro-bd-stats b{font-size:15px; font-weight:800; color:var(--text);}
+  .ro-bd-stats span{font-size:10px; color:var(--text-dim);}
+
+  @media (max-width:520px){
+    .ro-bd-figures{gap:14px;}
+    .ro-bd-ring{width:64px; height:64px;}
+    .ro-bd-ring span{width:48px; height:48px; font-size:14px;}
+  }
 
   html[dir="rtl"] .ro-course, .plan-page.rtl-mode .ro-course{direction:rtl;}
 
@@ -3882,6 +3951,12 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   display:inline-block; margin-inline-start:6px; padding:1px 7px;
   border-radius:99px; background:rgba(93,184,255,.16);
   font-size:10.5px; font-weight:800; color:var(--accent);
+}
+/* "(Optional)" next to an elective heading — the university's own app marks
+   Spec. Elec. and Univ. Elec. that way, and the distinction matters: these are
+   a menu you pick from, not courses the plan requires in a fixed term. */
+.imp-optional-tag{
+  font-size:11.5px; font-weight:700; color:var(--text-dim); opacity:.9;
 }
 
 /* The Worker-address escape hatch on the admin sign-in screen. Collapsed until

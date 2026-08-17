@@ -1103,9 +1103,17 @@
     });
   }
 
+  // A Specialization Elective is a CHOICE out of a pool, not a course the
+  // plan tells you to take in a given term — the university's own app lists
+  // "Spec. Elec." as (Optional) next to the mandatory categories. Showing them
+  // inline made a semester look heavier than it is and implied a fixed slot
+  // that does not exist, so they are lifted out of the year grid and gathered
+  // into one pool block under the years (see electivePoolHtml below).
+  function isPoolElective(c){ return c && c.category === 'dept'; }
+
   function semesterHtml(planId, plan, yearId, semester, editing, rtl){
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
-    var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester; });
+    var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester && !isPoolElective(c); });
     var addCard = editing ? '<div class="imp-add-course-card" onclick="AAUP_IMPORTED.addCoursePrompt(\'' + planId + '\',\'' + yearId + '\',\'' + semester + '\')">+</div>' : '';
     return '<div class="imp-semester-block"><div class="imp-semester-title">' + (rtl ? SEMESTER_LABEL_AR[semester] : SEMESTER_LABEL[semester]) + '</div>' +
       '<div class="course-row" id="' + containerId + '">' +
@@ -1124,14 +1132,16 @@
   // through the shared code, which finds courses by id and does not care
   // where on the page they sit.
   var UNSCHEDULED_LABEL = {
-    dept: { en: 'Department Electives', ar: 'متطلبات القسم الاختيارية' },
+    dept: { en: 'Specialization Electives', ar: 'متطلبات التخصص الاختيارية' },
     free: { en: 'Free Electives', ar: 'المتطلبات الحرة' },
     uni:  { en: 'University Electives', ar: 'المتطلبات الجامعية الاختيارية' },
     other:{ en: 'Electives — choose from these', ar: 'مواد اختيارية' }
   };
 
   function unscheduledHtml(planId, plan, editing, rtl){
-    var loose = (plan.courses || []).filter(function(c){ return !c.yearId; });
+    // Two sources feed one pool: courses the plan never scheduled, and every
+    // specialization elective regardless of the term the data happens to name.
+    var loose = (plan.courses || []).filter(function(c){ return !c.yearId || isPoolElective(c); });
     if(!loose.length) return '';
 
     // Grouped by category so a plan with both department and free electives
@@ -1145,7 +1155,8 @@
 
     var html = '<div class="imp-year-block imp-elective-block">' +
       '<div class="imp-year-header"><h3>' +
-      (rtl ? 'مواد اختيارية — غير مجدولة' : 'Electives — not tied to a semester') + '</h3></div>' +
+      (rtl ? 'مواد اختيارية' : 'Electives') +
+      ' <span class="imp-optional-tag">' + (rtl ? '(اختياري)' : '(Optional)') + '</span></h3></div>' +
       '<p class="imp-elective-note">' +
       (rtl
         ? 'اختر منها بالعدد الذي تتطلبه خطتك. الخطة لا تحدد لها فصلًا — ضعها في الفصل الذي يناسبك.'
@@ -1156,8 +1167,9 @@
       if(!groups[k]) return;
       var label = UNSCHEDULED_LABEL[k];
       html += '<div class="imp-semester-block"><div class="imp-semester-title">' +
-        (rtl ? label.ar : label.en) + ' <span class="imp-elective-count">' +
-        groups[k].length + '</span></div>' +
+        (rtl ? label.ar : label.en) +
+        ' <span class="imp-optional-tag">' + (rtl ? '(اختياري)' : '(Optional)') + '</span>' +
+        ' <span class="imp-elective-count">' + groups[k].length + '</span></div>' +
         '<div class="course-row" id="' + planId + '-elective-' + k + '">' +
         groups[k].map(function(c){ return courseCardHtml(planId, c, rtl); }).join('') +
         '</div></div>';
