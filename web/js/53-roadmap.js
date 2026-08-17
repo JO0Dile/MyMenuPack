@@ -53,7 +53,12 @@
         years.push({ label: label.replace(/\s+/g, ' ').trim(), courses: courses });
       });
     } else {
-      Array.prototype.slice.call(root.querySelectorAll('.imp-year-block')).forEach(function(yb){
+      // :not(.imp-elective-block) — the elective pool reuses the year-block
+      // markup for its styling, but it is a menu of choices, not a year. It
+      // must not appear as an extra node on the timeline between Year 5 and
+      // graduation. It is still counted in the whole-plan scope, which walks
+      // the page root rather than the year list.
+      Array.prototype.slice.call(root.querySelectorAll('.imp-year-block:not(.imp-elective-block)')).forEach(function(yb){
         var label = (yb.querySelector('.imp-year-header h3') || {}).textContent || '';
         var courses = [];
         yb.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
@@ -63,6 +68,135 @@
       });
     }
     return years;
+  }
+
+  // ---------------------------------------------------------------
+  // Category breakdown ("what do I still owe, by requirement type")
+  // ---------------------------------------------------------------
+  // The university's own portal shows a degree as a set of requirement
+  // buckets — University Req., University Elec., College Req., Spec. Req.,
+  // Spec. Elec. — each with hours, earned, remaining and a course count, and
+  // each marked Mandatory or Optional. That is the view a student actually
+  // plans against, so My Path offers the same rollup: one per year, and one
+  // for the whole degree.
+  //
+  // Two of the app's internal categories ('skills' and 'eng') are both
+  // University Requirements and already share a label in the plan legend, so
+  // they roll into a single bucket here rather than appearing twice.
+  var CAT_BUCKET = {
+    skills: 'univReq', eng: 'univReq', uni: 'univElec',
+    math: 'colgReq', core: 'specReq', dept: 'specElec', free: 'freeElec'
+  };
+  var BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec'];
+  var BUCKET_META = {
+    univReq:  { en: 'Univ. Req.',  ar: 'متطلب جامعي',          optional: false },
+    univElec: { en: 'Univ. Elec.', ar: 'اختياري جامعي',        optional: true  },
+    colgReq:  { en: 'Colg. Req.',  ar: 'متطلب كلية',           optional: false },
+    specReq:  { en: 'Spec. Req.',  ar: 'متطلب تخصص',           optional: false },
+    specElec: { en: 'Spec. Elec.', ar: 'اختياري تخصص',         optional: true  },
+    freeElec: { en: 'Free Elec.',  ar: 'اختياري حر',           optional: true  }
+  };
+
+  function bucketOf(el){
+    for(var k in CAT_BUCKET){
+      if(Object.prototype.hasOwnProperty.call(CAT_BUCKET, k) && el.classList.contains(k)) return CAT_BUCKET[k];
+    }
+    return null;
+  }
+
+  // scope: null for the whole plan, or a year index for just that year.
+  // Reads the rendered page for the same reason yearModel does — the DOM is
+  // the one place that already knows which year a course ended up in.
+  function categoryModel(prefix, scopeYearIndex){
+    var root = document.getElementById('page-' + prefix);
+    if(!root) return [];
+    var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
+    var progress = window.__getProgress ? window.__getProgress() : {};
+
+    var blocks;
+    if(scopeYearIndex == null){
+      blocks = [root];
+    } else {
+      var all = root.querySelectorAll('.year-row').length
+        ? root.querySelectorAll('.year-row')
+        : root.querySelectorAll('.imp-year-block:not(.imp-elective-block)');
+      blocks = all[scopeYearIndex] ? [all[scopeYearIndex]] : [];
+    }
+
+    var acc = {};
+    BUCKET_ORDER.forEach(function(k){ acc[k] = { hours: 0, earned: 0, courses: 0, done: 0 }; });
+
+    var seen = {};
+    blocks.forEach(function(block){
+      block.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
+        var b = bucketOf(el);
+        if(!b) return;
+        if(seen[el.id]) return;
+        seen[el.id] = true;
+        var parts = window.__splitCourseId ? window.__splitCourseId(el.id) : null;
+        var meta = parts ? info[parts.slug] : null;
+        var cr = meta ? (parseFloat(meta.cr) || 0) : 0;
+        acc[b].hours += cr;
+        acc[b].courses += 1;
+        if(progress[el.id]){ acc[b].earned += cr; acc[b].done += 1; }
+      });
+    });
+
+    return BUCKET_ORDER.filter(function(k){ return acc[k].courses > 0; }).map(function(k){
+      var a = acc[k];
+      return {
+        key: k, meta: BUCKET_META[k],
+        hours: a.hours, earned: a.earned,
+        remaining: Math.max(0, a.hours - a.earned),
+        courses: a.courses, done: a.done,
+        pct: a.hours > 0 ? Math.round(a.earned / a.hours * 100) : 0
+      };
+    });
+  }
+
+  function breakdownHTML(prefix, scopeYearIndex, rtl){
+    var rows = categoryModel(prefix, scopeYearIndex);
+    if(!rows.length){
+      return '<p class="ro-empty">' + (rtl ? 'لا مساقات في هذا النطاق.' : 'No courses in this scope.') + '</p>';
+    }
+    var hours = 0, earned = 0, courses = 0;
+    rows.forEach(function(r){ hours += r.hours; earned += r.earned; courses += r.courses; });
+    var pct = hours > 0 ? Math.round(earned / hours * 100) : 0;
+    var remaining = Math.max(0, hours - earned);
+
+    var head =
+      '<div class="ro-bd-summary">' +
+        '<div class="ro-bd-figures">' +
+          '<div class="ro-bd-fig"><span class="ro-bd-fig-label">' + (rtl ? 'الساعات' : 'Hours') + '</span><b>' + Math.round(hours) + '</b></div>' +
+          '<div class="ro-bd-fig"><span class="ro-bd-fig-label">' + (rtl ? 'المساقات' : 'Courses') + '</span><b>' + courses + '</b></div>' +
+          '<div class="ro-bd-fig"><span class="ro-bd-fig-label">' + (rtl ? 'الفئات' : 'Categories') + '</span><b>' + rows.length + '</b></div>' +
+        '</div>' +
+        '<div class="ro-bd-ring" style="--ro-pct:' + pct + ';"><span>' + pct + '%</span></div>' +
+      '</div>' +
+      '<div class="ro-bd-totals">' +
+        '<div class="ro-bd-total ro-bd-total-earned"><b>' + Math.round(earned) + '</b><span>' + (rtl ? 'ساعة مكتسبة' : 'Earned Hours') + '</span></div>' +
+        '<div class="ro-bd-total ro-bd-total-left"><b>' + Math.round(remaining) + '</b><span>' + (rtl ? 'ساعة متبقية' : 'Remaining Hours') + '</span></div>' +
+      '</div>';
+
+    var cards = rows.map(function(r){
+      return '<div class="ro-bd-cat">' +
+        '<div class="ro-bd-cat-head">' +
+          '<span class="ro-bd-cat-name">' + esc(rtl ? r.meta.ar : r.meta.en) + '</span>' +
+          '<span class="ro-bd-cat-tag' + (r.meta.optional ? ' ro-bd-cat-tag-opt' : '') + '">' +
+            (r.meta.optional ? (rtl ? '(اختياري)' : '(Optional)') : (rtl ? '(إجباري)' : '(Mandatory)')) +
+          '</span>' +
+        '</div>' +
+        '<div class="ro-bd-bar"><span style="width:' + r.pct + '%;"></span></div>' +
+        '<div class="ro-bd-stats">' +
+          '<div><b>' + Math.round(r.hours) + '</b><span>' + (rtl ? 'ساعات' : 'Hours') + '</span></div>' +
+          '<div><b>' + Math.round(r.earned) + '</b><span>' + (rtl ? 'مكتسبة' : 'Earned') + '</span></div>' +
+          '<div><b>' + Math.round(r.remaining) + '</b><span>' + (rtl ? 'متبقية' : 'Remaining') + '</span></div>' +
+          '<div><b>' + r.done + '/' + r.courses + '</b><span>' + (rtl ? 'مساقات' : 'Courses') + '</span></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    return head + '<div class="ro-bd-cats">' + cards + '</div>';
   }
 
   // done: every course in the year is passed. current: the first
@@ -108,21 +242,26 @@
     years.forEach(function(y, i){
       var st = statuses[i];
       var chSum = y.courses.reduce(function(s, c){ return s + (parseFloat(c.cr) || 0); }, 0);
+      // Each node is a button: pressing a year swaps the breakdown below to
+      // that year's requirement buckets. That is the whole point of the
+      // screen — "what do I still owe, and in which category".
       timelineParts.push(
-        '<div class="ro-node-wrap">' +
+        '<button type="button" class="ro-node-wrap" data-ro-scope="' + i + '"' +
+          ' aria-label="' + esc((rtl ? 'تفصيل ' : 'Breakdown for ') + (y.label || ((rtl ? 'سنة ' : 'Year ') + (i + 1)))) + '">' +
           '<div class="ro-node ro-node-' + st + '"></div>' +
           '<div class="ro-node-label">' + esc(y.label || ((rtl ? 'سنة ' : 'Year ') + (i + 1))) + '</div>' +
           '<div class="ro-node-sub">' + (STATUS_LABEL[st] ? esc(STATUS_LABEL[st]) : (chSum ? Math.round(chSum) + ' CH' : '')) + '</div>' +
-        '</div>'
+        '</button>'
       );
       timelineParts.push('<div class="ro-connector ro-connector-' + st + '"></div>');
     });
     timelineParts.push(
-      '<div class="ro-node-wrap">' +
+      '<button type="button" class="ro-node-wrap" data-ro-scope="all"' +
+        ' aria-label="' + (rtl ? 'تفصيل الخطة كاملة' : 'Breakdown for the whole plan') + '">' +
         '<div class="ro-node ro-node-future ro-node-grad"></div>' +
-        '<div class="ro-node-label">' + (rtl ? 'التخرج' : 'Graduate') + '</div>' +
+        '<div class="ro-node-label">' + (rtl ? 'الخطة كاملة' : 'Whole plan') + '</div>' +
         '<div class="ro-node-sub">' + (totalCr ? (Math.round(totalCr) + ' CH') : '') + '</div>' +
-      '</div>'
+      '</button>'
     );
     var timelineHTML = '<div class="ro-timeline">' + timelineParts.join('') + '</div>';
 
@@ -156,7 +295,15 @@
         : 'Every course, in the order the degree expects — and where you are on it right now.') + '</p></div>' +
       (uni ? '<div class="ro-uni">AAUPath · ' + esc(uni.name.en) + '</div>' : '') +
       '</div>' +
-      timelineHTML + cardsHTML +
+      timelineHTML +
+      '<div class="ro-breakdown" id="roBreakdown">' +
+        '<div class="ro-bd-head"><h3 id="roBreakdownTitle">' + (rtl ? 'الخطة كاملة' : 'Whole plan') + '</h3>' +
+        '<p class="form-note" style="margin:2px 0 0;">' + (rtl
+          ? 'اضغط أي سنة في الشريط أعلاه لعرض تفصيلها.'
+          : 'Press any year on the track above to see its breakdown.') + '</p></div>' +
+        '<div id="roBreakdownBody">' + breakdownHTML(prefix, null, rtl) + '</div>' +
+      '</div>' +
+      cardsHTML +
       '<div class="ro-summary">' +
         '<div class="ro-summary-pct"><b>' + pct + '%</b><span>' + (rtl ? 'مكتمل' : 'complete') + '</span></div>' +
         '<div class="ro-summary-bar"><span style="width:' + pct + '%;"></span></div>' +
@@ -172,9 +319,35 @@
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML = layoutHTML(prefix, rtl);
+    bindScopeTabs(body, prefix, rtl);
     overlay.classList.add('open');
     markSeen(prefix);
   }
+  // Delegated so it survives the breakdown body being replaced on every press.
+  function bindScopeTabs(body, prefix, rtl){
+    var track = body.querySelector('.ro-timeline');
+    var titleEl = body.querySelector('#roBreakdownTitle');
+    var bodyEl = body.querySelector('#roBreakdownBody');
+    if(!track || !bodyEl) return;
+    var select = function(btn){
+      var scope = btn.getAttribute('data-ro-scope');
+      track.querySelectorAll('[data-ro-scope]').forEach(function(b){ b.classList.remove('ro-node-active'); });
+      btn.classList.add('ro-node-active');
+      var idx = scope === 'all' ? null : Number(scope);
+      bodyEl.innerHTML = breakdownHTML(prefix, idx, rtl);
+      if(titleEl){
+        var lbl = btn.querySelector('.ro-node-label');
+        titleEl.textContent = lbl ? lbl.textContent : (rtl ? 'الخطة كاملة' : 'Whole plan');
+      }
+    };
+    track.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-ro-scope]');
+      if(btn) select(btn);
+    });
+    var initial = track.querySelector('[data-ro-scope="all"]');
+    if(initial) initial.classList.add('ro-node-active');
+  }
+
   function close(){
     var overlay = document.getElementById('roadmapModalOverlay');
     if(overlay){ overlay.classList.remove('open'); }
