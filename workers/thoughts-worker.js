@@ -174,69 +174,146 @@ function clean(s) {
   return s.replace(/[<>]/g, '').replace(/\s+/g, ' ');
 }
 
-// ---- the same filter as the client, kept deliberately simple ---------------
+// ---- the same decision as the client -------------------------------------
 //
-// This is the copy that decides. It is a shortened version of
-// web/js/58-wordfilter.js: same normalization, same whole-word rule. When you
-// add a word to one, add it to the other — a word blocked only on the client
-// is not blocked at all.
+// This copy is the one that actually decides: a client is whatever is on the
+// other end of the wire, and anyone can curl this URL. It mirrors
+// web/js/58-wordfilter.js — same normalization, same two tiers, same context
+// rules — in a shortened form. When you change one, change the other; a word
+// blocked only on the client is not blocked at all.
+//
+// Two tiers:
+//   ALWAYS      an insult in every sentence. No context is looked for.
+//   CONTEXTUAL  only an insult when aimed at a person. "درسنا عن الحمير" is a
+//               biology lecture; "يا حمار" is not.
+// Plus comparatives ("أحمر من") which are checked on sight, because that
+// shape only ever exists to insult someone while sounding like a lecture.
 
-const AR_PREFIX = '(?:[\\u0648\\u0641\\u0628\\u0643\\u0644]|\\u0627\\u0644|\\u064a\\u0627|\\u0647\\u0627|\\u0647\\u0627\\u0644)*';
-const AR_SUFFIX = '(?:\\u0643|\\u0643\\u0645|\\u0647|\\u0647\\u0627|\\u0647\\u0645|\\u064a|\\u0646\\u0627|\\u064a\\u0646|\\u0627\\u062a)*';
-
-const WORDS_EN = [
-  'nigger', 'nigga', 'faggot', 'fag', 'retard', 'tranny', 'kike', 'spic', 'chink',
-  'coon', 'wetback', 'paki', 'gook', 'fuck', 'shit', 'bitch', 'bastard', 'asshole',
-  'ass', 'arse', 'dick', 'cock', 'prick', 'pussy', 'cunt', 'whore', 'slut',
-  'wanker', 'twat', 'douche', 'piss', 'crap', 'donkey', 'pig', 'dog', 'monkey',
-  'swine', 'kelev', 'kelef', 'zona', 'sharmuta', 'manyak', 'kus',
+const ALWAYS = [
+  'nigger', 'nigga', 'faggot', 'fag', 'retard', 'tranny', 'kike', 'spic',
+  'chink', 'coon', 'wetback', 'paki', 'gook', 'fuck', 'shit', 'bitch',
+  'bastard', 'asshole', 'dick', 'cock', 'prick', 'pussy', 'cunt', 'whore',
+  'slut', 'wanker', 'twat', 'sharmuta', 'sharmoot', 'manyak', 'manyook', 'ars',
+  'شرموط', 'قحبه', 'عاهره', 'منيوك', 'خول', 'لوطي', 'كسم', 'كسمك', 'طيز',
+  'خرا', 'معرص', 'يلعن', 'انعل',
 ];
 
-const WORDS_AR = [
-  'حمار', 'جحش', 'كلب', 'خنزير',
-  'قرد', 'وسخ', 'قذر', 'شرموط',
-  'قحبه', 'عاهره', 'منيوك',
-  'خول', 'لوطي', 'كس', 'طيز',
-  'خرا', 'غبي', 'تافه', 'حقير',
-  'كيليف', 'زونا', 'مانياك',
+const CONTEXTUAL = [
+  'ass', 'idiot', 'stupid', 'dumb', 'moron', 'loser', 'trash', 'filthy',
+  'donkey', 'pig', 'dog', 'monkey', 'swine', 'mule', 'cow', 'rat',
+  'kelev', 'kelef', 'kalb', 'kelb', 'hmar', 'himar', 'jahsh', 'khanzeer',
+  'حمار', 'حمير', 'جحش', 'كلب', 'كلاب', 'خنزير', 'خنازير', 'قرد', 'وسخ',
+  'قذر', 'نجس', 'زباله', 'غبي', 'تافه', 'حقير', 'واطي', 'فاشل', 'كيليف',
 ];
 
+const COMPARATIVES = [
+  'احمر من', 'اغبى من', 'اغبا من', 'احقر من', 'اوسخ من', 'اتفه من',
+  'اجحش من', 'اكلب من', 'انجس من', 'اقذر من', 'زي الحمار', 'متل الحمار',
+  'زي الكلب', 'متل الكلب', 'اكبر حمار', 'اكبر غبي',
+  'than a donkey', 'than a pig', 'than a dog', 'than an idiot',
+  'bigger idiot', 'biggest idiot', 'bigger donkey', 'more of an idiot',
+];
+
+const TARGETING = ['يا', 'انت', 'انتي', 'انتو', 'هاد', 'هذا', 'شكلك', 'ابن',
+  'امك', 'ابوك', 'you', 'your', 'youre', 'ur', 'u'];
+const TARGET_PHRASES = ['what a', 'such a', 'is a', 'are a', 'like a'];
+const PEOPLE = ['الدكتور', 'دكتور', 'استاذ', 'مدرس', 'المعلم', 'الطالب', 'مدير',
+  'doctor', 'dr', 'professor', 'prof', 'teacher', 'lecturer', 'instructor',
+  'student', 'he', 'she', 'they', 'him', 'her', 'them'];
+const TOPICAL = ['عن', 'حول', 'درسنا', 'ندرس', 'دراسه', 'بحث', 'مساق', 'محاضره',
+  'حيوان', 'حيوانات', 'فصيله', 'مزرعه', 'حديقه', 'عندي', 'عندنا', 'ربيت',
+  'اشتريت', 'شفت', 'صوره', 'فيلم', 'كتاب', 'الجيران', 'البيت',
+  'about', 'study', 'studied', 'studying', 'course', 'lecture', 'chapter',
+  'animal', 'animals', 'species', 'mammal', 'farm', 'zoo', 'biology', 'my',
+  'bought', 'adopted', 'photo', 'picture', 'movie', 'book', 'neighbour',
+  'neighbor', 'explained', 'talked'];
+
+const AR_PREFIX = '(?:[\u0648\u0641\u0628\u0643\u0644]|\u0627\u0644|\u064a\u0627|\u0647\u0627|\u0647\u0627\u0644)*';
+const AR_SUFFIX = '(?:\u0643|\u0643\u0645|\u0647|\u0647\u0627|\u0647\u0645|\u064a|\u0646\u0627|\u064a\u0646|\u0627\u062a)*';
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '9': 'g', '@': 'a', $: 's', '!': 'i' };
+const SEP = "[\\s._\\-*'\"`~^()\\[\\]{}/\\\\]";
 
 function normalize(text) {
   let s = String(text);
-  try { s = s.normalize('NFKD').replace(/[̀-ͯ]/g, ''); } catch {}
+  try { s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, ''); } catch {}
   s = s.toLowerCase()
-    .replace(/[ً-ٟـ​-‏]/g, '')
-    .replace(/[آأإٱ]/g, 'ا')
-    .replace(/ة/g, 'ه')
-    .replace(/[ىی]/g, 'ي')
-    .replace(/ؤ/g, 'و')
-    .replace(/ئ/g, 'ي')
-    .replace(/ک/g, 'ك')
+    .replace(/[\u064b-\u065f\u0640\u200b-\u200f]/g, '')
+    .replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')
+    .replace(/\u0629/g, '\u0647')
+    .replace(/[\u0649\u06cc]/g, '\u064a')
+    .replace(/\u0624/g, '\u0648')
+    .replace(/\u0626/g, '\u064a')
+    .replace(/\u06a9/g, '\u0643')
     .replace(/[013457|@$!]/g, (ch) => LEET[ch] || ch);
   return s.replace(/(.)\1{1,}/g, '$1');
 }
 
-function squeeze(s) { return s.replace(/[\s._\-*'"`~^()[\]{}/\\]+/g, ''); }
-function collapse(w) { return w.replace(/(.)\1{1,}/g, '$1'); }
+const collapse = (w) => w.replace(/(.)\1{1,}/g, '$1');
+const PADDED_TOKEN = new RegExp('^\\p{L}(?:' + SEP + '+\\p{L})+$', 'u');
+const SEP_RE = new RegExp(SEP, 'gu');
 
-const PATTERNS = [...WORDS_EN, ...WORDS_AR].map((raw) => {
+function depad(s) {
+  const out = [];
+  let run = [];
+  const flush = () => { if (run.length >= 3) out.push(run.join('')); else out.push(...run); run = []; };
+  for (const w of s.split(/\s+/)) {
+    if (!w) continue;
+    if (PADDED_TOKEN.test(w)) { flush(); out.push(w.replace(SEP_RE, '')); continue; }
+    if ([...w].length === 1) { run.push(w); continue; }
+    flush();
+    out.push(w);
+  }
+  flush();
+  return out.join(' ');
+}
+const squeeze = (s) => s.replace(SEP_RE, '');
+
+function pattern(raw) {
   const w = collapse(normalize(raw));
-  const isArabic = /[؀-ۿ]/.test(w);
   const open = '(?:^|[^\\p{L}\\p{N}])';
   const close = '(?:$|[^\\p{L}\\p{N}])';
-  const src = isArabic
+  const src = /[\u0600-\u06ff]/.test(w)
     ? open + AR_PREFIX + w + AR_SUFFIX + close
     : open + w + '(?:s|es|ed|ing)?' + close;
   return { raw, re: new RegExp(src, 'u') };
-});
+}
+
+const P_ALWAYS = ALWAYS.map(pattern);
+const P_CONTEXT = CONTEXTUAL.map(pattern);
+const P_TARGET = TARGETING.map(pattern);
+const P_PEOPLE = PEOPLE.map(pattern);
+const P_TOPICAL = TOPICAL.map(pattern);
+const N_COMPARATIVES = COMPARATIVES.map((c) => collapse(normalize(c)));
+const CLAUSE_SPLIT = /[.!?،؛,;\n]+|\s(?:بس|لكن|ولكن|though|but|however)\s/u;
+
+const any = (list, hay) => list.some((p) => p.re.test(hay));
 
 function firstBadWord(text) {
   const hay = normalize(text);
-  const squeezed = collapse(squeeze(hay));
-  for (const p of PATTERNS) {
-    if (p.re.test(hay) || (squeezed !== hay && p.re.test(squeezed))) return p.raw;
+  const variants = [hay, collapse(depad(hay)), collapse(squeeze(hay))];
+
+  for (const p of P_ALWAYS) {
+    if (variants.some((v) => v && p.re.test(v))) return p.raw;
   }
-  return '';
+  for (const c of N_COMPARATIVES) {
+    if (hay.includes(c)) return c;
+  }
+
+  // Clause by clause, so a topical half cannot vouch for an abusive half.
+  const clauses = [];
+  for (const v of variants) {
+    for (const c of v.split(CLAUSE_SPLIT).map((x) => x.trim()).filter(Boolean)) {
+      if (!clauses.includes(c)) clauses.push(c);
+    }
+  }
+  let unclear = '';
+  for (const cl of clauses) {
+    const hitWord = P_CONTEXT.find((p) => p.re.test(cl));
+    if (!hitWord) continue;
+    if (any(P_TARGET, cl) || TARGET_PHRASES.some((ph) => cl.includes(ph))) return hitWord.raw;
+    if (any(P_TOPICAL, cl)) continue;
+    if (any(P_PEOPLE, cl)) return hitWord.raw;
+    unclear = hitWord.raw;
+  }
+  return unclear;
 }

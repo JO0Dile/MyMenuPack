@@ -127,93 +127,158 @@
   // reads "kallb".
   function collapse(word){ return word.replace(/(.)\1{1,}/g, '$1'); }
 
-  // ---- the lists ----------------------------------------------------------
+  // ---- the lists, and the two tiers -------------------------------------
   //
-  // Entries are matched as whole words unless listed in ALWAYS. Keeping the
-  // strong slurs and the ordinary rude words in one list is deliberate: the
-  // rejection message does not vary by severity, so neither does the check.
+  // The words themselves live in js/58-wordlist-data.js so the list can be
+  // swapped for a bigger one without touching this file. If that file is
+  // missing the filter still runs on a small built-in core rather than
+  // silently letting everything through — a moderation feature that fails
+  // open is worse than one that is not there.
+  var CORE = {
+    always: { en: ['nigger', 'faggot', 'fuck', 'shit', 'bitch', 'cunt', 'asshole'],
+              ar: ['شرموط', 'قحبه', 'منيوك', 'كسمك', 'خرا'] },
+    contextual: { en: ['donkey', 'dog', 'pig', 'idiot', 'stupid'],
+                  ar: ['حمار', 'كلب', 'خنزير', 'غبي', 'وسخ'] },
+    markers: { targeting: { ar: ['يا', 'انت'], en: ['you', 'your'], phrases_en: [], phrases_ar: [] },
+               topical: { ar: ['عن', 'درسنا'], en: ['about', 'study'] } }
+  };
 
-  var EN = [
-    // slurs — these are the ones the feature exists to stop
-    'nigger', 'nigga', 'niger', 'nigg', 'faggot', 'fag', 'retard', 'retarded',
-    'tranny', 'kike', 'spic', 'chink', 'coon', 'wetback', 'paki', 'gook',
-    // crude abuse
-    'fuck', 'fucking', 'fucker', 'motherfucker', 'shit', 'bullshit', 'bitch',
-    'bastard', 'asshole', 'arsehole', 'ass', 'arse', 'dick', 'cock', 'prick',
-    'pussy', 'cunt', 'whore', 'slut', 'wanker', 'twat', 'douche', 'jackass',
-    'dumbass', 'dickhead', 'shithead', 'piss', 'crap', 'bollocks',
-    // animal insults, which travel between both languages
-    'donkey', 'pig', 'dog', 'monkey', 'swine', 'mule', 'cow', 'rat',
-    // Hebrew abuse written in Latin letters
-    'kelev', 'kelef', 'zona', 'sharmuta', 'sharmoota', 'manyak', 'kus', 'kusit',
-    // Arabizi — Arabic insults typed in Latin letters and digits, which is
-    // how a lot of this is actually written on a phone keyboard. The digits
-    // are already mapped to letters by normalize(), so "7mar" arrives here
-    // as "tmar"... which is why the digit spellings are listed too.
-    'hmar', '7mar', 'himar', 'jahsh', 'ja7sh', 'kalb', 'kelb', 'chelb',
-    'khanzeer', 'khanzir', '5anzeer', 'sharmoot', 'sharmout', 'manyook',
-    'manyouk', 'zbala', 'wesikh', 'wisikh', 'ars', 'teez', 'tiz', 'kess'
-  ];
-
-  var AR = [
-    // animals as insults — the exact list a student named, plus the
-    // spellings people actually type
-    'حمار', 'حماره', 'حمير', 'جحش', 'جحشه', 'حيمار', 'كلب', 'كلبه', 'كلاب',
-    'خنزير', 'خنزيره', 'خنازير', 'بسه', 'قطه', 'بقره', 'بغل', 'تيس', 'ثور',
-    'قرد', 'قروده', 'مونكي', 'زفت', 'وسخ', 'وسخه', 'قذر', 'قذره', 'نجس',
-    // crude abuse and slurs
-    'شرموط', 'شرموطه', 'قحبه', 'عاهره', 'زانيه', 'منيوك', 'منيك', 'خول',
-    'لوطي', 'زبي', 'زب', 'كس', 'كسم', 'كسمك', 'طيز', 'طيزك', 'خرا', 'خره',
-    'زق', 'يلعن', 'العن', 'لعنه', 'يخرب', 'انعل', 'نعل',
-    'غبي', 'غبيه', 'اغبياء', 'تافه', 'حقير', 'حقيره', 'واطي', 'وطي',
-    'صايع', 'مجنون', 'معتوه', 'ابله', 'خرع', 'زباله',
-    // Hebrew abuse written in Arabic letters — "كيليف" is the one a student
-    // pointed out by name
-    'كيليف', 'كيلف', 'زونا', 'مانياك', 'شرموتا'
-  ];
-
-  // Matched anywhere, not just as whole words: these have no innocent
-  // occurrence inside another word in either language.
-  var ALWAYS = ['nigger', 'nigga', 'faggot', 'motherfucker', 'cunt', 'sharmuta',
-                'شرموط', 'قحبه', 'منيوك', 'كسمك'];
+  function data(){
+    var d = window.AAUP_WORDLIST || CORE;
+    // A student-supplied list, merged on top. Same shape, added through
+    // Settings or the admin panel; never replaces the shipped one.
+    var extra = null;
+    try{ extra = JSON.parse(localStorage.getItem('aaup_wordlistExtra') || 'null'); }catch(e){}
+    if(!extra) return d;
+    var merged = { always: { en: [], ar: [] }, contextual: { en: [], ar: [] }, markers: d.markers };
+    ['always', 'contextual'].forEach(function(tier){
+      ['en', 'ar'].forEach(function(lang){
+        merged[tier][lang] = ((d[tier] && d[tier][lang]) || []).concat(
+          (extra[tier] && Array.isArray(extra[tier][lang])) ? extra[tier][lang] : []);
+      });
+    });
+    return merged;
+  }
 
   // Arabic words rarely stand alone: conjunctions, prepositions, the article
   // and the vocative attach to the front; possessives to the back.
+  //
   // Levantine speech glues more than Modern Standard Arabic does: "هالحمار"
   // is ها + ال + حمار ("this donkey") and is how anyone here would actually
   // type it, so the demonstrative and the "على" contraction belong here too.
   var AR_PREFIX = '(?:[وفبكل]|ال|وال|بال|كال|فال|لل|يا|ها|هال|وهال|لهال|عال|ع)*';
   var AR_SUFFIX = '(?:ك|كم|كن|ه|ها|هم|هن|ي|نا|ين|ات|ه)*';
 
-  var ALWAYS_SET = Object.create(null);
-  ALWAYS.forEach(function(w){ ALWAYS_SET[collapse(normalize(w))] = true; });
-
   function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-  function buildPatterns(){
-    var out = [];
-    EN.concat(AR).forEach(function(raw){
-      var w = collapse(normalize(raw));
-      if(!w) return;
-      var body = escapeRe(w);
-      var src;
-      var OPEN = '(?:^|[^\\p{L}\\p{N}])';   // start of text, or a non-letter
-      var CLOSE = '(?:$|[^\\p{L}\\p{N}])';
-      if(ALWAYS_SET[w]){
-        src = body;                                   // anywhere in the text
-      } else if(/[؀-ۿ]/.test(w)){
-        // Arabic: allow the clitics, but nothing else may touch the word.
-        src = OPEN + AR_PREFIX + body + AR_SUFFIX + CLOSE;
-      } else {
-        // Latin: plain whole word, with the usual plural/verb endings.
-        src = OPEN + body + '(?:s|es|ed|ing|y|ies)?' + CLOSE;
-      }
-      try{ out.push({ word: raw, re: new RegExp(src, 'u') }); }catch(e){}
-    });
-    return out;
+  // A word this short and this specific has no innocent occurrence inside a
+  // longer one, so it may match anywhere rather than as a whole word.
+  var ANYWHERE = ['nigger', 'nigga', 'faggot', 'motherfucker', 'cunt', 'sharmuta',
+                  'شرموط', 'قحبه', 'منيوك', 'كسمك'];
+  var ANYWHERE_SET = Object.create(null);
+  ANYWHERE.forEach(function(w){ ANYWHERE_SET[collapse(normalize(w))] = true; });
+
+  function patternFor(raw){
+    var w = collapse(normalize(raw));
+    if(!w) return null;
+    var body = escapeRe(w);
+    var OPEN = '(?:^|[^\\p{L}\\p{N}])';
+    var CLOSE = '(?:$|[^\\p{L}\\p{N}])';
+    var src;
+    if(ANYWHERE_SET[w]) src = body;
+    else if(/[؀-ۿ]/.test(w)) src = OPEN + AR_PREFIX + body + AR_SUFFIX + CLOSE;
+    else src = OPEN + body + '(?:s|es|ed|ing|y|ies)?' + CLOSE;
+    try{ return { word: raw, re: new RegExp(src, 'u') }; }catch(e){ return null; }
   }
 
-  var PATTERNS = buildPatterns();
+  var built = null;
+  function patterns(){
+    if(built) return built;
+    var d = data();
+    var mk = function(list){
+      return (list || []).map(patternFor).filter(Boolean);
+    };
+    built = {
+      comparatives: ((d.comparatives && d.comparatives.ar) || [])
+        .concat((d.comparatives && d.comparatives.en) || [])
+        .map(function(ph){ return collapse(normalize(ph)); })
+        .filter(Boolean),
+      always: mk((d.always && d.always.en) || []).concat(mk((d.always && d.always.ar) || [])),
+      contextual: mk((d.contextual && d.contextual.en) || []).concat(mk((d.contextual && d.contextual.ar) || [])),
+      markers: (d.markers || CORE.markers)
+    };
+    return built;
+  }
+  // Called after a list is imported so the next check uses it.
+  function reload(){ built = null; }
+
+  // ---- context ------------------------------------------------------------
+  //
+  // A contextual word is only abuse when it is aimed at somebody. Both
+  // languages leave traces when that happens — a vocative, a second-person
+  // pronoun, "you are a", a demonstrative — and different traces when the
+  // sentence is ABOUT the thing: "we studied", "about", "species", "I have a".
+  //
+  // The rule, in order:
+  //   1. a STRONG targeting marker ("يا", "you are a")   -> abuse
+  //   2. otherwise a topical marker ("about", "درسنا")   -> allowed
+  //   3. otherwise a person in the sentence ("الدكتور")  -> abuse
+  //   4. otherwise                                       -> abuse
+  //
+  // Step 3 is the deliberate part. On a wall every student reads, an
+  // unexplained "الدكتور حمار" is far likelier to be an insult than a
+  // zoology observation, and the cost of being wrong is a rephrase — the
+  // message says which word to change. The cost of the opposite default is
+  // the thing this feature exists to prevent.
+  function hasMarker(hay, words){
+    for(var i = 0; i < (words || []).length; i++){
+      var w = collapse(normalize(words[i]));
+      if(!w) continue;
+      var re;
+      try{
+        re = /[؀-ۿ]/.test(w)
+          ? new RegExp('(?:^|[^\\p{L}\\p{N}])' + AR_PREFIX + escapeRe(w) + AR_SUFFIX + '(?:$|[^\\p{L}\\p{N}])', 'u')
+          : new RegExp('(?:^|[^\\p{L}\\p{N}])' + escapeRe(w) + '(?:s|es)?(?:$|[^\\p{L}\\p{N}])', 'u');
+      }catch(e){ continue; }
+      if(re.test(hay)) return true;
+    }
+    return false;
+  }
+  function hasPhrase(hay, phrases){
+    for(var i = 0; i < (phrases || []).length; i++){
+      var pnorm = collapse(normalize(phrases[i]));
+      if(pnorm && hay.indexOf(pnorm) !== -1) return true;
+    }
+    return false;
+  }
+
+  function aimedAtSomeone(hay, markers){
+    var t = markers.targeting || {};
+    if(hasMarker(hay, t.ar) || hasMarker(hay, t.en)) return true;
+    if(hasPhrase(hay, t.phrases_en) || hasPhrase(hay, t.phrases_ar)) return true;
+    return false;
+  }
+  // A person is mentioned. Likely an insult, but not proof — see the note on
+  // `people` in the word list.
+  // Split on the joins people actually use between two statements —
+  // punctuation, and the Arabic/English "but", "and", "though". Kept crude on
+  // purpose: this is not parsing, it is refusing to let one half of a
+  // sentence vouch for the other.
+  var CLAUSE_SPLIT = /[.!?،؛,;\n]+|\s(?:بس|لكن|لاكن|ولكن|اما|اما|though|but|however|and yet)\s/u;
+  function splitClauses(hay){
+    var parts = hay.split(CLAUSE_SPLIT).map(function(x){ return (x || '').trim(); }).filter(Boolean);
+    return parts.length ? parts : [hay];
+  }
+
+  function personMentioned(hay, markers){
+    var pe = markers.people || {};
+    return hasMarker(hay, pe.ar) || hasMarker(hay, pe.en);
+  }
+  function talkingAboutIt(hay, markers){
+    var t = markers.topical || {};
+    return hasMarker(hay, t.ar) || hasMarker(hay, t.en) ||
+           hasPhrase(hay, t.en) || hasPhrase(hay, t.ar);
+  }
 
   // ---- the check ----------------------------------------------------------
 
@@ -223,31 +288,74 @@
   function check(text){
     var hay = normalize(text);
     if(!hay) return { clean: true };
-    // Collapse runs AGAIN after squeezing: "n i g g e r" has no ADJACENT
-    // repeats while the spaces are still in it, so normalize() left the
-    // double g alone — and the needles are stored collapsed ("niger"), so
-    // without this the padded spelling walked straight through.
     // Three readings of the same sentence: as typed, with padded runs closed
     // up, and with every separator gone. Collapsed again each time, because
     // the needles are stored collapsed and "n i g g e r" only grows its
     // double letter once the spaces are out.
     var variants = [hay, collapse(depad(hay)), collapse(squeeze(hay))];
-    for(var i = 0; i < PATTERNS.length; i++){
-      var re = PATTERNS[i].re;
-      for(var v = 0; v < variants.length; v++){
-        if(variants[v] && re.test(variants[v])){
-          return { clean: false, word: PATTERNS[i].word };
+    var p = patterns();
+
+    function hit(list){
+      for(var i = 0; i < list.length; i++){
+        for(var v = 0; v < variants.length; v++){
+          if(variants[v] && list[i].re.test(variants[v])) return list[i].word;
         }
       }
+      return null;
     }
-    return { clean: true };
+
+    var always = hit(p.always);
+    if(always) return { clean: false, word: always, tier: 'always' };
+
+    // "more X than" — an insult wearing a topical sentence as a coat.
+    for(var c = 0; c < p.comparatives.length; c++){
+      if(hay.indexOf(p.comparatives[c]) !== -1){
+        return { clean: false, word: p.comparatives[c], tier: 'comparative' };
+      }
+    }
+
+    var soft = hit(p.contextual);
+    if(!soft) return { clean: true };
+
+    // Judged CLAUSE BY CLAUSE, not sentence by sentence.
+    //
+    // "درسنا عن الحمير بس الدكتور حمار" is two statements: a lecture and an
+    // insult. Weighed as one sentence the topical half excuses the other
+    // half, which is exactly how someone would get an insult past a filter
+    // that reads whole sentences. Each clause is judged alone and any
+    // abusive clause rejects the post.
+    // Every variant is split, not just the text as typed: "ي ا ح م ا ر" only
+    // becomes a word once the padding is closed up, and a clause list built
+    // from the raw text would never contain it.
+    var clauses = [];
+    variants.forEach(function(v){
+      splitClauses(v).forEach(function(c){ if(clauses.indexOf(c) === -1) clauses.push(c); });
+    });
+    var verdict = null;
+    for(var i = 0; i < clauses.length; i++){
+      var cl = clauses[i];
+      if(!cl) continue;
+      var here = null;
+      for(var j = 0; j < p.contextual.length; j++){
+        if(p.contextual[j].re.test(cl)){ here = p.contextual[j].word; break; }
+      }
+      if(!here) continue;
+      if(aimedAtSomeone(cl, p.markers)) return { clean: false, word: here, tier: 'aimed' };
+      if(talkingAboutIt(cl, p.markers)){ continue; }          // this clause is fine
+      if(personMentioned(cl, p.markers)) return { clean: false, word: here, tier: 'aboutPerson' };
+      verdict = { clean: false, word: here, tier: 'unclear' };
+    }
+    return verdict || { clean: true, note: 'topical' };
   }
 
   window.AAUP_WORDFILTER = {
     check: check,
+    // Call after writing aaup_wordlistExtra so the next check uses it.
+    reload: reload,
     // Exposed for the test page and for anything else that needs the same
     // normalization (search, for one) rather than writing its own.
     normalize: normalize,
-    size: function(){ return PATTERNS.length; }
+    size: function(){ var p = patterns(); return p.always.length + p.contextual.length; },
+    tiers: function(){ var p = patterns(); return { always: p.always.length, contextual: p.contextual.length }; }
   };
 })();
