@@ -116,6 +116,11 @@
     var blocks;
     if(scopeYearIndex == null){
       blocks = [root];
+    } else if(scopeYearIndex === 'electives'){
+      // The specialization/free/university elective pool is not a year — the
+      // plan does not schedule it — but it IS credit hours you owe, so it
+      // gets its own stop on the track rather than vanishing from the total.
+      blocks = Array.prototype.slice.call(root.querySelectorAll('.imp-elective-block'));
     } else {
       var all = root.querySelectorAll('.year-row').length
         ? root.querySelectorAll('.year-row')
@@ -128,7 +133,14 @@
 
     var seen = {};
     blocks.forEach(function(block){
-      block.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
+      // __dedupeForCredit collapses a lecture and its lab — one registered
+      // course, one catalogue number, one credit value — into a single entry.
+      // Without it this screen counted both halves and reported 137 CH for a
+      // 129 CH degree while the Degree Audit, which does dedupe, said 123.
+      var countable = window.__dedupeForCredit
+        ? window.__dedupeForCredit(prefix, block.querySelectorAll('.course[id]:not(.course-removed)'))
+        : Array.prototype.slice.call(block.querySelectorAll('.course[id]:not(.course-removed)'));
+      countable.forEach(function(el){
         var b = bucketOf(el);
         if(!b) return;
         if(seen[el.id]) return;
@@ -168,6 +180,37 @@
         pct: a.hours > 0 ? Math.round(a.earned / a.hours * 100) : 0
       };
     });
+  }
+
+  // The credit hours a single year is worth, counting each registered course
+  // once (lecture + lab = one course).
+  function yearHours(prefix, yearIndex){
+    var rows = categoryModel(prefix, yearIndex);
+    var h = 0;
+    rows.forEach(function(r){ h += r.hours; });
+    return h;
+  }
+
+  // What the university says the degree is worth, when the plan carries it.
+  function officialHours(prefix){
+    var plan = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix]) || null;
+    var h = plan && parseFloat(plan.degreeHours);
+    return (h && isFinite(h) && h > 0) ? h : null;
+  }
+
+  // Said out loud when our own course list does not add up to the official
+  // total — better an honest "we are 6 hours short of the published plan"
+  // than a confident wrong number.
+  function planTotalNote(prefix, computed, rtl){
+    var official = officialHours(prefix);
+    if(!official) return '';
+    var diff = Math.round(computed - official);
+    if(Math.abs(diff) < 0.5) return '';
+    return '<p class="ro-total-note">' + (rtl
+      ? ('الخطة الرسمية ' + official + ' ساعة، والمساقات المسجّلة هنا مجموعها ' + Math.round(computed) +
+         ' — أي فرق ' + Math.abs(diff) + ' ساعة. قائمة المساقات بحاجة إلى مراجعة.')
+      : ('The official degree is ' + official + ' CH; the courses recorded here add up to ' + Math.round(computed) +
+         ' — a ' + Math.abs(diff) + ' CH gap. This plan\u2019s course list needs a review.')) + '</p>';
   }
 
   function breakdownHTML(prefix, scopeYearIndex, rtl){
@@ -244,10 +287,17 @@
     var info = dash && dash.planDisplayInfo ? dash.planDisplayInfo(prefix) : { icon: '🎓', name: prefix };
     var uni = (window.APP_UNIVERSITIES || {})[(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix] || {}).university || 'aaup'];
 
+    // The header number and the breakdown panel underneath it used to be
+    // computed two different ways and disagreed out loud (137 CH in the panel,
+    // 123 in the node). Both read categoryModel now. When the plan declares
+    // its official degree hours, that wins — it is the number on the
+    // university's own page, and a mismatch means our course list is
+    // incomplete, which planTotalNote() says in as many words.
     var totalCr = 0, doneCr = 0;
-    if(window.AAUP_AUDIT){
-      window.AAUP_AUDIT.computeAudit(prefix).forEach(function(r){ totalCr += r.total; doneCr += r.completed; });
-    }
+    categoryModel(prefix, null).forEach(function(r){ totalCr += r.hours; doneCr += r.earned; });
+    var computedCr = totalCr;
+    var official = officialHours(prefix);
+    if(official){ totalCr = official; }
     var pct = totalCr ? Math.round(doneCr / totalCr * 100) : 0;
     var gpaResult = window.AAUP_GPA ? window.AAUP_GPA.gpaFor(prefix, null) : { gpa: null };
     var gpaText = gpaResult && gpaResult.gpa != null ? gpaResult.gpa.toFixed(2) : '—';
@@ -262,7 +312,9 @@
     var timelineParts = [];
     years.forEach(function(y, i){
       var st = statuses[i];
-      var chSum = y.courses.reduce(function(s, c){ return s + (parseFloat(c.cr) || 0); }, 0);
+      // Deduped the same way as the breakdown below — a lecture and its lab
+      // are one registered course, so Year 1 read 48 CH when it is 44.
+      var chSum = yearHours(prefix, i);
       // Each node is a button: pressing a year swaps the breakdown below to
       // that year's requirement buckets. That is the whole point of the
       // screen — "what do I still owe, and in which category".
@@ -271,11 +323,40 @@
           ' aria-label="' + esc((rtl ? 'تفصيل ' : 'Breakdown for ') + (y.label || ((rtl ? 'سنة ' : 'Year ') + (i + 1)))) + '">' +
           '<div class="ro-node ro-node-' + st + '"></div>' +
           '<div class="ro-node-label">' + esc(y.label || ((rtl ? 'سنة ' : 'Year ') + (i + 1))) + '</div>' +
-          '<div class="ro-node-sub">' + (STATUS_LABEL[st] ? esc(STATUS_LABEL[st]) : (chSum ? Math.round(chSum) + ' CH' : '')) + '</div>' +
+          // The status label used to REPLACE the hours, so the year you are
+          // actually in was the one year whose size you could not see.
+          '<div class="ro-node-sub">' +
+            (STATUS_LABEL[st] ? esc(STATUS_LABEL[st]) + (chSum ? ' · ' + Math.round(chSum) + ' CH' : '')
+                              : (chSum ? Math.round(chSum) + ' CH' : '')) +
+          '</div>' +
         '</button>'
       );
       timelineParts.push('<div class="ro-connector ro-connector-' + st + '"></div>');
     });
+    // Electives live outside the year blocks, so a plan like AI & Medical
+    // Sciences showed Year 4 as 13 CH while 15 CH of specialization electives
+    // belonged to that stage of the degree and appeared nowhere on the track.
+    var electiveRows = categoryModel(prefix, 'electives');
+    var electiveCr = 0, electivePick = null;
+    electiveRows.forEach(function(r){
+      electiveCr += r.hours;
+      if(r.pickOf) electivePick = r.pickOf;
+    });
+    if(electiveCr > 0){
+      timelineParts.push(
+        '<button type="button" class="ro-node-wrap" data-ro-scope="electives"' +
+          ' aria-label="' + (rtl ? 'تفصيل المواد الاختيارية' : 'Breakdown for the electives you choose') + '">' +
+          '<div class="ro-node ro-node-future"></div>' +
+          '<div class="ro-node-label">' + (rtl ? 'اختيارية' : 'Electives') + '</div>' +
+          '<div class="ro-node-sub">' + Math.round(electiveCr) + ' CH' +
+            (electivePick ? ' · ' + (rtl
+              ? ('اختر ' + electivePick.need + ' من ' + electivePick.from)
+              : ('pick ' + electivePick.need + ' of ' + electivePick.from)) : '') +
+          '</div>' +
+        '</button>'
+      );
+      timelineParts.push('<div class="ro-connector ro-connector-future"></div>');
+    }
     timelineParts.push(
       '<button type="button" class="ro-node-wrap" data-ro-scope="all"' +
         ' aria-label="' + (rtl ? 'تفصيل الخطة كاملة' : 'Breakdown for the whole plan') + '">' +
@@ -286,17 +367,26 @@
     );
     var timelineHTML = '<div class="ro-timeline">' + timelineParts.join('') + '</div>';
 
+    // "+ 16 more" was a plain div painted in the accent colour: it looked like
+    // a link, and pressing it did nothing. It is a button now and opens the
+    // rest of the year in place — which is what anyone pressing it expected.
     var cardsHTML = '<div class="ro-cards">' +
       years.map(function(y, i){
         var st = statuses[i];
         var shown = y.courses.slice(0, MAX_PREVIEW);
         var rest = y.courses.length - shown.length;
-        return '<div class="ro-card ro-card-' + st + '">' +
-          shown.map(function(c){
-            return '<div class="ro-course"><span class="ro-course-name">' + esc(c.name) + '</span>' +
+        return '<div class="ro-card ro-card-' + st + '" data-ro-card="' + i + '">' +
+          y.courses.map(function(c, ci){
+            return '<div class="ro-course' + (ci >= MAX_PREVIEW ? ' ro-course-extra' : '') + '">' +
+              '<span class="ro-course-name">' + esc(c.name) + '</span>' +
               (c.cr !== '' ? '<span class="ro-course-cr">' + esc(c.cr) + '</span>' : '') + '</div>';
           }).join('') +
-          (rest > 0 ? '<div class="ro-more">+ ' + rest + (rtl ? ' أخرى' : ' more') + '</div>' : '') +
+          (rest > 0
+            ? '<button type="button" class="ro-more" data-ro-expand="' + i + '"' +
+              ' aria-expanded="false">' +
+              '<span class="ro-more-open">+ ' + rest + (rtl ? ' أخرى' : ' more') + '</span>' +
+              '<span class="ro-more-close">' + (rtl ? 'إخفاء' : 'Show less') + '</span></button>'
+            : '') +
           (!y.courses.length ? '<p class="ro-empty" style="margin:0;">' + (rtl ? 'لا مساقات بعد' : 'No courses yet') + '</p>' : '') +
         '</div>';
       }).join('') +
@@ -323,6 +413,7 @@
           ? 'اضغط أي سنة في الشريط أعلاه لعرض تفصيلها.'
           : 'Press any year on the track above to see its breakdown.') + '</p></div>' +
         '<div id="roBreakdownBody">' + breakdownHTML(prefix, null, rtl) + '</div>' +
+        planTotalNote(prefix, computedCr, rtl) +
       '</div>' +
       cardsHTML +
       '<div class="ro-summary">' +
@@ -354,7 +445,7 @@
       var scope = btn.getAttribute('data-ro-scope');
       track.querySelectorAll('[data-ro-scope]').forEach(function(b){ b.classList.remove('ro-node-active'); });
       btn.classList.add('ro-node-active');
-      var idx = scope === 'all' ? null : Number(scope);
+      var idx = scope === 'all' ? null : (scope === 'electives' ? 'electives' : Number(scope));
       bodyEl.innerHTML = breakdownHTML(prefix, idx, rtl);
       if(titleEl){
         var lbl = btn.querySelector('.ro-node-label');
@@ -367,6 +458,25 @@
     });
     var initial = track.querySelector('[data-ro-scope="all"]');
     if(initial) initial.classList.add('ro-node-active');
+
+    // "+ N more" opens the rest of that year's courses in place.
+    //
+    // Bound to the modal body, which SURVIVES a re-render (only its innerHTML
+    // is replaced), so it must be bound exactly once — open() can run more
+    // than once for the same plan, and two copies of this handler toggled the
+    // class on and straight back off, which looked exactly like the button
+    // being dead.
+    if(!body.__roExpandBound){
+      body.__roExpandBound = true;
+      body.addEventListener('click', function(e){
+        var btn = e.target.closest('[data-ro-expand]');
+        if(!btn) return;
+        var card = btn.closest('.ro-card');
+        if(!card) return;
+        var open = card.classList.toggle('ro-card-open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    }
   }
 
   function close(){
