@@ -67,9 +67,6 @@
     s = s.toLowerCase().replace(STRIP, '');
     ARABIC_FOLD.forEach(function(pair){ s = s.replace(pair[0], pair[1]); });
     s = s.replace(/[0134578|@$!+]/g, function(ch){ return LEET[ch] || ch; });
-    // Collapse letter runs: "assssss" -> "ass", "كلللب" -> "كلب". Done after
-    // leet mapping so "a55" has already become "ass".
-    s = s.replace(/(.)\1{1,}/g, '$1');
     return s;
   }
 
@@ -122,10 +119,23 @@
   // match anywhere rather than as whole words.
   function squeeze(s){ return s.replace(SEP_RE, ''); }
 
-  // Because runs are collapsed in the haystack, the needles must be too, or
-  // "kalb" would never match a haystack that reads "kalb" but a needle that
-  // reads "kallb".
-  function collapse(word){ return word.replace(/(.)\1{1,}/g, '$1'); }
+  function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  // Elongation ("assssss", "كلللب", "yaaaa") used to be handled by collapsing
+  // every repeated letter in BOTH the text and the word list. That was wrong
+  // in a way only a big corpus showed: collapsing turns "ass" into "as", and
+  // the filter then rejected every English sentence containing the word "as"
+  // — "save it as a PDF", "signed in as", "mark calculus i as completed".
+  // 22 sentences out of 13,589 died on that alone.
+  //
+  // The pattern absorbs the repetition instead: "ass" compiles to /a+s+s+/,
+  // which matches "ass" and "asssss" but NOT "as" — the second s still has to
+  // be there. Nothing is collapsed anywhere now.
+  function elongate(word){
+    var out = '';
+    for(var i = 0; i < word.length; i++){ out += escapeRe(word[i]) + '+'; }
+    return out;
+  }
 
   // ---- the lists, and the two tiers -------------------------------------
   //
@@ -167,27 +177,41 @@
   // is ها + ال + حمار ("this donkey") and is how anyone here would actually
   // type it, so the demonstrative and the "على" contraction belong here too.
   var AR_PREFIX = '(?:[وفبكل]|ال|وال|بال|كال|فال|لل|يا|ها|هال|وهال|لهال|عال|ع)*';
-  var AR_SUFFIX = '(?:ك|كم|كن|ه|ها|هم|هن|ي|نا|ين|ات|ه)*';
-
-  function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  // Possessive endings are always safe: "كلبك" is "your dog", the same word.
+  var AR_SUFFIX_POSS = '(?:ك|كم|كن|ها|هم|هن|ي|نا)*';
+  // These BUILD words: "ثور" + ة is "ثورة" (revolution), "قرد" + ات is
+  // unrelated. Allowed only on entries long enough that a collision is
+  // unlikely — short roots take the possessives alone.
+  var AR_SUFFIX_FORMS = '(?:ه|ات|ين)?';
+  var AR_SUFFIX = AR_SUFFIX_POSS + AR_SUFFIX_FORMS;
 
   // A word this short and this specific has no innocent occurrence inside a
   // longer one, so it may match anywhere rather than as a whole word.
   var ANYWHERE = ['nigger', 'nigga', 'faggot', 'motherfucker', 'cunt', 'sharmuta',
                   'شرموط', 'قحبه', 'منيوك', 'كسمك'];
   var ANYWHERE_SET = Object.create(null);
-  ANYWHERE.forEach(function(w){ ANYWHERE_SET[collapse(normalize(w))] = true; });
+  ANYWHERE.forEach(function(w){ ANYWHERE_SET[normalize(w)] = true; });
 
   function patternFor(raw){
-    var w = collapse(normalize(raw));
+    var w = normalize(raw);
     if(!w) return null;
-    var body = escapeRe(w);
+    var body = elongate(w);
     var OPEN = '(?:^|[^\\p{L}\\p{N}])';
     var CLOSE = '(?:$|[^\\p{L}\\p{N}])';
     var src;
-    if(ANYWHERE_SET[w]) src = body;
-    else if(/[؀-ۿ]/.test(w)) src = OPEN + AR_PREFIX + body + AR_SUFFIX + CLOSE;
-    else src = OPEN + body + '(?:s|es|ed|ing|y|ies)?' + CLOSE;
+    if(ANYWHERE_SET[w]){
+      src = body;
+    } else if(/[؀-ۿ]/.test(w)){
+      // A three-letter Arabic root plus a "ة" is usually a different word,
+      // not an inflection of the same one: "ثور" (bull) + ه is "ثورة"
+      // (revolution), which the corpus caught 32 times. Short entries take
+      // the clitic prefixes only; anything that really is an inflection is
+      // listed in its own right.
+      var suffix = w.length >= 4 ? AR_SUFFIX : AR_SUFFIX_POSS;
+      src = OPEN + AR_PREFIX + body + suffix + CLOSE;
+    } else {
+      src = OPEN + body + '(?:s|es|ed|ing|y|ies)?' + CLOSE;
+    }
     try{ return { word: raw, re: new RegExp(src, 'u') }; }catch(e){ return null; }
   }
 
@@ -201,7 +225,7 @@
     built = {
       comparatives: ((d.comparatives && d.comparatives.ar) || [])
         .concat((d.comparatives && d.comparatives.en) || [])
-        .map(function(ph){ return collapse(normalize(ph)); })
+        .map(function(ph){ return normalize(ph); })
         .filter(Boolean),
       always: mk((d.always && d.always.en) || []).concat(mk((d.always && d.always.ar) || [])),
       contextual: mk((d.contextual && d.contextual.en) || []).concat(mk((d.contextual && d.contextual.ar) || [])),
@@ -232,13 +256,13 @@
   // the thing this feature exists to prevent.
   function hasMarker(hay, words){
     for(var i = 0; i < (words || []).length; i++){
-      var w = collapse(normalize(words[i]));
+      var w = normalize(words[i]);
       if(!w) continue;
       var re;
       try{
         re = /[؀-ۿ]/.test(w)
-          ? new RegExp('(?:^|[^\\p{L}\\p{N}])' + AR_PREFIX + escapeRe(w) + AR_SUFFIX + '(?:$|[^\\p{L}\\p{N}])', 'u')
-          : new RegExp('(?:^|[^\\p{L}\\p{N}])' + escapeRe(w) + '(?:s|es)?(?:$|[^\\p{L}\\p{N}])', 'u');
+          ? new RegExp('(?:^|[^\\p{L}\\p{N}])' + AR_PREFIX + elongate(w) + (w.length >= 4 ? AR_SUFFIX : AR_SUFFIX_POSS) + '(?:$|[^\\p{L}\\p{N}])', 'u')
+          : new RegExp('(?:^|[^\\p{L}\\p{N}])' + elongate(w) + '(?:s|es)?(?:$|[^\\p{L}\\p{N}])', 'u');
       }catch(e){ continue; }
       if(re.test(hay)) return true;
     }
@@ -246,7 +270,7 @@
   }
   function hasPhrase(hay, phrases){
     for(var i = 0; i < (phrases || []).length; i++){
-      var pnorm = collapse(normalize(phrases[i]));
+      var pnorm = normalize(phrases[i]);
       if(pnorm && hay.indexOf(pnorm) !== -1) return true;
     }
     return false;
@@ -258,6 +282,13 @@
     if(hasPhrase(hay, t.phrases_en) || hasPhrase(hay, t.phrases_ar)) return true;
     return false;
   }
+  // An inanimate subject is being described. Calling a course rubbish is not
+  // abuse; calling a person rubbish is.
+  function aboutAThing(hay, markers){
+    var th = markers.things || {};
+    return hasMarker(hay, th.ar) || hasMarker(hay, th.en);
+  }
+
   // A person is mentioned. Likely an insult, but not proof — see the note on
   // `people` in the word list.
   // Split on the joins people actually use between two statements —
@@ -292,7 +323,7 @@
     // up, and with every separator gone. Collapsed again each time, because
     // the needles are stored collapsed and "n i g g e r" only grows its
     // double letter once the spaces are out.
-    var variants = [hay, collapse(depad(hay)), collapse(squeeze(hay))];
+    var variants = [hay, depad(hay), squeeze(hay)];
     var p = patterns();
 
     function hit(list){
@@ -308,9 +339,15 @@
     if(always) return { clean: false, word: always, tier: 'always' };
 
     // "more X than" — an insult wearing a topical sentence as a coat.
+    //
+    // It still needs somebody to be aimed at, or the shape collides with
+    // ordinary Arabic: "الأحمر من الناحية العلمية" is "the red one, from a
+    // scientific standpoint". So a comparative is abuse unless the sentence
+    // is plainly about a subject and mentions no person at all.
     for(var c = 0; c < p.comparatives.length; c++){
       if(hay.indexOf(p.comparatives[c]) !== -1){
-        return { clean: false, word: p.comparatives[c], tier: 'comparative' };
+        var excused = talkingAboutIt(hay, p.markers) && !personMentioned(hay, p.markers);
+        if(!excused) return { clean: false, word: p.comparatives[c], tier: 'comparative' };
       }
     }
 
@@ -327,6 +364,42 @@
     // Every variant is split, not just the text as typed: "ي ا ح م ا ر" only
     // becomes a word once the padding is closed up, and a clause list built
     // from the raw text would never contain it.
+    // PROXIMITY, before anything else.
+    //
+    // Clause splitting cannot see "و": in "درسنا عن الحمير والدكتور حمار" the
+    // "and" is glued to the next word, so the lecture and the insult are one
+    // clause and the lecture half excuses the insult half. Both evasions
+    // found in testing worked exactly that way.
+    //
+    // So each OCCURRENCE is judged by its own neighbourhood: a person right
+    // beside the word, with no topical word in between, is an insult
+    // regardless of what the rest of the sentence is about. Two tokens either
+    // side — wide enough for "الدكتور حمار" and "the professor is a pig",
+    // tight enough that "الدكتور بحكي عن الحمير" keeps its "عن".
+    var WINDOW = 2;
+    for(var vi = 0; vi < variants.length; vi++){
+      var toks = (variants[vi] || '').split(/\s+/).filter(Boolean);
+      for(var ti = 0; ti < toks.length; ti++){
+        var word = null;
+        for(var pi = 0; pi < p.contextual.length; pi++){
+          if(p.contextual[pi].re.test(' ' + toks[ti] + ' ')){ word = p.contextual[pi].word; break; }
+        }
+        if(!word) continue;
+        var near = toks.slice(Math.max(0, ti - WINDOW), ti + WINDOW + 1).join(' ');
+        // Only a GOVERNOR excuses a word standing next to a person, and only
+        // from in front of it: "عن" and "درسنا" govern what follows, so
+        // "الدكتور بحكي عن الحمير" is a lecture. A field name does not govern
+        // anything — "استاذ الاحياء كلب" is an insult with a subject noun in
+        // it, and treating "الأحياء" as cover let it through.
+        var before = toks.slice(Math.max(0, ti - WINDOW), ti).join(' ');
+        if(hasMarker(before, (p.markers.governors || {}).ar) ||
+           hasMarker(before, (p.markers.governors || {}).en)) continue;
+        if(aimedAtSomeone(near, p.markers) || personMentioned(near, p.markers)){
+          return { clean: false, word: word, tier: 'nearPerson' };
+        }
+      }
+    }
+
     var clauses = [];
     variants.forEach(function(v){
       splitClauses(v).forEach(function(c){ if(clauses.indexOf(c) === -1) clauses.push(c); });
@@ -343,6 +416,8 @@
       if(aimedAtSomeone(cl, p.markers)) return { clean: false, word: here, tier: 'aimed' };
       if(talkingAboutIt(cl, p.markers)){ continue; }          // this clause is fine
       if(personMentioned(cl, p.markers)) return { clean: false, word: here, tier: 'aboutPerson' };
+      // Only once no person is in the clause: a thing can be called rubbish.
+      if(aboutAThing(cl, p.markers)){ continue; }
       verdict = { clean: false, word: here, tier: 'unclear' };
     }
     return verdict || { clean: true, note: 'topical' };

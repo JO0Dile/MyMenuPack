@@ -178,16 +178,17 @@ function clean(s) {
 //
 // This copy is the one that actually decides: a client is whatever is on the
 // other end of the wire, and anyone can curl this URL. It mirrors
-// web/js/58-wordfilter.js — same normalization, same two tiers, same context
-// rules — in a shortened form. When you change one, change the other; a word
-// blocked only on the client is not blocked at all.
+// web/js/58-wordfilter.js — same normalization, same tiers, same context
+// rules. When you change one, change the other; a word blocked only on the
+// client is not blocked at all.
 //
-// Two tiers:
-//   ALWAYS      an insult in every sentence. No context is looked for.
-//   CONTEXTUAL  only an insult when aimed at a person. "درسنا عن الحمير" is a
-//               biology lecture; "يا حمار" is not.
-// Plus comparatives ("أحمر من") which are checked on sight, because that
-// shape only ever exists to insult someone while sounding like a lecture.
+//   ALWAYS       an insult in every sentence. No context is looked for.
+//   CONTEXTUAL   only an insult when aimed at a person.
+//   COMPARATIVE  "أفعل من" — an insult wearing a topical sentence as a coat.
+//
+// The contextual decision, in order: a person right beside the word with no
+// governing preposition in front of it, then strong targeting, then topic,
+// then a thing being criticised, then a person anywhere, then block.
 
 const ALWAYS = [
   'nigger', 'nigga', 'faggot', 'fag', 'retard', 'tranny', 'kike', 'spic',
@@ -200,10 +201,10 @@ const ALWAYS = [
 
 const CONTEXTUAL = [
   'ass', 'idiot', 'stupid', 'dumb', 'moron', 'loser', 'trash', 'filthy',
-  'donkey', 'pig', 'dog', 'monkey', 'swine', 'mule', 'cow', 'rat',
+  'donkey', 'pig', 'dog', 'monkey', 'swine',
   'kelev', 'kelef', 'kalb', 'kelb', 'hmar', 'himar', 'jahsh', 'khanzeer',
-  'حمار', 'حمير', 'جحش', 'كلب', 'كلاب', 'خنزير', 'خنازير', 'قرد', 'وسخ',
-  'قذر', 'نجس', 'زباله', 'غبي', 'تافه', 'حقير', 'واطي', 'فاشل', 'كيليف',
+  'حمار', 'حمير', 'جحش', 'كلب', 'كلاب', 'خنزير', 'خنازير', 'قرد', 'مونكي',
+  'وسخ', 'قذر', 'نجس', 'زباله', 'غبي', 'تافه', 'حقير', 'فاشل', 'كيليف',
 ];
 
 const COMPARATIVES = [
@@ -218,25 +219,36 @@ const TARGETING = ['يا', 'انت', 'انتي', 'انتو', 'هاد', 'هذا',
   'امك', 'ابوك', 'you', 'your', 'youre', 'ur', 'u'];
 const TARGET_PHRASES = ['what a', 'such a', 'is a', 'are a', 'like a'];
 const PEOPLE = ['الدكتور', 'دكتور', 'استاذ', 'مدرس', 'المعلم', 'الطالب', 'مدير',
-  'doctor', 'dr', 'professor', 'prof', 'teacher', 'lecturer', 'instructor',
-  'student', 'he', 'she', 'they', 'him', 'her', 'them'];
-const TOPICAL = ['عن', 'حول', 'درسنا', 'ندرس', 'دراسه', 'بحث', 'مساق', 'محاضره',
-  'حيوان', 'حيوانات', 'فصيله', 'مزرعه', 'حديقه', 'عندي', 'عندنا', 'ربيت',
-  'اشتريت', 'شفت', 'صوره', 'فيلم', 'كتاب', 'الجيران', 'البيت',
-  'about', 'study', 'studied', 'studying', 'course', 'lecture', 'chapter',
-  'animal', 'animals', 'species', 'mammal', 'farm', 'zoo', 'biology', 'my',
-  'bought', 'adopted', 'photo', 'picture', 'movie', 'book', 'neighbour',
-  'neighbor', 'explained', 'talked'];
+  'المشرف', 'المحاضر', 'doctor', 'dr', 'professor', 'prof', 'teacher',
+  'lecturer', 'instructor', 'student', 'he', 'she', 'they', 'him', 'her', 'them'];
+// Govern what follows them, so they excuse a word that comes after.
+const GOVERNORS = ['عن', 'حول', 'درسنا', 'ندرس', 'يدرس', 'يشرح', 'شرح', 'اوضح',
+  'تحدث', 'بحث', 'قرأت', 'يتناول', 'بحكي', 'حكى',
+  'about', 'on', 'studied', 'study', 'studying', 'explained', 'talked',
+  'covers', 'read', 'discussed'];
+const TOPICAL = GOVERNORS.concat(['دراسه', 'مساق', 'محاضره', 'حيوان', 'حيوانات',
+  'فصيله', 'مزرعه', 'حديقه', 'عندي', 'عندنا', 'ربيت', 'اشتريت', 'صوره', 'فيلم',
+  'كتاب', 'الجيران', 'البيت', 'احياء', 'الاحياء', 'علم', 'تجارب', 'مدربه',
+  'تربيه', 'سلوك', 'انواع', 'course', 'lecture', 'chapter', 'animal', 'animals',
+  'species', 'mammal', 'farm', 'zoo', 'biology', 'my', 'bought', 'adopted',
+  'photo', 'picture', 'movie', 'book', 'neighbour', 'neighbor']);
+// A thing can be called rubbish; a person cannot.
+const THINGS = ['المساق', 'مساق', 'المحاضره', 'الامتحان', 'امتحان', 'النظام',
+  'التطبيق', 'الموقع', 'الجدول', 'الخطه', 'المشروع', 'الكتاب', 'الواجب',
+  'التسجيل', 'الماده', 'الفصل', 'الترم', 'course', 'lecture', 'exam', 'system',
+  'app', 'website', 'schedule', 'plan', 'project', 'book', 'assignment',
+  'homework', 'lab', 'registration', 'semester', 'term'];
 
-const AR_PREFIX = '(?:[\u0648\u0641\u0628\u0643\u0644]|\u0627\u0644|\u064a\u0627|\u0647\u0627|\u0647\u0627\u0644)*';
-const AR_SUFFIX = '(?:\u0643|\u0643\u0645|\u0647|\u0647\u0627|\u0647\u0645|\u064a|\u0646\u0627|\u064a\u0646|\u0627\u062a)*';
+const AR_PREFIX = '(?:[\u0648\u0641\u0628\u0643\u0644]|\u0627\u0644|\u064a\u0627|\u0647\u0627|\u0647\u0627\u0644|\u0639)*';
+const AR_POSS = '(?:\u0643|\u0643\u0645|\u0647\u0627|\u0647\u0645|\u064a|\u0646\u0627)*';
+const AR_FORMS = '(?:\u0647|\u0627\u062a|\u064a\u0646)?';
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '9': 'g', '@': 'a', $: 's', '!': 'i' };
 const SEP = "[\\s._\\-*'\"`~^()\\[\\]{}/\\\\]";
 
 function normalize(text) {
   let s = String(text);
   try { s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, ''); } catch {}
-  s = s.toLowerCase()
+  return s.toLowerCase()
     .replace(/[\u064b-\u065f\u0640\u200b-\u200f]/g, '')
     .replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')
     .replace(/\u0629/g, '\u0647')
@@ -245,10 +257,12 @@ function normalize(text) {
     .replace(/\u0626/g, '\u064a')
     .replace(/\u06a9/g, '\u0643')
     .replace(/[013457|@$!]/g, (ch) => LEET[ch] || ch);
-  return s.replace(/(.)\1{1,}/g, '$1');
 }
 
-const collapse = (w) => w.replace(/(.)\1{1,}/g, '$1');
+// Elongation is absorbed by the pattern, never by collapsing the text:
+// collapsing turns "ass" into "as" and rejects every English sentence that
+// contains the word "as".
+const elongate = (w) => [...w].map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '+').join('');
 const PADDED_TOKEN = new RegExp('^\\p{L}(?:' + SEP + '+\\p{L})+$', 'u');
 const SEP_RE = new RegExp(SEP, 'gu');
 
@@ -266,15 +280,15 @@ function depad(s) {
   flush();
   return out.join(' ');
 }
-const squeeze = (s) => s.replace(SEP_RE, '');
 
 function pattern(raw) {
-  const w = collapse(normalize(raw));
+  const w = normalize(raw);
   const open = '(?:^|[^\\p{L}\\p{N}])';
   const close = '(?:$|[^\\p{L}\\p{N}])';
-  const src = /[\u0600-\u06ff]/.test(w)
-    ? open + AR_PREFIX + w + AR_SUFFIX + close
-    : open + w + '(?:s|es|ed|ing)?' + close;
+  const arabic = /[\u0600-\u06ff]/.test(w);
+  const src = arabic
+    ? open + AR_PREFIX + elongate(w) + (w.length >= 4 ? AR_POSS + AR_FORMS : AR_POSS) + close
+    : open + elongate(w) + '(?:s|es|ed|ing)?' + close;
   return { raw, re: new RegExp(src, 'u') };
 }
 
@@ -283,20 +297,36 @@ const P_CONTEXT = CONTEXTUAL.map(pattern);
 const P_TARGET = TARGETING.map(pattern);
 const P_PEOPLE = PEOPLE.map(pattern);
 const P_TOPICAL = TOPICAL.map(pattern);
-const N_COMPARATIVES = COMPARATIVES.map((c) => collapse(normalize(c)));
+const P_GOVERN = GOVERNORS.map(pattern);
+const P_THINGS = THINGS.map(pattern);
+const N_COMPARATIVES = COMPARATIVES.map(normalize);
 const CLAUSE_SPLIT = /[.!?،؛,;\n]+|\s(?:بس|لكن|ولكن|though|but|however)\s/u;
 
 const any = (list, hay) => list.some((p) => p.re.test(hay));
 
 function firstBadWord(text) {
   const hay = normalize(text);
-  const variants = [hay, collapse(depad(hay)), collapse(squeeze(hay))];
+  const variants = [hay, depad(hay), hay.replace(SEP_RE, '')];
 
   for (const p of P_ALWAYS) {
     if (variants.some((v) => v && p.re.test(v))) return p.raw;
   }
   for (const c of N_COMPARATIVES) {
-    if (hay.includes(c)) return c;
+    if (hay.includes(c) && !(any(P_TOPICAL, hay) && !any(P_PEOPLE, hay))) return c;
+  }
+
+  // A person right beside the word, with nothing governing it from in front.
+  const WINDOW = 2;
+  for (const v of variants) {
+    const toks = v.split(/\s+/).filter(Boolean);
+    for (let i = 0; i < toks.length; i++) {
+      const hit = P_CONTEXT.find((p) => p.re.test(' ' + toks[i] + ' '));
+      if (!hit) continue;
+      const before = toks.slice(Math.max(0, i - WINDOW), i).join(' ');
+      if (any(P_GOVERN, before)) continue;
+      const near = toks.slice(Math.max(0, i - WINDOW), i + WINDOW + 1).join(' ');
+      if (any(P_TARGET, near) || any(P_PEOPLE, near)) return hit.raw;
+    }
   }
 
   // Clause by clause, so a topical half cannot vouch for an abusive half.
@@ -308,12 +338,13 @@ function firstBadWord(text) {
   }
   let unclear = '';
   for (const cl of clauses) {
-    const hitWord = P_CONTEXT.find((p) => p.re.test(cl));
-    if (!hitWord) continue;
-    if (any(P_TARGET, cl) || TARGET_PHRASES.some((ph) => cl.includes(ph))) return hitWord.raw;
+    const hit = P_CONTEXT.find((p) => p.re.test(cl));
+    if (!hit) continue;
+    if (any(P_TARGET, cl) || TARGET_PHRASES.some((ph) => cl.includes(ph))) return hit.raw;
     if (any(P_TOPICAL, cl)) continue;
-    if (any(P_PEOPLE, cl)) return hitWord.raw;
-    unclear = hitWord.raw;
+    if (any(P_PEOPLE, cl)) return hit.raw;
+    if (any(P_THINGS, cl)) continue;
+    unclear = hit.raw;
   }
   return unclear;
 }
