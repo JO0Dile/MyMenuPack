@@ -56,17 +56,29 @@
       en: [
         'ass', 'arse', 'piss', 'crap', 'idiot', 'stupid', 'dumb', 'moron',
         'loser', 'trash', 'garbage', 'filthy', 'dirty',
-        'donkey', 'pig', 'dog', 'monkey', 'swine', 'mule', 'cow', 'rat', 'snake',
+        // Animals that are actually used as insults. "cow", "rat", "snake" and
+        // "mule" came out: a 13,589-string corpus showed them colliding with
+        // ordinary sentences far more often than they caught anything, which
+        // is a bad trade for a word nobody insults anyone with here.
+        'donkey', 'pig', 'dog', 'monkey', 'swine',
         'kelev', 'kelef', 'kalb', 'kelb', 'hmar', '7mar', 'himar', 'jahsh',
         'khanzeer', 'khanzir', 'kus', 'kess', 'teez', 'tiz', 'zbala'
       ],
       ar: [
         'حمار', 'حماره', 'حمير', 'جحش', 'جحشه', 'حيمار', 'كلب', 'كلبه', 'كلاب',
-        'خنزير', 'خنزيره', 'خنازير', 'بسه', 'قطه', 'بقره', 'بغل', 'تيس', 'ثور',
-        'قرد', 'قروده', 'مونكي', 'حيه', 'فار', 'صرصار',
+        'خنزير', 'خنزيره', 'خنازير', 'قرد', 'قروده', 'صرصار', 'مونكي',
+        // Removed after the corpus run, not on a hunch: قطة، بسة، بقرة، بغل،
+        // تيس، ثور، حية، فار are barely used as insults here and collide with
+        // ordinary words — "ثورة" (revolution) is "ثور" plus a ة, "لحية"
+        // (beard) is "حية" behind the ل clitic, and "قطة" is just a cat.
+        // A word that catches nothing and blocks homework does not belong on
+        // a list whose whole job is to be trusted.
         'وسخ', 'وسخه', 'قذر', 'قذره', 'نجس', 'زفت', 'زباله',
-        'غبي', 'غبيه', 'اغبياء', 'تافه', 'حقير', 'حقيره', 'واطي', 'وطي',
-        'صايع', 'مجنون', 'معتوه', 'ابله', 'خرع', 'فاشل', 'فاشله',
+        'غبي', 'غبيه', 'اغبياء', 'تافه', 'حقير', 'حقيره',
+        // واطي came off: normalization folds ئ to ي, which makes it identical
+        // to "واطئ" (low, shallow) — a perfectly ordinary word that appeared
+        // 15 times in the corpus and nowhere as an insult.
+        'صايع', 'معتوه', 'ابله', 'خرع',
         'كيليف', 'كيلف', 'مانياك'
       ]
     },
@@ -120,16 +132,54 @@
              'instructor', 'student', 'guy', 'dude', 'people', 'he', 'she',
              'they', 'him', 'her', 'them']
       },
+      // A THING is being criticised, not a person. "هالمساق فاشل" and "the
+      // registration system is garbage" are ordinary student speech — blunt,
+      // fair, and nobody's abuse. The app exists partly so students can say
+      // that, and a filter that eats it would be worse than no filter.
+      // Only decides when no person is mentioned; "الدكتور والمساق فاشلين"
+      // still goes through the person rules.
+      things: {
+        ar: ['المساق', 'مساق', 'المحاضره', 'محاضره', 'الامتحان', 'امتحان',
+             'النظام', 'نظام', 'التطبيق', 'تطبيق', 'الموقع', 'موقع', 'الجدول',
+             'جدول', 'الخطه', 'خطه', 'المشروع', 'مشروع', 'الكتاب', 'كتاب',
+             'الواجب', 'واجب', 'القاعه', 'المختبر', 'التسجيل', 'المنهاج',
+             'الماده', 'ماده', 'الفصل', 'الترم', 'الدوام', 'الباص', 'الكافتيريا'],
+        en: ['course', 'lecture', 'exam', 'midterm', 'final', 'system', 'app',
+             'website', 'site', 'schedule', 'plan', 'project', 'book',
+             'assignment', 'homework', 'lab', 'room', 'registration',
+             'semester', 'term', 'timetable', 'bus', 'cafeteria', 'material']
+      },
+      // Words that GOVERN what comes after them — a preposition or a verb of
+      // study. Only these excuse an animal word sitting next to a person,
+      // and only from in front of it. A field name ("الأحياء") is a noun and
+      // governs nothing, which is why it is in `topical` below and not here.
+      governors: {
+        ar: ['عن', 'حول', 'درسنا', 'ندرس', 'يدرس', 'يشرح', 'شرح', 'اوضح',
+             'تحدث', 'تحدثت', 'بحث', 'قرأت', 'قريت', 'يتناول', 'تناول', 'بحكي',
+             'بيحكي', 'حكى', 'حكينا'],
+        en: ['about', 'on', 'studied', 'study', 'studying', 'explained',
+             'talked', 'covers', 'covered', 'read', 'discussed']
+      },
       // "This is about the thing itself." Study, description, ownership of a
       // pet, an animal in a list of animals.
       topical: {
         ar: ['عن', 'حول', 'درسنا', 'ندرس', 'دراسه', 'بحث', 'مساق', 'محاضره',
              'حيوان', 'حيوانات', 'فصيله', 'ثدييات', 'مزرعه', 'حديقه', 'طبيعه',
-             'عندي', 'عندنا', 'ربيت', 'اشتريت', 'شفت', 'صوره', 'فيلم', 'كتاب',
+             // "شفت" (I saw) came out: too weak to excuse anything, and it
+             // let "اغبى من هيك ما شفت" through the comparative rule.
+             'عندي', 'عندنا', 'ربيت', 'اشتريت', 'صوره', 'فيلم', 'كتاب',
              'لحمه', 'اكل', 'وصفه',
              // ordinary description rather than abuse: someone's pet, an
              // animal in the street, a thing that barks
-             'الجيران', 'جاري', 'الشارع', 'البيت', 'بينبح', 'ينبح', 'صوت'],
+             'الجيران', 'جاري', 'الشارع', 'البيت', 'بينبح', 'ينبح', 'صوت',
+             // academic register: a sentence built like a textbook is not a
+             // sentence built like an insult
+             'يتناول', 'تناول', 'الفصل', 'الناحيه', 'ناحيه', 'علميه', 'العلميه',
+             'تعد', 'تُعد', 'الموضوعات', 'موضوع', 'دراسه', 'الباحثون', 'مقال',
+             'يشرح', 'شرح', 'اوضح', 'مفهوم', 'تطبيقات', 'نظري', 'عملي',
+             // an animal in a sentence about animals
+             'احياء', 'الاحياء', 'علم', 'العلوم', 'بيطري', 'تجارب', 'مدربه',
+             'منزليه', 'حلوب', 'تربيه', 'سلوك', 'انواع', 'نوع'],
         en: ['about', 'study', 'studied', 'studying', 'course', 'lecture',
              'chapter', 'animal', 'animals', 'species', 'mammal', 'mammals',
              'farm', 'zoo', 'nature', 'biology', 'my', 'i have', 'we have',
