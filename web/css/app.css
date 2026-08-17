@@ -2209,7 +2209,30 @@
   .ro-course:first-child{border-top:none; padding-top:0;}
   .ro-course-name{color:var(--text); overflow-wrap:anywhere;}
   .ro-course-cr{color:var(--text-dim); font-size:10.5px; white-space:nowrap; flex:none;}
-  .ro-more{font-size:11px; color:var(--accent); font-weight:700; padding-top:6px;}
+  /* Was a plain div in the accent colour — it read as a link and did
+     nothing when pressed. Now a real button that opens the rest of the year
+     in place, and it looks pressable. */
+  .ro-more{
+    display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+    font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;
+    color:var(--accent);background:transparent;
+    border:1px solid var(--line);border-radius:999px;padding:4px 11px;
+  }
+  .ro-more:hover{border-color:var(--accent);background:var(--accent-soft, transparent);}
+  .ro-more:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .ro-course-extra{display:none;}
+  .ro-card-open .ro-course-extra{display:flex;}
+  .ro-more .ro-more-close{display:none;}
+  .ro-card-open .ro-more .ro-more-open{display:none;}
+  .ro-card-open .ro-more .ro-more-close{display:inline;}
+
+  /* Said out loud when the recorded course list does not add up to the
+     university's published degree hours. */
+  .ro-total-note{
+    font-size:11.5px;line-height:1.5;color:var(--text-dim);
+    border-left:2px solid var(--connect);padding:6px 10px;margin:10px 0 0;
+    background:rgba(224,168,63,.08);border-radius:0 6px 6px 0;
+  }
   .ro-card-grad{background:rgba(93,184,255,.06); border-color:var(--accent);}
 
   .ro-summary{

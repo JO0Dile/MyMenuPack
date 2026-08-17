@@ -64,6 +64,9 @@ jobs:
       - name: Offline file list matches the page
         run: python3 tools/check-precache.py
 
+      - name: Plans add up to the degree they claim
+        run: python3 tools/check-plan-hours.py
+
       # On a pull request this is a real guard: Publish catalogue only runs on
       # main, so a PR that edits data/ without committing the rebuild would
       # merge a plans.json that disagrees with its own source.

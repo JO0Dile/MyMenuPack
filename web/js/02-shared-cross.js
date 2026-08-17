@@ -265,6 +265,39 @@ window.__openCourses = function(prefix){
     .filter(function(el){ return !progress[el.id]; });
 };
 
+// One registered course = one entry, for anything counting credit hours.
+//
+// AAUP registers a lecture and its lab as ONE course: both halves carry the
+// same catalogue number and the same credit value, and the plan grid draws
+// them as two cards on purpose (they meet at different times). Anything that
+// SUMS them has to count that pair once — otherwise every lecture+lab pair
+// adds its hours twice. It did: the AI & Medical Sciences plan totalled 137
+// CH against a 129 CH degree, its Year 1 read 48 CH, and the roadmap's own
+// header disagreed with the Degree Audit sitting one screen away (137 vs
+// 123), because the Audit deduped and the roadmap did not.
+//
+// Same rule the Degree Audit already used: keep the row whose catalogue
+// number is seen first (GPA's primaryId resolves a "-lab" slug to its
+// lecture), skip a course superseded by a retake, and never dedupe on the
+// "-" placeholder that generic elective slots share.
+window.__dedupeForCredit = function(prefix, els){
+  var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
+  var seen = Object.create(null);
+  var out = [];
+  Array.prototype.forEach.call(els || [], function(el){
+    var parts = window.__splitCourseId ? window.__splitCourseId(el.id) : null;
+    if(!parts){ out.push(el); return; }
+    if(window.__isSupersededByRetake && window.__isSupersededByRetake(prefix, parts.slug)) return;
+    var meta = info[parts.slug];
+    if(!meta){ out.push(el); return; }
+    var key = (meta.num && meta.num !== '-') ? String(meta.num) : parts.slug;
+    if(seen[key]) return;
+    seen[key] = true;
+    out.push(el);
+  });
+  return out;
+};
+
 // What the arrow-drawing code should iterate. Falls back to the plan's own
 // hard-coded list if registration hasn't happened yet for any reason.
 window.__livePrereqs = function(prefix, fallback){

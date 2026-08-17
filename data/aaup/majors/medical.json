@@ -5,7 +5,7 @@
   "nameAr": "الذكاء الاصطناعي والعلوم الطبية",
   "university": "aaup",
   "college": "aaup-ai-ds",
-  "degreeHours": null,
+  "degreeHours": 129,
   "courses": [
     {
       "slug": "arabic-language",

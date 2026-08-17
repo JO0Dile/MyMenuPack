@@ -14,7 +14,13 @@
   var DEPT_REQUIRED = {
     robotics: 6,       // 6 of 7 department electives
     cybersecurity: 3,  // 3 department elective slots, chosen from the pool of 8
-    medical: 3,        // students select 3 of the 10 offered
+    // 5 of the 13 specialization electives this plan lists. Derived, not
+    // guessed: counting each lecture+lab pair once, the mandatory hours are
+    // 14 (Univ. Req.) + 6 (Univ. Elec.) + 18 (College Req.) + 70 (Spec. Req.)
+    // + 6 (Free Elec.) = 114 against a published 129 CH degree, leaving
+    // exactly 15H — 5 electives at 3H. The old "3 of the 10 offered" was
+    // both counts wrong and left the plan reading 123 CH.
+    medical: 5,
     cs: 3,              // students select 3 of the 13 offered
     // Feed/imported plans can add their own entry here too — needed whenever
     // a plan has more than one dept-tagged elective slot at the SAME credit
