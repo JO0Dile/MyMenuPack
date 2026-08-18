@@ -310,6 +310,17 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <button type="button" class="ta-btn" id="globalActionToastBtn"></button>
 </div>
 
+<!-- The visible half of "say it out loud" (js/14-storage.js's
+     showUnlockToast) — a screen reader already hears this on every tick
+     that opens something new; this is the same news, on screen. -->
+<div class="unlock-toast" id="globalUnlockToast" role="status" aria-live="polite">
+  <span class="ut-icon">✓</span>
+  <span class="ut-body">
+    <span class="ut-title" id="globalUnlockToastTitle"></span>
+    <span class="ut-sub" id="globalUnlockToastSub"></span>
+  </span>
+</div>
+
 <div class="tut-layer" id="tutLayer">
   <div class="tut-spotlight" id="tutSpotlight"></div>
   <div class="tut-tooltip" id="tutTooltip">
@@ -554,6 +565,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/61-theme-custom.js"></script>
 <script src="js/62-change-plan.js"></script>
 <script src="js/63-whatif.js"></script>
+<script src="js/64-milestones.js"></script>
+<script src="js/65-focus-mode.js"></script>
+<script src="js/66-graduation.js"></script>
+<script src="js/67-gpa-target.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 

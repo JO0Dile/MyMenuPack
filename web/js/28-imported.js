@@ -1366,6 +1366,8 @@
     if(window.AAUP_COMMUNITY){ window.AAUP_COMMUNITY.refreshAllCommunityBadges(); }
     if(window.__refreshCollapse){ window.__refreshCollapse(id); }
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
+    if(window.__refreshMilestones){ window.__refreshMilestones(id); }
+    if(window.__refreshFocusMode){ window.__refreshFocusMode(id); }
     // Runs against the freshly-rebuilt DOM. The first call per plan (on open)
     // silently seeds already-complete semesters; later ones (after a toggle
     // re-renders) fire confetti for a semester that just became complete.
@@ -1408,6 +1410,16 @@
         (opened.length > 4 ? (rtl ? ' وغيرها' : ' and more') : '');
     }
     node.textContent = msg;
+
+    // The same news, visibly — only worth a toast when something actually
+    // opened up; ticking a leaf course with nothing downstream of it has
+    // nothing new to announce on screen either.
+    if(done && opened.length && window.__showUnlockToast){
+      var title = (rtl ? '✓ ' : '✓ ') + name + ' — ' + (rtl ? 'مُنجز' : 'marked passed');
+      var subtitle = (rtl ? 'أصبح متاحًا الآن: ' : 'Now open to you: ') + opened.slice(0, 3).join(', ') +
+        (opened.length > 3 ? (rtl ? ' وغيرها' : ' and more') : '');
+      window.__showUnlockToast(title, subtitle);
+    }
   }
 
   // Called by the Plan Editor's applyMove() right after a successful drag —

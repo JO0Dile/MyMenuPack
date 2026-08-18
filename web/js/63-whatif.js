@@ -151,32 +151,25 @@
     if(!hours) return '<p class="wi-msg">' + t('needNone', rtl) + '</p>';
 
     // The base is the scenario WITHOUT the planned courses: their grades are
-    // the unknown being solved for.
+    // the unknown being solved for. The formula itself now lives in
+    // AAUP_GPA.neededAverage — shared with the Degree Audit's own target
+    // box, so the two screens can never quietly disagree.
     var base = window.AAUP_GPA.gpaFor(prefix, null, { replace: onlyRetakes() });
     var basePoints = (base.gpa || 0) * base.credits;
-    var need = (target * (base.credits + hours) - basePoints) / hours;
+    var need = window.AAUP_GPA.neededAverage(basePoints, base.credits, hours, target);
+    var d = window.AAUP_GPA.describeNeeded(need, hours, basePoints, base.credits);
 
-    if(need <= window.AAUP_GPA.GRADE_POINTS.F){
+    if(d.status === 'already'){
       return '<p class="wi-msg wi-ok">' + t('already', rtl) + '</p>';
     }
-    if(need > 4){
-      var best = (basePoints + 4 * hours) / (base.credits + hours);
+    if(d.status === 'impossible'){
       return '<p class="wi-msg wi-warn">' + t('needAll', rtl)
-        .replace('{n}', hours).replace('{gpa}', fmt(best)) + '</p>';
+        .replace('{n}', hours).replace('{gpa}', fmt(d.bestCase)) + '</p>';
     }
-    // Name the nearest letter at or above what is needed, so the answer is
+    // d.status === 'reachable' — named as a letter, so the answer reads
     // "a B+ average", not "3.19 grade points".
-    var order = window.AAUP_GPA.GRADE_ORDER.filter(function(g){
-      return window.AAUP_GPA.GRADE_POINTS[g] !== undefined;
-    }).sort(function(a, b){
-      return window.AAUP_GPA.GRADE_POINTS[a] - window.AAUP_GPA.GRADE_POINTS[b];
-    });
-    var letter = order[order.length - 1];
-    for(var i = 0; i < order.length; i++){
-      if(window.AAUP_GPA.GRADE_POINTS[order[i]] >= need - 0.001){ letter = order[i]; break; }
-    }
     return '<p class="wi-msg">' + t('needAvg', rtl)
-      .replace('{g}', letter + ' (' + need.toFixed(2) + ')').replace('{n}', hours) + '</p>';
+      .replace('{g}', d.letter + ' (' + d.need.toFixed(2) + ')').replace('{n}', hours) + '</p>';
   }
   function onlyRetakes(){
     var out = {};
