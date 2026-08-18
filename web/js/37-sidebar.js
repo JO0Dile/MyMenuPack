@@ -27,6 +27,10 @@
     { key: 'studyplan', icon: '🗺️', label: 'My Study Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
     { key: 'roadmap', icon: '🧭', label: 'My Path', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
     { key: 'audit', icon: '📋', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
+    // Sits with the GPA screen it plays with, not at the bottom of the
+    // list: a student opens the audit, sees a number they do not like,
+    // and the next thing they want is right there.
+    { key: 'whatif', icon: '🎯', label: 'What if… (GPA)', action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
     { key: 'achievements', icon: '🏆', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
     { key: 'advisor', icon: '🧠', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
     { key: 'overview', icon: '🖨️', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },

@@ -346,6 +346,14 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- What-if GPA — retakes and next semester, as a sandbox (js/63-whatif.js) -->
+<div class="modal-overlay" id="whatifOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="whatifClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="whatifBody"></div>
+  </div>
+</div>
+
 <!-- Change Major — the transfer comparison before a switch (js/62-change-plan.js) -->
 <div class="modal-overlay" id="changePlanOverlay">
   <div class="modal-card">
@@ -545,6 +553,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/60-backbar.js"></script>
 <script src="js/61-theme-custom.js"></script>
 <script src="js/62-change-plan.js"></script>
+<script src="js/63-whatif.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 
