@@ -314,7 +314,12 @@
     var queued = loadQueue().length;
 
     body.innerHTML =
-      window.__backBarHTML(rtl ? 'أفكار الطلاب' : 'Student thoughts', 'thoughtsModalOverlay', rtl) +
+      // Every other dialog puts its title in an <h2> and passes '' to
+      // __backBarHTML — this was the one holdout, passing a title straight
+      // into the bar with no heading at all, which rendered as one run-on
+      // line ("←Back STUDENT THOUGHTS") instead of a page title.
+      window.__backBarHTML('', 'thoughtsModalOverlay', rtl) +
+      '<h2 style="margin-top:0;">💭 ' + (rtl ? 'أفكار الطلاب' : 'Student Thoughts') + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' +
         (rtl
           ? 'اكتب سطرًا يشوفه كل طالب في نفس التخصص. بلا شتائم — الفلتر بيرفضها فورًا.'

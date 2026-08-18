@@ -23,10 +23,22 @@
   var LABEL = { en: 'Back', ar: 'رجوع' };
 
   // Some dialogs are deliberately chromeless — the onboarding wizard runs the
-  // whole screen and has its own navigation, and the celebration overlays are
-  // not dialogs at all. A bar on top of those would fight what is already
-  // there.
-  var SKIP = ['onboardingOverlay', 'recapOverlay', 'storyOverlay', 'shareCardOverlay'];
+  // whole screen and has its own step navigation (js/55-onboarding.js's own
+  // "← Back" steps BACK one screen; it is not a close button), and the story
+  // stack (semester recap + the "why is this locked?" walkthrough,
+  // js/56-story-stack.js) has its own progress dots and its own ✕. A second
+  // "← Back" pasted on top of either would not just be visual clutter: on
+  // the onboarding wizard it silently CLOSED THE WHOLE FIRST-RUN SETUP,
+  // because that overlay has no .modal-close for the click handler to defer
+  // to, so it fell through to `overlay.classList.remove('open')` — verified
+  // by opening a brand-new profile and pressing the injected bar once.
+  //
+  // This list previously read 'onboardingOverlay' / 'storyOverlay' /
+  // 'recapOverlay' / 'shareCardOverlay' — none of which are real element
+  // ids (the actual ones are onboardingWizardOverlay and storyStackOverlay;
+  // the other two never existed), so neither dialog was actually being
+  // skipped despite the comment saying they would be.
+  var SKIP = ['onboardingWizardOverlay', 'storyStackOverlay'];
 
   function isRtlNow(card){
     if(card && card.getAttribute('dir') === 'rtl') return true;
