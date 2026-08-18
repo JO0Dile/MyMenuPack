@@ -55,7 +55,7 @@ window.APP_COLLECT_SECRET = 'Winston';
 // Left empty, the whole feature still works — thoughts are written, read and
 // deleted on the student's own device and nothing leaves the phone. That is
 // the honest default: no silent half-broken network state.
-window.APP_THOUGHTS_URL = '';
+window.APP_THOUGHTS_URL = 'https://thoughts-worker.pmhtrfalab999.workers.dev';
 // Which collector you're pointing at, so the app sends in the shape that host
 // accepts. Only two values:
 //   'cloudflare'  (default) — sends JSON with the secret in a header, and
