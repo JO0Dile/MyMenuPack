@@ -306,6 +306,39 @@
     return out;
   }
 
+  // ---------------------------------------------------------------------
+  // "What would I need to average?" — shared by the Degree Audit's target
+  // box (whole remaining degree) and What-if's target box (just the planned
+  // semester). One formula, so the two screens can never quietly disagree
+  // about what "you need a 3.87 average" actually means.
+  //
+  // Solve target = (basePoints + need*extraHours) / (baseCredits+extraHours)
+  // for need.
+  function neededAverage(basePoints, baseCredits, extraHours, target){
+    if(!extraHours || extraHours <= 0) return null;
+    return (target * (baseCredits + extraHours) - basePoints) / extraHours;
+  }
+
+  // Turns a raw "need" grade-point value into what a student actually reads:
+  // already there, a nameable letter average, or physically out of reach —
+  // classified against the real 4.0-scale letters, not just printed as a
+  // number nobody has ever seen on a transcript.
+  function describeNeeded(need, extraHours, basePoints, baseCredits){
+    if(need === null) return { status: 'none' };
+    if(need <= GRADE_POINTS.F) return { status: 'already', need: need };
+    if(need > 4){
+      var best = (basePoints + 4 * extraHours) / (baseCredits + extraHours);
+      return { status: 'impossible', need: need, bestCase: best };
+    }
+    var order = GRADE_ORDER.filter(function(g){ return GRADE_POINTS[g] !== undefined; })
+      .sort(function(a, b){ return GRADE_POINTS[a] - GRADE_POINTS[b]; });
+    var letter = order[order.length - 1];
+    for(var i = 0; i < order.length; i++){
+      if(GRADE_POINTS[order[i]] >= need - 0.001){ letter = order[i]; break; }
+    }
+    return { status: 'reachable', need: need, letter: letter };
+  }
+
   function standingFor(gpa){
     // NaN fails every comparison below, so an unguarded NaN used to fall
     // through to "Probation" — the worst possible label, invented from data
@@ -342,6 +375,8 @@
     primaryId: primaryId,
     gpaFor: gpaFor,
     semesterGpas: semesterGpas,
+    neededAverage: neededAverage,
+    describeNeeded: describeNeeded,
     standingFor: standingFor,
     loadPairModeOverrides: loadPairModeOverrides,
     savePairModeOverrides: savePairModeOverrides,

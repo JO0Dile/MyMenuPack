@@ -53,6 +53,25 @@
     hideTimer = setTimeout(function(){ el.classList.remove('show'); }, 3200);
   }
 
+  // "Say it out loud" — the toast half of the same moment the screen-reader
+  // announcer already speaks (see announceToggle in js/28-imported.js and
+  // js/11-module11.js's built-in-plan equivalent). A tick can silently
+  // unlock three more courses with nothing on screen changing anywhere near
+  // where the student is looking; this puts the news where the eye already
+  // is, for the three seconds it takes to read it, then gets out of the way.
+  var unlockHideTimer = null;
+  function showUnlockToast(title, subtitle){
+    var el = document.getElementById('globalUnlockToast');
+    var titleEl = document.getElementById('globalUnlockToastTitle');
+    var subEl = document.getElementById('globalUnlockToastSub');
+    if(!el || !titleEl) return;
+    titleEl.textContent = title;
+    if(subEl){ subEl.textContent = subtitle || ''; subEl.hidden = !subtitle; }
+    el.classList.add('show');
+    if(unlockHideTimer) clearTimeout(unlockHideTimer);
+    unlockHideTimer = setTimeout(function(){ el.classList.remove('show'); }, 3000);
+  }
+
   // A toast that carries one tappable action (used for "Moved — Undo").
   // Stays up a little longer than the plain toast to give a real chance to
   // hit the button, and is dismissed either by tapping the action or when
@@ -96,6 +115,7 @@
     return false;
   }
   window.__showToast = showToast;
+  window.__showUnlockToast = showUnlockToast;
   window.__anyVisiblePageIsRtl = anyVisiblePageIsRtl;
 
   // ---------------------------------------------------------------------

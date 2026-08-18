@@ -163,6 +163,10 @@
         '<div class="dash-card"><h3>GPA</h3><div class="dash-big">' + (gpaResult.gpa != null ? gpaResult.gpa.toFixed(2) : '\u2014') + '</div><div class="dash-sub">' + (standingLabel || (rtl ? 'لم تُدخل علامات بعد' : 'No grades entered yet')) + '</div></div>' +
         '<div class="dash-card"><h3>' + (rtl ? 'الإنجازات' : 'Achievements') + '</h3><div class="dash-big">' + achv.unlocked + ' / ' + achv.total + '</div><div class="dash-sub">' + (rtl ? 'مُنجَز' : 'unlocked') + '</div></div>' +
       '</div>' +
+      (window.AAUP_GRADUATION
+        ? '<div class="dash-card grad-card" style="margin-bottom:20px;"><h3>🎓 ' + window.AAUP_GRADUATION.title(rtl) +
+          '</h3><div id="' + prefix + '-dashGradBody"></div></div>'
+        : '') +
       '<div class="dash-card" style="margin-bottom:20px;"><h3>' + (rtl ? 'ما الذي يمكنني أخذه الآن؟' : 'What Can I Take Next') + '</h3>' +
       (window.AAUP_WHATS_NEXT
         ? '<div id="' + prefix + '-dashNextBody"></div>'
@@ -197,6 +201,7 @@
     }
     host.innerHTML = html;
     if(window.AAUP_WHATS_NEXT){ window.AAUP_WHATS_NEXT.render(prefix, prefix + '-dashNextBody'); }
+    if(window.AAUP_GRADUATION){ window.AAUP_GRADUATION.render(prefix, prefix + '-dashGradBody'); }
   }
 
   // showPage('home') now means "take me to my personal landing point" —

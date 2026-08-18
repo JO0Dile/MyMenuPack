@@ -1225,6 +1225,32 @@
     .collapse-toggle{margin-left:16px;margin-right:16px;width:calc(100% - 32px);}
   }
 
+  /* ---------- focus mode (js/65-focus-mode.js) ----------
+     Same pill, same place, always offered (collapse's toggle only shows up
+     once a year is finished; this one is useful from day one). Dims every
+     course that is neither open nor done — the prerequisite SVG layer is
+     untouched on purpose, since it is what explains why a course is dim. */
+  .plan-focus .course:not(.available):not(.completed){
+    opacity:.32;filter:saturate(.55);transition:opacity .15s ease,filter .15s ease;
+  }
+  .plan-focus .course:not(.available):not(.completed):hover{opacity:.62;filter:none;}
+  @media (prefers-reduced-motion:reduce){
+    .plan-focus .course:not(.available):not(.completed){transition:none;}
+  }
+
+  /* ---------- milestones (js/64-milestones.js) ----------
+     Two tick marks added to the progress bar's own track, at the cumulative
+     hour where a real category requirement closes out, plus one caption
+     line naming the nearer of the two. */
+  .pw-gate{
+    position:absolute;inset-block:0;width:2px;background:var(--connect);
+    pointer-events:none;
+  }
+  .pw-gate-next{background:var(--accent);}
+  .pw-gate-caption{
+    margin:6px 2px 0;font-size:11px;color:var(--text-dim);text-align:center;
+  }
+
   /* A finished year in collapse mode: its semesters are hidden and a single
      compact "all done — tap to expand" strip stands in for them. */
   .year-row.year-collapsed .semesters,
@@ -2540,6 +2566,69 @@
   .achievement-badge .ab-share:hover{background:var(--accent);color:var(--on-accent);}
   /* ================= AI STUDY ADVISOR ================= */
 
+  /* ---------- when do I graduate (js/66-graduation.js) ---------- */
+  .grad-msg{font-size:12.5px;color:var(--text-dim);margin:0;}
+  .grad-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .grad-load-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);}
+  .grad-load-val{font-size:14px;font-weight:800;color:var(--accent);}
+  .grad-slider{
+    -webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;
+    background:linear-gradient(to right,var(--unlock),var(--accent));cursor:pointer;margin-bottom:14px;
+  }
+  .grad-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;
+  }
+  .grad-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer;}
+  .grad-dots{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;position:relative;}
+  .grad-dots::before{
+    content:'';position:absolute;top:5px;left:5%;right:5%;height:2px;background:var(--line);z-index:0;
+  }
+  .grad-dot{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;z-index:1;}
+  .grad-dot-mark{width:10px;height:10px;border-radius:50%;background:var(--line);border:2px solid var(--surface-bg);}
+  .grad-dot-now .grad-dot-mark{background:var(--accent);box-shadow:0 0 0 3px rgba(93,184,255,.25);}
+  .grad-dot-end .grad-dot-mark{background:var(--unlock);}
+  .grad-dot-label{font-size:9.5px;color:var(--text-dim);text-align:center;white-space:nowrap;}
+  .grad-dot-now .grad-dot-label{color:var(--accent);font-weight:700;}
+  .grad-finish{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .grad-finish span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);}
+  .grad-finish b{font-size:17px;font-weight:800;color:var(--unlock);}
+  .grad-note{margin:10px 0 0;font-size:12px;line-height:1.6;color:var(--text-dim);}
+  .grad-note-bound{color:var(--text);}
+  .grad-caveat{margin:10px 0 0;font-size:10.5px;color:var(--text-dim);opacity:.8;line-height:1.5;}
+
+  /* ---------- gpa target (js/67-gpa-target.js) ---------- */
+  .gt-section{
+    margin:18px 0 20px;padding:14px 16px;border-radius:12px;
+    background:var(--surface-bg);border:1px solid var(--line);
+  }
+  .gt-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+  .gt-now{font-size:12px;color:var(--text-dim);}
+  .gt-now b{font-size:15px;color:var(--text);}
+  .gt-target{font-size:12px;color:var(--text-dim);text-align:right;}
+  .gt-target b{font-size:15px;color:var(--accent);}
+  .gt-slider{
+    -webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;
+    background:linear-gradient(to right,var(--prereq),var(--connect) 50%,var(--unlock));cursor:pointer;margin:6px 0 10px;
+  }
+  .gt-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;
+  }
+  .gt-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer;}
+  .gt-msg{font-size:12.5px;color:var(--text-dim);line-height:1.6;margin:0 0 10px;}
+  .gt-msg b{color:var(--text);}
+  .gt-ok{color:var(--unlock);font-weight:700;}
+  .gt-warn{color:var(--prereq);font-weight:700;}
+  .gt-presets{display:flex;gap:8px;flex-wrap:wrap;}
+  .gt-preset{
+    font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;
+    border:1px solid var(--line);background:none;color:var(--text-dim);font-family:inherit;cursor:pointer;
+  }
+  .gt-preset:hover{border-color:var(--accent);color:var(--text);}
+  .gt-preset-ok{color:var(--unlock);border-color:var(--unlock);}
+  .gt-preset-bad{color:var(--prereq);border-color:var(--prereq);}
+
   /* ---------- what-if GPA (js/63-whatif.js) ----------
      Two big numbers with an arrow between them, then the rows that move the
      second one. The arrow colours by direction so the answer is legible
@@ -3588,6 +3677,29 @@
     white-space:nowrap;
   }
   .toast-action .ta-btn:hover{filter:brightness(1.08);}
+
+  /* The visible half of "say it out loud" — two lines, so a rounded card
+     rather than the one-line pill the plain toasts use. Sits above them
+     (z-index) since an unlock is the more consequential of the two. */
+  .unlock-toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(8px);
+    max-width:min(420px, calc(100vw - 32px));
+    display:flex;align-items:flex-start;gap:10px;
+    background:var(--panel);border:1px solid var(--unlock);color:var(--text);
+    padding:12px 16px;border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:1202;
+    opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+  }
+  .unlock-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .unlock-toast .ut-icon{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+    background:var(--unlock);color:var(--panel);font-size:12px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;
+  }
+  .unlock-toast .ut-body{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .unlock-toast .ut-title{font-size:13px;font-weight:800;line-height:1.35;}
+  .unlock-toast .ut-sub{font-size:12px;color:var(--text-dim);line-height:1.4;}
+  .unlock-toast .ut-sub[hidden]{display:none;}
 
   /* Respect the OS-level "reduce motion" accessibility setting. */
   @media (prefers-reduced-motion: reduce){

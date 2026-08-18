@@ -209,10 +209,15 @@
       '<h2 style="margin-top:0;">📋 ' + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
       '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' +
       (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.layout(prefix, rtl) : renderGpaDashboard(prefix, rtl)) +
+      (window.AAUP_GPA_TARGET
+        ? '<div class="gt-section"><h3 style="margin-bottom:6px;">' + window.AAUP_GPA_TARGET.title(rtl) + '</h3>' +
+          '<div id="auditGpaTargetBody"></div></div>'
+        : '') +
       renderSemesterGpas(prefix, rtl) +
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');
     if(window.AAUP_GPA_STUDIO) window.AAUP_GPA_STUDIO.bind(prefix, rtl);
+    if(window.AAUP_GPA_TARGET) window.AAUP_GPA_TARGET.render(prefix, 'auditGpaTargetBody', rtl);
   }
 
   // Mirrors a real transcript's structure: each semester's own GPA (which
@@ -249,5 +254,5 @@
   if(document.readyState === 'complete'){ bind(); }
   else { window.addEventListener('load', bind); }
 
-  window.AAUP_AUDIT = { open: open, computeAudit: computeAudit };
+  window.AAUP_AUDIT = { open: open, computeAudit: computeAudit, labelFor: labelFor };
 })();
