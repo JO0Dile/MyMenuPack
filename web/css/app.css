@@ -2773,6 +2773,7 @@
   .grad-finish{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
   .grad-finish span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);}
   .grad-finish b{font-size:17px;font-weight:800;color:var(--unlock);}
+  .grad-years-hint{font-size:12px;font-weight:700;color:var(--text-dim);}
   .grad-note{margin:10px 0 0;font-size:12px;line-height:1.6;color:var(--text-dim);}
   .grad-note-bound{color:var(--text);}
   .grad-caveat{margin:10px 0 0;font-size:10.5px;color:var(--text-dim);opacity:.8;line-height:1.5;}

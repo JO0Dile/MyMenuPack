@@ -212,7 +212,7 @@
       '</div>';
   }
 
-  function dataTabHtml(r){
+  function dataTabHtml(r, devUnlocked){
     return '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
       '<button type="button" class="home-btn" id="setExportBtn">📤 ' + (r ? 'تصدير التقدّم' : 'Export Progress') + '</button>' +
       '<button type="button" class="home-btn" id="setImportBtn">📥 ' + (r ? 'استيراد التقدّم' : 'Import Progress') + '</button>' +
@@ -226,7 +226,12 @@
         '</div>' +
         '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
       ) : '') +
-      (window.AAUP_THOUGHTS && window.AAUP_THOUGHTS.settingsSectionHtml
+      // Which server the wall talks to is a self-hosting/testing knob, not
+      // a normal setting — the app already ships pointed at the real one,
+      // so an ordinary student pasting a URL here can only ever break their
+      // own wall (or point it somewhere they didn't mean to). Same
+      // Developer Mode gate as the tour-replay button below already uses.
+      (devUnlocked && window.AAUP_THOUGHTS && window.AAUP_THOUGHTS.settingsSectionHtml
         ? window.AAUP_THOUGHTS.settingsSectionHtml(r) : '') +
       (window.AAUP_CONTRIBUTE && window.AAUP_CONTRIBUTE.settingsSectionHtml
         ? window.AAUP_CONTRIBUTE.settingsSectionHtml(r) : '') +
@@ -266,7 +271,7 @@
     body.setAttribute('dir', r ? 'rtl' : 'ltr');
 
     var tabContent = activeSettingsTab === 'prefs' ? prefsTabHtml(r, selectedPlan, isRtlNow)
-      : activeSettingsTab === 'data' ? dataTabHtml(r)
+      : activeSettingsTab === 'data' ? dataTabHtml(r, devUnlocked)
       : activeSettingsTab === 'help' ? helpTabHtml(r, selectedPlan, isImportedSelected, devUnlocked)
       : accountTabHtml(r, current, others);
 

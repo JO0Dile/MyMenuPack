@@ -149,9 +149,24 @@
               ar: 'تقدير: التطبيق ما بيعرف تاريخ تسجيلك الحقيقي — بيفترض إيقاع خريف/ربيع عادي ابتداءً من اليوم.' },
     bound: { en: 'Even at {load}H it stays {term} — {chain} is {n} terms deep whatever load you carry.',
              ar: 'حتى بحمل {load} ساعة رح يضل {term} — سلسلة {chain} عمقها {n} فصول مهما كان حملك.' },
-    done: { en: 'Nothing left to plan for — every course is done.', ar: 'ما بقي إشي تخطط له — كل المساقات منجزة.' }
+    done: { en: 'Nothing left to plan for — every course is done.', ar: 'ما بقي إشي تخطط له — كل المساقات منجزة.' },
+    years1: { en: '(≈1 year)', ar: '(≈سنة)' },
+    yearsN: { en: '(≈{n} years)', ar: '(≈{n} سنوات)' }
   };
   function t(k, r){ return r ? TX[k].ar : TX[k].en; }
+
+  // "8 more semesters" takes a beat of mental math to land as "4 years" —
+  // spelling it out is what actually answers the caption's own question.
+  // Half-year rounding (7 semesters -> "3.5 years") rather than rounding
+  // away the odd semester, which would quietly disagree with the number
+  // right next to it.
+  function yearsHint(semesters, rtl){
+    if(semesters <= 0) return '';
+    var years = semesters / 2;
+    if(years === 1) return t('years1', rtl);
+    var label = (years % 1 === 0) ? String(years) : years.toFixed(1);
+    return t('yearsN', rtl).replace('{n}', label);
+  }
 
   function render(prefix, hostId){
     var host = document.getElementById(hostId);
@@ -223,6 +238,7 @@
         '<span>' + t('finish', rtl) + '</span>' +
         '<b>' + termLabel(finish, rtl) + ' · ' +
           (semesters === 1 ? t('sems', rtl).replace('{n}', semesters) : t('semsPl', rtl).replace('{n}', semesters)) +
+          ' <span class="grad-years-hint">' + yearsHint(semesters, rtl) + '</span>' +
         '</b>' +
       '</div>' +
       (chainBinding
