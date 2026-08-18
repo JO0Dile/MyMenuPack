@@ -2904,27 +2904,53 @@
      Phones already turn a dialog into a page with a back arrow; this is the
      same affordance on a desktop, where the only exit used to be a small ✕
      in the corner. Students asked for it in those words: a button that says
-     "back", because hunting for the way out is not a puzzle worth setting. */
+     "back", because hunting for the way out is not a puzzle worth setting.
+
+     The first version was a bordered pill on a panel background — the same
+     colour as the card it sat on — parked above the dialog's heading with a
+     divider under it. It read as a stray grey box rather than a control, and
+     the student who asked for the feature said so. This version is a header
+     row instead: a round arrow that looks pressable, the word next to it, and
+     no divider competing with the heading right below. The right-hand padding
+     keeps it clear of the ✕ that still sits in the corner. */
   .back-bar{
-    display:flex;align-items:center;gap:12px;
-    margin:-4px 0 14px;padding-bottom:10px;
-    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;
+    margin:-6px 0 14px;padding-inline-end:30px;
+    min-height:32px;
   }
-  .back-bar-rtl{flex-direction:row-reverse;}
+  .back-bar-rtl{flex-direction:row-reverse;padding-inline-end:0;padding-inline-start:30px;}
   .back-bar-btn{
-    display:inline-flex;align-items:center;gap:7px;cursor:pointer;
-    font-family:inherit;font-size:13px;font-weight:700;
-    color:var(--text);background:var(--panel);
-    border:1px solid var(--line);border-radius:999px;
-    padding:7px 15px 7px 11px;
+    display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:800;letter-spacing:.01em;
+    color:var(--text-dim);background:none;border:0;padding:0;
+    border-radius:999px;
   }
-  .back-bar-rtl .back-bar-btn{padding:7px 11px 7px 15px;}
-  .back-bar-btn:hover{border-color:var(--accent);color:var(--accent);}
-  .back-bar-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  .back-bar-arrow{font-size:17px;line-height:1;}
+  .back-bar-arrow{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:32px;height:32px;flex:0 0 32px;border-radius:50%;
+    background:var(--search-bg);border:1px solid var(--line);
+    color:var(--text);font-size:17px;line-height:1;
+    transition:background .15s ease,border-color .15s ease,color .15s ease,transform .15s ease;
+  }
+  /* --panel is the card's own background and --accent is picked to stand out
+     against it, so accent-on-panel is readable in all six themes without any
+     theme having to declare a seventh colour for this one button. */
+  .back-bar-btn:hover{color:var(--text);}
+  .back-bar-btn:hover .back-bar-arrow{
+    background:var(--accent);border-color:var(--accent);color:var(--panel);
+    transform:translateX(-2px);
+  }
+  .back-bar-rtl .back-bar-btn:hover .back-bar-arrow{transform:translateX(2px);}
+  .back-bar-btn:active .back-bar-arrow{transform:none;}
+  .back-bar-btn:focus-visible{outline:none;}
+  .back-bar-btn:focus-visible .back-bar-arrow{outline:2px solid var(--accent);outline-offset:2px;}
   .back-bar-title{
     font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
     color:var(--text-dim);
+  }
+  @media (prefers-reduced-motion:reduce){
+    .back-bar-arrow{transition:none;}
+    .back-bar-btn:hover .back-bar-arrow{transform:none;}
   }
   /* On a phone the fixed ← bar at the top of the page already IS the back
      control, so the in-body one would be a second one saying the same thing. */
