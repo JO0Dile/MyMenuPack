@@ -187,7 +187,20 @@
   }
 
   // categoryFilter(el) -> boolean, or null/undefined for "every graded course".
-  function gpaFor(prefix, categoryFilter){
+  //
+  // `scenario` is how the What-if screen (js/63-whatif.js) asks "what would
+  // my GPA be IF…" without a second implementation of these rules drifting
+  // away from this one — which is the only way the two numbers a student
+  // compares can ever be computed differently:
+  //   scenario.replace  { [primaryId]: grade }  a different grade for a
+  //                     course, including one not passed yet (a retake, or a
+  //                     course being planned)
+  //   scenario.add      [{ cr, grade }]         hypothetical courses that are
+  //                     not on this plan's page at all
+  function gpaFor(prefix, categoryFilter, scenario){
+    var replace = (scenario && scenario.replace) || {};
+    var extra = (scenario && scenario.add) || [];
+    var hasReplacement = function(pid){ return Object.prototype.hasOwnProperty.call(replace, pid); };
     var grades = loadMap('aaup_grades');
     var progress = window.__getProgress ? window.__getProgress() : {};
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
@@ -211,8 +224,8 @@
       seenNum[dedupeKey] = true;
 
       if(categoryFilter && !categoryFilter(el)) return;
-      if(!progress[pid]) return;
-      var g = grades[pid];
+      if(!progress[pid] && !hasReplacement(pid)) return;
+      var g = hasReplacement(pid) ? replace[pid] : grades[pid];
       if(!isRealGrade(g)) return;
 
       // AAUP's repeat policy: once a course has been retaken AND the
@@ -226,12 +239,20 @@
       // something. Until the retake actually has a grade, the F stays.
       if(window.AAUP_RETAKES && window.AAUP_RETAKES.isSuperseded(prefix, parts.slug)){
         var retakeSlug = window.AAUP_RETAKES.retakeSlugFor(prefix, parts.slug);
-        var retakeGrade = grades[prefix + '-c-' + retakeSlug];
+        var retakePid = prefix + '-c-' + retakeSlug;
+        var retakeGrade = hasReplacement(retakePid) ? replace[retakePid] : grades[retakePid];
         if(isRealGrade(retakeGrade)) return;
       }
 
       var cr = parseFloat(meta.cr) || 0;
       points += GRADE_POINTS[g] * cr;
+      credits += cr;
+    });
+
+    extra.forEach(function(x){
+      if(!isRealGrade(x.grade)) return;
+      var cr = parseFloat(x.cr) || 0;
+      points += GRADE_POINTS[x.grade] * cr;
       credits += cr;
     });
 

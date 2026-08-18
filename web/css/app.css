@@ -2526,6 +2526,54 @@
   .achievement-badge .ab-share:hover{background:var(--accent);color:var(--on-accent);}
   /* ================= AI STUDY ADVISOR ================= */
 
+  /* ---------- what-if GPA (js/63-whatif.js) ----------
+     Two big numbers with an arrow between them, then the rows that move the
+     second one. The arrow colours by direction so the answer is legible
+     before the digits are read. */
+  .wi-head{
+    display:flex;align-items:stretch;gap:10px;margin:12px 0 6px;
+    border:1px solid var(--line);border-radius:12px;padding:12px;
+    background:var(--surface-bg);
+  }
+  .wi-fig{flex:1;display:flex;flex-direction:column;gap:2px;text-align:center;}
+  .wi-fig span{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text-dim);}
+  .wi-fig b{font-size:26px;font-weight:800;color:var(--text);line-height:1.15;}
+  .wi-fig small{font-size:10.5px;color:var(--text-dim);}
+  .wi-arrow{display:flex;align-items:center;font-size:20px;color:var(--text-dim);}
+  .wi-up .wi-arrow,.wi-up .wi-fig:last-child b{color:var(--unlock);}
+  .wi-down .wi-arrow,.wi-down .wi-fig:last-child b{color:var(--prereq);}
+  .wi-h3{margin:18px 0 4px;font-size:13px;font-weight:800;color:var(--text);}
+  .wi-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .wi-row{
+    display:flex;align-items:center;gap:9px;padding:7px 10px;
+    border:1px solid var(--line);border-radius:9px;background:var(--panel);
+  }
+  .wi-row-name{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--text);line-height:1.35;}
+  .wi-row-cr{font-size:11px;font-weight:800;color:var(--accent);}
+  .wi-row-old{
+    font-size:11px;font-weight:800;color:var(--text-dim);
+    border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+  }
+  .wi-sel{
+    font-family:inherit;font-size:12px;padding:5px 8px;border-radius:7px;
+    border:1px solid var(--line);background:var(--search-bg);color:var(--text);
+    max-width:44%;
+  }
+  .wi-msg{font-size:12px;color:var(--text-dim);line-height:1.6;margin:8px 0 0;}
+  .wi-ok{color:var(--unlock);font-weight:700;}
+  .wi-warn{color:var(--prereq);font-weight:700;}
+  .wi-target{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-top:8px;}
+  .wi-target input{
+    width:88px;font-family:inherit;font-size:15px;font-weight:800;padding:7px 9px;
+    border-radius:8px;border:1px solid var(--line);background:var(--search-bg);color:var(--text);
+  }
+  .wi-target > div{flex:1;min-width:180px;}
+  .wi-more{
+    margin-top:8px;background:none;border:0;padding:4px 0;cursor:pointer;
+    font-family:inherit;font-size:12px;font-weight:800;color:var(--accent);
+  }
+  .wi-actions{display:flex;gap:8px;margin-top:14px;}
+
   /* ---------- change major (js/62-change-plan.js) ----------
      A ranked list of every other plan with how much of your work carries
      into it, then one plan's detail. The bar in each row is relative to the
