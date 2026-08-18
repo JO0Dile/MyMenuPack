@@ -365,6 +365,14 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- Share link + QR code for a plan (js/72-share.js) -->
+<div class="modal-overlay" id="shareOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="shareClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="shareBody"></div>
+  </div>
+</div>
+
 <!-- What-if GPA — retakes and next semester, as a sandbox (js/63-whatif.js) -->
 <div class="modal-overlay" id="whatifOverlay">
   <div class="modal-card">

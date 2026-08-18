@@ -1888,6 +1888,7 @@
                                     credits, category, prereqIds || [], null);
     },
     exportPlan: exportPlan, submitPlan: submitPlan, editCoursePrompt: openCourseEditPopup, runAutoLink: runAutoLink,
+    planBundle: planBundle,
     refresh: render, openGradePrompt: openGradePrompt, collegeKeyForPlan: collegeKeyForPlan,
     // Re-measure and redraw the prerequisite lines without rebuilding the
     // plan. Folding/unfolding a year (js/05-collapse-finished-years.js)

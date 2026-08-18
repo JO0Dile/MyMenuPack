@@ -180,6 +180,9 @@
         '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">🏆</span>' + (rtl ? 'الإنجازات' : 'Achievements') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">🧠</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +
         '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">🗺️</span>' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</div>' +
+        (window.AAUP_SHARE
+          ? '<div class="dash-quicklink" onclick="AAUP_SHARE.open(\'' + prefix + '\')"><span class="dq-icon">🔗</span>' + (rtl ? 'شارك هذه الخطة' : 'Share this plan') + '</div>'
+          : '') +
         (window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured()
           ? '<div class="dash-quicklink" onclick="AAUP_CLOUD.open()"><span class="dq-icon">🗄️</span>' +
             (window.AAUP_CLOUD.isSignedIn()

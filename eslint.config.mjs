@@ -32,6 +32,12 @@ export default [
         getSelection: 'readonly', self: 'readonly',
         Blob: 'readonly', File: 'readonly', FileReader: 'readonly', AbortController: 'readonly',
         URL: 'readonly', Image: 'readonly', XMLHttpRequest: 'readonly',
+        // Used by js/72-share.js to build a share link: base64 (btoa/atob),
+        // gzip (Compression/DecompressionStream, feature-detected — absent
+        // on an older browser, not a ReferenceError), and reading the
+        // compressed bytes back out (Response, TextEncoder/TextDecoder).
+        btoa: 'readonly', atob: 'readonly', TextEncoder: 'readonly', TextDecoder: 'readonly',
+        CompressionStream: 'readonly', DecompressionStream: 'readonly', Response: 'readonly',
         // Defined in js/02-shared-cross.js and called from other modules and
         // from inline onclick="" attributes, so they are genuinely global.
         showPage: 'readonly', toggleLang: 'readonly'

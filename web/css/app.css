@@ -2689,6 +2689,18 @@
     .skel-avatar,.skel-line{animation:none;background:var(--line);}
   }
 
+  /* ---------- share link + QR (js/72-share.js) ---------- */
+  .share-loading{font-size:12.5px;color:var(--text-dim);}
+  .share-link-row{display:flex;gap:8px;margin:12px 0 18px;}
+  .share-link-input{
+    flex:1 1 auto;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;
+    background:var(--search-bg);color:var(--text);font-family:monospace;font-size:12px;
+  }
+  .share-qr-wrap{text-align:center;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface-bg);}
+  .share-qr-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);margin:0 0 10px;}
+  .share-qr-canvas{max-width:100%;height:auto;border-radius:6px;background:#fff;padding:8px;}
+  .share-qr-toobig{font-size:12.5px;color:var(--text-dim);margin:0;}
+
   /* ---------- contacts (js/68-contacts.js) ---------- */
   .ct-privacy{
     font-size:11px;color:var(--text-dim);background:var(--surface-bg);
@@ -3509,9 +3521,14 @@
      row instead: a round arrow that looks pressable, the word next to it, and
      no divider competing with the heading right below. The right-hand padding
      keeps it clear of the ✕ that still sits in the corner. */
+  /* Not margin:-6px anymore — .back-bar is the first thing inside
+     .modal-card > .modal-body, which scrolls its own content (added later,
+     to cap a tall dialog's height). A scroll container clips a child's
+     negative top margin instead of letting it poke out above, which cut
+     the top off the back arrow's circle. Zero margin here can never clip. */
   .back-bar{
     display:flex;align-items:center;gap:10px;
-    margin:-6px 0 14px;padding-inline-end:30px;
+    margin:0 0 14px;padding-inline-end:30px;
     min-height:32px;
   }
   .back-bar-rtl{flex-direction:row-reverse;padding-inline-end:0;padding-inline-start:30px;}

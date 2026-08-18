@@ -51,7 +51,7 @@ OUT = REPO / 'web' / 'bundles'
 GROUPS = {
     'core': [
         '02-shared-cross.js', '04-icons.js', '10-progress-core.js', '11-module11.js',
-        '14-storage.js', '60-backbar.js', '70-skeleton.js',
+        '14-storage.js', '60-backbar.js', '70-skeleton.js', '71-qrcode.js',
     ],
     'shell': [
         '15-student.js', '17-theme.js', '22-feedback.js', '26-dev.js', '29-home.js',
@@ -71,7 +71,7 @@ GROUPS = {
         '28-imported.js', '36-dashboard.js', '49-course-detail.js', '50-whats-next.js',
         '51-gpa-studio.js', '53-roadmap.js', '54-prereq-graph.js', '57-card-input.js',
         '62-change-plan.js', '63-whatif.js', '64-milestones.js', '65-focus-mode.js',
-        '66-graduation.js', '67-gpa-target.js', '69-phone-header.js',
+        '66-graduation.js', '67-gpa-target.js', '69-phone-header.js', '72-share.js',
     ],
     'server': [
         '30-sync.js', '31-collect.js', '41-assistant-kb.js', '42-assistant.js',
