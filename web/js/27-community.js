@@ -113,7 +113,12 @@
   }
 
   function refreshAllCommunityBadges(){
-    (window.__PLANS || []).forEach(function(prefix){
+    // window.__PLANS is only the four hardcoded majors (js/11-module11.js)
+    // — every imported/feed-synced plan (which is most of them) registers
+    // into window.__PLAN_DATA the same way but was never in that list, so
+    // this silently never refreshed a single badge for any of them. Every
+    // currently-registered plan is the right set, not a hardcoded four.
+    Object.keys(window.__PLAN_DATA || {}).forEach(function(prefix){
       var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
       Object.keys(info).forEach(function(slug){ refreshCardBadge(prefix, slug); });
     });
@@ -159,10 +164,96 @@
     }, 0);
   }
 
+  // ---- live pooling (workers/ratings-worker.js) --------------------------
+  //
+  // Everything above this point works the way it always has: a maintainer
+  // pastes an aggregated feedback file, and it shows as badges. This adds a
+  // second, live source feeding the exact same badges — the difficulty
+  // stars and workload buttons a student already sets for themselves
+  // (js/21-course-modal-extras.js) now also, quietly, contribute to a
+  // pooled number for that course. Nothing new to fill in; the rating
+  // itself is the only thing shared, same shape as importFeedback already
+  // handled, so summarize()/refreshCardBadge() need no changes at all.
+
+  function ratingsUrl(){ return (window.APP_RATINGS_URL || '').replace(/\/+$/, ''); }
+  function deviceId(){ return window.__deviceId ? window.__deviceId() : 'd-anon'; }
+
+  // A study-plan page re-renders on every single course toggle — syncLive()
+  // is called from that same post-render hook, so without this it would
+  // refetch the whole plan's ratings on every click. Once per plan per
+  // 5 minutes is plenty for numbers that only move when someone else rates
+  // something.
+  var lastSyncAt = {};
+  var SYNC_COOLDOWN_MS = 5 * 60 * 1000;
+
+  function mergeLiveAggregate(courseId, agg, community){
+    if(!agg) return;
+    var entry = community[courseId] || { totalDifficulty: 0, difficultyVotes: 0, workloadCounts: {}, sampleNotes: [] };
+    if(agg.avgDifficulty != null && agg.difficultyVotes){
+      entry.totalDifficulty = agg.avgDifficulty * agg.difficultyVotes;
+      entry.difficultyVotes = agg.difficultyVotes;
+    }
+    if(agg.workloadCounts) entry.workloadCounts = agg.workloadCounts;
+    entry.inProgressCount = agg.inProgressCount || 0;
+    community[courseId] = entry;
+  }
+
+  // Pulls pooled numbers for every course in this plan, in batches (the
+  // Worker caps how many course ids one request can ask for). Merges into
+  // the same local map the pasted-feedback path writes, so a device that
+  // has both a manually-imported snapshot AND a live Worker configured
+  // shows the live numbers without losing sample notes only the pasted
+  // file carries.
+  function syncLive(prefix){
+    var url = ratingsUrl();
+    var ids = Object.keys((window.__PLAN_DATA[prefix] || {}).courseInfo || {});
+    if(!url || !ids.length) return Promise.resolve();
+    var now = Date.now();
+    if(lastSyncAt[prefix] && now - lastSyncAt[prefix] < SYNC_COOLDOWN_MS) return Promise.resolve();
+    lastSyncAt[prefix] = now;
+    var CHUNK = 60;
+    var chunks = [];
+    for(var i = 0; i < ids.length; i += CHUNK){ chunks.push(ids.slice(i, i + CHUNK)); }
+    return chunks.reduce(function(chain, chunk){
+      return chain.then(function(){
+        return fetch(url + '/ratings?courses=' + encodeURIComponent(chunk.join(',')))
+          .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function(data){
+            var community = loadCommunity();
+            Object.keys(data.ratings || {}).forEach(function(id){ mergeLiveAggregate(id, data.ratings[id], community); });
+            saveCommunity(community);
+          }).catch(function(){});
+      });
+    }, Promise.resolve()).then(function(){ refreshAllCommunityBadges(); });
+  }
+
+  // Sends this device's CURRENT difficulty/workload/status for one course —
+  // always all three together, since the Worker stores one row per device
+  // and replaces it wholesale on every write. Sending only whichever field
+  // just changed would silently erase the other two from the pooled count.
+  function pingRating(prefix, courseId){
+    var url = ratingsUrl();
+    if(!url || !courseId) return;
+    var pid = window.AAUP_GPA ? window.AAUP_GPA.primaryId(prefix, courseId) : courseId;
+    var ratings = (window.AAUP_PERSONAL ? window.AAUP_PERSONAL.loadRatings() : {})[pid] || {};
+    var statuses = window.AAUP_GPA ? window.AAUP_GPA.loadStatuses() : {};
+    fetch(url + '/ratings', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courseId: courseId, deviceId: deviceId(),
+        difficulty: ratings.difficulty || null,
+        workload: ratings.workload || null,
+        status: statuses[pid] || null
+      })
+    }).catch(function(){});
+  }
+
   window.AAUP_COMMUNITY = {
     importFeedback: importFeedback,
     refreshAllCommunityBadges: refreshAllCommunityBadges,
-    loadCommunity: loadCommunity
+    loadCommunity: loadCommunity,
+    syncLive: syncLive,
+    pingRating: pingRating
   };
 
   function init(){ refreshAllCommunityBadges(); }

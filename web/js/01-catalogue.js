@@ -67,6 +67,14 @@ window.APP_THOUGHTS_URL = 'https://thoughts-worker.pmhtrfalab999.workers.dev';
 // Left empty, "coming soon" majors fall back to their old read-only note.
 window.APP_CONTRIB_URL = '';
 window.APP_CONTRIB_SECRET = '';
+// ---------------------------------------------------------------------------
+// Ratings (js/27-community.js) — pools the difficulty/workload stars a
+// student already sets on a course (previously local-only) across every
+// student who has, plus a live "N students have this in progress right
+// now" count. Deploy workers/ratings-worker.js and put its URL here.
+// Left empty, ratings stay exactly as they were: private to this device,
+// and the community-feedback badges only show what was pasted in by hand.
+window.APP_RATINGS_URL = '';
 // Which collector you're pointing at, so the app sends in the shape that host
 // accepts. Only two values:
 //   'cloudflare'  (default) — sends JSON with the secret in a header, and

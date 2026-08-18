@@ -321,10 +321,23 @@
         : (rtl ? 'أزِله إن كنت قد تجاوزته أو لم تأخذه (مثل الإنجليزية المتوسطة) — لن يُحتسب ضمن متطلباتك.' : "Remove it if you tested out of it or never took it (e.g. Intermediate English) — it won't count toward your requirements.")) +
       '</p></div>';
 
+    // Pooled from every other student's own planning status for this course
+    // (workers/ratings-worker.js) — already fetched in the background when
+    // the plan page opened (js/27-community.js's syncLive), so this just
+    // reads what's already local rather than firing its own request.
+    var liveEntry = (window.AAUP_COMMUNITY ? window.AAUP_COMMUNITY.loadCommunity() : {})[slug];
+    var inProgressCount = liveEntry ? (liveEntry.inProgressCount || 0) : 0;
+    var whoElseHtml = inProgressCount
+      ? '<p class="who-else-note">👥 ' + (rtl
+          ? (inProgressCount === 1 ? 'طالب واحد آخذ هذا المساق حاليًا هالفصل.' : inProgressCount + ' طلاب آخذين هذا المساق حاليًا هالفصل.')
+          : (inProgressCount === 1 ? '1 other student has this in progress this semester.' : inProgressCount + ' other students have this in progress this semester.')) +
+        '</p>'
+      : '';
+
     return '<div class="modal-extras" data-pid="' + pid + '" data-slug="' + slug + '">' +
       nameFieldHtml +
       '<div class="modal-row-block"><span class="k">' + (rtl ? 'حالة التخطيط' : 'Planning status') + '</span>' +
-      '<div class="status-btn-group">' + statusHtml + '</div></div>' +
+      '<div class="status-btn-group">' + statusHtml + '</div>' + whoElseHtml + '</div>' +
       gradeHtml +
       '<div class="modal-row-block"><span class="k">' + (rtl ? 'مستوى الصعوبة' : 'Difficulty') + '</span>' +
       '<div class="star-rating" id="difficultyStars">' + starsHtml + '</div></div>' +
@@ -417,6 +430,7 @@
         window.AAUP_GPA.saveStatuses(statuses);
         container.querySelectorAll('.status-btn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
+        if(window.AAUP_COMMUNITY) window.AAUP_COMMUNITY.pingRating(prefix, slug);
       });
     });
 
@@ -547,6 +561,7 @@
           s.textContent = v <= next ? '★' : '☆';
         });
         window.AAUP_PERSONAL.refreshCard(prefix, slug);
+        if(window.AAUP_COMMUNITY) window.AAUP_COMMUNITY.pingRating(prefix, slug);
       });
     });
 
@@ -561,6 +576,7 @@
         container.querySelectorAll('.workload-btn').forEach(function(b){ b.classList.remove('active'); });
         if(ratings[pid].workload) btn.classList.add('active');
         window.AAUP_PERSONAL.refreshCard(prefix, slug);
+        if(window.AAUP_COMMUNITY) window.AAUP_COMMUNITY.pingRating(prefix, slug);
       });
     });
 

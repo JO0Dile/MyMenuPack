@@ -1370,7 +1370,10 @@
     initSearch(id);
 
     if(window.AAUP_PLAN_EDITOR){ window.AAUP_PLAN_EDITOR.bindDraggable(id); }
-    if(window.AAUP_COMMUNITY){ window.AAUP_COMMUNITY.refreshAllCommunityBadges(); }
+    if(window.AAUP_COMMUNITY){
+      window.AAUP_COMMUNITY.refreshAllCommunityBadges();
+      if(window.AAUP_COMMUNITY.syncLive) window.AAUP_COMMUNITY.syncLive(id);
+    }
     if(window.__refreshCollapse){ window.__refreshCollapse(id); }
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }
