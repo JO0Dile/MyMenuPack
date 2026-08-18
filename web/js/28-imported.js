@@ -1301,7 +1301,7 @@
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
       '<div class="imp-body-pad">' +
-      (bioEn ? '<p style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
+      (bioEn ? '<p class="imp-bio-text" style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
       '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
 
@@ -1368,6 +1368,7 @@
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }
     if(window.__refreshFocusMode){ window.__refreshFocusMode(id); }
+    if(window.__refreshPhoneHeader){ window.__refreshPhoneHeader(id); }
     // Runs against the freshly-rebuilt DOM. The first call per plan (on open)
     // silently seeds already-complete semesters; later ones (after a toggle
     // re-renders) fire confetti for a semester that just became complete.

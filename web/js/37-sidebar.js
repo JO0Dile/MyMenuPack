@@ -38,6 +38,7 @@
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
     { key: 'thoughts', icon: '💭', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
+    { key: 'contacts', icon: '📇', label: 'Contacts', action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
     // Not the same thing as "Switch Plan" at the bottom, which only reopens
     // the picker. This one answers the question first: what happens to my
     // progress if I move?
