@@ -64,6 +64,22 @@ jobs:
       - name: Offline file list matches the page
         run: python3 tools/check-precache.py
 
+      # No live-publish workflow rebuilds this one on merge (unlike
+      # plans.json below), so there is no race to dodge — this can run on
+      # every push, including main, and it is the only thing standing
+      # between an edited data/aaup/contacts.json and a stale (or
+      # accidentally phone-number-carrying) web/contacts.json shipping to
+      # students.
+      - name: web/contacts.json matches data/, and carries no phone numbers
+        run: |
+          python3 tools/build-contacts.py
+          git diff --exit-code web/contacts.json || {
+            echo ''
+            echo 'web/contacts.json is out of date with data/.'
+            echo 'Run: python3 tools/build-contacts.py  — and commit the result.'
+            exit 1
+          }
+
       - name: Plans add up to the degree they claim
         run: python3 tools/check-plan-hours.py
 

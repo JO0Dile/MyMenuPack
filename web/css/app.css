@@ -2566,6 +2566,104 @@
   .achievement-badge .ab-share:hover{background:var(--accent);color:var(--on-accent);}
   /* ================= AI STUDY ADVISOR ================= */
 
+  /* ---------- phone study-plan header (js/69-phone-header.js) ----------
+     Desktop is untouched (nothing here fires above 720px). On a phone the
+     whole pre-course header — brand block, title, buttons, legend, both
+     toggles, search, description, progress bar — collapses behind one
+     sticky bar with the plan name, its progress, and a chevron. All those
+     pieces stay exactly where their own modules put them; this only hides
+     them with a class-scoped rule and reveals them again on tap. */
+  .imp-phone-bar{display:none;}
+  @media (max-width:720px){
+    .sheet-plan{position:relative;}
+    .imp-phone-bar{
+      display:block;position:sticky;top:0;z-index:40;
+      background:var(--header-bg);border-bottom:1px solid var(--line);
+      margin:0 -16px 10px;padding-inline-start:58px;   /* clears the fixed ☰ sidebar toggle */
+    }
+    .imp-phone-bar-btn{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      width:100%;padding:13px 16px;background:none;border:0;
+      font-family:inherit;font-size:13.5px;font-weight:800;color:var(--text);cursor:pointer;
+    }
+    .imp-phone-bar-title{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:start;}
+    .imp-phone-bar-pct{flex:0 0 auto;color:var(--accent);font-weight:800;}
+    .imp-phone-bar-chevron{flex:0 0 auto;font-size:16px;color:var(--text-dim);}
+
+    .sheet-plan > header,
+    .sheet-plan > .legend,
+    .sheet-plan > .collapse-toggle,
+    .sheet-plan > .course-search-wrap,
+    .sheet-plan > .imp-body-pad > .imp-bio-text,
+    .sheet-plan > .imp-body-pad > .progress-widget,
+    .sheet-plan > .imp-body-pad > .imp-stat-chips,
+    .sheet-plan > .imp-body-pad > .panel-action-row{
+      display:none;
+    }
+    .sheet-plan.imp-phone-open > header,
+    .sheet-plan.imp-phone-open > .legend,
+    .sheet-plan.imp-phone-open > .collapse-toggle,
+    .sheet-plan.imp-phone-open > .course-search-wrap,
+    .sheet-plan.imp-phone-open > .imp-body-pad > .imp-bio-text,
+    .sheet-plan.imp-phone-open > .imp-body-pad > .progress-widget,
+    .sheet-plan.imp-phone-open > .imp-body-pad > .imp-stat-chips,
+    .sheet-plan.imp-phone-open > .imp-body-pad > .panel-action-row{
+      display:block;
+    }
+    /* These are flex/block toggles by their own rules elsewhere in this
+       file, which would otherwise win the cascade over the plain "display:
+       block" above and leave them invisible even once revealed. */
+    .sheet-plan.imp-phone-open > .course-search-wrap .search-box{display:flex;}
+    .sheet-plan.imp-phone-open > .imp-body-pad > .progress-widget{display:flex;}
+    .sheet-plan.imp-phone-open > .collapse-toggle{display:flex;}
+    .sheet-plan.imp-phone-open > .imp-body-pad > .imp-stat-chips{display:flex;}
+    .sheet-plan.imp-phone-open > .imp-body-pad > .panel-action-row{display:flex;}
+  }
+
+  /* ---------- contacts (js/68-contacts.js) ---------- */
+  .ct-privacy{
+    font-size:11px;color:var(--text-dim);background:var(--surface-bg);
+    border:1px solid var(--line);border-radius:8px;padding:8px 11px;margin:0 0 12px;
+  }
+  .ct-loading{font-size:12.5px;color:var(--text-dim);}
+  .ct-search{
+    width:100%;font-family:inherit;font-size:13px;padding:9px 12px;
+    border-radius:10px;border:1px solid var(--line);background:var(--search-bg);
+    color:var(--text);margin-bottom:10px;
+  }
+  .ct-chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+  .ct-chip{
+    font-size:11.5px;font-weight:700;padding:6px 13px;border-radius:999px;
+    border:1px solid var(--line);background:none;color:var(--text-dim);
+    font-family:inherit;cursor:pointer;white-space:nowrap;
+  }
+  .ct-chip:hover{border-color:var(--accent);color:var(--text);}
+  .ct-chip-on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
+  .ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+  .ct-card{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel);}
+  .ct-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+  .ct-avatar{
+    width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:var(--surface-bg);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .ct-card-main{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .ct-name{font-size:13px;font-weight:800;color:var(--text);line-height:1.3;}
+  .ct-sub{font-size:11px;color:var(--text-dim);line-height:1.4;}
+  .ct-email-row{display:flex;align-items:center;gap:8px;justify-content:space-between;}
+  .ct-email{
+    font-size:11.5px;color:var(--accent);text-decoration:none;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;min-width:0;
+  }
+  .ct-email:hover{text-decoration:underline;}
+  .ct-copy{
+    font-size:10.5px;font-weight:700;color:var(--text-dim);background:none;
+    border:1px solid var(--line);border-radius:999px;padding:3px 10px;
+    font-family:inherit;cursor:pointer;flex:0 0 auto;
+  }
+  .ct-copy:hover{border-color:var(--accent);color:var(--text);}
+  .ct-noemail{font-size:11px;color:var(--text-dim);font-style:italic;}
+  .ct-empty{font-size:12.5px;color:var(--text-dim);margin-top:10px;}
+
   /* ---------- when do I graduate (js/66-graduation.js) ---------- */
   .grad-msg{font-size:12.5px;color:var(--text-dim);margin:0;}
   .grad-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}

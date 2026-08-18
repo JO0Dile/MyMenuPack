@@ -26,7 +26,7 @@ def loaded_by_page():
     urls = re.findall(r'<script[^>]+src="([^"]+)"', html)
     urls += re.findall(r'<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"', html)
     # Not referenced by a tag, but fetched at runtime and required offline.
-    urls += ['plans.json', 'manifest.json']
+    urls += ['plans.json', 'contacts.json', 'manifest.json']
     return [u for u in urls if '//' not in u]
 
 

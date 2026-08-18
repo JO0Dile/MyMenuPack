@@ -357,6 +357,14 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 </div>
 
+<!-- Contacts — instructors and offices, read-only (js/68-contacts.js) -->
+<div class="modal-overlay" id="contactsOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="contactsClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="contactsBody"></div>
+  </div>
+</div>
+
 <!-- What-if GPA — retakes and next semester, as a sandbox (js/63-whatif.js) -->
 <div class="modal-overlay" id="whatifOverlay">
   <div class="modal-card">
@@ -569,6 +577,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <script src="js/65-focus-mode.js"></script>
 <script src="js/66-graduation.js"></script>
 <script src="js/67-gpa-target.js"></script>
+<script src="js/68-contacts.js"></script>
+<script src="js/69-phone-header.js"></script>
 
 <script src="js/05-collapse-finished-years.js"></script>
 
