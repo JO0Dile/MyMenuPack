@@ -37,7 +37,21 @@
 
   function esc(s){ return window.__escapeHtml(s == null ? '' : String(s)); }
   function store(){ return window.AAUP_STORAGE; }
-  function endpoint(){ return window.APP_THOUGHTS_URL || ''; }
+  // The server can be set two ways: baked into js/01-catalogue.js at build
+  // time, or pasted into Settings → Data on the device. The stored one wins,
+  // because someone who has just deployed their Worker is holding a phone,
+  // not a text editor.
+  var URL_KEY = 'aaup_thoughtsUrl';
+  function storedUrl(){
+    try{ return localStorage.getItem(URL_KEY) || ''; }catch(e){ return ''; }
+  }
+  function endpoint(){ return storedUrl() || window.APP_THOUGHTS_URL || ''; }
+  function setServerUrl(v){
+    v = String(v || '').trim().replace(/\/+$/, '');
+    if(v && !/^https:\/\/[^\s]+$/i.test(v)) return false;
+    try{ if(v) localStorage.setItem(URL_KEY, v); else localStorage.removeItem(URL_KEY); }catch(e){}
+    return true;
+  }
   function online(){ return typeof navigator === 'undefined' || navigator.onLine !== false; }
 
   function isRtl(prefix){ return window.__isRtl ? window.__isRtl(prefix) : false; }
@@ -404,7 +418,65 @@
 
   window.addEventListener('online', function(){ flushQueue(); });
 
+  // ---- Settings → Data: where the wall's server lives ---------------------
+  // The Worker is deployed by hand, once, by whoever runs the app. Before
+  // this existed the only way to point the app at it was to edit
+  // js/01-catalogue.js and redeploy the site — which is why the wall still
+  // said "local mode" to someone who had already deployed their Worker and
+  // put thoughts on it.
+  function settingsSectionHtml(r){
+    var saved = storedUrl();
+    var live = endpoint();
+    return '<h3 style="margin:18px 0 6px;">💭 ' + (r ? 'خادم الأفكار' : 'Thoughts server') + '</h3>' +
+      '<p class="form-note" style="margin-top:0;">' +
+      (r ? 'ألصق رابط الـ Worker الخاص بالأفكار ليصير الحائط مشتركًا بين الطلاب. بدونه تبقى أفكارك على جهازك فقط.'
+         : 'Paste your thoughts Worker URL to make the wall shared between students. Without it, your thoughts stay on this device.') +
+      '</p>' +
+      '<div class="form-field-row">' +
+      '<div class="form-field"><input type="url" id="thUrlInput" spellcheck="false" dir="ltr" ' +
+        'placeholder="https://your-worker.workers.dev" value="' + esc(saved) + '"></div>' +
+      '<button type="button" class="home-btn" id="thUrlSave" style="align-self:flex-start;">' +
+        (r ? '💾 حفظ وفحص' : '💾 Save & test') + '</button>' +
+      '</div>' +
+      '<p class="form-note" id="thUrlMsg" style="margin-top:4px;">' +
+      (live
+        ? (r ? 'المستخدم حاليًا: ' : 'Currently using: ') + esc(live) + (saved ? '' : (r ? ' (من ملف الإعدادات)' : ' (from the config file)'))
+        : (r ? 'غير مُهيّأ — الوضع المحلي.' : 'Not configured — local mode.')) +
+      '</p>';
+  }
+
+  function bindSettingsSection(root, prefix){
+    var input = root.querySelector('#thUrlInput');
+    var save = root.querySelector('#thUrlSave');
+    var msg = root.querySelector('#thUrlMsg');
+    if(!input || !save || !msg) return;
+    var r = root.getAttribute('dir') === 'rtl';
+    save.addEventListener('click', function(){
+      var v = input.value.trim();
+      if(!setServerUrl(v)){
+        msg.textContent = r ? 'الرابط لازم يبدأ بـ https://' : 'The URL has to start with https://';
+        return;
+      }
+      if(!v){ msg.textContent = r ? 'تم المسح — الوضع المحلي.' : 'Cleared — local mode.'; return; }
+      // Say what actually happened, not what we hope happened: this asks the
+      // Worker for a real wall and reports what came back, including the
+      // failure.
+      msg.textContent = r ? 'جارٍ الفحص…' : 'Testing…';
+      fetchWall(prefix || 'ai').then(function(list){
+        msg.textContent = r
+          ? ('متصل ✓ — الخادم ردّ بـ ' + (list ? list.length : 0) + ' فكرة.')
+          : ('Connected ✓ — the server answered with ' + (list ? list.length : 0) + ' thought(s).');
+      }).catch(function(e){
+        msg.textContent = (r ? 'ما زبطت: ' : 'Could not reach it: ') + String(e && e.message || e) +
+          (r ? ' — تأكد أن ALLOWED_ORIGIN في الـ Worker يشمل هذا الموقع.'
+             : ' — check the Worker\'s ALLOWED_ORIGIN includes this site.');
+      });
+    });
+  }
+
   window.AAUP_THOUGHTS = {
+    serverUrl: endpoint, storedUrl: storedUrl, setServerUrl: setServerUrl,
+    settingsSectionHtml: settingsSectionHtml, bindSettingsSection: bindSettingsSection,
     open: open, close: close, publish: publish, wallFor: wallFor,
     flushQueue: flushQueue, count: function(prefix){ return wallFor(prefix).length; }
   };
