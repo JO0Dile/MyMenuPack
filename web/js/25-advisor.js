@@ -42,7 +42,13 @@
     return null;
   }
 
-  function esc(s){ return window.__escapeHtml ? window.__escapeHtml(String(s == null ? '' : s)) : String(s == null ? '' : s); }
+  // Course names can arrive already HTML-encoded from a plan's JSON, so
+  // decode once and re-escape once rather than printing "&amp;" at a student.
+  function esc(s){
+    var v = String(s == null ? '' : s);
+    if(window.__cleanText) return window.__cleanText(v);
+    return window.__escapeHtml ? window.__escapeHtml(v) : v;
+  }
 
   // ---- what the student has found hard before -----------------------------
   // Averaged over their OWN ratings, per category. A category they have

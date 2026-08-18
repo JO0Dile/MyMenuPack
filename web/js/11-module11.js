@@ -57,6 +57,12 @@
   // (which needs to know completion state, but lives in its own IIFE) always
   // reads the exact same live data instead of keeping a second copy.
   window.__getProgress = function(){ return progress; };
+  // Persisting is exported too, for the one caller that writes progress for a
+  // plan that is NOT on screen: Change Major ticking off the courses that
+  // carried across (js/62-change-plan.js). It goes through the same merge
+  // below rather than writing localStorage itself, so a second tab's ticks
+  // survive it like everything else.
+  window.__saveProgress = function(){ saveProgress(); };
 
   // saveProgress used to write this tab's whole in-memory blob over whatever
   // was in storage. Two tabs open (a completely ordinary thing — the plan in
