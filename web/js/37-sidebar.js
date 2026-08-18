@@ -33,7 +33,11 @@
     // The one place in the app where students talk to each other rather than
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
-    { key: 'thoughts', icon: '💭', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } }
+    { key: 'thoughts', icon: '💭', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
+    // Not the same thing as "Switch Plan" at the bottom, which only reopens
+    // the picker. This one answers the question first: what happens to my
+    // progress if I move?
+    { key: 'changeplan', icon: '🔀', label: 'Change Major', action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
   ];
 
   var currentPrefix = null;

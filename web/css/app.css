@@ -2526,6 +2526,76 @@
   .achievement-badge .ab-share:hover{background:var(--accent);color:var(--on-accent);}
   /* ================= AI STUDY ADVISOR ================= */
 
+  /* ---------- change major (js/62-change-plan.js) ----------
+     A ranked list of every other plan with how much of your work carries
+     into it, then one plan's detail. The bar in each row is relative to the
+     best match, so the list reads at a glance as "this is where my credits
+     go furthest" without anyone doing arithmetic. */
+  .cp-current{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+    background:var(--surface-bg);margin:10px 0 14px;font-size:12px;color:var(--text-dim);
+  }
+  .cp-current b{color:var(--text);font-size:13px;}
+  .cp-list{display:flex;flex-direction:column;gap:8px;}
+  .cp-row{
+    display:flex;align-items:center;gap:11px;width:100%;text-align:start;
+    padding:10px 12px;border-radius:11px;border:1px solid var(--line);
+    background:var(--panel);cursor:pointer;font-family:inherit;color:var(--text);
+    transition:border-color .13s ease;
+  }
+  .cp-row:hover{border-color:var(--accent);}
+  .cp-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .cp-row-icon{font-size:22px;flex:0 0 auto;line-height:1;}
+  .cp-row-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
+  .cp-row-name{font-size:13px;font-weight:700;line-height:1.3;}
+  .cp-row-col{font-size:10.5px;color:var(--text-dim);}
+  .cp-bar{
+    display:block;height:5px;border-radius:999px;margin-top:3px;
+    background:var(--search-bg);border:1px solid var(--line);overflow:hidden;
+  }
+  .cp-bar-fill{display:block;height:100%;background:var(--unlock);}
+  .cp-row-num{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto;}
+  .cp-row-num b{font-size:15px;font-weight:800;color:var(--accent);line-height:1.1;}
+  .cp-row-num small{font-size:9.5px;color:var(--text-dim);letter-spacing:.03em;}
+  .cp-back{
+    background:none;border:0;color:var(--text-dim);font-family:inherit;
+    font-size:12px;font-weight:700;cursor:pointer;padding:2px 0;margin-bottom:8px;
+  }
+  .cp-back:hover{color:var(--text);}
+  .cp-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .cp-head-icon{font-size:30px;line-height:1;}
+  .cp-head h3{margin:0;font-size:17px;font-weight:800;color:var(--text);}
+  .cp-head p{margin:2px 0 0;font-size:11.5px;color:var(--text-dim);}
+  .cp-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px;}
+  .cp-num{
+    border:1px solid var(--line);border-radius:10px;padding:10px;
+    background:var(--surface-bg);text-align:center;
+  }
+  .cp-num b{display:block;font-size:20px;font-weight:800;color:var(--text);line-height:1.2;}
+  .cp-num span{display:block;font-size:10px;color:var(--text-dim);margin-top:3px;line-height:1.45;}
+  .cp-det{
+    border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px;
+    background:var(--panel);
+  }
+  .cp-det summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--text);}
+  .cp-ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;}
+  .cp-ul li{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--text);flex-wrap:wrap;}
+  .cp-li-cr{font-size:11px;font-weight:800;color:var(--accent);}
+  .cp-li-note{font-size:10.5px;color:var(--text-dim);}
+  .cp-ul-lose li{color:var(--text-dim);}
+  .cp-carry{
+    display:flex;align-items:flex-start;gap:8px;margin:12px 0 4px;
+    font-size:12px;font-weight:700;color:var(--text);line-height:1.5;cursor:pointer;
+  }
+  .cp-carry input{margin-top:2px;accent-color:var(--accent);}
+  .cp-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .cp-go{border-color:var(--accent);}
+
+  @media (max-width:620px){
+    .cp-nums{grid-template-columns:1fr;}
+  }
+
   /* ---------- semester builder (js/25-advisor.js) ----------
      Was a read-only list of eight courses; a student picking a semester is
      choosing BETWEEN courses, so this is a pool on one side, a tray on the
@@ -3161,10 +3231,13 @@
     .back-bar-btn:hover .back-bar-arrow{transform:none;}
   }
   /* On a phone the fixed ← bar at the top of the page already IS the back
-     control, so the in-body one would be a second one saying the same thing. */
+     control, so an in-body one is a second control saying the same thing —
+     stacked directly under it, which reads as a mistake. Hidden for every
+     bar here, not only the auto-injected ones: a dialog that asks for its
+     own bar (Thoughts, the semester builder, Change Major) gets the same
+     treatment, because the phone already has the affordance. */
   @media (max-width:720px){
-    .back-bar-auto{display:none;}
-    .back-bar{margin-top:0;}
+    .back-bar{display:none;}
   }
 
   /* ---------- Thoughts (js/59-thoughts.js) ---------- */
