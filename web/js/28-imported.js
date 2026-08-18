@@ -50,6 +50,29 @@
   }
   function hasStructure(p){ return !!(p.structure && Array.isArray(p.structure.years) && p.structure.years.length); }
 
+  // Plan strings are sanitized on the way IN — on import, on sync, and again
+  // for every stored plan at boot (see the pass at the bottom of this file).
+  // These two escape them again on the way OUT, so a plan that reaches
+  // storage through some path that skips the sanitizer still cannot put
+  // markup on the page. __cleanText is idempotent, so already-clean text
+  // renders byte-identical and nothing double-escapes.
+  //
+  // This is not theoretical: writing a majorName of
+  // "<img src=x onerror=…>" straight into storage and calling
+  // renderHomeCards() ran the handler, because the card wrote the name into
+  // innerHTML raw. It survived only until the next boot re-sanitized it —
+  // one page load is plenty.
+  function txt(s){
+    var v = String(s == null ? '' : s);
+    return window.__cleanText ? window.__cleanText(v) : v;
+  }
+  // A plan id lands inside a JS string inside an HTML attribute, so it needs
+  // both escapes: backslash and quote for the JS layer, then HTML for the
+  // attribute the browser decodes first.
+  function jsAttr(s){
+    return txt(String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+  }
+
   // Where a plan sits among its faculty's tiles. Empty means unplaced, not
   // zero — zero is a real position that would move the plan to the front.
   function sortOrderOf(p){
@@ -136,20 +159,20 @@
             : 'Course list not added yet \u2014 coming soon.')
         : ((p.bio && p.bio.en) || (courseCount + ' courses \u00b7 community-imported major'));
       var uni = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'];
-      var badge = (uni ? uni.icon + ' ' + uni.shortName + ' \u00b7 ' : '') + (p.official ? (p.wasEdited ? '✏️ Official (Edited)' : '✅ Official') : (p.wasEdited ? '✏️ User Edited' : '👤 User Made'));
+      var badge = (uni ? txt(uni.icon) + ' ' + txt(uni.shortName) + ' \u00b7 ' : '') + (p.official ? (p.wasEdited ? '✏️ Official (Edited)' : '✅ Official') : (p.wasEdited ? '✏️ User Edited' : '👤 User Made'));
       // Reuses the exact .plan-card class the four built-in majors use —
       // same icon box, same two-tone title, same dim bio text, same small
       // blue CTA — rather than a bespoke look-alike that has to be kept in
       // sync with it by hand.
       var openAction = pending
         ? 'AAUP_IMPORTED.notePending()'
-        : 'AAUP_DASHBOARD.selectAndOpen(\'' + id + '\')';
-      return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + id + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + (p.university || 'aaup') + '" data-college="' + collegeKeyForPlan(p) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
+        : 'AAUP_DASHBOARD.selectAndOpen(\'' + jsAttr(id) + '\')';
+      return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + txt(id) + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + txt(p.university || 'aaup') + '" data-college="' + txt(collegeKeyForPlan(p)) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
         '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">🗑 Delete</button>' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(p, { size: 30 }) + '</div>' +
-        '<h2>' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</h2>' +
-        '<p class="pc-bio">' + bio + '</p>' +
+        '<h2>' + txt(en.big) + (en.small ? '<em>' + txt(en.small) + '</em>' : '') + '</h2>' +
+        '<p class="pc-bio">' + txt(bio) + '</p>' +
         '<div class="pc-cta">' + (pending
           ? (rtl ? 'قريبًا' : 'Coming soon')
           : (rtl ? 'عرض الخطة ←' : 'View plan →')) + '</div></div>';
@@ -1278,7 +1301,7 @@
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
       '<div class="imp-body-pad">' +
-      (bioEn ? '<p style="font-size:12px;color:var(--text-dim);opacity:.85;">' + (rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
+      (bioEn ? '<p style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
       '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
 
@@ -1461,7 +1484,7 @@
 
     var html = '<div class="sheet sheet-plan sheet-plan-simple">' +
       '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>🏠</span><span>Home</span></button></div>' +
-      '<h1>' + en.big + (en.small ? ' ' + en.small : '') + ' <em style="opacity:.6;font-size:.6em;">' + ar.big + (ar.small ? ' ' + ar.small : '') + '</em></h1></header>' +
+      '<h1>' + txt(en.big) + (en.small ? ' ' + txt(en.small) : '') + ' <em style="opacity:.6;font-size:.6em;">' + txt(ar.big) + (ar.small ? ' ' + txt(ar.small) : '') + '</em></h1></header>' +
       '<div class="imp-body-pad">' +
       '<p style="font-size:12px;color:var(--text-dim);">This is a community-imported plan \u2014 a simplified view without the custom prerequisite-arrow diagram the built-in majors have, but progress tracking and prerequisite locking both work normally.</p>' +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
