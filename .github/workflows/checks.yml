@@ -64,6 +64,21 @@ jobs:
       - name: Offline file list matches the page
         run: python3 tools/check-precache.py
 
+      # web/js/*.js is still where every feature is written and reviewed;
+      # web/bundles/*.js is what index.html actually loads. Nothing rebuilds
+      # the bundles automatically, so a change to a module that isn't
+      # followed by rebuilding its bundle would ship silently stale code —
+      # this is what catches that before it reaches main.
+      - name: web/bundles/*.js match web/js/*.js
+        run: |
+          python3 tools/build-bundles.py
+          git diff --exit-code web/bundles/ || {
+            echo ''
+            echo 'web/bundles/*.js is out of date with web/js/.'
+            echo 'Run: python3 tools/build-bundles.py  — and commit the result.'
+            exit 1
+          }
+
       # No live-publish workflow rebuilds this one on merge (unlike
       # plans.json below), so there is no race to dodge — this can run on
       # every push, including main, and it is the only thing standing

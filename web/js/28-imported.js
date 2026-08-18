@@ -1290,7 +1290,7 @@
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">📤 Export Plan</button>' : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">📨 Contribute</button>' : '') +
       '</div></header>' +
-      '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">▶</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span></button>' +
+      '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">▶</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
       '<div class="legend-items">' +
       CATS.map(function(c){ return '<span class="item"><span class="chip ' + c + '"></span><span>' + CAT_LABELS[c][rtl ? 1 : 0] + '</span></span>'; }).join('') +
       '<span class="arrow-sample"><span class="ln"></span><span>' + (rtl ? 'متطلب سابق (مرر المؤشر فوق المساق لتتبعه)' : 'Prerequisite (hover a course to trace it)') + '</span></span>' +

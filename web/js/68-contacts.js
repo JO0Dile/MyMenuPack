@@ -114,7 +114,7 @@
       '<h2 style="margin-top:0;">📇 ' + t('title', rtl) + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' + t('lead', rtl) + '</p>' +
       '<p class="ct-privacy">🔒 ' + t('noPhones', rtl) + '</p>' +
-      '<p class="ct-loading">' + (rtl ? 'جارٍ التحميل…' : 'Loading…') + '</p>';
+      '<div class="ct-loading">' + (window.__skeletonHTML ? window.__skeletonHTML('card', 5, rtl) : (rtl ? 'جارٍ التحميل…' : 'Loading…')) + '</div>';
 
     load().then(function(data){
       if(data === 'error'){

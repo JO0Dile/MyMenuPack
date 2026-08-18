@@ -501,10 +501,6 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="fix-body" id="fixBody"></div>
 </div>
 
-
-<script src="js/02-shared-cross.js"></script>
-
-
 <div class="float-popup" id="floatPopup" style="display:none;" role="dialog" aria-label="Course details">
   <div class="float-popup-head" id="floatPopupHead">
     <span class="float-popup-title" id="floatPopupTitle">Course</span>
@@ -516,77 +512,18 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="float-popup-body" id="floatPopupBody"></div>
 </div>
 
-<script src="js/03-search.js"></script>
-<script src="js/04-icons.js"></script>
-
-<script src="js/10-progress-core.js"></script>
-<script src="js/11-module11.js"></script>
-<script src="js/12-removed.js"></script>
-<script src="js/13-pair-mode-toggle.js"></script>
-<script src="js/14-storage.js"></script>
-<script src="js/15-student.js"></script>
-<script src="js/16-data.js"></script>
-<script src="js/17-theme.js"></script>
-<script src="js/18-gpa.js"></script>
-<script src="js/19-audit.js"></script>
-<script src="js/20-personal.js"></script>
-<script src="js/21-course-modal-extras.js"></script>
-<script src="js/22-feedback.js"></script>
-<script src="js/23-legend.js"></script>
-<script src="js/24-achievements.js"></script>
-<script src="js/25-advisor.js"></script>
-<script src="js/26-dev.js"></script>
-<script src="js/27-community.js"></script>
-<script src="js/28-imported.js"></script>
-<script src="js/29-home.js"></script>
-<script src="js/30-sync.js"></script>
-<script src="js/31-collect.js"></script>
-<script src="js/32-tutorial.js"></script>
-<script src="js/33-plan-editor.js"></script>
-<script src="js/34-structure.js"></script>
-<script src="js/35-links.js"></script>
-<script src="js/36-dashboard.js"></script>
-<script src="js/37-sidebar.js"></script>
-<script src="js/38-accounts.js"></script>
-<script src="js/39-orphans.js"></script>
-<script src="js/40-retakes.js"></script>
-<script src="js/41-assistant-kb.js"></script>
-<script src="js/42-assistant.js"></script>
-<script src="js/43-assistant-ui.js"></script>
-<script src="js/44-fix-analyzers.js"></script>
-<script src="js/45-fix.js"></script>
-<script src="js/46-assistant-ai.js"></script>
-<script src="js/48-admin.js"></script>
-<script src="js/49-course-detail.js"></script>
-<script src="js/50-whats-next.js"></script>
-<script src="js/51-gpa-studio.js"></script>
-<script src="js/52-cloud.js"></script>
-<script src="js/53-roadmap.js"></script>
-<script src="js/54-prereq-graph.js"></script>
-<script src="js/55-onboarding.js"></script>
-<script src="js/56-story-stack.js"></script>
-<script src="js/57-card-input.js"></script>
-<script src="js/58-wordlist-data.js"></script>
-<script src="js/58-wordfilter.js"></script>
-<script src="js/59-thoughts.js"></script>
-<script src="js/60-backbar.js"></script>
-<script src="js/61-theme-custom.js"></script>
-<script src="js/62-change-plan.js"></script>
-<script src="js/63-whatif.js"></script>
-<script src="js/64-milestones.js"></script>
-<script src="js/65-focus-mode.js"></script>
-<script src="js/66-graduation.js"></script>
-<script src="js/67-gpa-target.js"></script>
-<script src="js/68-contacts.js"></script>
-<script src="js/69-phone-header.js"></script>
-
-<script src="js/05-collapse-finished-years.js"></script>
-
-<script src="js/06-per.js"></script>
-
-<script src="js/07-plan-overview-print.js"></script>
-
-<script src="js/08-celebrations.js"></script>
+<!-- Six bundles instead of the 68 separate module files they're built from
+     (see tools/build-bundles.py) — grouped by feature area, not by the
+     00-70 load-order numbers those files still keep for editing. Order
+     here only matters in that "core" (shared utilities every other group
+     calls into) has to load first; the rest do not depend on load order
+     between them. -->
+<script src="bundles/core.bundle.js"></script>
+<script src="bundles/shell.bundle.js"></script>
+<script src="bundles/edit.bundle.js"></script>
+<script src="bundles/plan.bundle.js"></script>
+<script src="bundles/server.bundle.js"></script>
+<script src="bundles/admin.bundle.js"></script>
 
 <script>
   // The one unambiguous "did this device actually get the update" signal —
@@ -602,7 +539,6 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     else { window.addEventListener('load', paint); }
   })();
 </script>
-
 
 </body>
 </html>

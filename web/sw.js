@@ -15,26 +15,12 @@
 // the CDN, correct and verified, and simply not what the browser ran. The
 // fetch handler below does refresh entries one at a time, so it heals after an
 // extra reload, but "reload twice" is not a fix anyone can be told to rely on.
-var CACHE = 'studyplan-shell-v61';
+var CACHE = 'studyplan-shell-v62';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './contacts.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',
-  './js/02-shared-cross.js', './js/03-search.js', './js/04-icons.js', './js/05-collapse-finished-years.js',
-  './js/06-per.js', './js/07-plan-overview-print.js', './js/08-celebrations.js',
-  './js/10-progress-core.js', './js/11-module11.js', './js/12-removed.js',
-  './js/13-pair-mode-toggle.js', './js/14-storage.js', './js/15-student.js', './js/16-data.js',
-  './js/17-theme.js', './js/18-gpa.js', './js/19-audit.js', './js/20-personal.js',
-  './js/21-course-modal-extras.js', './js/22-feedback.js', './js/23-legend.js',
-  './js/24-achievements.js', './js/25-advisor.js', './js/26-dev.js', './js/27-community.js',
-  './js/28-imported.js', './js/29-home.js', './js/30-sync.js', './js/31-collect.js',
-  './js/32-tutorial.js', './js/33-plan-editor.js', './js/34-structure.js', './js/35-links.js',
-  './js/36-dashboard.js', './js/37-sidebar.js', './js/38-accounts.js', './js/39-orphans.js',
-  './js/40-retakes.js', './js/41-assistant-kb.js', './js/42-assistant.js',
-  './js/43-assistant-ui.js', './js/44-fix-analyzers.js', './js/45-fix.js',
-  './js/46-assistant-ai.js', './js/48-admin.js', './js/49-course-detail.js', './js/50-whats-next.js', './js/51-gpa-studio.js',
-  './js/52-cloud.js', './js/53-roadmap.js', './js/54-prereq-graph.js', './js/55-onboarding.js',
-  './js/56-story-stack.js', './js/57-card-input.js', './js/58-wordlist-data.js', './js/58-wordfilter.js',
-  './js/59-thoughts.js', './js/60-backbar.js', './js/61-theme-custom.js', './js/62-change-plan.js', './js/63-whatif.js', './js/64-milestones.js', './js/65-focus-mode.js', './js/66-graduation.js', './js/67-gpa-target.js', './js/68-contacts.js', './js/69-phone-header.js',
+  './bundles/core.bundle.js', './bundles/shell.bundle.js', './bundles/edit.bundle.js',
+  './bundles/plan.bundle.js', './bundles/server.bundle.js', './bundles/admin.bundle.js',
   './assets/icons/favicon.png', './assets/icons/apple-touch-icon.png',
   './assets/icons/icon-any-192.png', './assets/icons/icon-any-384.png',
   './assets/icons/icon-any-512.png',
