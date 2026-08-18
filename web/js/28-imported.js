@@ -116,8 +116,12 @@
 
   // Tapping a plan whose courses are not in yet: say why, rather than opening
   // an empty grid or silently doing nothing.
-  function notePending(){
+  function notePending(id){
     var rtl = window.__anyVisiblePageIsRtl ? window.__anyVisiblePageIsRtl() : false;
+    if(window.AAUP_CONTRIBUTE && id){
+      window.AAUP_CONTRIBUTE.offerToHelp(id);
+      return;
+    }
     if(window.__showToast){
       window.__showToast(rtl
         ? '\u23f3 هذه الخطة منشورة لكن مساقاتها لم تُدخل بعد.'
@@ -165,7 +169,7 @@
       // blue CTA — rather than a bespoke look-alike that has to be kept in
       // sync with it by hand.
       var openAction = pending
-        ? 'AAUP_IMPORTED.notePending()'
+        ? 'AAUP_IMPORTED.notePending(\'' + jsAttr(id) + '\')'
         : 'AAUP_DASHBOARD.selectAndOpen(\'' + jsAttr(id) + '\')';
       return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + txt(id) + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + txt(p.university || 'aaup') + '" data-college="' + txt(collegeKeyForPlan(p)) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
@@ -1289,6 +1293,9 @@
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">📚 Course Library</button>' : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">📤 Export Plan</button>' : '') +
         (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">📨 Contribute</button>' : '') +
+        (p.contributing && window.AAUP_CONTRIBUTE
+          ? '<button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">📮 Submit contribution</button>'
+          : '') +
       '</div></header>' +
       '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">▶</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
       '<div class="legend-items">' +

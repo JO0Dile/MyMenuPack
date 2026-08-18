@@ -38,7 +38,12 @@
     browseUni: null,
     browseFaculties: null,
     browseMajors: null,
-    browseLoading: false
+    browseLoading: false,
+    // Contributions (js/73-contribute.js) — a separate Worker, not the
+    // GitHub-writing one this whole panel otherwise talks to, so it is
+    // fetched directly rather than through api().
+    contribItems: null,
+    contribLoading: false
   };
 
   function esc(s){ return window.__escapeHtml(s == null ? '' : String(s)); }
@@ -139,6 +144,7 @@
     ['prereqs',       '🔗 Prerequisites'],
     ['schedule',      '🗓 Study Plan'],
     ['assets',        '🖼 Assets'],
+    ['contributions', '📮 Contributions'],
     ['settings',      '⚙️ Settings']
   ];
 
@@ -1002,6 +1008,97 @@
         : '<p class="ex-note">Nothing uploaded yet.</p>');
   }
 
+  // ---------- Contributions (js/73-contribute.js / workers/contributions-worker.js) ----------
+  //
+  // A separate Worker from everything else this panel talks to, on purpose
+  // — same reasoning as Thoughts having its own. A reply here does not
+  // write to the repo; it is a message back to the student. Actually
+  // incorporating what they sent still happens by hand, in Majors/Courses,
+  // same as any other edit.
+
+  function contribUrl(){ return (window.APP_CONTRIB_URL || '').replace(/\/+$/, ''); }
+  function contribHeaders(){
+    var h = { 'Content-Type': 'application/json' };
+    if(window.APP_CONTRIB_SECRET) h['X-Admin-Secret'] = window.APP_CONTRIB_SECRET;
+    return h;
+  }
+
+  function loadContributions(){
+    if(!contribUrl()) return;
+    state.contribLoading = true;
+    fetch(contribUrl() + '/contributions', { headers: contribHeaders() })
+      .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(data){
+        state.contribItems = (data && Array.isArray(data.contributions)) ? data.contributions : [];
+      })
+      .catch(function(){ state.contribItems = []; toast('Could not load contributions.'); })
+      .then(function(){ state.contribLoading = false; render(); });
+  }
+
+  function sectionContributions(){
+    if(!contribUrl()){
+      return '<h2>📮 Contributions</h2>' +
+        '<div class="admin-note">APP_CONTRIB_URL is not set in web/js/01-catalogue.js — deploy ' +
+        '<code>workers/contributions-worker.js</code> and put its URL there to see what students send in ' +
+        'while helping build "coming soon" majors.</div>';
+    }
+    if(state.contribLoading || !state.contribItems){
+      return '<h2>📮 Contributions</h2><p class="ex-note">Loading…</p>';
+    }
+    if(!state.contribItems.length){
+      return '<h2>📮 Contributions</h2>' +
+        '<div class="form-actions"><button type="button" class="home-btn" id="contribReload">🔄 Refresh</button></div>' +
+        '<p class="ex-note">Nothing sent in yet.</p>';
+    }
+    return '<h2>📮 Contributions</h2>' +
+      '<div class="form-actions"><button type="button" class="home-btn" id="contribReload">🔄 Refresh</button></div>' +
+      state.contribItems.map(function(c){
+        return '<div class="admin-note" data-contrib-id="' + esc(c.id) + '">' +
+          '<strong>' + esc(c.majorName || c.prefix) + '</strong> (' + esc(c.prefix) + ') — ' +
+          esc((c.courses || []).length) + ' course(s), ' + esc((c.prerequisites || []).length) + ' prerequisite line(s)' +
+          (c.contributorName ? ' — from ' + esc(c.contributorName) : '') +
+          '<br><span style="opacity:.7;">' + esc(new Date(c.submittedAt).toLocaleString()) + ' · status: ' + esc(c.status) + '</span>' +
+          (c.adminReply ? '<div class="admin-note" style="margin-top:8px;"><strong>Your reply:</strong> ' + esc(c.adminReply) + '</div>' : '') +
+          '<pre class="admin-contrib-json">' + esc(JSON.stringify({ courses: c.courses, prerequisites: c.prerequisites, structure: c.structure }, null, 2)) + '</pre>' +
+          '<div class="form-field"><label>Reply' + (c.adminReply ? ' (replacing the one above)' : '') + '</label>' +
+          '<textarea data-contrib-reply rows="2" placeholder="Thanks — added! or: can you double check X\'s credit hours?"></textarea></div>' +
+          '<div class="form-actions">' +
+          '<button type="button" class="home-btn admin-primary" data-contrib-send="' + esc(c.id) + '">Send reply</button> ' +
+          '<button type="button" class="home-btn admin-danger" data-contrib-dismiss="' + esc(c.id) + '">🗑 Delete</button>' +
+          '</div></div>';
+      }).join('');
+  }
+
+  function bindContributions(main){
+    var reload = document.getElementById('contribReload');
+    if(reload) reload.addEventListener('click', loadContributions);
+    main.querySelectorAll('[data-contrib-send]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-contrib-send');
+        var card = btn.closest('[data-contrib-id]');
+        var ta = card ? card.querySelector('[data-contrib-reply]') : null;
+        var message = ta ? ta.value.trim() : '';
+        if(!message) return;
+        fetch(contribUrl() + '/contributions/' + encodeURIComponent(id) + '/reply', {
+          method: 'POST', headers: contribHeaders(),
+          body: JSON.stringify({ message: message, status: 'replied' })
+        }).then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function(){ toast('Reply sent.'); return loadContributions(); })
+          .catch(function(e){ toast('Could not send the reply: ' + e.message); });
+      });
+    });
+    main.querySelectorAll('[data-contrib-dismiss]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-contrib-dismiss');
+        if(!confirm('Delete this contribution permanently? Use this for junk or duplicates only — it also removes any reply from what the student can see, so send a reply first for anything real.')) return;
+        fetch(contribUrl() + '/contributions/' + encodeURIComponent(id), { method: 'DELETE', headers: contribHeaders() })
+          .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function(){ toast('Dismissed.'); return loadContributions(); })
+          .catch(function(e){ toast('Could not dismiss it: ' + e.message); });
+      });
+    });
+  }
+
   function sectionSettings(){
     return '<h2>Settings</h2>' +
       '<div class="admin-note"><strong>Signed in as</strong> ' + esc(state.username) + '.<br>' +
@@ -1045,6 +1142,10 @@
     else if(s === 'prereqs') main.innerHTML = sectionPrereqs();
     else if(s === 'schedule') main.innerHTML = sectionSchedule();
     else if(s === 'assets') main.innerHTML = sectionAssets();
+    else if(s === 'contributions'){
+      main.innerHTML = sectionContributions();
+      if(!state.contribLoading && !state.contribItems) loadContributions();
+    }
     else main.innerHTML = sectionSettings();
     bindMain();
   }
@@ -1057,6 +1158,7 @@
   function bindMain(){
     var main = document.getElementById('adminMain');
     bindIconPickers();
+    if(state.section === 'contributions') bindContributions(main);
 
     main.querySelectorAll('[data-edit-uni]').forEach(function(b){
       b.addEventListener('click', function(){

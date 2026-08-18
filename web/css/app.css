@@ -3617,6 +3617,27 @@
   .th-del:hover{border-color:var(--prereq);}
   .th-del:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
+  /* ---------- Contributions (js/73-contribute.js) ---------- */
+  .contrib-list{display:grid;gap:10px;margin-top:10px;}
+  .contrib-row{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;
+  }
+  .contrib-row-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .contrib-major{font-size:13px;font-weight:800;color:var(--text);}
+  .contrib-status{
+    font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+    padding:2px 8px;border-radius:999px;background:var(--search-bg);color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .contrib-status-replied{background:rgba(46,204,113,.16);color:var(--unlock);}
+  .contrib-meta{font-size:11px;color:var(--text-dim);margin-top:3px;}
+  .contrib-reply{
+    margin:8px 0 0;padding:8px 10px;border-radius:8px;
+    background:var(--search-bg);border:1px solid var(--line);
+    font-size:12.5px;line-height:1.5;color:var(--text);
+  }
+
   /* Announced by screen readers, never drawn — the sighted equivalent of
      these messages is the plan repainting itself. */
   .sr-only{
@@ -4561,6 +4582,11 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 }
 .admin-note strong{color:var(--text);}
 .admin-note-warn{background:rgba(255,193,94,.09);}
+.admin-contrib-json{
+  max-height:220px; overflow:auto; margin:8px 0; padding:9px 11px;
+  background:var(--search-bg); border:1px solid var(--line); border-radius:8px;
+  font-size:11px; line-height:1.5; white-space:pre-wrap; word-break:break-word;
+}
 
 .admin-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:6px;}
 .admin-table th{

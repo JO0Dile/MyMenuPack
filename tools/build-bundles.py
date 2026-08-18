@@ -76,7 +76,7 @@ GROUPS = {
     'server': [
         '30-sync.js', '31-collect.js', '41-assistant-kb.js', '42-assistant.js',
         '43-assistant-ui.js', '46-assistant-ai.js', '52-cloud.js',
-        '58-wordlist-data.js', '58-wordfilter.js', '59-thoughts.js',
+        '58-wordlist-data.js', '58-wordfilter.js', '59-thoughts.js', '73-contribute.js',
     ],
     'admin': [
         '48-admin.js',

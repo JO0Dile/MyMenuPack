@@ -111,18 +111,9 @@
   }
 
   // A stable id for this device so a student can delete their own thought
-  // from the wall without any account existing.
-  function deviceId(){
-    var k = 'aaup_deviceId';
-    try{
-      var v = localStorage.getItem(k);
-      if(!v){
-        v = 'd' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-        localStorage.setItem(k, v);
-      }
-      return v;
-    }catch(e){ return 'd-anon'; }
-  }
+  // from the wall without any account existing. Shared with js/14-storage.js
+  // (window.__deviceId) — same identity everywhere it's needed.
+  function deviceId(){ return window.__deviceId ? window.__deviceId() : 'd-anon'; }
 
   var lastPostAt = 0;
 

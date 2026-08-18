@@ -228,6 +228,8 @@
       ) : '') +
       (window.AAUP_THOUGHTS && window.AAUP_THOUGHTS.settingsSectionHtml
         ? window.AAUP_THOUGHTS.settingsSectionHtml(r) : '') +
+      (window.AAUP_CONTRIBUTE && window.AAUP_CONTRIBUTE.settingsSectionHtml
+        ? window.AAUP_CONTRIBUTE.settingsSectionHtml(r) : '') +
       (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '');
   }
 
@@ -298,6 +300,9 @@
     }
     if(window.AAUP_THOUGHTS && window.AAUP_THOUGHTS.bindSettingsSection){
       window.AAUP_THOUGHTS.bindSettingsSection(body, selectedPlan);
+    }
+    if(window.AAUP_CONTRIBUTE && window.AAUP_CONTRIBUTE.bindSettingsSection){
+      window.AAUP_CONTRIBUTE.bindSettingsSection(body);
     }
     body.querySelectorAll('[data-theme-swatch]').forEach(function(el){
       el.addEventListener('click', function(){

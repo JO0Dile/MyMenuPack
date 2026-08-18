@@ -118,6 +118,24 @@
   window.__showUnlockToast = showUnlockToast;
   window.__anyVisiblePageIsRtl = anyVisiblePageIsRtl;
 
+  // A stable per-device id, with no account behind it — first used by
+  // Student Thoughts (so a student can delete their own post) and now
+  // shared with Contributions (so a student can check back for a reply).
+  // Same key, same device, one identity across every feature that needs
+  // "this browser" without needing "this person".
+  function deviceId(){
+    var k = 'aaup_deviceId';
+    try{
+      var v = localStorage.getItem(k);
+      if(!v){
+        v = 'd' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        localStorage.setItem(k, v);
+      }
+      return v;
+    }catch(e){ return 'd-anon'; }
+  }
+  window.__deviceId = deviceId;
+
   // ---------------------------------------------------------------------
   // On a phone a dialog is presented as a page (see the max-width:720px block
   // in css/app.css), so the phone's own Back gesture has to close it. Without
