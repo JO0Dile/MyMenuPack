@@ -65,8 +65,12 @@ window.APP_THOUGHTS_URL = 'https://thoughts-worker.pmhtrfalab999.workers.dev';
 // header on admin-only calls; a student's own submit/check calls never
 // need it, the same way APP_COLLECT_SECRET works for js/31-collect.js.
 // Left empty, "coming soon" majors fall back to their old read-only note.
-window.APP_CONTRIB_URL = '';
-window.APP_CONTRIB_SECRET = '';
+window.APP_CONTRIB_URL = 'https://contributions-worker.pmhtrfalab999.workers.dev';
+// Set this Worker's ADMIN_SECRET (Cloudflare dashboard -> the Worker ->
+// Settings -> Variables -> add secret, name it ADMIN_SECRET) to this exact
+// value, or the admin panel's Contributions tab will load nothing and
+// every reply will fail with 403.
+window.APP_CONTRIB_SECRET = 'ZgYOkOOxrJCPUiqId7vGtyHnLuHIybNT';
 // ---------------------------------------------------------------------------
 // Ratings (js/27-community.js) — pools the difficulty/workload stars a
 // student already sets on a course (previously local-only) across every
@@ -74,7 +78,7 @@ window.APP_CONTRIB_SECRET = '';
 // now" count. Deploy workers/ratings-worker.js and put its URL here.
 // Left empty, ratings stay exactly as they were: private to this device,
 // and the community-feedback badges only show what was pasted in by hand.
-window.APP_RATINGS_URL = '';
+window.APP_RATINGS_URL = 'https://ratings-worker.pmhtrfalab999.workers.dev';
 // Which collector you're pointing at, so the app sends in the shape that host
 // accepts. Only two values:
 //   'cloudflare'  (default) — sends JSON with the secret in a header, and
