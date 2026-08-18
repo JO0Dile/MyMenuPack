@@ -392,5 +392,11 @@
   if(document.readyState === 'complete'){ bind(); }
   else { window.addEventListener('load', bind); }
 
-  window.AAUP_DEV = { openDialog: openDialog, closeDialog: closeDialog, isAuthenticated: function(){ return authenticated; } };
+  window.AAUP_DEV = {
+    openDialog: openDialog, closeDialog: closeDialog, isAuthenticated: function(){ return authenticated; },
+    // Shared with js/72-share.js: importing a plan someone sent via a share
+    // link goes through this exact same validate-and-store path a pasted
+    // JSON does in the Developer Panel, not a second copy of it.
+    importPlan: importPlan
+  };
 })();

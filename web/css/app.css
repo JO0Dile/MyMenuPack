@@ -166,6 +166,18 @@
     padding:20px;
   }
 
+  /* Every scroll container in the app inherits this — the page itself,
+     every modal body, every overflow:auto list — so nothing falls back to
+     the browser's plain default scrollbar (light gray on every theme,
+     including the dark ones, where it stands out like an error). A few
+     spots (.assessment-rows, .line-list) already had their own copy of the
+     same rule for a slimmer 5px thumb; those still win by specificity. */
+  html{ scrollbar-width:thin; scrollbar-color:var(--line) var(--surface-bg); }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-track{ background:var(--surface-bg); }
+  ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:999px; border:2px solid var(--surface-bg); }
+  ::-webkit-scrollbar-thumb:hover{ background:var(--accent); }
+
   .sheet{
     max-width:1500px;
     margin:0 auto;
@@ -998,13 +1010,17 @@
   .editing .course .name{padding-right:0;padding-left:0;}
   /* ---------- My Progress: completion checkbox on each course ---------- */
 
+  /* The circle itself lives on ::before, sized to the content box only —
+     .course-check's padding is an invisible tap-target extension (44px on
+     phones, per touch guidelines), not part of the visible badge. Padding
+     used to inflate the drawn circle right along with the tap target,
+     because a filled background with border-radius paints over padding by
+     default: a 44px hit area meant a 44px green circle sitting on top of
+     the card instead of a small tick in the corner. */
   .course-check{
     position:absolute;
     top:5px; right:5px;
     width:17px; height:17px;
-    border-radius:50%;
-    border:1.5px solid rgba(255,255,255,.5);
-    background:rgba(0,0,0,.2);
     display:flex; align-items:center; justify-content:center;
     font-size:11px; line-height:1; color:transparent;
     cursor:pointer;
@@ -1013,13 +1029,25 @@
     margin:-5px;
     box-sizing:content-box;
   }
+  .course-check::before{
+    content:'';
+    position:absolute;
+    inset:5px;
+    border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.5);
+    background:rgba(0,0,0,.2);
+    transition:border-color .12s ease,background .12s ease;
+    z-index:-1;   /* .course-check is its own stacking context (z-index:3),
+                     so this only drops below the ✓ glyph, not the whole card */
+  }
 
-  .course-check:hover{border-color:#fff;}
+  .course-check:hover::before{border-color:#fff;}
 
   .course-check:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
 
-  .course.completed .course-check{
-    background:#2ecc71; border-color:#2ecc71; color:#0b1330;
+  .course.completed .course-check{color:#0b1330;}
+  .course.completed .course-check::before{
+    background:#2ecc71; border-color:#2ecc71;
   }
 
   /* A finished course used to be dimmed to 50% AND struck through AND
@@ -1172,18 +1200,30 @@
 
   .legend{padding:0;overflow:hidden;display:block;}
 
+  /* The only visible cue that this whole bar is a button used to be one
+     small dim ▶ glyph in var(--text-dim) — easy to miss, easier to mistake
+     for a bullet than a control. Bigger, bolder arrow, full-strength label
+     color, and a plain-language hint on the other side of the row that
+     actually says what tapping it does. */
   .legend-toggle{
     display:flex;align-items:center;gap:8px;width:100%;
     background:none;border:none;font-family:inherit;cursor:pointer;
-    padding:12px 20px;color:var(--text-dim);font-size:12.5px;font-weight:700;
+    padding:12px 20px;color:var(--text);font-size:12.5px;font-weight:700;
     text-align:left;
   }
 
+  .legend-toggle:hover{color:var(--accent);}
+  .legend-toggle:hover .lt-arrow{color:var(--accent);}
+
   .plan-page.rtl-mode .legend-toggle{text-align:right;}
 
-  .legend-toggle .lt-arrow{display:inline-block;transition:transform .2s ease;color:var(--accent);}
+  .legend-toggle .lt-arrow{display:inline-block;transition:transform .2s ease;color:var(--accent);font-size:15px;font-weight:900;}
 
   .legend.expanded .legend-toggle .lt-arrow{transform:rotate(90deg);}
+
+  .legend-toggle .lt-hint{margin-left:auto;color:var(--text-dim);font-weight:600;font-size:11px;}
+  .plan-page.rtl-mode .legend-toggle .lt-hint,
+  .sheet.rtl-mode .legend-toggle .lt-hint{margin-left:0;margin-right:auto;}
 
   .legend-items{
     max-height:0;overflow:hidden;transition:max-height .3s ease;
@@ -1730,6 +1770,7 @@
   .modal-card .form-note{font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.6;}
 
   .status-btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .who-else-note{margin:2px 0 12px;font-size:11.5px;color:var(--text-dim);}
 
   .status-btn{
     background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text-dim);
@@ -2620,6 +2661,47 @@
     .sheet-plan.imp-phone-open > .imp-body-pad > .panel-action-row{display:flex;}
   }
 
+  /* ---------- skeleton loading (js/70-skeleton.js) ----------
+     A slow diagonal shimmer sweeping across a flat placeholder — the
+     standard "something is coming" cue, built from one gradient and one
+     animation so it costs nothing to add to a new screen later. */
+  .skel-wrap{display:flex;flex-direction:column;gap:10px;}
+  .skel-card{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;}
+  .skel-avatar{width:34px;height:34px;border-radius:50%;flex:0 0 auto;}
+  .skel-lines{flex:1 1 auto;display:flex;flex-direction:column;gap:7px;}
+  .skel-line{height:9px;border-radius:5px;}
+  .skel-line-a{width:55%;}
+  .skel-line-b{width:80%;}
+  .skel-avatar,.skel-line{
+    background:linear-gradient(100deg,var(--line) 30%,var(--search-bg) 50%,var(--line) 70%);
+    background-size:250% 100%;
+    animation:skelShimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes skelShimmer{
+    0%{background-position:150% 0;}
+    100%{background-position:-50% 0;}
+  }
+  .skel-tip{
+    margin:6px 0 0;font-size:11.5px;color:var(--text-dim);
+    background:var(--surface-bg);border:1px solid var(--line);border-radius:8px;
+    padding:8px 11px;
+  }
+  @media (prefers-reduced-motion:reduce){
+    .skel-avatar,.skel-line{animation:none;background:var(--line);}
+  }
+
+  /* ---------- share link + QR (js/72-share.js) ---------- */
+  .share-loading{font-size:12.5px;color:var(--text-dim);}
+  .share-link-row{display:flex;gap:8px;margin:12px 0 18px;}
+  .share-link-input{
+    flex:1 1 auto;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;
+    background:var(--search-bg);color:var(--text);font-family:monospace;font-size:12px;
+  }
+  .share-qr-wrap{text-align:center;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface-bg);}
+  .share-qr-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);margin:0 0 10px;}
+  .share-qr-canvas{max-width:100%;height:auto;border-radius:6px;background:#fff;padding:8px;}
+  .share-qr-toobig{font-size:12.5px;color:var(--text-dim);margin:0;}
+
   /* ---------- contacts (js/68-contacts.js) ---------- */
   .ct-privacy{
     font-size:11px;color:var(--text-dim);background:var(--surface-bg);
@@ -3440,9 +3522,14 @@
      row instead: a round arrow that looks pressable, the word next to it, and
      no divider competing with the heading right below. The right-hand padding
      keeps it clear of the ✕ that still sits in the corner. */
+  /* Not margin:-6px anymore — .back-bar is the first thing inside
+     .modal-card > .modal-body, which scrolls its own content (added later,
+     to cap a tall dialog's height). A scroll container clips a child's
+     negative top margin instead of letting it poke out above, which cut
+     the top off the back arrow's circle. Zero margin here can never clip. */
   .back-bar{
     display:flex;align-items:center;gap:10px;
-    margin:-6px 0 14px;padding-inline-end:30px;
+    margin:0 0 14px;padding-inline-end:30px;
     min-height:32px;
   }
   .back-bar-rtl{flex-direction:row-reverse;padding-inline-end:0;padding-inline-start:30px;}
@@ -3531,6 +3618,27 @@
   .th-del:hover{border-color:var(--prereq);}
   .th-del:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
+  /* ---------- Contributions (js/73-contribute.js) ---------- */
+  .contrib-list{display:grid;gap:10px;margin-top:10px;}
+  .contrib-row{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;
+  }
+  .contrib-row-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .contrib-major{font-size:13px;font-weight:800;color:var(--text);}
+  .contrib-status{
+    font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+    padding:2px 8px;border-radius:999px;background:var(--search-bg);color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .contrib-status-replied{background:rgba(46,204,113,.16);color:var(--unlock);}
+  .contrib-meta{font-size:11px;color:var(--text-dim);margin-top:3px;}
+  .contrib-reply{
+    margin:8px 0 0;padding:8px 10px;border-radius:8px;
+    background:var(--search-bg);border:1px solid var(--line);
+    font-size:12.5px;line-height:1.5;color:var(--text);
+  }
+
   /* Announced by screen readers, never drawn — the sighted equivalent of
      these messages is the plan repainting itself. */
   .sr-only{
@@ -3539,9 +3647,12 @@
   }
 
   /* Phones: the tick was 29x29 including its padding, under the 44px every
-     touch guideline asks for, and 13 cards were 43px tall. */
+     touch guideline asks for, and 13 cards were 43px tall. The 44px is a
+     tap-target size, not a badge size — see .course-check::before above —
+     so the padding grows here without the visible circle growing with it. */
   @media (max-width:720px){
-    .course-check{width:22px;height:22px;padding:11px;margin:-11px;font-size:13px;}
+    .course-check{width:18px;height:18px;padding:13px;margin:-13px;font-size:12px;}
+    .course-check::before{inset:13px;}
     .course .name{padding-right:28px;}
     .plan-page.rtl-mode .course .name,
     .sheet.rtl-mode .course .name{padding-right:0;padding-left:28px;}
@@ -4472,6 +4583,11 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 }
 .admin-note strong{color:var(--text);}
 .admin-note-warn{background:rgba(255,193,94,.09);}
+.admin-contrib-json{
+  max-height:220px; overflow:auto; margin:8px 0; padding:9px 11px;
+  background:var(--search-bg); border:1px solid var(--line); border-radius:8px;
+  font-size:11px; line-height:1.5; white-space:pre-wrap; word-break:break-word;
+}
 
 .admin-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:6px;}
 .admin-table th{

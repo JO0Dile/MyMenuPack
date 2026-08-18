@@ -55,7 +55,26 @@ window.APP_COLLECT_SECRET = 'Winston';
 // Left empty, the whole feature still works — thoughts are written, read and
 // deleted on the student's own device and nothing leaves the phone. That is
 // the honest default: no silent half-broken network state.
-window.APP_THOUGHTS_URL = '';
+window.APP_THOUGHTS_URL = 'https://thoughts-worker.pmhtrfalab999.workers.dev';
+// ---------------------------------------------------------------------------
+// Contributions (js/73-contribute.js) — students helping build a "coming
+// soon" major's course list get a live inbox instead of only an emailed
+// file: deploy workers/contributions-worker.js, put its URL here, and set
+// APP_CONTRIB_SECRET to the SAME value as that Worker's ADMIN_SECRET so the
+// admin panel can list and reply to submissions. The secret rides in a
+// header on admin-only calls; a student's own submit/check calls never
+// need it, the same way APP_COLLECT_SECRET works for js/31-collect.js.
+// Left empty, "coming soon" majors fall back to their old read-only note.
+window.APP_CONTRIB_URL = '';
+window.APP_CONTRIB_SECRET = '';
+// ---------------------------------------------------------------------------
+// Ratings (js/27-community.js) — pools the difficulty/workload stars a
+// student already sets on a course (previously local-only) across every
+// student who has, plus a live "N students have this in progress right
+// now" count. Deploy workers/ratings-worker.js and put its URL here.
+// Left empty, ratings stay exactly as they were: private to this device,
+// and the community-feedback badges only show what was pasted in by hand.
+window.APP_RATINGS_URL = '';
 // Which collector you're pointing at, so the app sends in the shape that host
 // accepts. Only two values:
 //   'cloudflare'  (default) — sends JSON with the secret in a header, and
