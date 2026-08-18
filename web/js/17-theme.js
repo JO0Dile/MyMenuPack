@@ -21,13 +21,173 @@
     { id: 'amber', icon: '🔥', en: 'Amber Ember', ar: 'جمر العنبر', bg: '#1c1410', accent: '#ff9f43' }
   ];
 
+  // ---------------------------------------------------------------------
+  // COLOUR MATHS — shared by the picker and by js/61-theme-custom.js.
+  //
+  // A student picking their own two colours only chooses a background and an
+  // accent; the other seven variables every theme sets have to be worked out
+  // from those, or the app ends up with black text on a black card. The
+  // relationships below are lifted from the six hand-made themes above: cards
+  // sit slightly lighter than the page, borders are the biggest step away
+  // from it, and text is the same hue pushed to the far end of the scale.
+  function hexToRgb(hex){
+    var m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex || '').trim());
+    if(!m) return null;
+    var h = m[1];
+    if(h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  }
+  function rgbToHex(r, g, b){
+    return '#' + [r, g, b].map(function(v){
+      var x = Math.round(Math.max(0, Math.min(255, v))).toString(16);
+      return x.length === 1 ? '0' + x : x;
+    }).join('');
+  }
+  function rgbToHsl(rgb){
+    var r = rgb[0] / 255, g = rgb[1] / 255, b = rgb[2] / 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var l = (max + min) / 2, h = 0, s = 0;
+    if(max !== min){
+      var d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if(max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+      else if(max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+    }
+    return [h, s, l];
+  }
+  function hslToHex(h, s, l){
+    h = ((h % 360) + 360) % 360; s = Math.max(0, Math.min(1, s)); l = Math.max(0, Math.min(1, l));
+    var c = (1 - Math.abs(2 * l - 1)) * s;
+    var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    var m = l - c / 2, t;
+    if(h < 60) t = [c, x, 0]; else if(h < 120) t = [x, c, 0]; else if(h < 180) t = [0, c, x];
+    else if(h < 240) t = [0, x, c]; else if(h < 300) t = [x, 0, c]; else t = [c, 0, x];
+    return rgbToHex((t[0] + m) * 255, (t[1] + m) * 255, (t[2] + m) * 255);
+  }
+  // WCAG relative luminance, so "is this background dark?" and "which ink
+  // reads on this button?" are answered by measurement rather than by a
+  // guess about the hue.
+  function relLum(hex){
+    var rgb = hexToRgb(hex) || [0, 0, 0];
+    var c = rgb.map(function(v){
+      v = v / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  function contrast(a, b){
+    var la = relLum(a), lb = relLum(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  function rgbaOf(hex, alpha){
+    var rgb = hexToRgb(hex) || [0, 0, 0];
+    return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + alpha + ')';
+  }
+
+  var INK_DARK = '#0b1330';
+  var INK_LIGHT = '#ffffff';
+
+  function deriveTokens(bg, accent){
+    if(!hexToRgb(bg)) bg = '#0b1330';
+    if(!hexToRgb(accent)) accent = '#5db8ff';
+    var hsl = rgbToHsl(hexToRgb(bg));
+    var h = hsl[0], s = Math.min(hsl[1], 0.6), l = hsl[2];
+    var dark = relLum(bg) < 0.22;
+    // Cards sit a step lighter than the page in every built-in theme —
+    // except when the page is already near-white, where there is no lighter
+    // left and the step has to go the other way for the card to show at all.
+    var dir = (!dark && l > 0.93) ? -1 : 1;
+    function step(d, sat){ return hslToHex(h, sat === undefined ? s : sat, l + dir * d); }
+    var out = {
+      page: bg,
+      surface: step(dark ? 0.045 : 0.06),
+      header: step(dark ? 0.075 : 0.02),
+      panel: step(dark ? 0.055 : 0.04),
+      search: step(dark ? 0.015 : 0.02),
+      // The border is the one value that steps AWAY from the page in the
+      // other direction on a light theme: dark themes lighten their lines,
+      // light themes darken them.
+      line: dark ? hslToHex(h, s * 0.9, l + 0.17) : hslToHex(h, s * 0.9, l - 0.14),
+      accent: accent
+    };
+    // Text is not chosen by "is the background dark?" but by measuring both
+    // candidates against it, because a mid-tone background (a medium green,
+    // say) is neither, and the wrong pick there is the difference between a
+    // readable app and a smear. If even the better one falls under 4.5:1 —
+    // the ratio ordinary body text needs — go to pure white or pure black,
+    // which is as far as it can go.
+    var lightText = hslToHex(h, Math.min(s, 0.28), 0.94);
+    var darkText = hslToHex(h, Math.min(s + 0.08, 0.4), 0.16);
+    var useLight = contrast(lightText, bg) >= contrast(darkText, bg);
+    out.text = useLight ? lightText : darkText;
+    if(contrast(out.text, bg) < 4.5) out.text = useLight ? '#ffffff' : '#000000';
+    // The dimmed text (course codes, hints, counts) only has to clear 3:1,
+    // but on a mid-tone background the usual step lands under that, so it is
+    // walked toward the nearer extreme until it clears — rather than left
+    // at a value that merely looks plausible next to the page colour.
+    var dimSat = useLight ? Math.min(s, 0.26) : Math.min(s, 0.3);
+    var dimL = useLight ? 0.72 : 0.42;
+    var dimStep = useLight ? 0.04 : -0.04;
+    for(var guard = 0; guard < 25; guard++){
+      if(contrast(hslToHex(h, dimSat, dimL), bg) >= 3) break;
+      if(dimL <= 0 || dimL >= 1) break;
+      dimL = Math.max(0, Math.min(1, dimL + dimStep));
+    }
+    out.dim = hslToHex(h, dimSat, dimL);
+    out['on-accent'] = contrast(accent, INK_LIGHT) >= contrast(accent, INK_DARK) ? INK_LIGHT : INK_DARK;
+    out.watermark = dark ? 'rgba(255,255,255,.05)' : rgbaOf(out.text, 0.22);
+    return out;
+  }
+
+  // ---------------------------------------------------------------------
+  // MY COLOURS — the seventh theme, whose two colours the student picks.
+  // It only exists once they have made one; until then nothing shows it.
+  var CUSTOM_KEY = 'aaup_customColors';
+  var CUSTOM_FALLBACK = { bg: '#0b1330', accent: '#5db8ff' };
+
+  function customColors(){
+    try{
+      var raw = localStorage.getItem(CUSTOM_KEY);
+      if(!raw) return null;
+      var v = JSON.parse(raw);
+      if(!v || !hexToRgb(v.bg) || !hexToRgb(v.accent)) return null;
+      return { bg: v.bg, accent: v.accent };
+    }catch(e){ return null; }
+  }
+  function customTheme(){
+    var c = customColors() || CUSTOM_FALLBACK;
+    return { id: 'custom', icon: '🎨', en: 'My colours', ar: 'ألواني', bg: c.bg, accent: c.accent };
+  }
+  function clearCustomColors(){
+    try{ localStorage.removeItem(CUSTOM_KEY); }catch(e){}
+  }
+  function setCustomColors(bg, accent){
+    if(!hexToRgb(bg) || !hexToRgb(accent)) return false;
+    try{ localStorage.setItem(CUSTOM_KEY, JSON.stringify({ bg: bg, accent: accent })); }catch(e){}
+    if(current() === 'custom'){ apply('custom'); }
+    return true;
+  }
+  // Paints the nine --c-* variables html[data-theme="custom"] reads, or
+  // clears them when any other theme is active.
+  function paintCustomVars(on, bg, accent){
+    var st = document.documentElement.style;
+    var names = ['page', 'surface', 'header', 'panel', 'search', 'line', 'text', 'dim', 'accent', 'on-accent', 'watermark'];
+    if(!on){ names.forEach(function(n){ st.removeProperty('--c-' + n); }); return; }
+    var d = deriveTokens(bg, accent);
+    names.forEach(function(n){ st.setProperty('--c-' + n, d[n]); });
+  }
+
   function themeById(id){
+    if(id === 'custom') return customTheme();
     for(var i = 0; i < THEMES.length; i++){ if(THEMES[i].id === id) return THEMES[i]; }
     return null;
   }
 
   function apply(id){
     var t = themeById(id) || themeById(DEFAULT);
+    paintCustomVars(t.id === 'custom', t.bg, t.accent);
     if(t.id === DEFAULT){ document.documentElement.removeAttribute('data-theme'); }
     else{ document.documentElement.setAttribute('data-theme', t.id); }
     document.querySelectorAll('.theme-toggle-icon').forEach(function(el){ el.textContent = t.icon; });
@@ -118,7 +278,15 @@
 
   window.AAUP_THEME = {
     toggle: toggle, setTheme: setTheme, current: current,
+    // list() is the six built-ins — what the first-run wizard offers.
+    // listAll() adds the student's own theme once they have made one,
+    // which is what the Settings picker shows.
     list: function(){ return THEMES.slice(); },
+    listAll: function(){ return customColors() ? THEMES.concat([customTheme()]) : THEMES.slice(); },
+    customColors: customColors, setCustomColors: setCustomColors,
+    clearCustomColors: clearCustomColors,
+    deriveTokens: deriveTokens, contrast: contrast, isHex: function(v){ return !!hexToRgb(v); },
+    hexToRgb: hexToRgb, rgbToHex: rgbToHex, rgbToHsl: rgbToHsl, hslToHex: hslToHex,
     setSize: setSize, currentSize: currentSize,
     sizes: function(){ return SIZES.slice(); }
   };

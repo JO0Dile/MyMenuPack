@@ -19,6 +19,12 @@
     --text:#e9ecf7;
     --text-dim:#9aa3cf;
     --accent:#5db8ff;
+    /* Ink for text sitting ON an accent-coloured button. Dark themes
+       have a bright accent, so the default is the darkest navy — but a
+       theme whose accent is itself dark has to say so, or its buttons
+       read dark-on-dark (Daylight and Cranberry did: 2.2:1 and 2.1:1,
+       both far under the 4.5:1 that ordinary text needs). */
+    --on-accent:var(--navy-900);
 
     /* Official AAUP requirement-category palette, applied to every plan:
        green University Req., gold University Elec., blue College Req.,
@@ -65,6 +71,7 @@
     --text-dim:#55647a;
     --accent:#1b4f8c;
     --search-bg:#eef1f6;
+    --on-accent:#ffffff;
   }
 
   html[data-theme="light"] .watermark-layer{color:rgba(27,42,63,.22);}
@@ -86,6 +93,7 @@
     --text-dim:#7a5c4a;
     --accent:#8c1f3d;
     --search-bg:#f7ece0;
+    --on-accent:#ffffff;
   }
   html[data-theme="cranberry"] .watermark-layer{color:rgba(58,31,26,.22);}
 
@@ -125,6 +133,26 @@
     --accent:#ff9f43;
     --search-bg:#201712;
   }
+
+  /* MY COLOURS (js/61-theme-custom.js) — the one theme whose values come
+     from the student rather than from this file. The editor writes nine
+     --c-* custom properties onto <html> and this block maps them onto the
+     same nine names every other theme sets, so nothing downstream needs to
+     know a custom theme exists. The fallbacks are the dark theme's values,
+     which is what you see if the stored colours are ever missing. */
+  html[data-theme="custom"]{
+    --page-bg:var(--c-page,#0b1330);
+    --surface-bg:var(--c-surface,#101a3d);
+    --header-bg:var(--c-header,#16204d);
+    --panel:var(--c-panel,#141d47);
+    --line:var(--c-line,#2a3568);
+    --text:var(--c-text,#e9ecf7);
+    --text-dim:var(--c-dim,#9aa3cf);
+    --accent:var(--c-accent,#5db8ff);
+    --search-bg:var(--c-search,#0e1636);
+    --on-accent:var(--c-on-accent,#0b1330);
+  }
+  html[data-theme="custom"] .watermark-layer{color:var(--c-watermark,rgba(255,255,255,.05));}
 
   /* ==========================================================================
      2. GLOBAL RESET & BASE — box-sizing, body background/font, outer .sheet frame
@@ -565,7 +593,7 @@
   .year-badge .num{
     width:38px;height:38px;border-radius:9px;
     background:var(--accent);
-    color:var(--navy-900);
+    color:var(--on-accent);
     font-weight:800;font-size:17px;
     display:flex;align-items:center;justify-content:center;
     transform:rotate(45deg);
@@ -1711,7 +1739,7 @@
     margin-bottom:4px;padding-bottom:9px;
   }
 
-  .status-btn.active{background:var(--accent);border-color:var(--accent);color:var(--navy-900);font-weight:700;}
+  .status-btn.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700;}
   .status-btn-auto{cursor:default;}
   .status-btn-auto.active{background:var(--unlock);border-color:var(--unlock);color:#fff;}
   .status-btn-auto:not(.active){opacity:.4;cursor:default;}
@@ -2378,7 +2406,7 @@
     display:block;margin-top:10px;background:rgba(93,184,255,.12);border:1px solid var(--accent);color:var(--accent);
     font-family:inherit;font-size:11.5px;font-weight:800;border-radius:999px;padding:6px 14px;cursor:pointer;
   }
-  .pg-why-locked-btn:hover{background:var(--accent);color:var(--navy-900);}
+  .pg-why-locked-btn:hover{background:var(--accent);color:var(--on-accent);}
 
   .pg-legend-row{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); padding:4px 0;}
   .pg-legend-dot{width:10px; height:10px; border-radius:50%; flex:none;}
@@ -2495,7 +2523,7 @@
     color:var(--accent);font-family:inherit;font-size:10px;font-weight:800;
     border-radius:999px;padding:4px 12px;cursor:pointer;
   }
-  .achievement-badge .ab-share:hover{background:var(--accent);color:var(--navy-900);}
+  .achievement-badge .ab-share:hover{background:var(--accent);color:var(--on-accent);}
   /* ================= AI STUDY ADVISOR ================= */
 
   .advisor-summary{
@@ -2595,7 +2623,7 @@
   }
   .wiz-back:hover{color:var(--text);}
   .wiz-continue{
-    background:var(--accent);color:var(--navy-900);border:none;border-radius:999px;
+    background:var(--accent);color:var(--on-accent);border:none;border-radius:999px;
     padding:10px 22px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;
   }
 
@@ -2662,7 +2690,7 @@
   }
   .story-back:hover{color:var(--text);}
   .story-continue{
-    background:var(--accent);color:var(--navy-900);border:none;border-radius:999px;
+    background:var(--accent);color:var(--on-accent);border:none;border-radius:999px;
     padding:10px 22px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;
   }
 
@@ -2713,7 +2741,7 @@
     text-align:center; padding:8px 10px; border-radius:8px; font-size:12.5px; font-weight:700;
     color:var(--text-dim); cursor:pointer; white-space:nowrap;
   }
-  .settings-tab.active{background:var(--accent); color:#04122b;}
+  .settings-tab.active{background:var(--accent); color:var(--on-accent);}
   .settings-tab-icon{font-size:14px;}
 
   /* ---- theme picker (Settings > Preferences) ---- */
@@ -2740,6 +2768,73 @@
   .theme-swatch-check{margin-left:auto; opacity:0; color:var(--accent); font-weight:800;}
   .theme-swatch-active .theme-swatch-check{opacity:1;}
   html[dir="rtl"] .theme-swatch-check{margin-left:0; margin-right:auto;}
+
+  /* ---- my colours (js/61-theme-custom.js) ----
+     The Customize button under the theme grid, and the panel it opens: a
+     real hue/saturation wheel on a canvas, a lightness slider, a hex box and
+     the system colour picker, all editing whichever of the two colours is
+     selected above them. */
+  .tc-open-row{display:flex;margin:2px 0 4px;}
+  .tc-panel{
+    border:1px solid var(--line);border-radius:12px;padding:12px;
+    margin-top:8px;background:var(--surface-bg);
+  }
+  .tc-lead{margin-top:0;}
+  .tc-targets{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .tc-target{
+    flex:1 1 130px;display:flex;align-items:center;gap:9px;padding:8px;
+    border-radius:10px;border:1.5px solid var(--line);background:none;
+    cursor:pointer;font-family:inherit;text-align:start;
+  }
+  .tc-target-on{border-color:var(--accent);}
+  .tc-target-chip{
+    width:26px;height:26px;flex:0 0 26px;border-radius:50%;
+    border:1px solid rgba(0,0,0,.25);
+  }
+  .tc-target-txt{display:flex;flex-direction:column;gap:1px;font-size:11.5px;font-weight:700;color:var(--text);}
+  .tc-target-txt code{font-size:10.5px;color:var(--text-dim);font-weight:600;}
+  .tc-editor{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+  .tc-wheel{border-radius:50%;cursor:crosshair;touch-action:none;flex:0 0 auto;}
+  .tc-fields{flex:1 1 190px;min-width:180px;display:flex;flex-direction:column;gap:6px;}
+  .tc-lab{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);}
+  .tc-light{
+    appearance:none;-webkit-appearance:none;width:100%;height:12px;
+    border-radius:999px;border:1px solid var(--line);cursor:pointer;
+    background:var(--tc-hue-bg,linear-gradient(to right,#000,#888,#fff));
+  }
+  .tc-light::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;
+  }
+  .tc-light::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;
+  }
+  .tc-hex-row{display:flex;gap:8px;align-items:center;}
+  .tc-hex{
+    flex:1;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:13px;padding:8px 10px;border-radius:8px;
+    border:1px solid var(--line);background:var(--search-bg);color:var(--text);
+  }
+  .tc-native{
+    width:44px;height:38px;padding:2px;flex:0 0 44px;
+    border:1px solid var(--line);border-radius:8px;background:none;cursor:pointer;
+  }
+  .tc-msg{margin:2px 0 0;font-size:11px;color:var(--text-dim);}
+  .tc-msg-warn{color:var(--prereq);font-weight:700;}
+  /* The preview paints the DERIVED values, not the two chosen ones — the
+     point is to show what the app will look like, and seven of the nine
+     colours in it were worked out rather than picked. */
+  .tc-preview{
+    display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px;
+    border:1px solid var(--line);border-radius:10px;flex-wrap:wrap;
+  }
+  .tc-prev-card{
+    display:flex;align-items:center;gap:8px;padding:8px 12px;
+    border:1px solid;border-radius:8px;font-size:12px;font-weight:700;
+  }
+  .tc-prev-btn{padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;}
+  .tc-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
 
   .dev-wrong-pass{color:var(--prereq);font-size:12.5px;font-weight:700;margin-top:8px;}
 
@@ -3417,7 +3512,7 @@
   .tut-skip{background:none;border:none;color:var(--text-dim);font-size:12px;font-family:inherit;cursor:pointer;padding:0;}
   .tut-skip:hover{color:var(--text);}
   .tut-next{
-    background:var(--accent);border:none;color:var(--navy-900);
+    background:var(--accent);border:none;color:var(--on-accent);
     font-size:12.5px;font-weight:800;font-family:inherit;
     padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
   }
@@ -3442,7 +3537,7 @@
   }
   .update-bar{
     position:fixed; top:0; left:0; right:0; z-index:2000;
-    background:var(--accent); color:var(--navy-900);
+    background:var(--accent); color:var(--on-accent);
     padding:9px 14px; font-size:12.5px; font-weight:700;
     display:none; align-items:center; justify-content:center; gap:12px;
     text-align:center;
@@ -3478,7 +3573,7 @@
 .asst-launcher{
   position:fixed; right:16px; bottom:38px; z-index:1400;
   width:52px; height:52px; border-radius:50%;
-  background:var(--accent); color:var(--navy-900);
+  background:var(--accent); color:var(--on-accent);
   border:none; font-size:22px; line-height:1; cursor:pointer;
   box-shadow:0 10px 26px rgba(0,0,0,.45);
   display:flex; align-items:center; justify-content:center;
@@ -3521,7 +3616,7 @@
   background:var(--surface-bg); border:1px solid var(--line);
 }
 .asst-user .asst-bubble{
-  background:var(--accent); color:var(--navy-900);
+  background:var(--accent); color:var(--on-accent);
   border-color:transparent; font-weight:600;
 }
 .asst-bubble p{margin:0 0 6px;}
@@ -3540,7 +3635,7 @@
 }
 .asst-act:hover:not(:disabled){color:var(--text); border-color:var(--accent);}
 .asst-act:disabled{opacity:.5; cursor:default;}
-.asst-act-primary{background:var(--accent); color:var(--navy-900); border-color:transparent;}
+.asst-act-primary{background:var(--accent); color:var(--on-accent); border-color:transparent;}
 
 .asst-chips{display:flex; flex-wrap:wrap; gap:7px;}
 .asst-chip{
@@ -3561,7 +3656,7 @@
 }
 .asst-input:focus{outline:none; border-color:var(--accent);}
 .asst-send{
-  background:var(--accent); color:var(--navy-900); border:none;
+  background:var(--accent); color:var(--on-accent); border:none;
   width:38px; height:38px; border-radius:50%; cursor:pointer;
   font-size:14px; font-family:inherit; flex:0 0 auto;
 }
@@ -3608,7 +3703,7 @@
 }
 .guide-end:hover{color:var(--text);}
 .guide-next{
-  background:var(--accent); border:none; color:var(--navy-900);
+  background:var(--accent); border:none; color:var(--on-accent);
   font-size:12.5px; font-weight:800; font-family:inherit;
   padding:8px 16px; border-radius:999px; cursor:pointer; white-space:nowrap;
 }
@@ -3670,7 +3765,7 @@
 }
 .fix-btn:hover:not(:disabled){color:var(--text); border-color:var(--accent);}
 .fix-btn:disabled{opacity:.55; cursor:default;}
-.fix-btn-primary{background:var(--accent); color:var(--navy-900); border-color:transparent;}
+.fix-btn-primary{background:var(--accent); color:var(--on-accent); border-color:transparent;}
 .fix-btn-ghost{font-weight:600;}
 
 .fix-summary{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px;}

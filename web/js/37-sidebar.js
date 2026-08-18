@@ -161,7 +161,7 @@
   function themePickerHtml(r){
     if(!window.AAUP_THEME) return '';
     var current = window.AAUP_THEME.current();
-    var themes = window.AAUP_THEME.list();
+    var themes = window.AAUP_THEME.listAll ? window.AAUP_THEME.listAll() : window.AAUP_THEME.list();
     return '<h3 style="margin:0 0 6px;">🎨 ' + (r ? 'السمة' : 'Theme') + '</h3>' +
       '<div class="theme-picker-grid" role="group" aria-label="' + (r ? 'السمة' : 'Theme') + '">' +
       themes.map(function(t){
@@ -172,7 +172,8 @@
           '<span class="theme-swatch-label"><span>' + t.icon + ' ' + (r ? t.ar : t.en) + '</span><span class="theme-swatch-check">✓</span></span>' +
           '</button>';
       }).join('') +
-      '</div>';
+      '</div>' +
+      (window.AAUP_THEME_CUSTOM ? window.AAUP_THEME_CUSTOM.sectionHtml(r) : '');
   }
 
   // How big the course cards read. Six themes shipped without any way to
@@ -216,6 +217,8 @@
         '</div>' +
         '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
       ) : '') +
+      (window.AAUP_THOUGHTS && window.AAUP_THOUGHTS.settingsSectionHtml
+        ? window.AAUP_THOUGHTS.settingsSectionHtml(r) : '') +
       (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '');
   }
 
@@ -280,6 +283,12 @@
     }
     if(window.AAUP_CLOUD){
       window.AAUP_CLOUD.bindSection(body);
+    }
+    if(window.AAUP_THEME_CUSTOM){
+      window.AAUP_THEME_CUSTOM.bindSection(body, function(){ renderSettingsBody(body); });
+    }
+    if(window.AAUP_THOUGHTS && window.AAUP_THOUGHTS.bindSettingsSection){
+      window.AAUP_THOUGHTS.bindSettingsSection(body, selectedPlan);
     }
     body.querySelectorAll('[data-theme-swatch]').forEach(function(el){
       el.addEventListener('click', function(){
