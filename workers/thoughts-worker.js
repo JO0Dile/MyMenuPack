@@ -55,13 +55,25 @@ export default {
         const plan = safeId(url.searchParams.get('plan') || '');
         if (!plan) return json({ error: 'plan is required' }, 400, cors);
         const list = await readWall(env, plan);
-        return json({ thoughts: list }, 200, cors);
+        // `voters` is which device id cast which reaction — that is exactly
+        // the kind of anonymous-but-linkable record this Worker promises not
+        // to keep around for anyone but the owner. Every reader gets the
+        // count; nobody but this endpoint's own react handler ever sees who.
+        const out = list.map((t) => ({ ...t, up: countReactions(t, 'up'), down: countReactions(t, 'down'), voters: undefined }));
+        return json({ thoughts: out }, 200, cors);
       }
 
       if (request.method === 'POST' && path.endsWith('/thoughts')) {
         const body = await request.json().catch(() => null);
         if (!body) return json({ error: 'invalid json' }, 400, cors);
         return await addThought(env, body, cors, request);
+      }
+
+      if (request.method === 'POST' && path.includes('/thoughts/') && path.endsWith('/react')) {
+        const id = decodeURIComponent(path.split('/thoughts/')[1].replace(/\/react$/, ''));
+        const body = await request.json().catch(() => null);
+        if (!body) return json({ error: 'invalid json' }, 400, cors);
+        return await reactToThought(env, id, body, cors);
       }
 
       if (request.method === 'DELETE' && path.includes('/thoughts/')) {
@@ -135,6 +147,36 @@ async function addThought(env, body, cors, request) {
   await writeWall(env, plan, list);
 
   return json({ ok: true, thought: item }, 200, cors);
+}
+
+function countReactions(t, kind) {
+  const voters = t.voters || {};
+  return Object.keys(voters).filter((k) => voters[k] === kind).length;
+}
+
+// One reaction per device per thought, switchable, and un-settable by
+// sending the same kind twice (toggle off) — same ownership model as
+// deleteThought below: the device id is the only claim there is.
+async function reactToThought(env, id, body, cors) {
+  const plan = safeId(body.plan || '');
+  const by = safeId(body.by || '');
+  const kind = body.kind === 'up' || body.kind === 'down' ? body.kind : null;
+  if (!plan || !by) return json({ error: 'plan and by are required' }, 400, cors);
+
+  const list = await readWall(env, plan);
+  const item = list.find((t) => t.id === id);
+  if (!item) return json({ error: 'not found' }, 404, cors);
+  if (!item.voters) item.voters = {};
+
+  if (kind && item.voters[by] === kind) {
+    delete item.voters[by]; // tapping the same reaction again clears it
+  } else if (kind) {
+    item.voters[by] = kind;
+  } else {
+    delete item.voters[by];
+  }
+  await writeWall(env, plan, list);
+  return json({ ok: true, up: countReactions(item, 'up'), down: countReactions(item, 'down'), mine: item.voters[by] || null }, 200, cors);
 }
 
 async function deleteThought(env, id, by, cors) {

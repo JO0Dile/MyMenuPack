@@ -1307,6 +1307,7 @@
       '<input type="text" id="' + id + '-courseSearchInput" class="search-input" placeholder="' + (rtl ? 'ابحث عن مساق بالاسم أو الرقم…' : 'Search a course by name or code…') + '" autocomplete="off">' +
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
+      searchHintHtml(id, rtl) +
       '<div class="imp-body-pad">' +
       (bioEn ? '<p class="imp-bio-text" style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
@@ -1470,6 +1471,21 @@
   function toggleLegend(planId){
     legendOpen[planId] = !legendOpen[planId];
     render(planId);
+  }
+
+  // A one-line tip shown until dismissed once, ever — search feels like the
+  // only way in otherwise, when scrolling the tree works just as well.
+  var SEARCH_HINT_KEY = 'aaup_searchHintSeen';
+  function searchHintHtml(id, rtl){
+    try{ if(localStorage.getItem(SEARCH_HINT_KEY)) return ''; }catch(e){}
+    return '<p class="search-hint" id="' + id + '-searchHint">💡 ' +
+      (rtl ? 'ابحث عن مساق مباشرة، أو مرر لأسفل فقط — كل شيء قابل للتصفح أيضًا.'
+           : 'Search a course directly, or just scroll — everything’s browsable too.') +
+      '<button type="button" class="search-hint-x" onclick="AAUP_IMPORTED.dismissSearchHint()" aria-label="Dismiss">&times;</button></p>';
+  }
+  function dismissSearchHint(){
+    try{ localStorage.setItem(SEARCH_HINT_KEY, '1'); }catch(e){}
+    document.querySelectorAll('.search-hint').forEach(function(el){ el.remove(); });
   }
 
   // ---------- legacy renderer (plans imported before this update — free-text
@@ -1884,6 +1900,7 @@
     compareByDisplayOrder: compareByDisplayOrder,
     confirmDelete: confirmDelete, deletePlan: deletePlan,
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
+    dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
     // Programmatic course creation, for callers that already have every field
     // and do not want the popup — the assistant (js/46-assistant-ai.js) after

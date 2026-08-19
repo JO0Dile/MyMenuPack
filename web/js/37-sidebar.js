@@ -238,14 +238,22 @@
       (window.AAUP_ORPHANS ? window.AAUP_ORPHANS.sectionHtml(r) : '');
   }
 
+  // A small ✓/○ so the tour list doubles as a map of what's left — the
+  // buttons themselves already jump straight to any tour (they always
+  // have), the only thing missing was seeing which ones are done at a
+  // glance instead of having to remember or replay each to check.
+  function tourMark(id){
+    var seen = !!(window.AAUP_TUTORIAL && window.AAUP_TUTORIAL.hasSeen(id));
+    return '<span class="tour-mark' + (seen ? ' done' : '') + '">' + (seen ? '✓' : '○') + '</span>';
+  }
   function helpTabHtml(r, selectedPlan, isImportedSelected, devUnlocked){
     return '<p class="form-note" style="margin-top:0;">' + (r ? 'أعد تشغيل الجولة التوضيحية لأي شاشة.' : 'Replay the spotlight walkthrough for any screen.') + '</p>' +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setTourHomeBtn">🔁 ' + (r ? 'جولة الرئيسية' : 'Home tour') + '</button>' +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">🔁 ' + (r ? 'جولة اللوحة' : 'Dashboard tour') + '</button>' : '') +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">🔁 ' + (r ? 'جولة الخطة الدراسية' : 'Study Plan tour') + '</button>' : '') +
-      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">🔁 ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
-      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">🔁 ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
+      '<button type="button" class="home-btn" id="setTourHomeBtn">' + tourMark('home') + ' ' + (r ? 'جولة الرئيسية' : 'Home tour') + '</button>' +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourDashBtn">' + tourMark('dashboard') + ' ' + (r ? 'جولة اللوحة' : 'Dashboard tour') + '</button>' : '') +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setTourPlanBtn">' + tourMark('studyplan') + ' ' + (r ? 'جولة الخطة الدراسية' : 'Study Plan tour') + '</button>' : '') +
+      (isImportedSelected ? '<button type="button" class="home-btn" id="setTourEditBtn">' + tourMark('planEditor') + ' ' + (r ? 'جولة محرر الخطة' : 'Plan Editor tour') + '</button>' : '') +
+      (devUnlocked ? '<button type="button" class="home-btn" id="setTourDevEditBtn">' + tourMark('devEdit') + ' ' + (r ? 'جولة تعديل المطوّر' : 'Developer Edit tour') + '</button>' : '') +
       '</div>';
   }
 

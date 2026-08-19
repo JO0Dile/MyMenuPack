@@ -155,7 +155,8 @@
             ar: 'حملك الدراسي هو اللي يحدد هذا التاريخ — زوّده فوق {load} ساعة ورح تخلص أبكر.' },
     done: { en: 'Nothing left to plan for — every course is done.', ar: 'ما بقي إشي تخطط له — كل المساقات منجزة.' },
     years1: { en: '(≈1 year)', ar: '(≈سنة)' },
-    yearsN: { en: '(≈{n} years)', ar: '(≈{n} سنوات)' }
+    yearsN: { en: '(≈{n} years)', ar: '(≈{n} سنوات)' },
+    saveImg: { en: '📤 Save as image', ar: '📤 احفظ كصورة' }
   };
   function t(k, r){ return r ? TX[k].ar : TX[k].en; }
 
@@ -253,13 +254,32 @@
         : (semesters > 0
             ? '<p class="grad-note grad-note-pace">' + t('pace', rtl).replace('{load}', load) + '</p>'
             : '')) +
-      '<p class="grad-caveat">' + t('caveat', rtl) + '</p>';
+      '<p class="grad-caveat">' + t('caveat', rtl) + '</p>' +
+      '<button type="button" class="grad-save-img" id="' + hostId + 'SaveImg">' + t('saveImg', rtl) + '</button>';
 
     var slider = document.getElementById(hostId + 'Slider');
     if(slider){
       slider.addEventListener('input', function(){
         saveLoad(prefix, parseInt(slider.value, 10));
         render(prefix, hostId);
+      });
+    }
+    var saveBtn = document.getElementById(hostId + 'SaveImg');
+    if(saveBtn){
+      saveBtn.addEventListener('click', function(){
+        var page = document.getElementById('page-' + prefix);
+        var nameEl = page && page.querySelector('.title-block .en');
+        var planTitle = nameEl ? nameEl.textContent.trim() : prefix;
+        window.__downloadCardImage({
+          title: '🎓 ' + t('title', rtl),
+          subtitle: planTitle,
+          rows: [
+            { label: t('finish', rtl), value: termLabel(finish, rtl), accent: true },
+            { label: rtl ? 'الفصول المتبقية' : 'Semesters left', value: semesters + ' ' + (rtl ? '' : yearsHint(semesters, rtl)) },
+            { label: t('load', rtl), value: load + 'H' }
+          ],
+          filename: 'graduation-' + prefix
+        });
       });
     }
   }
