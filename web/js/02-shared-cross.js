@@ -304,3 +304,97 @@ window.__livePrereqs = function(prefix, fallback){
   var d = window.__PLAN_DATA[prefix];
   return (d && d.prereqs) || fallback || [];
 };
+
+// A stat card ("When do I graduate?", Achievements progress) drawn to a
+// canvas and downloaded as a PNG — the same offline-first reasoning as the
+// QR encoder in js/71-qrcode.js: no external image-export library, because
+// this app never reaches out for one when a hundred lines of canvas code
+// does the job. Deliberately hand-drawn rather than a DOM screenshot: a real
+// DOM-to-canvas conversion needs a library this app does not ship, so this
+// redraws just the handful of facts a card is actually FOR — the number,
+// not the pixels — onto a small themed card of its own.
+function __cardRoundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+// spec: { title, subtitle, rows: [{label, value, accent}], footer, filename,
+//         bg, panel, line, text, dim, accent }
+window.__downloadCardImage = function(spec){
+  var W = 640, PAD = 28, scale = Math.min(2, window.devicePixelRatio || 2);
+  var rowH = 56, headH = spec.subtitle ? 84 : 60, footH = 36;
+  var rows = spec.rows || [];
+  var H = headH + rows.length * rowH + footH + PAD * 2;
+
+  var canvas = document.createElement('canvas');
+  canvas.width = W * scale; canvas.height = H * scale;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  var bg = spec.bg || '#0b1330', panel = spec.panel || '#141d47', line = spec.line || '#2a3568';
+  var text = spec.text || '#e9ecf7', dim = spec.dim || '#9aa3cf', accent = spec.accent || '#5db8ff';
+  var FONT = '-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  __cardRoundRect(ctx, PAD / 2, PAD / 2, W - PAD, H - PAD, 16);
+  ctx.fillStyle = panel; ctx.fill();
+  ctx.strokeStyle = line; ctx.lineWidth = 1; ctx.stroke();
+
+  var y = PAD + 22;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = text;
+  ctx.font = '700 20px ' + FONT;
+  ctx.fillText(spec.title || '', PAD + 14, y);
+  if(spec.subtitle){
+    y += 24;
+    ctx.fillStyle = dim;
+    ctx.font = '600 12px ' + FONT;
+    ctx.fillText(spec.subtitle, PAD + 14, y);
+  }
+  y = headH + PAD - 8;
+
+  rows.forEach(function(row){
+    ctx.fillStyle = dim;
+    ctx.font = '700 10px ' + FONT;
+    ctx.fillText(String(row.label || '').toUpperCase(), PAD + 14, y);
+    ctx.fillStyle = row.accent ? accent : text;
+    ctx.font = '800 19px ' + FONT;
+    ctx.fillText(String(row.value == null ? '' : row.value), PAD + 14, y + 24);
+    y += rowH;
+  });
+
+  ctx.fillStyle = dim;
+  ctx.font = '600 10px ' + FONT;
+  ctx.fillText(spec.footer || 'Easy Plans', PAD + 14, H - PAD + 6);
+
+  var filename = (spec.filename || 'card') + '.png';
+  function downloadBlob(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    if(window.__showToast) window.__showToast('🖼️ Saved.');
+  }
+  canvas.toBlob(function(blob){
+    if(!blob){ if(window.__showToast) window.__showToast('Could not create the image.'); return; }
+    // Same preference as js/08-celebrations.js's achievement share: the
+    // native share sheet, with the image already attached, beats a plain
+    // download on a phone — straight into whatever app the student actually
+    // wants to send it through, no extra step to attach the file by hand.
+    var file = null;
+    try{ file = new File([blob], filename, { type: 'image/png' }); }catch(e){ file = null; }
+    if(file && navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share){
+      navigator.share({ files: [file], title: spec.title || 'Card' }).catch(function(){ downloadBlob(blob); });
+    } else {
+      downloadBlob(blob);
+    }
+  }, 'image/png');
+};

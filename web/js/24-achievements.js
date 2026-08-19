@@ -616,9 +616,16 @@
         '</div>';
     }).join('');
 
+    var majorNameForGrid = (window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.planDisplayInfo) ? window.AAUP_DASHBOARD.planDisplayInfo(prefix).name : '';
     return '<h2 style="margin-top:0;">🏆 ' + (rtl ? 'الإنجازات' : 'Achievements') + '</h2>' +
-      '<p class="achievements-summary">' + unlockedCount + ' / ' + applicableCount + ' ' +
-      (rtl ? 'إنجازًا محقَّقًا لهذا التخصص' : 'unlocked for this major') + '</p>' +
+      '<div class="ach-summary-row">' +
+        '<p class="achievements-summary">' + unlockedCount + ' / ' + applicableCount + ' ' +
+        (rtl ? 'إنجازًا محقَّقًا لهذا التخصص' : 'unlocked for this major') + '</p>' +
+        '<button type="button" class="ach-grid-save" id="achGridSaveImg" ' +
+          'data-ach-major="' + window.__escapeHtml(majorNameForGrid) + '" ' +
+          'data-ach-unlocked="' + unlockedCount + '" data-ach-total="' + applicableCount + '">' +
+          (rtl ? '📤 احفظ التقدّم كصورة' : '📤 Save progress as image') + '</button>' +
+      '</div>' +
       heroHtml +
       '<div class="achievement-grid">' + badges + '</div>';
   }
@@ -658,6 +665,17 @@
         title: btn.getAttribute('data-ach-title'),
         subtitle: btn.getAttribute('data-ach-sub'),
         footer: 'University Easy Plans'
+      });
+    });
+    overlay.addEventListener('click', function(e){
+      var btn = e.target.closest && e.target.closest('#achGridSaveImg');
+      if(!btn || !window.__downloadCardImage) return;
+      e.stopPropagation();
+      window.__downloadCardImage({
+        title: '🏆 Achievements',
+        subtitle: btn.getAttribute('data-ach-major') || '',
+        rows: [{ label: 'Unlocked', value: btn.getAttribute('data-ach-unlocked') + ' / ' + btn.getAttribute('data-ach-total'), accent: true }],
+        filename: 'achievements'
       });
     });
   }

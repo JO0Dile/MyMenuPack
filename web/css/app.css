@@ -790,6 +790,24 @@
 
   .search-dropdown.open{display:block;}
 
+  .search-hint{
+    display:flex; align-items:center; gap:8px; margin:8px 0 0; padding:8px 12px;
+    font-size:12.5px; color:var(--text-dim); background:var(--panel); border:1px solid var(--line);
+    border-radius:8px;
+  }
+  .search-hint-x{
+    margin-left:auto; background:none; border:none; color:var(--text-dim); font-size:16px;
+    line-height:1; cursor:pointer; opacity:.7; padding:0 2px;
+  }
+  .search-hint-x:hover{opacity:1;}
+  [dir="rtl"] .search-hint-x{margin-left:0; margin-right:auto;}
+
+  .tour-mark{
+    display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px;
+    border-radius:50%; font-size:10px; line-height:1; color:var(--text-dim); border:1.3px solid var(--line);
+  }
+  .tour-mark.done{ color:var(--unlock); border-color:var(--unlock); }
+
   .search-hit{
     display:flex;flex-direction:column;gap:2px;
     padding:9px 12px;
@@ -2533,7 +2551,13 @@
   .year-cel-close:hover{background:#243662;}
   @media (prefers-reduced-motion:reduce){ .year-cel-cursor{animation:none;} }
 
-  .achievements-summary{font-size:12.5px;color:var(--text-dim);margin:-6px 0 14px;}
+  .achievements-summary{font-size:12.5px;color:var(--text-dim);margin:0;}
+  .ach-summary-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:-6px 0 14px;}
+  .ach-grid-save{
+    cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:var(--text-dim);
+    background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;white-space:nowrap;
+  }
+  .ach-grid-save:hover{border-color:var(--accent);color:var(--text);}
 
   /* "Next Up" hero — the locked-but-applicable achievement closest to being
      unlocked, so the modal leads with something concrete to chase instead of
@@ -2778,6 +2802,11 @@
   .grad-note{margin:10px 0 0;font-size:12px;line-height:1.6;color:var(--text-dim);}
   .grad-note-bound{color:var(--text);}
   .grad-caveat{margin:10px 0 0;font-size:10.5px;color:var(--text-dim);opacity:.8;line-height:1.5;}
+  .grad-save-img{
+    margin-top:10px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;
+    color:var(--text-dim);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+  }
+  .grad-save-img:hover{border-color:var(--accent);color:var(--text);}
 
   /* ---------- gpa target (js/67-gpa-target.js) ---------- */
   .gt-section{
@@ -3350,6 +3379,38 @@
     border:1px solid;border-radius:8px;font-size:12px;font-weight:700;
   }
   .tc-prev-btn{padding:7px 14px;border-radius:999px;font-size:12px;font-weight:800;}
+
+  .tc-presets{margin-top:14px;}
+  .tc-presets-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);margin-bottom:8px;}
+  .tc-presets-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+  .tc-preset-wrap{position:relative;}
+  .tc-preset-pick{
+    width:34px;height:34px;border-radius:50%;padding:0;border:2px solid var(--line);
+    background:none;cursor:pointer;overflow:hidden;
+  }
+  .tc-preset-active .tc-preset-pick{border-color:var(--accent);}
+  .tc-preset-dot{display:block;width:100%;height:100%;border-radius:50%;position:relative;}
+  .tc-preset-dot i{
+    position:absolute;right:0;bottom:0;width:60%;height:60%;border-radius:50%;
+    border:2px solid var(--panel);font-style:normal;
+  }
+  .tc-preset-del{
+    position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
+    background:var(--prereq);color:#fff;border:none;font-size:11px;line-height:1;cursor:pointer;
+    display:none;align-items:center;justify-content:center;padding:0;
+  }
+  .tc-preset-wrap:hover .tc-preset-del,
+  .tc-preset-wrap:focus-within .tc-preset-del{display:flex;}
+  .tc-preset-add{
+    padding:6px 12px;height:34px;border-radius:999px;border:1.5px dashed var(--line);background:none;
+    color:var(--text-dim);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;
+  }
+  .tc-preset-add:hover{border-color:var(--accent);color:var(--text);}
+  .tc-preset-name-row{display:flex;gap:8px;margin-top:10px;}
+  .tc-preset-name-row input{
+    flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--line);
+    background:var(--search-bg);color:var(--text);font-family:inherit;font-size:12.5px;
+  }
   .tc-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
 
   .dev-wrong-pass{color:var(--prereq);font-size:12.5px;font-weight:700;margin-top:8px;}
@@ -3619,6 +3680,16 @@
   }
   .th-del:hover{border-color:var(--prereq);}
   .th-del:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .th-react{display:flex;gap:6px;margin-top:8px;}
+  .th-react-btn{
+    display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:inherit;
+    font-size:12px;color:var(--text-dim);background:transparent;border:1px solid var(--line);
+    border-radius:999px;padding:3px 9px;
+  }
+  .th-react-btn span{font-variant-numeric:tabular-nums;}
+  .th-react-btn:hover{border-color:var(--accent);color:var(--text);}
+  .th-react-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(93,184,255,.12);}
+  .th-react-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   /* ---------- Contributions (js/73-contribute.js) ---------- */
   .contrib-list{display:grid;gap:10px;margin-top:10px;}

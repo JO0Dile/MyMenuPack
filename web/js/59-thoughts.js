@@ -32,6 +32,7 @@
   var LOCAL_KEY = 'aaup_thoughts';        // this device's own thoughts
   var QUEUE_KEY = 'aaup_thoughtsQueue';   // written offline, not yet posted
   var CACHE_KEY = 'aaup_thoughtsCache';   // last wall we successfully fetched
+  var REACT_KEY = 'aaup_thoughtReactions'; // { thoughtId: 'up'|'down' } — this device's own reactions
   var MAX_LEN = 280;
   var COOLDOWN_MS = 20 * 1000;            // between one student's posts
 
@@ -103,6 +104,8 @@
   function saveQueue(list){ store().setJSON(QUEUE_KEY, list.slice(0, 50)); }
   function loadCache(){ return store().getJSON(CACHE_KEY, {}); }
   function saveCache(map){ store().setJSON(CACHE_KEY, map); }
+  function loadReactions(){ return store().getJSON(REACT_KEY, {}); }
+  function saveReactions(map){ store().setJSON(REACT_KEY, map); }
 
   function displayName(){
     var s = window.AAUP_STUDENT ? window.AAUP_STUDENT.get() : null;
@@ -151,7 +154,9 @@
           text: String(t.text || '').slice(0, MAX_LEN),
           name: String(t.name || '').slice(0, 40),
           at: Number(t.at) || 0,
-          by: String(t.by || '').slice(0, 40)
+          by: String(t.by || '').slice(0, 40),
+          up: Number(t.up) || 0,
+          down: Number(t.down) || 0
         };
       }).filter(function(t){ return t.text; });
       var cache = loadCache();
@@ -264,6 +269,64 @@
     }
   }
 
+  function postReaction(id, plan, kind){
+    var url = endpoint();
+    if(!url) return Promise.reject(new Error('not configured'));
+    return fetch(url.replace(/\/$/, '') + '/thoughts/' + encodeURIComponent(id) + '/react', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: plan, by: deviceId(), kind: kind })
+    }).then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
+  // Updates the cached wall's counts and this device's own reaction record —
+  // used both for the optimistic tap and to reconcile with what the server
+  // actually settled on afterward, since another device's vote landing in
+  // between is rare but not impossible and the server's count is the real one.
+  function applyReactionLocally(prefix, id, up, down, mine){
+    var cache = loadCache();
+    var entry = cache[prefix];
+    if(entry && Array.isArray(entry.list)){
+      entry.list.forEach(function(t){ if(t.id === id){ t.up = up; t.down = down; } });
+      saveCache(cache);
+    }
+    var reactions = loadReactions();
+    if(mine){ reactions[id] = mine; } else { delete reactions[id]; }
+    saveReactions(reactions);
+  }
+
+  // Tapping the same reaction twice clears it — a real "un-react", not just
+  // a switch. Renders immediately off the optimistic count so the tap feels
+  // instant, then reconciles (or rolls back on failure) once the Worker answers.
+  function toggleReaction(prefix, id, kind){
+    if(!online() || !endpoint()) return;
+    var current = loadReactions()[id] || null;
+    var next = (current === kind) ? null : kind;
+
+    var cache = loadCache();
+    var entry = cache[prefix];
+    var item = entry && Array.isArray(entry.list) && entry.list.filter(function(t){ return t.id === id; })[0];
+    var beforeUp = (item && item.up) || 0, beforeDown = (item && item.down) || 0;
+    var up = beforeUp, down = beforeDown;
+    if(current === 'up') up--; if(current === 'down') down--;
+    if(next === 'up') up++; if(next === 'down') down++;
+    applyReactionLocally(prefix, id, Math.max(0, up), Math.max(0, down), next);
+    render(prefix);
+
+    postReaction(id, prefix, next).then(function(res){
+      applyReactionLocally(prefix, id, res.up || 0, res.down || 0, res.mine || null);
+      var overlay = document.getElementById('thoughtsModalOverlay');
+      if(overlay && overlay.classList.contains('open')) render(prefix);
+    }).catch(function(){
+      applyReactionLocally(prefix, id, beforeUp, beforeDown, current);
+      var overlay = document.getElementById('thoughtsModalOverlay');
+      if(overlay && overlay.classList.contains('open')) render(prefix);
+    });
+  }
+
   // The wall as it should be shown right now: what the server last gave us,
   // plus anything this device wrote that has not come back yet.
   function wallFor(prefix){
@@ -292,12 +355,20 @@
 
   function thoughtHTML(t, rtl){
     var isMine = t.by === deviceId();
+    // Reactions need a real shared wall to mean anything — a device with no
+    // server configured only ever sees its own thoughts, so there is nothing
+    // to react to.
+    var myReaction = endpoint() ? (loadReactions()[t.id] || null) : null;
     return '<div class="th-item' + (isMine ? ' th-mine' : '') + '">' +
       '<div class="th-head">' +
         '<span class="th-who">' + esc(t.name || (rtl ? 'طالب' : 'A student')) + '</span>' +
         '<span class="th-when">' + esc(timeAgo(t.at, rtl)) + '</span>' +
       '</div>' +
       '<p class="th-text">' + esc(t.text) + '</p>' +
+      (endpoint() ? '<div class="th-react">' +
+        '<button type="button" class="th-react-btn' + (myReaction === 'up' ? ' active' : '') + '" data-th-react="up" data-th-id="' + esc(t.id) + '">👍<span>' + (t.up || 0) + '</span></button>' +
+        '<button type="button" class="th-react-btn' + (myReaction === 'down' ? ' active' : '') + '" data-th-react="down" data-th-id="' + esc(t.id) + '">👎<span>' + (t.down || 0) + '</span></button>' +
+      '</div>' : '') +
       (isMine ? '<button type="button" class="th-del" data-th-del="' + esc(t.id) + '">' +
         (rtl ? 'حذف' : 'Delete') + '</button>' : '') +
       '</div>';
@@ -397,10 +468,10 @@
     });
 
     document.getElementById('thList').addEventListener('click', function(e){
-      var btn = e.target.closest('[data-th-del]');
-      if(!btn) return;
-      removeMine(btn.getAttribute('data-th-del'));
-      render(prefix);
+      var delBtn = e.target.closest('[data-th-del]');
+      if(delBtn){ removeMine(delBtn.getAttribute('data-th-del')); render(prefix); return; }
+      var reactBtn = e.target.closest('[data-th-react]');
+      if(reactBtn){ toggleReaction(prefix, reactBtn.getAttribute('data-th-id'), reactBtn.getAttribute('data-th-react')); }
     });
   }
 

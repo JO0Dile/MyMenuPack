@@ -169,6 +169,36 @@
     if(current() === 'custom'){ apply('custom'); }
     return true;
   }
+
+  // ---------------------------------------------------------------------
+  // SAVED PRESETS — named snapshots of a bg/accent pair a student can
+  // recall later without redoing the wheel/hex work. "My colours" itself
+  // stays the single LIVE slot (the one the wheel edits and the one that
+  // actually paints when the theme is 'custom'); a preset is just a copy of
+  // some earlier bg/accent worth keeping, loaded back into that live slot
+  // on pick — not a theme in its own right, so nothing here touches apply()
+  // or the CSS's fixed html[data-theme="custom"] selector.
+  var PRESETS_KEY = 'aaup_customPresets';
+  function loadPresets(){
+    try{
+      var v = JSON.parse(localStorage.getItem(PRESETS_KEY));
+      return Array.isArray(v) ? v.filter(function(p){ return p && hexToRgb(p.bg) && hexToRgb(p.accent); }) : [];
+    }catch(e){ return []; }
+  }
+  function savePresets(list){
+    try{ localStorage.setItem(PRESETS_KEY, JSON.stringify(list.slice(0, 12))); }catch(e){}
+  }
+  function addPreset(name, bg, accent){
+    if(!hexToRgb(bg) || !hexToRgb(accent)) return null;
+    var list = loadPresets();
+    var preset = { id: 'p' + Date.now().toString(36), name: String(name || '').slice(0, 24) || 'My colours', bg: bg, accent: accent };
+    list.push(preset);
+    savePresets(list);
+    return preset;
+  }
+  function removePreset(id){
+    savePresets(loadPresets().filter(function(p){ return p.id !== id; }));
+  }
   // Paints the nine --c-* variables html[data-theme="custom"] reads, or
   // clears them when any other theme is active.
   function paintCustomVars(on, bg, accent){
@@ -285,6 +315,7 @@
     listAll: function(){ return customColors() ? THEMES.concat([customTheme()]) : THEMES.slice(); },
     customColors: customColors, setCustomColors: setCustomColors,
     clearCustomColors: clearCustomColors,
+    presets: loadPresets, addPreset: addPreset, removePreset: removePreset,
     deriveTokens: deriveTokens, contrast: contrast, isHex: function(v){ return !!hexToRgb(v); },
     hexToRgb: hexToRgb, rgbToHex: rgbToHex, rgbToHsl: rgbToHsl, hslToHex: hslToHex,
     setSize: setSize, currentSize: currentSize,

@@ -27,6 +27,41 @@
     return !!(page && page.classList.contains('rtl-mode'));
   }
 
+  // ---- typo tolerance: a fallback only, never the primary match. Exact
+  // substring matching (below) stays first and untouched — this only kicks
+  // in when it finds nothing, so a correctly-typed query behaves exactly as
+  // it always has. Compares the query against each word of the text with a
+  // classic edit-distance, tolerant threshold scaling with query length so
+  // "cs" doesn't fuzzy-match half the catalogue.
+  function levenshtein(a, b){
+    if(a === b) return 0;
+    var al = a.length, bl = b.length;
+    if(!al) return bl;
+    if(!bl) return al;
+    var prev = new Array(bl + 1);
+    for(var j = 0; j <= bl; j++) prev[j] = j;
+    for(var i = 1; i <= al; i++){
+      var cur = [i];
+      for(var jj = 1; jj <= bl; jj++){
+        var cost = a.charAt(i - 1) === b.charAt(jj - 1) ? 0 : 1;
+        cur[jj] = Math.min(prev[jj] + 1, cur[jj - 1] + 1, prev[jj - 1] + cost);
+      }
+      prev = cur;
+    }
+    return prev[bl];
+  }
+  function fuzzyContains(q, text){
+    if(q.length < 3) return false;
+    var threshold = q.length <= 5 ? 1 : (q.length <= 9 ? 2 : 3);
+    var words = text.split(/\s+/);
+    for(var i = 0; i < words.length; i++){
+      var w = words[i];
+      if(!w || Math.abs(w.length - q.length) > threshold + 2) continue;
+      if(levenshtein(q, w) <= threshold) return true;
+    }
+    return false;
+  }
+
   /* ---------------- generic search-box wiring ---------------- */
   function renderDropdown(dropdownEl, results, opts){
     dropdownEl.innerHTML = '';
@@ -79,7 +114,14 @@
         return normalize(item.en).indexOf(q) !== -1 ||
                normalize(item.ar).indexOf(q) !== -1 ||
                (item.code && item.code.toLowerCase().indexOf(q) !== -1);
-      }).slice(0, 10);
+      });
+      // Nothing matched exactly — try a typo-tolerant pass before giving up.
+      if(!currentResults.length){
+        currentResults = all.filter(function(item){
+          return fuzzyContains(q, normalize(item.en)) || fuzzyContains(q, normalize(item.ar));
+        });
+      }
+      currentResults = currentResults.slice(0, 10);
       activeIndex = -1;
       renderDropdown(dropdown, currentResults, {
         emptyText: opts.emptyText,
@@ -318,7 +360,17 @@
 
   /* ---------------- floating draggable popup ---------------- */
   var popupEl, popupHead, popupTitle, popupBody, popupCloseBtn;
-  var lastPopupPos = null;
+  var POPUP_POS_KEY = 'aaup_popupPos';
+  function loadPopupPos(){
+    try{
+      var v = JSON.parse(localStorage.getItem(POPUP_POS_KEY));
+      return (v && typeof v.left === 'string' && typeof v.top === 'string') ? v : null;
+    }catch(e){ return null; }
+  }
+  function savePopupPos(pos){
+    try{ localStorage.setItem(POPUP_POS_KEY, JSON.stringify(pos)); }catch(e){}
+  }
+  var lastPopupPos = loadPopupPos();
 
   function listHTML(prefix, slugs){
     return '<ul>' + slugs.map(function(s){
@@ -474,6 +526,7 @@
       if(!dragging) return;
       dragging = false;
       lastPopupPos = { left: popupEl.style.left, top: popupEl.style.top };
+      savePopupPos(lastPopupPos);
     }
     popupHead.addEventListener('pointerup', endDrag);
     popupHead.addEventListener('pointercancel', endDrag);

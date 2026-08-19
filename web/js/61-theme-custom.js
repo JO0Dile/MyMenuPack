@@ -37,7 +37,12 @@
                  ar: 'النص رح يكون تباينه ضعيف على هذه الخلفية — لون أغمق أو أفتح بيقرأ أحسن.' },
     okAccent:  { en: 'Good contrast.', ar: 'تباين جيد.' },
     badHex:    { en: 'That is not a colour code. Try #1b4f8c.',
-                 ar: 'هذا ليس كود لون. جرّب ‎#1b4f8c‎.' }
+                 ar: 'هذا ليس كود لون. جرّب ‎#1b4f8c‎.' },
+    presets:      { en: 'Saved presets', ar: 'المحفوظات' },
+    savePreset:   { en: '+ Save current colours', ar: '+ احفظ الألوان الحالية' },
+    presetNamePh: { en: 'Name this preset…', ar: 'اسم للمحفوظة…' },
+    save:         { en: 'Save', ar: 'حفظ' },
+    presetDel:    { en: 'Delete', ar: 'حذف' }
   };
   function t(key, r){ return r ? TX[key].ar : TX[key].en; }
 
@@ -47,8 +52,13 @@
   var restore = null;        // {theme, colors} — what "undo" puts back
   var wheelCanvas = null, wheelSize = 168, wheelLight = 0.5;
   var rtlNow = false;        // the language the panel was drawn in
+  var presetNameOpen = false; // is the "name this preset" row showing
 
   function theme(){ return window.AAUP_THEME; }
+  function esc(s){
+    var v = String(s == null ? '' : s);
+    return window.__cleanText ? window.__cleanText(v) : (window.__escapeHtml ? window.__escapeHtml(v) : v);
+  }
 
   // The colours the panel starts from: the student's own if they have made
   // a theme, otherwise whichever theme is active, so "customize" begins as a
@@ -177,6 +187,25 @@
         '</div>' +
         '<span class="tc-prev-btn" style="background:' + d.accent + ';color:' + d['on-accent'] + ';">' +
           t('button', r) + '</span>' +
+      '</div>' +
+      '<div class="tc-presets">' +
+        '<div class="tc-presets-label">' + t('presets', r) + '</div>' +
+        '<div class="tc-presets-row">' +
+          T.presets().map(function(p){
+            var active = p.bg === bg && p.accent === accent;
+            return '<div class="tc-preset-wrap' + (active ? ' tc-preset-active' : '') + '">' +
+              '<button type="button" class="tc-preset-pick" data-tc-preset="' + esc(p.id) + '" title="' + esc(p.name) + '">' +
+                '<span class="tc-preset-dot" style="background:' + p.bg + ';"><i style="background:' + p.accent + ';"></i></span>' +
+              '</button>' +
+              '<button type="button" class="tc-preset-del" data-tc-preset-del="' + esc(p.id) + '" aria-label="' + t('presetDel', r) + ' ' + esc(p.name) + '">&times;</button>' +
+            '</div>';
+          }).join('') +
+          (presetNameOpen ? '' : '<button type="button" class="tc-preset-add" id="tcPresetAdd">' + t('savePreset', r) + '</button>') +
+        '</div>' +
+        (presetNameOpen ? '<div class="tc-preset-name-row">' +
+          '<input type="text" id="tcPresetName" maxlength="24" placeholder="' + t('presetNamePh', r) + '" dir="' + (r ? 'rtl' : 'ltr') + '">' +
+          '<button type="button" class="home-btn" id="tcPresetSave">' + t('save', r) + '</button>' +
+        '</div>' : '') +
       '</div>' +
       '<div class="tc-actions">' +
         '<button type="button" class="home-btn" id="tcUndo">' + t('undo', r) + '</button>' +
@@ -315,6 +344,47 @@
         syncControls();
       });
     }
+    host.querySelectorAll('[data-tc-preset]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var T = theme();
+        var id = b.getAttribute('data-tc-preset');
+        var p = T.presets().filter(function(x){ return x.id === id; })[0];
+        if(!p) return;
+        bg = p.bg; accent = p.accent;
+        T.setCustomColors(bg, accent);
+        if(T.current() !== 'custom') T.setTheme('custom');
+        wheelLight = T.rgbToHsl(T.hexToRgb(currentColor()))[2];
+        var light = host.querySelector('.tc-light');
+        if(light) light.value = String(Math.round(wheelLight * 100));
+        renderPanel(host, r);
+      });
+    });
+    host.querySelectorAll('[data-tc-preset-del]').forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        theme().removePreset(b.getAttribute('data-tc-preset-del'));
+        renderPanel(host, r);
+      });
+    });
+    var presetAdd = document.getElementById('tcPresetAdd');
+    if(presetAdd) presetAdd.addEventListener('click', function(){
+      presetNameOpen = true;
+      renderPanel(host, r);
+      var nameEl = document.getElementById('tcPresetName');
+      if(nameEl){
+        nameEl.value = t('title', r) + ' ' + (theme().presets().length + 1);
+        nameEl.focus();
+        nameEl.select();
+      }
+    });
+    var presetSave = document.getElementById('tcPresetSave');
+    if(presetSave) presetSave.addEventListener('click', function(){
+      var nameEl = document.getElementById('tcPresetName');
+      var name = (nameEl && nameEl.value.trim()) || (t('title', r) + ' ' + (theme().presets().length + 1));
+      theme().addPreset(name, bg, accent);
+      presetNameOpen = false;
+      renderPanel(host, r);
+    });
     var undo = document.getElementById('tcUndo');
     if(undo) undo.addEventListener('click', function(){
       var T = theme();
@@ -327,11 +397,13 @@
         T.setTheme(restore.theme);
       }
       open = false;
+      presetNameOpen = false;
       if(host.__rerender) host.__rerender();
     });
     var done = document.getElementById('tcDone');
     if(done) done.addEventListener('click', function(){
       open = false;
+      presetNameOpen = false;
       if(host.__rerender) host.__rerender();
     });
   }
