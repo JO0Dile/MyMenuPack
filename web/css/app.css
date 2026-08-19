@@ -1475,13 +1475,9 @@
   /* Mobile course grid — this app is meant to be used on a phone first, not
      as a shrunk-down desktop layout. Smaller, denser cards fit two per row
      instead of the desktop 120-190px range collapsing to one per row at a
-     real phone width. Idle prerequisite lines used to be hidden entirely
-     here (opacity:0) on the theory that a permanent web of lines down a
-     single tall stacked column reads as noise — but that meant a student on
-     a phone (the primary way this app is used) never saw a hint that a
-     connection even existed unless they successfully held a course to trace
-     it. Removed: the faint 5% idle opacity from the base .connector-layer
-     path.edge rule now applies here too, same as desktop. */
+     real phone width. (The connector SVG itself is hidden below 720px —
+     see the .connector-layer{display:none} rule and its comment further
+     down, in the one-column course-row section.) */
   @media (max-width:640px){
     .body-grid, .imp-body-pad{padding:14px 10px 22px;}
     .legend{margin-left:16px;margin-right:16px;padding:10px 14px;gap:14px;}
@@ -5853,6 +5849,19 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    same DOM structure and class names untouched; nothing here adds or
    removes an element, only how the existing ones are painted. */
 @media (max-width:720px){
+  /* The prerequisite connector SVG draws a path between each course pair's
+     real on-screen coordinates — which reads fine on desktop's wrapping
+     grid, where prereqs sit at different x-positions. One column per row
+     means every card shares the same x-center, so every edge collapses
+     into the same straight vertical stroke: a hold-to-trace on a course
+     with several links just paints one line down through everything,
+     impossible to tell apart. Hiding the layer here doesn't lose the
+     trace interaction itself — handleCourseHoverEnter() in
+     js/28-imported.js still adds .node-active to every connected card in
+     sequence, and that glow (below, already phone-visible) is what
+     actually answers "what does this connect to" on a single column. */
+  .connector-layer{display:none;}
+
   .course{
     flex:1 1 100%; max-width:none; min-width:0; min-height:auto;
     background:var(--panel); border:none; border-radius:14px;
@@ -5923,6 +5932,17 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .course.available{box-shadow:0 4px 14px rgba(0,0,0,.22); animation:none;}
   .course.available:not(.completed){
     box-shadow:0 4px 14px rgba(0,0,0,.22), 0 0 0 1px rgba(111,140,255,.4);
+  }
+
+  /* .node-active (the hold-to-trace highlight, js/28-imported.js) is the
+     same (class,class) specificity as .course.available just above, and
+     source order would otherwise let .available's plain shadow win on any
+     course that's both available/completed AND being traced — silencing
+     the one visual cue tracing has left now that the connector line itself
+     is hidden on phone (see .connector-layer{display:none} above). Restated
+     after, so it always wins the tie. */
+  .course.node-active{
+    box-shadow:0 0 0 2px #ff6fb8, 0 0 16px rgba(255,111,184,.55), 0 6px 14px rgba(0,0,0,.35);
   }
 }
 
