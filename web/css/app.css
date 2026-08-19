@@ -5402,11 +5402,84 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
 .cd-extras{margin-top:18px; padding-top:16px; border-top:1px solid var(--line);}
 .cd-extras .modal-extras{margin:0;}
 
+/* ---- phone-only additions (mockup-matched): category chip, the three
+   stat tiles, a compact always-visible prereq chain, and the why-locked/
+   what-opens prose turned into two swipeable slides instead of stacking.
+   Every rule below is hidden again inside the @media(min-width:720px)
+   block further down — desktop keeps its original .cd-sub line, its
+   stacked (non-swiping) .cd-sec pair, and none of this new markup. ---- */
+.cd-catchip{
+  display:inline-block; font-size:10.5px; font-weight:800; padding:4px 11px;
+  border-radius:999px; margin-bottom:8px; background:rgba(0,0,0,.22);
+}
+.cd-catchip-core{color:var(--core); border:1px solid var(--core);}
+.cd-catchip-skills{color:var(--skills); border:1px solid var(--skills);}
+.cd-catchip-math{color:var(--math); border:1px solid var(--math);}
+.cd-catchip-dept{color:var(--dept); border:1px solid var(--dept);}
+.cd-catchip-eng{color:var(--eng); border:1px solid var(--eng);}
+.cd-catchip-uni{color:var(--uni); border:1px solid var(--uni);}
+.cd-catchip-free{color:var(--free); border:1px solid var(--free);}
+.cd-catchip-misc{color:var(--misc); border:1px solid var(--misc);}
+.cd-catchip-intern{color:var(--intern); border:1px solid var(--intern);}
+.cd-catchip-summer{color:var(--summer); border:1px solid var(--summer);}
+
+.cd-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0 22px 14px;}
+.cd-stat{background:var(--search-bg); border-radius:12px; padding:10px 8px; text-align:center;}
+.cd-stat-n{font-size:16px; font-weight:800; color:var(--text); line-height:1.2;}
+.cd-stat-l{font-size:9.5px; color:var(--text-dim); font-weight:700; text-transform:uppercase; letter-spacing:.04em; margin-top:2px;}
+
+.cd-mini-chain{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:0 22px 14px;}
+.cd-prereq-chip{
+  font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer;
+  background:var(--search-bg); border:1px solid var(--line); color:var(--text-dim);
+  border-radius:999px; padding:6px 12px;
+}
+.cd-prereq-chip.is-ok{color:var(--unlock); border-color:rgba(47,191,113,.4);}
+.cd-prereq-arrow{color:var(--text-dim); font-size:12px;}
+
+.cd-slides{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;}
+.cd-slides .cd-slide{flex:0 0 100%; scroll-snap-align:start; min-width:0;}
+.cd-slides .cd-sec{margin-bottom:0;}
+.cd-swipe-dots{display:flex; justify-content:center; gap:6px; margin-top:10px;}
+.cd-swipe-dots span{width:6px; height:6px; border-radius:50%; background:var(--line); display:block;}
+.cd-swipe-dots span.on{background:var(--accent);}
+
+.cd-actions{padding:4px 22px 20px;}
+.cd-action-primary{
+  width:100%; padding:13px; border-radius:14px; border:none;
+  background:var(--accent); color:var(--on-accent); font-family:inherit;
+  font-size:13.5px; font-weight:800; cursor:pointer;
+}
+
+/* Set by js/49-course-detail.js's bind() on the underlying course row when
+   "View in course tree" scrolls to it — a brief accent flash so the row
+   that was just the whole sheet's subject is findable at a glance. */
+.course.cd-highlight{animation:cd-highlight-pulse 1.6s ease;}
+@keyframes cd-highlight-pulse{
+  0%{box-shadow:0 0 0 3px rgba(111,140,255,.6);}
+  100%{box-shadow:0 4px 14px rgba(0,0,0,.22);}
+}
+@media (prefers-reduced-motion:reduce){ .course.cd-highlight{animation:none;} }
+
+/* Planning status is meaningless for a course you can't act on yet, and
+   the grade/difficulty/workload/notes block only makes sense once Done is
+   picked — see js/21-course-modal-extras.js's own comments on is-locked/
+   is-done for why the gating logic lives there, not here. */
+.modal-extras.is-locked .cd-locked-hide{display:none;}
+.modal-extras:not(.is-done) .cd-review-block{display:none;}
+
 @media (min-width:720px){
   .cd-body{display:grid; grid-template-columns:1.35fr 1fr; align-items:start;}
   .cd-main{padding:20px 24px; border-inline-end:1px solid var(--line);}
   .cd-side{padding:20px 24px;}
   .cd-head{padding:22px 50px 18px 26px;}
+  .cd-catchip, .cd-stats, .cd-mini-chain, .cd-swipe-dots, .cd-actions{display:none;}
+  .cd-slides{display:block; overflow:visible;}
+  .cd-slides .cd-slide{flex:none; width:auto;}
+  .cd-slides .cd-slide:first-child .cd-sec{margin-bottom:20px;}
+  /* Desktop's grade/difficulty/workload/notes block was always shown
+     regardless of completion — is-done only gates the phone rule above. */
+  .modal-extras.is-locked .cd-locked-hide{display:block;}
 }
 
 /* The modal is the full height of a small screen, so the panel scrolls inside
@@ -5417,6 +5490,33 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .cd-head{position:sticky; top:0; background:var(--panel); z-index:2;}
   .cd-head h3{font-size:17px;}
   .cd-arrow{transform:rotate(90deg); display:inline-block;}
+
+  /* The 4 planning-status buttons become one segmented control (mockup-
+     matched) instead of a wrapped row of separate pills. Scoped to
+     .cd-extras so .status-btn-group elsewhere (there is nowhere else —
+     js/21-course-modal-extras.js is its only user — but scoping costs
+     nothing and documents the intent) can never pick this up by accident. */
+  .cd-extras .status-btn-group{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+    background:var(--search-bg); border-radius:12px; padding:3px; margin-bottom:14px;
+  }
+  .cd-extras .status-btn{
+    text-align:center; white-space:nowrap; border:none; overflow:hidden;
+    text-overflow:ellipsis; min-width:0;
+    border-radius:9px; padding:9px 4px; font-size:10.5px; background:none;
+  }
+  /* Equal specificity to the base .status-btn.active rule (two classes
+     each), which sets this same background — restated here only because
+     source order would otherwise let the plain .status-btn rule above win
+     and leave the active segment's on-accent-colored text invisible
+     against a transparent background. */
+  .cd-extras .status-btn.active{font-weight:800; background:var(--accent);}
+  /* The Done segment is a real button here (see status.v==='done' in
+     js/21-course-modal-extras.js's bind()) — the disabled/dimmed treatment
+     that option keeps on desktop would read as broken on a control where
+     every other segment is obviously tappable. */
+  .cd-extras .status-btn-auto{cursor:pointer; opacity:1;}
+  .cd-extras .status-btn-auto:not(.active){opacity:1;}
 }
 
 /* ==========================================================================

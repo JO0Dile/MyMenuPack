@@ -228,19 +228,37 @@
 
     var statuses = window.AAUP_GPA.loadStatuses();
     var currentStatus = isDone ? 'done' : (statuses[pid] || '');
-    var statusOptions = [
+    // On desktop "Done" stays a disabled reflection of the completion
+    // checkbox, as it always was — clicking it there wouldn't make sense
+    // next to the checkbox right above the tree. On phone, where this row
+    // becomes one tappable segmented control (mockup-matched), leaving one
+    // of four segments dead is worse than the inconsistency it avoids, so
+    // it's a real button there: tapping it calls the same toggle the
+    // checkbox uses (see bind() below), never a second source of truth.
+    //
+    // Phone also gets terser labels in the mockup's own order (Not started/
+    // In progress/Planned/Done) — "📌 Planned next semester" simply does not
+    // fit four-across as a segmented control, and a segmented control that
+    // scrolls to reveal its own fourth option defeats the point of showing
+    // all four at once. Desktop keeps the original longer wording exactly
+    // as it always read, wrapped across a row of separate pills.
+    var phoneSegmented = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width:720px)').matches;
+    var statusOptions = phoneSegmented ? [
+      { v: '', en: 'Not started', ar: 'لم يبدأ' },
+      { v: 'in_progress', en: 'In progress', ar: 'قيد الإنجاز' },
+      { v: 'planned', en: 'Planned', ar: 'مخطط' },
+      { v: 'done', en: 'Done', ar: 'مكتمل' }
+    ] : [
       { v: '', en: 'Not planned', ar: 'غير مخطط' },
       { v: 'planned', en: '📌 Planned next semester', ar: '📌 مخطط للفصل القادم' },
       { v: 'in_progress', en: '📖 In progress this semester', ar: '📖 قيد الإنجاز هذا الفصل' },
       { v: 'done', en: '✅ Done / Completed', ar: '✅ مكتمل' }
     ];
     var statusHtml = statusOptions.map(function(o){
-      // "Done" isn't a button to click — it reflects the completion
-      // checkbox automatically, so clicking it here wouldn't make sense
-      // (checking the box is what sets it).
       var isDoneOption = o.v === 'done';
+      var doneClickable = isDoneOption && phoneSegmented;
       return '<button type="button" class="status-btn' + (currentStatus === o.v ? ' active' : '') + (isDoneOption ? ' status-btn-auto' : '') + '"' +
-        (isDoneOption ? ' disabled' : ' data-status="' + o.v + '"') + '>' +
+        ((isDoneOption && !doneClickable) ? ' disabled' : ' data-status="' + o.v + '"') + '>' +
         (rtl ? o.ar : o.en) + '</button>';
     }).join('');
 
@@ -334,10 +352,24 @@
         '</p>'
       : '';
 
-    return '<div class="modal-extras" data-pid="' + pid + '" data-slug="' + slug + '">' +
+    // locked: on phone, the whole planning-status control is hidden while a
+    // course is still locked (nothing to plan yet — see the CSS gate on
+    // .cd-locked-hide) rather than showing four buttons for a course you
+    // can't act on. Desktop is untouched: it never hid this block, and
+    // still doesn't — the class is only ever read inside a phone media query.
+    var locked = window.AAUP_COURSE_DETAIL && window.AAUP_COURSE_DETAIL.status(prefix, slug) === 'locked';
+
+    // difficulty/workload/notes are wrapped together as .cd-review-block so
+    // phone CSS can hide the whole group until the course is marked Done —
+    // matches "when pressing Done you see grade, difficulty, workload, and
+    // notes" (the mockup's segmented control implies the sheet stays lean
+    // before that point). Desktop is untouched: nothing here hides them
+    // there, same as it always showed them regardless of completion.
+    return '<div class="modal-extras' + (isDone ? ' is-done' : '') + (locked ? ' is-locked' : '') + '" data-pid="' + pid + '" data-slug="' + slug + '">' +
       nameFieldHtml +
-      '<div class="modal-row-block"><span class="k">' + (rtl ? 'حالة التخطيط' : 'Planning status') + '</span>' +
+      '<div class="modal-row-block cd-locked-hide"><span class="k">' + (rtl ? 'حالة التخطيط' : 'Planning status') + '</span>' +
       '<div class="status-btn-group">' + statusHtml + '</div>' + whoElseHtml + '</div>' +
+      '<div class="cd-review-block">' +
       gradeHtml +
       '<div class="modal-row-block"><span class="k">' + (rtl ? 'مستوى الصعوبة' : 'Difficulty') + '</span>' +
       '<div class="star-rating" id="difficultyStars">' + starsHtml + '</div></div>' +
@@ -346,6 +378,7 @@
       '<div class="modal-row-block"><span class="k">📝 ' + (rtl ? 'ملاحظاتي' : 'My notes') + '</span>' +
       '<textarea class="notes-textarea" id="courseNotesTextarea" maxlength="2000" rows="3" placeholder="' +
       (rtl ? 'ملاحظات شخصية عن هذا المساق…' : 'Personal notes about this course…') + '">' + noteText + '</textarea></div>' +
+      '</div>' +
       removeHtml +
       '</div>';
   }
@@ -424,8 +457,24 @@
 
     container.querySelectorAll('.status-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
-        var statuses = window.AAUP_GPA.loadStatuses();
         var val = btn.getAttribute('data-status');
+        // Phone-only real "Done" segment: the checkbox is the one source of
+        // truth for completion, so this calls the exact same toggle rather
+        // than writing a parallel "done" entry into the statuses map — then
+        // fully re-renders, since isDone gates the grade/difficulty/
+        // workload/notes block below and the planning-status buttons need
+        // to reflect a real progress-map change, not just an active class.
+        if(val === 'done'){
+          var el = document.getElementById(pid);
+          if(el && window.__toggleCourse){ window.__toggleCourse(el); }
+          var parent = container.parentNode;
+          var freshHtml = render(prefix, slug);
+          container.outerHTML = freshHtml;
+          var freshContainer = parent.querySelector('.modal-extras');
+          bind(prefix, slug, freshContainer);
+          return;
+        }
+        var statuses = window.AAUP_GPA.loadStatuses();
         if(val){ statuses[pid] = val; } else { delete statuses[pid]; }
         window.AAUP_GPA.saveStatuses(statuses);
         container.querySelectorAll('.status-btn').forEach(function(b){ b.classList.remove('active'); });
