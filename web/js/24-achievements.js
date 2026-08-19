@@ -206,16 +206,26 @@
     return { done: Math.min(s.doneCredits, target), total: target, unit: 'credit hours' };
   }
 
+  // iconKey is a js/04-icons.js key, used only for the on-screen badge (see
+  // render() below) — icon (the emoji) stays untouched and is still what
+  // js/08-celebrations.js's canvas-based share card draws, since a raster
+  // canvas can render a font glyph but not an arbitrary SVG path without a
+  // lot more work than a share-card image is worth.
+  //
+  // cat groups them for the phone filter chips (All/Progress/Grades/
+  // Special) — this app genuinely has no "social" achievements (no invite-
+  // a-friend feature or similar), so the categories are honest to what's
+  // actually here rather than copied from a reference that assumed one.
   var ACHIEVEMENTS = [
     {
-      id: 'year1', icon: '🍄',
+      id: 'year1', icon: '🍄', iconKey: 'cap', cat: 'progress',
       title: { en: 'No Longer a Smurf', ar: 'لم أعد سنفورًا' },
       desc: { en: 'Finish every Year 1 course — welcome to university!', ar: 'أكمل جميع مساقات السنة الأولى — أهلاً بك في الجامعة!' },
       check: function(prefix){ return allYearCompleted(prefix, 1); },
       prog: function(prefix){ return countYearCourses(prefix, 1); }
     },
     {
-      id: 'year2', icon: '🥈',
+      id: 'year2', icon: '🥈', iconKey: 'medal', cat: 'progress',
       appliesTo: function(prefix){ return countYearCourses(prefix, 2) !== null; },
       title: { en: 'Sophomore Survivor', ar: 'ناجٍ من السنة الثانية' },
       desc: { en: 'Complete every course in Year 2.', ar: 'أكمل جميع مساقات السنة الثانية.' },
@@ -223,7 +233,7 @@
       prog: function(prefix){ return countYearCourses(prefix, 2); }
     },
     {
-      id: 'year3', icon: '🥉',
+      id: 'year3', icon: '🥉', iconKey: 'star', cat: 'progress',
       appliesTo: function(prefix){ return countYearCourses(prefix, 3) !== null; },
       title: { en: 'Junior Legend', ar: 'أسطورة السنة الثالثة' },
       desc: { en: 'Complete every course in Year 3.', ar: 'أكمل جميع مساقات السنة الثالثة.' },
@@ -231,7 +241,7 @@
       prog: function(prefix){ return countYearCourses(prefix, 3); }
     },
     {
-      id: 'year4', icon: '🎓',
+      id: 'year4', icon: '🎓', iconKey: 'cap', cat: 'progress',
       appliesTo: function(prefix){ return countYearCourses(prefix, 4) !== null; },
       title: { en: 'Senior at Last', ar: 'أوشكت على التخرّج' },
       desc: { en: 'Complete every course in Year 4.', ar: 'أكمل جميع مساقات السنة الرابعة.' },
@@ -239,7 +249,7 @@
       prog: function(prefix){ return countYearCourses(prefix, 4); }
     },
     {
-      id: 'year5', icon: '🧓',
+      id: 'year5', icon: '🧓', iconKey: 'clock', cat: 'progress',
       appliesTo: function(prefix){ return countYearCourses(prefix, 5) !== null; },
       title: function(gender){
         if(gender === 'Female') return { en: 'Hello Granny', ar: 'أهلاً تيتا' };
@@ -250,14 +260,14 @@
       prog: function(prefix){ return countYearCourses(prefix, 5); }
     },
     {
-      id: 'allmath', icon: '📐',
+      id: 'allmath', icon: '📐', iconKey: 'ruler', cat: 'special',
       title: { en: 'Completed all Math', ar: 'أتقنت الرياضيات' },
       desc: { en: 'Finish every math & statistics course.', ar: 'أكمل جميع مساقات الرياضيات والإحصاء.' },
       check: function(prefix){ return allCategoryCompleted(prefix, 'math'); },
       prog: function(prefix){ return countCategory(prefix, 'math'); }
     },
     {
-      id: 'progpath', icon: '💻',
+      id: 'progpath', icon: '💻', iconKey: 'code', cat: 'special',
       title: { en: 'Finished Programming Path', ar: 'أتممت مسار البرمجة' },
       desc: { en: 'Complete the intro programming sequence.', ar: 'أكمل تسلسل مساقات البرمجة التأسيسية.' },
       appliesTo: progPathApplies,
@@ -265,14 +275,14 @@
       prog: function(prefix){ var seq = findProgSequence(prefix); return seq ? countSlugs(prefix, seq) : null; }
     },
     {
-      id: 'halfway', icon: '🎯',
+      id: 'halfway', icon: '🎯', iconKey: 'target', cat: 'progress',
       title: { en: 'Halfway to Graduation', ar: 'في منتصف الطريق للتخرج' },
       desc: { en: 'Complete 50% of required credit hours.', ar: 'أكمل 50٪ من الساعات المعتمدة المطلوبة.' },
       check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 50; },
       prog: function(prefix){ return creditProgressToward(prefix, 50); }
     },
     {
-      id: 'gradready', icon: '🎓',
+      id: 'gradready', icon: '🎓', iconKey: 'trophy', cat: 'progress',
       title: { en: 'Graduation Ready', ar: 'جاهز للتخرج' },
       desc: { en: 'Meet 100% of the graduation requirements.', ar: 'أكمل 100٪ من متطلبات التخرج.' },
       check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.doneCredits >= s.totalCredits; },
@@ -283,49 +293,49 @@
     // in reach for two years: almost everything was end-of-degree. Each of
     // these is computed from data the app already keeps — no new tracking. ----
     {
-      id: 'firstcourse', icon: '🌱',
+      id: 'firstcourse', icon: '🌱', iconKey: 'leaf', cat: 'progress',
       title: { en: 'Off the Mark', ar: 'الانطلاقة' },
       desc: { en: 'Pass your first course.', ar: 'انجح في أول مساق لك.' },
       check: function(prefix){ var s = window.__computeStats(prefix); return s.doneCourses >= 1; },
       prog: function(prefix){ var s = window.__computeStats(prefix); return { done: Math.min(s.doneCourses, 1), total: 1, unit: 'courses' }; }
     },
     {
-      id: 'quarter', icon: '🧭',
+      id: 'quarter', icon: '🧭', iconKey: 'compass', cat: 'progress',
       title: { en: 'A Quarter Down', ar: 'ربع الطريق' },
       desc: { en: 'Complete 25% of required credit hours.', ar: 'أكمل 25٪ من الساعات المعتمدة المطلوبة.' },
       check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 25; },
       prog: function(prefix){ return creditProgressToward(prefix, 25); }
     },
     {
-      id: 'threequarters', icon: '🏔️',
+      id: 'threequarters', icon: '🏔️', iconKey: 'rocket', cat: 'progress',
       title: { en: 'Home Straight', ar: 'الخط الأخير' },
       desc: { en: 'Complete 75% of required credit hours.', ar: 'أكمل 75٪ من الساعات المعتمدة المطلوبة.' },
       check: function(prefix){ var s = window.__computeStats(prefix); return s.totalCredits > 0 && s.pct >= 75; },
       prog: function(prefix){ return creditProgressToward(prefix, 75); }
     },
     {
-      id: 'firsta', icon: '🅰️',
+      id: 'firsta', icon: '🅰️', iconKey: 'star', cat: 'grades',
       title: { en: 'First A', ar: 'أول امتياز' },
       desc: { en: 'Record an A in any course.', ar: 'سجّل علامة A في أي مساق.' },
       check: function(prefix){ return countTopGrades(prefix).done >= 1; },
       prog: function(prefix){ var c = countTopGrades(prefix); return { done: Math.min(c.done, 1), total: 1, unit: 'A grades' }; }
     },
     {
-      id: 'gpa3', icon: '📈',
+      id: 'gpa3', icon: '📈', iconKey: 'chart', cat: 'grades',
       title: { en: 'Solid Standing', ar: 'وضع متين' },
       desc: { en: 'Hold a 3.0 GPA across at least 10 graded courses.', ar: 'حافظ على معدل 3.0 عبر 10 مساقات مُقيَّمة على الأقل.' },
       check: function(prefix){ var g = gradedGpa(prefix); return g.count >= 10 && g.gpa >= 3; },
       prog: function(prefix){ var g = gradedGpa(prefix); return { done: Math.min(g.count, 10), total: 10, unit: 'graded courses' }; }
     },
     {
-      id: 'gpa35', icon: '🏅',
+      id: 'gpa35', icon: '🏅', iconKey: 'medal', cat: 'grades',
       title: { en: 'Honours Pace', ar: 'مسار التفوّق' },
       desc: { en: 'Hold a 3.5 GPA across at least 10 graded courses.', ar: 'حافظ على معدل 3.5 عبر 10 مساقات مُقيَّمة على الأقل.' },
       check: function(prefix){ var g = gradedGpa(prefix); return g.count >= 10 && g.gpa >= 3.5; },
       prog: function(prefix){ var g = gradedGpa(prefix); return { done: Math.min(g.count, 10), total: 10, unit: 'graded courses' }; }
     },
     {
-      id: 'goodstudent', icon: '🌟',
+      id: 'goodstudent', icon: '🌟', iconKey: 'sun', cat: 'grades',
       title: function(gender){
         if(gender === 'Male') return { en: 'Good Boy', ar: 'ولد مجتهد' };
         if(gender === 'Female') return { en: 'Good Girl', ar: 'بنت مجتهدة' };
@@ -353,7 +363,7 @@
       }
     },
     {
-      id: 'arabiclegend', icon: '🕌', global: true,
+      id: 'arabiclegend', icon: '🕌', iconKey: 'language', cat: 'special', global: true,
       title: { en: 'Arabic Legend', ar: 'أسطورة اللغة العربية' },
       desc: { en: 'Browse in Arabic for 5+ total minutes.', ar: 'تصفّح الموقع بالعربية لأكثر من 5 دقائق إجمالًا.' },
       check: arabicLegendDone,
@@ -364,28 +374,28 @@
       }
     },
     {
-      id: 'highskilled', icon: '🖥️',
+      id: 'highskilled', icon: '🖥️', iconKey: 'terminal', cat: 'special',
       title: { en: 'High Skilled Student', ar: 'طالب عالي المهارة' },
       desc: { en: 'Complete Computer Skills & Research Methods.', ar: 'أكمل مهارات حاسوبية وأساسيات مناهج البحث.' },
       check: highSkilledDone,
       prog: function(prefix){ return countSlugs(prefix, ['computer-skills', 'research-methods']); }
     },
     {
-      id: 'englishmaster', icon: '🔤',
+      id: 'englishmaster', icon: '🔤', iconKey: 'book', cat: 'special',
       title: { en: 'English Master', ar: 'أستاذ اللغة الإنجليزية' },
       desc: { en: 'Complete every English course.', ar: 'أكمل جميع مساقات اللغة الإنجليزية.' },
       check: function(prefix){ return allCategoryCompleted(prefix, 'eng'); },
       prog: function(prefix){ return countCategory(prefix, 'eng'); }
     },
     {
-      id: 'mathholic', icon: '🧮',
+      id: 'mathholic', icon: '🧮', iconKey: 'sigma', cat: 'special',
       title: { en: 'Mathholic', ar: 'مهووس بالرياضيات' },
       desc: { en: 'Finish all math courses with a 3.5+ GPA in them.', ar: 'أكمل كل مساقات الرياضيات بمعدل أعلى من 3.5.' },
       check: mathholicDone,
       prog: function(prefix){ return countCategory(prefix, 'math'); }
     },
     {
-      id: 'cpphoster', icon: '⚙️',
+      id: 'cpphoster', icon: '⚙️', iconKey: 'circuit', cat: 'special',
       title: { en: 'C++ Hoster', ar: 'محترف ++C' },
       desc: { en: 'Complete Programming Fundamentals I & II.', ar: 'أكمل أساسيات البرمجة 1 و2.' },
       appliesTo: cppHosterApplies,
@@ -393,6 +403,12 @@
       prog: function(prefix){ return countSlugs(prefix, ['progfund1', 'progfund2']); }
     }
   ];
+  var CAT_LABELS = {
+    all: { en: 'All', ar: 'الكل' },
+    progress: { en: 'Progress', ar: 'التقدّم' },
+    grades: { en: 'Grades', ar: 'العلامات' },
+    special: { en: 'Special', ar: 'خاصة' }
+  };
 
   function loadUnlocked(){
     return window.AAUP_STORAGE.getJSON('aaup_achievements', {});
@@ -556,7 +572,7 @@
       var nt = resolveTitle(nextUp.a, gender);
       var heroPct = Math.round(nextUp.pct * 100);
       heroHtml = '<div class="ach-next">' +
-        '<div class="ach-next-icon">' + nextUp.a.icon + '</div>' +
+        '<div class="ach-next-icon">' + badgeIconHtml(nextUp.a) + '</div>' +
         '<div class="ach-next-body">' +
           '<div class="ach-next-kicker">' + (rtl ? 'التالي' : 'Next up') + '</div>' +
           '<div class="ach-next-title">' + (rtl ? nt.ar : nt.en) + '</div>' +
@@ -565,12 +581,28 @@
       '</div>';
     }
 
-    var badges = ACHIEVEMENTS.map(function(a){
+    // Every applicable badge is walked once, unfiltered, so the summary
+    // counts and the "recently unlocked" list are always the true totals —
+    // only the grid markup below is filtered down to activeCat.
+    var recentUnlocks = [];
+    var gridItems = ACHIEVEMENTS.map(function(a){
       var applies = !a.appliesTo || a.appliesTo(prefix);
       var key = a.global ? a.id : (prefix + ':' + a.id);
       var isUnlocked = applies && !!unlocked[key];
       if(applies) applicableCount++;
-      if(isUnlocked) unlockedCount++;
+      if(isUnlocked){
+        unlockedCount++;
+        var at = unlocked[key] && unlocked[key].at;
+        if(at) recentUnlocks.push({ a: a, at: at });
+      }
+      return { a: a, applies: applies, isUnlocked: isUnlocked };
+    });
+    recentUnlocks.sort(function(x, y){ return new Date(y.at) - new Date(x.at); });
+
+    var badges = gridItems.filter(function(item){
+      return activeCat === 'all' || item.a.cat === activeCat;
+    }).map(function(item){
+      var a = item.a, applies = item.applies, isUnlocked = item.isUnlocked;
       var title = resolveTitle(a, gender);
       var cls = !applies ? 'na' : (isUnlocked ? 'unlocked' : 'locked');
       var tag = isUnlocked ? ('✓ ' + (rtl ? 'مُنجَز' : 'Unlocked'))
@@ -607,7 +639,7 @@
           'data-ach-sub="' + window.__escapeHtml(majorName) + '">📤 ' + (rtl ? 'مشاركة' : 'Share') + '</button>';
       }
       return '<div class="achievement-badge ' + cls + '">' +
-        '<div class="ab-icon">' + a.icon + '</div>' +
+        '<div class="ab-icon">' + badgeIconHtml(a) + '</div>' +
         '<div class="ab-title">' + (rtl ? title.ar : title.en) + '</div>' +
         '<div class="ab-desc">' + (rtl ? a.desc.ar : a.desc.en) + '</div>' +
         progHtml +
@@ -626,11 +658,69 @@
           'data-ach-unlocked="' + unlockedCount + '" data-ach-total="' + applicableCount + '">' +
           (rtl ? '📤 احفظ التقدّم كصورة' : '📤 Save progress as image') + '</button>' +
       '</div>' +
+      catChipsHtml(rtl) +
       heroHtml +
+      recentUnlockedHtml(recentUnlocks.slice(0, 4), gender, rtl) +
+      '<div class="ach-section-label">' + (rtl ? 'كل الإنجازات' : 'All badges') + '</div>' +
       '<div class="achievement-grid">' + badges + '</div>';
   }
 
+  // Category filter chips — phone-only visually (see CSS), but built
+  // unconditionally like every other filter UI in this app so there is one
+  // code path regardless of screen size.
+  var activeCat = 'all';
+  function catChipsHtml(rtl){
+    var order = ['all', 'progress', 'grades', 'special'];
+    return '<div class="ach-cats" id="achCats">' + order.map(function(c){
+      return '<button type="button" class="ach-cat-pill' + (activeCat === c ? ' active' : '') + '" data-ach-cat="' + c + '">' +
+        (rtl ? CAT_LABELS[c].ar : CAT_LABELS[c].en) + '</button>';
+    }).join('') + '</div>';
+  }
+
+  // iconKey renders as a hand-drawn line icon everywhere (not just phone —
+  // this replaces the emoji-badge look app-wide, same as the icon rollout
+  // js/04-icons.js's own header describes for the sidebar/dashboard).
+  // Falls back to the emoji if the icon system isn't loaded yet or the
+  // achievement has no iconKey, so nothing renders blank.
+  function badgeIconHtml(a){
+    if(a.iconKey && window.AAUP_ICONS && window.AAUP_ICONS.preview){
+      return window.AAUP_ICONS.preview(a.iconKey, 22);
+    }
+    return a.icon;
+  }
+
+  // "2 days ago" / "3 weeks ago" — coarse on purpose, this is a celebratory
+  // timestamp, not a log; nobody needs to know it was 2 days and 4 hours.
+  function relativeTime(iso, rtl){
+    var ms = Date.now() - new Date(iso).getTime();
+    var mins = Math.floor(ms / 60000);
+    if(mins < 60) return rtl ? 'الآن' : 'just now';
+    var hours = Math.floor(mins / 60);
+    if(hours < 24) return rtl ? (hours + ' ساعة') : (hours + (hours === 1 ? ' hour ago' : ' hours ago'));
+    var days = Math.floor(hours / 24);
+    if(days < 7) return rtl ? (days + ' يوم') : (days + (days === 1 ? ' day ago' : ' days ago'));
+    var weeks = Math.floor(days / 7);
+    if(weeks < 5) return rtl ? (weeks + ' أسبوع') : (weeks + (weeks === 1 ? ' week ago' : ' weeks ago'));
+    var months = Math.floor(days / 30);
+    return rtl ? (months + ' شهر') : (months + (months === 1 ? ' month ago' : ' months ago'));
+  }
+
+  function recentUnlockedHtml(recent, gender, rtl){
+    if(!recent.length) return '';
+    return '<div class="ach-section-label">' + (rtl ? 'أُنجز مؤخرًا' : 'Recently unlocked') + '</div>' +
+      '<div class="ach-recent-scroll">' + recent.map(function(r){
+        var t = resolveTitle(r.a, gender);
+        return '<div class="ach-recent-card">' +
+          '<div class="ach-recent-icon">' + badgeIconHtml(r.a) + '</div>' +
+          '<div><div class="ach-recent-title">' + (rtl ? t.ar : t.en) + '</div>' +
+          '<div class="ach-recent-when">' + relativeTime(r.at, rtl) + '</div></div>' +
+          '</div>';
+      }).join('') + '</div>';
+  }
+
+  var lastPrefix = null;
   function open(prefix){
+    lastPrefix = prefix;
     var body = document.getElementById('achievementsModalBody');
     var overlay = document.getElementById('achievementsModalOverlay');
     if(!body || !overlay) return;
@@ -666,6 +756,13 @@
         subtitle: btn.getAttribute('data-ach-sub'),
         footer: 'University Easy Plans'
       });
+    });
+    overlay.addEventListener('click', function(e){
+      var btn = e.target.closest && e.target.closest('[data-ach-cat]');
+      if(!btn || !lastPrefix) return;
+      e.stopPropagation();
+      activeCat = btn.getAttribute('data-ach-cat');
+      open(lastPrefix);
     });
     overlay.addEventListener('click', function(e){
       var btn = e.target.closest && e.target.closest('#achGridSaveImg');

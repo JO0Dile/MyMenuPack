@@ -2709,6 +2709,7 @@
     font-size:22px;flex:0 0 auto;width:44px;height:44px;border-radius:12px;
     background:rgba(242,185,61,.16);display:flex;align-items:center;justify-content:center;
   }
+  .ach-next-icon .app-icon-svg{width:22px;height:22px;color:#f2b93d;}
   .ach-next-body{flex:1 1 auto;min-width:0;}
   .ach-next-kicker{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#f2b93d;}
   .ach-next-title{font-size:13px;font-weight:800;margin-top:2px;color:var(--text);}
@@ -2735,8 +2736,10 @@
     display:flex;align-items:center;justify-content:center;
     background:rgba(255,255,255,.05);border:2px solid var(--line);
   }
+  .achievement-badge .ab-icon .app-icon-svg{width:20px;height:20px;color:var(--text-dim);}
 
   .achievement-badge.unlocked .ab-icon{border-color:#f2b93d;background:rgba(242,185,61,.16);}
+  .achievement-badge.unlocked .ab-icon .app-icon-svg{color:#f2b93d;}
 
   .achievement-badge .ab-title{font-size:11.5px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;}
 
@@ -2764,6 +2767,41 @@
     border-radius:999px;padding:4px 12px;cursor:pointer;
   }
   .achievement-badge .ab-share:hover{background:var(--accent);color:var(--on-accent);}
+
+  /* Filter chips, section labels and the "Recently unlocked" strip are phone-only
+     structural additions (mockup-driven); desktop keeps its plain single-grid
+     layout, so these stay hidden there. */
+  .ach-cats, .ach-section-label, .ach-recent-scroll{display:none;}
+
+  @media (max-width:720px){
+    .ach-cats{display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 14px;padding-bottom:2px;}
+    .ach-cat-pill{
+      flex:0 0 auto;font-size:11.5px;font-weight:700;padding:6px 13px;border-radius:999px;
+      border:1px solid var(--line);background:none;color:var(--text-dim);
+      font-family:inherit;cursor:pointer;white-space:nowrap;
+    }
+    .ach-cat-pill:hover{border-color:var(--accent);color:var(--text);}
+    .ach-cat-pill.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
+
+    .ach-section-label{
+      display:block;font-size:10.5px;font-weight:800;color:var(--text-dim);text-transform:uppercase;
+      letter-spacing:.06em;margin:16px 2px 8px;
+    }
+
+    .ach-recent-scroll{display:flex;gap:9px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 4px;padding-bottom:2px;}
+    .ach-recent-card{
+      flex:0 0 auto;width:118px;background:rgba(255,255,255,.03);border:1px solid var(--line);
+      border-radius:12px;padding:11px;
+    }
+    .ach-recent-icon{
+      width:32px;height:32px;border-radius:50%;margin-bottom:8px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(242,185,61,.16);border:2px solid #f2b93d;
+    }
+    .ach-recent-icon .app-icon-svg{width:17px;height:17px;color:#f2b93d;}
+    .ach-recent-title{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px;}
+    .ach-recent-when{font-size:9.5px;color:var(--text-dim);}
+  }
   /* ================= AI STUDY ADVISOR ================= */
 
   /* ---------- phone study-plan header (js/69-phone-header.js) ----------
