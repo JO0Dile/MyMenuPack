@@ -2683,6 +2683,57 @@
     .sheet-plan.imp-phone-open > .collapse-toggle{display:flex;}
     .sheet-plan.imp-phone-open > .imp-body-pad > .imp-stat-chips{display:flex;}
     .sheet-plan.imp-phone-open > .imp-body-pad > .panel-action-row{display:flex;}
+
+    /* Year tabs — always visible, not gated behind imp-phone-open: reaching
+       a later year is the point, and that should not require opening the
+       full header first. */
+    .imp-phone-years{
+      display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px;
+      scrollbar-width:none;
+    }
+    .imp-phone-years::-webkit-scrollbar{display:none;}
+    .imp-phone-year-tab{
+      flex:0 0 auto;padding:6px 14px;border-radius:999px;border:1px solid var(--line);
+      background:var(--panel);color:var(--text-dim);font-family:inherit;font-size:12px;font-weight:700;
+    }
+    .imp-phone-year-tab:active{border-color:var(--accent);color:var(--text);}
+
+    /* Icon chips replace Legend's and Focus Mode's own full-width rows once
+       the header is open — see js/69-phone-header.js for why Collapse
+       Finished Years is left as its own row instead of a third chip. */
+    .imp-phone-chips{display:none;gap:8px;margin:0 0 10px;}
+    .sheet-plan.imp-phone-open > .imp-phone-chips{display:flex;}
+    .imp-phone-chip{
+      flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+      color:var(--text-dim);font-family:inherit;font-size:12px;font-weight:700;
+    }
+    .imp-phone-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(93,184,255,.1);}
+    .sheet-plan.imp-phone-open > .legend > .legend-toggle{display:none;}
+    .sheet-plan.imp-phone-open > .collapse-toggle.focus-toggle{display:none;}
+
+    /* Auto-hide on scroll — the sticky bar, year tabs and chips all ride
+       together as one unit, tucked out of view scrolling down and pulled
+       back scrolling up (js/69-phone-header.js's watchScroll). */
+    .imp-phone-bar,.imp-phone-years,.imp-phone-chips{transition:transform .22s ease, opacity .22s ease;}
+    .sheet-plan.imp-phone-hide > .imp-phone-bar,
+    .sheet-plan.imp-phone-hide > .imp-phone-years,
+    .sheet-plan.imp-phone-hide > .imp-phone-chips{
+      transform:translateY(-14px);opacity:0;pointer-events:none;
+    }
+
+    /* Jump-to-current-semester — small, unlabelled, bottom-left (the
+       assistant/Fix launchers already own bottom-right/left at their own
+       heights, so this sits just above the Fix button rather than
+       competing with it for the same spot). */
+    .imp-phone-jump{
+      position:fixed;left:16px;bottom:130px;z-index:1399;
+      width:34px;height:34px;border-radius:50%;
+      background:var(--panel);color:var(--text-dim);border:1px solid var(--line);
+      font-size:15px;line-height:1;cursor:pointer;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+      display:flex;align-items:center;justify-content:center;
+    }
   }
 
   /* ---------- skeleton loading (js/70-skeleton.js) ----------
@@ -5175,4 +5226,44 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
 @media (max-width:720px){
   body:has(.modal-overlay.open) .asst-launcher,
   body:has(.modal-overlay.open) .fix-launcher{display:none !important;}
+}
+
+/* ==========================================================================
+   PHONE BOTTOM TAB BAR (js/37-sidebar.js) — Dashboard / Plan / Assistant /
+   More, shown only on phone and only while the sidebar itself would be
+   (body.has-sidebar drives both). Hidden outright above 720px: this is a
+   phone-only affordance, the desktop sidebar is untouched.
+   ========================================================================== */
+.sb-tabbar{display:none;}
+@media (max-width:720px){
+  body.has-sidebar .sb-tabbar{
+    display:flex; position:fixed; left:0; right:0; bottom:0; z-index:950;
+    background:var(--header-bg); border-top:1px solid var(--line);
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow:0 -6px 20px rgba(0,0,0,.28);
+  }
+  /* A dialog is now a full page on phone (see the modal rules above) — its
+     own back arrow is the way out, and the tab bar underneath it would just
+     be a second, confusing way to leave. */
+  body:has(.modal-overlay.open) .sb-tabbar{display:none;}
+
+  .sb-tab{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    background:none; border:none; padding:4px 2px; color:var(--text-dim);
+    font-family:inherit; cursor:pointer;
+  }
+  .sb-tab-ic{font-size:19px; line-height:1; position:relative;}
+  .sb-tab-lbl{font-size:9.5px; font-weight:700;}
+  .sb-tab.active{color:var(--accent);}
+  .sb-tab-badge{
+    position:absolute; top:-6px; right:-14px; font-size:8.5px; font-weight:800;
+    color:#06172b; background:var(--accent); border-radius:999px; padding:1px 4px;
+    line-height:1.3; white-space:nowrap;
+  }
+
+  /* Raised clear of the tab bar so neither floating button sits under it. */
+  body.has-sidebar .asst-launcher{bottom:78px;}
+  body.has-sidebar .fix-launcher{bottom:78px;}
+  body.has-sidebar .asst-panel{bottom:140px;}
+  body.has-sidebar .fix-panel{bottom:140px;}
 }

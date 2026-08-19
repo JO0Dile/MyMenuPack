@@ -1380,6 +1380,7 @@
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }
     if(window.__refreshFocusMode){ window.__refreshFocusMode(id); }
     if(window.__refreshPhoneHeader){ window.__refreshPhoneHeader(id); }
+    if(window.__refreshTabBarProgress){ window.__refreshTabBarProgress(id); }
     // Runs against the freshly-rebuilt DOM. The first call per plan (on open)
     // silently seeds already-complete semesters; later ones (after a toggle
     // re-renders) fire confetti for a semester that just became complete.
