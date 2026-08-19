@@ -522,7 +522,7 @@
 
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">➕ ' + (rtl ? 'إضافة مساق' : 'Add Course') + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('plus', 20) + (rtl ? 'إضافة مساق' : 'Add Course') + '</h2>' +
       '<div class="form-field-row">' +
         '<div class="form-field"><label for="ncqNameEn">' + (rtl ? 'الاسم (بالإنجليزية)' : 'Name (English)') + '</label><input type="text" id="ncqNameEn" maxlength="80"></div>' +
         '<div class="form-field"><label for="ncqNameAr">' + (rtl ? 'الاسم (بالعربية)' : 'Name (Arabic)') + '</label><input type="text" id="ncqNameAr" maxlength="80"></div>' +
@@ -639,7 +639,7 @@
 
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">✏️ ' + (rtl ? 'تعديل المساق' : 'Edit Course') + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('pen', 20) + (rtl ? 'تعديل المساق' : 'Edit Course') + '</h2>' +
       '<div class="form-field-row">' +
         '<div class="form-field"><label for="ecqNameEn">' + (rtl ? 'الاسم (بالإنجليزية)' : 'Name (English)') + '</label><input type="text" id="ecqNameEn" maxlength="80" value="' + course.name.replace(/"/g, '&quot;') + '"></div>' +
         '<div class="form-field"><label for="ecqNameAr">' + (rtl ? 'الاسم (بالعربية)' : 'Name (Arabic)') + '</label><input type="text" id="ecqNameAr" maxlength="80" value="' + (course.ar || '').replace(/"/g, '&quot;') + '"></div>' +
@@ -1032,7 +1032,7 @@
     var dispName = rtl && course.ar ? course.ar : course.name;
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">📊 ' + (rtl ? 'العلامة \u2014 ' : 'Grade \u2014 ') + window.__escapeHtml(dispName) + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('chart', 20) + (rtl ? 'العلامة \u2014 ' : 'Grade \u2014 ') + window.__escapeHtml(dispName) + '</h2>' +
       '<div class="form-field"><label for="impGradeSelect">' + (rtl ? 'العلامة' : 'Grade') + '</label><select id="impGradeSelect">' + opts + '</select>' +
       '<div class="numeric-grade-row">' +
         '<input type="number" min="0" max="100" step="0.1" class="numeric-grade-input" id="impNumericGradeInput" placeholder="' +
@@ -1764,7 +1764,7 @@
 
     function showPicker(){
       body.innerHTML =
-        '<h2 style="margin-top:0;">📚 Course Library</h2>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('book', 20) + 'Course Library</h2>' +
         '<p class="form-note" style="margin-top:-6px;">Choose a study plan to browse its courses.</p>' +
         (currentPlanId ? '<p class="form-note" style="margin-top:-2px;">Currently in <b>' + window.__escapeHtml(planLabel(currentPlanId)) + '</b>.</p>' : '') +
         '<div class="form-field"><label for="libPlanSelect">Study plan</label><select id="libPlanSelect">' +
@@ -1809,8 +1809,8 @@
       }
 
       body.innerHTML =
-        '<h2 style="margin-top:0;">📚 ' + planLabel(browsePrefix) + '</h2>' +
-        '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">🔀 Change plan</button>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('book', 20) + planLabel(browsePrefix) + '</h2>' +
+        '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">' + window.AAUP_ICONS.preview('shuffle', 14) + 'Change plan</button>' +
         (currentIsSame ? '<p class="form-note">This is the plan you\u2019re already editing.</p>' : '') +
         '<div class="form-field"><input type="text" id="libSearch" placeholder="Search by name or course code…"></div>' +
         '<div id="libList" class="lib-list"></div>' +
@@ -1850,7 +1850,7 @@
       }).join('');
 
       body.innerHTML =
-        '<h2 style="margin-top:0;">➕ Add "' + course.name + '"</h2>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('plus', 20) + 'Add "' + course.name + '"</h2>' +
         (alreadyExists
           ? '<p class="dev-error-msg">This plan already has a course with the same ID (' + course.slug + '). Adding it again isn\u2019t possible from here — check the plan first.</p>' +
             '<div class="form-actions"><button type="button" class="home-btn" id="libTargetBack">← Back</button></div>'

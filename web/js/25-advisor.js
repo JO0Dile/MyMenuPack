@@ -294,7 +294,7 @@
     // No title in the back bar: the <h2> underneath already says it, and
     // printing the same words twice in a row reads like a mistake.
     var head = (window.__backBarHTML ? window.__backBarHTML('', 'advisorModalOverlay', rtl) : '') +
-      '<h2 style="margin-top:0;">🧠 ' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</h2>';
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('brain', 20) + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</h2>';
 
     if(!pool.length){
       return head + '<p class="ex-note">' + (rtl

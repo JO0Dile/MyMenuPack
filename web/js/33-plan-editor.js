@@ -412,7 +412,7 @@
     var selectedIcon = icons[0];
 
     body.innerHTML =
-      '<h2 style="margin-top:0;">➕ New Study Plan · خطة دراسية جديدة</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('plus', 20) + 'New Study Plan · خطة دراسية جديدة</h2>' +
       '<div class="form-field"><label>Icon · الأيقونة</label><div class="icon-picker-grid" id="npIconGrid">' +
       icons.map(function(ic, i){ return '<div class="icon-picker-option' + (i === 0 ? ' selected' : '') + '" data-icon="' + ic + '">' + ic + '</div>'; }).join('') +
       '</div></div>' +

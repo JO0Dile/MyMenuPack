@@ -4951,6 +4951,11 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
    ========================================================================== */
 .app-icon{display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
 
+/* Panel/modal headings that used to be a plain "🏆 Achievements"-style emoji
+   prefix — icon + label side by side with the same gap the rest of the app's
+   icon+label rows (.home-btn, .dq-icon, .sb-icon...) already use. */
+h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
+
 /* The SVGs are drawn with currentColor, so they take the accent from whatever
    tile they sit in and follow the theme without a second set for dark mode. */
 .app-icon-svg{color:var(--accent);}
@@ -5818,9 +5823,10 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   box-shadow:0 16px 40px rgba(0,0,0,.5); padding:6px; display:flex; flex-direction:column; gap:2px;
 }
 .course-qa-menu button{
-  display:block; width:100%; text-align:left; padding:9px 10px; border-radius:7px;
+  display:flex; align-items:center; gap:8px; width:100%; text-align:left; padding:9px 10px; border-radius:7px;
   background:none; border:none; color:var(--text); font-family:inherit; font-size:13px; cursor:pointer;
 }
+.course-qa-menu button .app-icon-svg{color:var(--text-dim);}
 .course-qa-menu button:hover,
 .course-qa-menu button:focus-visible{background:var(--search-bg);}
 [dir="rtl"] .course-qa-menu button{text-align:right;}

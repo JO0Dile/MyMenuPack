@@ -242,7 +242,33 @@
       '<path d="M19.4 6v4.4H15"/><path d="M4.6 18v-4.4H9"/>'),
     link: stroke('<path d="M9.6 14.4 14.4 9.6"/>' +
       '<path d="M13 6.6l1.6-1.6a3.2 3.2 0 0 1 4.4 4.4L17.4 11"/>' +
-      '<path d="M11 17.4l-1.6 1.6a3.2 3.2 0 0 1-4.4-4.4L6.6 13"/>')
+      '<path d="M11 17.4l-1.6 1.6a3.2 3.2 0 0 1-4.4-4.4L6.6 13"/>'),
+
+    // ---- small UI glyphs (buttons, menus, headings) — the same hand-drawn
+    // family as the app chrome above, standing in for the plain characters
+    // (✓ ➕ 🔒 ⚠️ ...) headings and menus used to be prefixed with. ----
+    plus: stroke('<path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/>'),
+    check: stroke('<circle cx="12" cy="12" r="8.6"/><path d="m7.6 12.4 3 3 6-6.4"/>'),
+    undo: stroke('<path d="M8.4 15 4 10.6 8.4 6.2"/><path d="M4 10.6h10.4a5.6 5.6 0 0 1 0 11.2H10"/>'),
+    copy: stroke('<rect x="9" y="9" width="11" height="11" rx="2"/>' +
+      '<path d="M15 9V6.4A2.4 2.4 0 0 0 12.6 4H6.4A2.4 2.4 0 0 0 4 6.4v6.2A2.4 2.4 0 0 0 6.4 15H9"/>'),
+    unlock: stroke('<rect x="4.4" y="10.4" width="15.2" height="10.2" rx="2"/>' +
+      '<path d="M8 10.4V7.6a4 4 0 0 1 7.6-1.8"/><circle cx="12" cy="15.4" r="1.4"/>'),
+    warning: stroke('<path d="M12 3.4 21.6 20H2.4z"/><path d="M12 9.6v4.8"/>' +
+      '<circle cx="12" cy="17.4" r=".9" fill="currentColor" stroke="none"/>'),
+    person: stroke('<circle cx="12" cy="8" r="3.6"/><path d="M4.6 20.4a7.4 7.4 0 0 1 14.8 0"/>'),
+    textsize: stroke('<path d="M4 6.6h9M8.5 6.6v11"/><path d="M14.4 11h6M17.4 11v7"/>'),
+    mail: stroke('<rect x="2.6" y="5" width="18.8" height="14" rx="2"/><path d="m3.4 6.4 8.6 6.4 8.6-6.4"/>'),
+    trash: stroke('<path d="M4.4 7.4h15.2"/><path d="M9 7.4V5a1.6 1.6 0 0 1 1.6-1.6h2.8A1.6 1.6 0 0 1 16 5v2.4"/>' +
+      '<path d="M6.4 7.4 7.2 19a2 2 0 0 0 2 1.8h5.6a2 2 0 0 0 2-1.8l.8-11.6"/><path d="M10.2 11v6M13.8 11v6"/>'),
+    upload: stroke('<path d="M12 15.6V4.4"/><path d="m7.4 9 4.6-4.6L16.6 9"/>' +
+      '<path d="M4.6 15.6v3a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2v-3"/>'),
+    download: stroke('<path d="M12 4.4v11.2"/><path d="m7.4 11 4.6 4.6L16.6 11"/>' +
+      '<path d="M4.6 15.6v3a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2v-3"/>'),
+    save: stroke('<path d="M5 4.4h11.2l2.4 2.4v12.8H5z"/><path d="M7.6 4.4v5.6h8.8V4.4"/><path d="M8 14h8v5.2H8z"/>'),
+    help: stroke('<circle cx="12" cy="12" r="8.6"/>' +
+      '<path d="M9.4 9.4a2.6 2.6 0 1 1 3.6 2.4c-.7.4-1 .8-1 1.6v.4"/>' +
+      '<circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/>')
   };
 
   // An uploaded image is the only one of the three layers that can carry a

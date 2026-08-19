@@ -154,7 +154,7 @@
 
   function settingsSectionHtml(r){
     if(!endpoint()) return '';
-    return '<h3 style="margin:18px 0 6px;">📮 ' + t('settingsTitle', r) + '</h3>' +
+    return '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('mail', 18) + t('settingsTitle', r) + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + t('settingsLead', r) + '</p>' +
       '<div class="form-actions" style="justify-content:flex-start;"><button type="button" class="home-btn" id="contribRefreshBtn">' + t('refresh', r) + '</button></div>' +
       '<div id="contribList" class="contrib-list"></div>';

@@ -81,7 +81,7 @@
     rows.push((rtl ? 'أُنشئ في: ' : 'Generated: ') + today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0'));
 
     return '<div class="po-header">' +
-      '<div class="po-title"><span class="po-icon">' + esc(info.icon || '🎓') + '</span>' +
+      '<div class="po-title"><span class="po-icon">' + window.AAUP_ICONS.markup(info, { size: 28 }) + '</span>' +
       // info.name (from planDisplayInfo) is already HTML-escaped once by the
       // sync sanitizer — esc()'ing it again would show a literal "&amp;".
       '<div><div class="po-name">' + (info.name || prefix) + '</div>' +

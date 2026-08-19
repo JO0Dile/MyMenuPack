@@ -388,7 +388,7 @@
       // into the bar with no heading at all, which rendered as one run-on
       // line ("←Back STUDENT THOUGHTS") instead of a page title.
       window.__backBarHTML('', 'thoughtsModalOverlay', rtl) +
-      '<h2 style="margin-top:0;">💭 ' + (rtl ? 'أفكار الطلاب' : 'Student Thoughts') + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('speech', 20) + (rtl ? 'أفكار الطلاب' : 'Student Thoughts') + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' +
         (rtl
           ? 'اكتب سطرًا يشوفه كل طالب في نفس التخصص. بلا شتائم — الفلتر بيرفضها فورًا.'
@@ -572,7 +572,7 @@
   function settingsSectionHtml(r){
     var saved = storedUrl();
     var live = endpoint();
-    return '<h3 style="margin:18px 0 6px;">💭 ' + (r ? 'خادم الأفكار' : 'Thoughts server') + '</h3>' +
+    return '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('speech', 18) + (r ? 'خادم الأفكار' : 'Thoughts server') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' +
       (r ? 'ألصق رابط الـ Worker الخاص بالأفكار ليصير الحائط مشتركًا بين الطلاب. بدونه تبقى أفكارك على جهازك فقط.'
          : 'Paste your thoughts Worker URL to make the wall shared between students. Without it, your thoughts stay on this device.') +

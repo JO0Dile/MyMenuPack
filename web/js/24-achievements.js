@@ -649,7 +649,7 @@
     }).join('');
 
     var majorNameForGrid = (window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.planDisplayInfo) ? window.AAUP_DASHBOARD.planDisplayInfo(prefix).name : '';
-    return '<h2 style="margin-top:0;">🏆 ' + (rtl ? 'الإنجازات' : 'Achievements') + '</h2>' +
+    return '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('trophy', 20) + (rtl ? 'الإنجازات' : 'Achievements') + '</h2>' +
       '<div class="ach-summary-row">' +
         '<p class="achievements-summary">' + unlockedCount + ' / ' + applicableCount + ' ' +
         (rtl ? 'إنجازًا محقَّقًا لهذا التخصص' : 'unlocked for this major') + '</p>' +

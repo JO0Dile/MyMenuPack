@@ -149,7 +149,7 @@
 
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
-      '<h2 style="margin-top:0;">🔗 ' + (rtl ? 'خطوط المتطلبات السابقة' : 'Prerequisite lines') + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('link', 20) + (rtl ? 'خطوط المتطلبات السابقة' : 'Prerequisite lines') + '</h2>' +
       '<p class="form-note">' + (rtl
         ? 'إذا لاحظت أن مساقًا ينقصه خط، أو أن خطًا غير صحيح، صحّحه هنا. تعديلاتك محفوظة على جهازك ولا تغيّر الخطة الرسمية لبقية الطلاب.'
         : 'If a course is missing a line, or a line looks wrong, correct it here. Your edits are saved on your device and don’t change the official plan for anyone else.') + '</p>' +

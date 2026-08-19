@@ -212,7 +212,7 @@
 
     body.innerHTML =
       (window.__backBarHTML ? window.__backBarHTML('', 'whatifOverlay', rtl) : '') +
-      '<h2 style="margin-top:0;">🎯 ' + t('title', rtl) + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('target', 20) + t('title', rtl) + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' + t('lead', rtl) + '</p>' +
       '<div id="wiHead">' + headHtml(prefix, rtl) + '</div>' +
       '<h3 class="wi-h3">' + t('retake', rtl) + '</h3>' +
