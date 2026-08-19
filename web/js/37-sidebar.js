@@ -26,62 +26,161 @@
   // header for why: a hand-drawn line icon and an emoji next to each other
   // read as two different apps, so once one nav surface got real icons
   // every other one showing the same items had to as well.
+  //
+  // group is used only by the phone "More" sheet (see moreGroupsHtml below)
+  // to organize this same list into labeled sections instead of one long
+  // scroll — the desktop sidebar ignores it and renders ITEMS as one flat
+  // list, exactly as it always has.
   var ITEMS = [
-    { key: 'dashboard', icon: 'home', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
-    { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'roadmap', icon: 'compass', label: 'My Path', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
-    { key: 'audit', icon: 'clipboard', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
+    { key: 'dashboard', icon: 'home', label: 'Dashboard', group: null, action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', group: 'plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'roadmap', icon: 'compass', label: 'My Path', group: 'plan', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
+    { key: 'audit', icon: 'clipboard', label: 'Degree Audit & GPA', group: 'plan', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
     // Sits with the GPA screen it plays with, not at the bottom of the
     // list: a student opens the audit, sees a number they do not like,
     // and the next thing they want is right there.
-    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
-    { key: 'achievements', icon: 'trophy', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
-    { key: 'advisor', icon: 'brain', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
-    { key: 'overview', icon: 'printer', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
+    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', group: 'plan', action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
+    { key: 'achievements', icon: 'trophy', label: 'Achievements', group: 'plan', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
+    { key: 'advisor', icon: 'brain', label: 'Plan My Next Semester', group: 'plan', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
+    { key: 'overview', icon: 'printer', label: 'Overview & Print', group: 'plan', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
     // The one place in the app where students talk to each other rather than
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
-    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
-    { key: 'contacts', icon: 'people', label: 'Contacts', action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
+    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', group: 'community', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
+    { key: 'contacts', icon: 'people', label: 'Contacts', group: 'community', action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
     // Not the same thing as "Switch Plan" at the bottom, which only reopens
     // the picker. This one answers the question first: what happens to my
     // progress if I move?
-    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
+    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
   ];
+  var GROUP_LABELS = { plan: 'Plan', community: 'Community', account: 'Account' };
 
   var currentPrefix = null;
+
+  // Phone-only markup: the same ITEMS grouped into labeled sections with an
+  // icon badge per row instead of one flat list of plain-gray icons. Built
+  // alongside the desktop flat list (below), not instead of it — CSS shows
+  // exactly one of the two per breakpoint (see .sb-groups/.sb-flat-list in
+  // app.css), and both share the same [data-sb-key] attribute so the one
+  // click handler in render() covers whichever markup is actually visible.
+  function moreGroupsHtml(prefix, activeKey, hasLibrary){
+    var byGroup = { plan: [], community: [], account: [] };
+    ITEMS.forEach(function(item){ if(item.group && byGroup[item.group]) byGroup[item.group].push(item); });
+    if(hasLibrary){
+      byGroup.account.push({ key: 'library', icon: 'book', label: 'Course Library' });
+    }
+    byGroup.account.push({ key: 'settings', icon: 'gear', label: 'Settings' });
+    byGroup.account.push({ key: 'switch', icon: 'refresh', label: 'Switch Plan' });
+
+    function rowHtml(item){
+      return '<button type="button" class="sb-mrow' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
+        '<span class="sb-mrow-icon">' + window.AAUP_ICONS.preview(item.icon, 17) + '</span>' +
+        '<span class="sb-mrow-label">' + item.label + '</span>' +
+        '<span class="sb-mrow-chevron">›</span></button>';
+    }
+    function groupHtml(key){
+      var items = byGroup[key];
+      if(!items.length) return '';
+      return '<div class="sb-group-label">' + GROUP_LABELS[key] + '</div>' +
+        '<div class="sb-group">' + items.map(rowHtml).join('') + '</div>';
+    }
+    // Dashboard has no group (it is the app's own Home tab, duplicated here
+    // for convenience) — a standalone row above the labeled sections rather
+    // than forced into one of them.
+    var dashItem = ITEMS.filter(function(i){ return i.key === 'dashboard'; })[0];
+    return (dashItem ? '<div class="sb-group sb-group-solo">' + rowHtml(dashItem) + '</div>' : '') +
+      groupHtml('plan') + groupHtml('community') + groupHtml('account');
+  }
 
   function render(prefix, activeKey){
     var sidebar = document.getElementById('appSidebar');
     if(!sidebar) return;
     var name = planName(prefix);
     var icon = isImportedPlan(prefix) ? ((window.AAUP_IMPORTED.loadImportedPlans()[prefix] || {}).icon || '🎓') : (BUILT_IN_ICONS[prefix] || '🎓');
+    var hasLibrary = isImportedPlan(prefix);
 
     var html = '<div class="sb-brand"><span class="sb-mark">' + icon + '</span><span>' + name + '</span></div>';
+    html += '<div class="sb-flat-list">';
     html += ITEMS.map(function(item){
       return '<button type="button" class="sb-item' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
         '<span class="sb-icon">' + window.AAUP_ICONS.preview(item.icon, 16) + '</span><span>' + item.label + '</span></button>';
     }).join('');
-    if(isImportedPlan(prefix)){
+    if(hasLibrary){
       html += '<button type="button" class="sb-item" data-sb-key="library"><span class="sb-icon">' + window.AAUP_ICONS.preview('book', 16) + '</span><span>Course Library</span></button>';
     }
     html += '<div class="sb-spacer"></div>';
     html += '<div class="sb-switch"><button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>Settings</span></button>' +
       '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('refresh', 16) + '</span><span>Switch Plan</span></button></div>';
+    html += '</div>';
+    html += '<div class="sb-groups">' + moreGroupsHtml(prefix, activeKey, hasLibrary) + '</div>';
     sidebar.innerHTML = html;
 
     sidebar.querySelectorAll('[data-sb-key]').forEach(function(el){
       el.addEventListener('click', function(){
         var key = el.getAttribute('data-sb-key');
+        // On phone, More is a drawer the student explicitly opened — if
+        // whatever this click opens has its own back/close control,
+        // closing THAT should return to More rather than skipping past it
+        // to whatever page was open underneath before More was ever
+        // tapped. Read before closeMobile() clears .open below.
+        var openedFromMoreDrawer = sidebar.classList.contains('open');
         closeMobile();
         if(key === 'switch'){ window.AAUP_DASHBOARD.choosePlan(); return; }
-        if(key === 'settings'){ openSettings(); return; }
-        if(key === 'library'){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.openLibrary(prefix); return; }
+        if(key === 'settings'){ openSettings(); tagOpenedFromMore(openedFromMoreDrawer); return; }
+        if(key === 'library'){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.openLibrary(prefix); tagOpenedFromMore(openedFromMoreDrawer); return; }
         var item = ITEMS.filter(function(i){ return i.key === key; })[0];
-        if(item){ item.action(prefix); if(key !== 'dashboard' && key !== 'studyplan'){ setActive(key); } }
+        if(item){
+          item.action(prefix);
+          if(key !== 'dashboard' && key !== 'studyplan'){ setActive(key); }
+          tagOpenedFromMore(openedFromMoreDrawer);
+        }
       });
     });
   }
+
+  // One-shot marker on whichever .modal-overlay just opened, consumed by
+  // the observer below the first time that overlay closes again. Clears
+  // any stale marker first — the same overlay id (devModalOverlay, used by
+  // Settings AND several unrelated forms) can be opened later for a
+  // completely different reason, and a leftover tag from a past More visit
+  // must not silently reopen More on THAT close instead.
+  function tagOpenedFromMore(openedFromMoreDrawer){
+    if(!openedFromMoreDrawer) return;
+    document.querySelectorAll('[data-more-return]').forEach(function(el){ el.removeAttribute('data-more-return'); });
+    // The action above opens synchronously, so the freshly-opened overlay
+    // is already in the DOM with .open by the time this runs.
+    var ov = document.querySelector('.modal-overlay.open');
+    if(ov) ov.setAttribute('data-more-return', '1');
+  }
+
+  // Watches every .modal-overlay for losing .open (however that happens —
+  // the back bar, the ✕, Escape, tapping the backdrop all end the same
+  // way: overlay.classList.remove('open')) and reopens More exactly once
+  // if that overlay was tagged. A trailing-edge observer, not a click
+  // interceptor, so it does not care which of the several different close
+  // mechanisms this app's dialogs use.
+  function watchMoreReturn(){
+    var obs = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        var el = m.target;
+        if(el.classList && el.hasAttribute('data-more-return') && !el.classList.contains('open')){
+          el.removeAttribute('data-more-return');
+          if(currentPrefix) toggleMobile();
+        }
+      });
+    });
+    function observe(el){ obs.observe(el, { attributes: true, attributeFilter: ['class'] }); }
+    document.querySelectorAll('.modal-overlay').forEach(observe);
+    new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        Array.prototype.forEach.call(m.addedNodes, function(n){
+          if(n.nodeType === 1 && n.classList && n.classList.contains('modal-overlay')){ observe(n); }
+        });
+      });
+    }).observe(document.body, { childList: true });
+  }
+  if(document.readyState === 'complete'){ watchMoreReturn(); }
+  else { window.addEventListener('load', watchMoreReturn); }
 
   function setActive(key){
     var sidebar = document.getElementById('appSidebar');

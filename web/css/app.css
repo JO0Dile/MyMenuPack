@@ -4251,6 +4251,11 @@
   .app-sidebar .sb-spacer{flex:1;}
   .app-sidebar .sb-switch{border-top:1px solid var(--line); margin-top:8px; padding-top:12px;}
 
+  /* .sb-groups is the phone-only grouped rendering of the same ITEMS list
+     (js/37-sidebar.js moreGroupsHtml) — hidden here so desktop, which never
+     asked for grouped sections, keeps exactly the flat list it always had. */
+  .app-sidebar .sb-groups{display:none;}
+
   .sb-toggle-btn{
     display:none; position:fixed; top:14px; left:14px; z-index:950;
     width:38px; height:38px; border-radius:8px; border:1px solid var(--line);
@@ -4301,11 +4306,36 @@
       content:''; flex:none; display:block; width:38px; height:5px; border-radius:99px;
       background:var(--line); margin:12px auto 6px;
     }
-    .app-sidebar .sb-item{border-left:none; border-radius:12px; margin:0 10px; width:calc(100% - 20px);}
-    .app-sidebar .sb-item.active{border-left:none;}
-    .app-sidebar .sb-item::after{
-      content:'\203A'; margin-inline-start:auto; color:var(--text-faint); font-size:16px; flex:none;
+    .app-sidebar .sb-flat-list{display:none;}
+    .app-sidebar .sb-groups{display:block; padding:0 14px 20px;}
+
+    /* Grouped rows (mockup-matched): a labeled section header, then a
+       single elevated card per section holding its rows — one shadow per
+       group instead of a border or chevron bolted onto each flat row. */
+    .app-sidebar .sb-group-label{
+      font-size:10.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase;
+      letter-spacing:.06em; margin:16px 4px 8px;
     }
+    .app-sidebar .sb-group{
+      background:var(--panel); border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,.22);
+      overflow:hidden;
+    }
+    .app-sidebar .sb-group-solo{margin-bottom:4px;}
+    .app-sidebar .sb-mrow{
+      display:flex; align-items:center; gap:13px; width:100%; padding:13px 15px;
+      background:none; border:none; color:var(--text); font-family:inherit;
+      font-size:14px; font-weight:600; cursor:pointer; text-align:start;
+    }
+    .app-sidebar .sb-mrow + .sb-mrow{border-top:1px solid var(--line);}
+    .app-sidebar .sb-mrow-icon{
+      width:34px; height:34px; flex:none; border-radius:10px;
+      background:rgba(111,140,255,.14); color:var(--accent);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .app-sidebar .sb-mrow-label{flex:1; min-width:0;}
+    .app-sidebar .sb-mrow-chevron{color:var(--text-faint); font-size:17px; flex:none;}
+    .app-sidebar .sb-mrow.active .sb-mrow-label{color:var(--accent); font-weight:800;}
+    .app-sidebar .sb-mrow.active .sb-mrow-icon{background:var(--accent); color:var(--on-accent);}
   }
 
   /* ==========================================================================
@@ -4905,7 +4935,8 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
    would have every item look "selected" and erase that signal. Here the icon
    just follows whatever colour its own button is already using. */
 .sb-item .app-icon-svg,
-.sb-tab .app-icon-svg{color:inherit;}
+.sb-tab .app-icon-svg,
+.sb-mrow-icon .app-icon-svg{color:inherit;}
 
 /* An uploaded logo is never cropped or stretched: it is fitted, so a wide
    university wordmark and a square crest both sit correctly in the same box. */
