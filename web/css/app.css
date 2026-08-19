@@ -5203,6 +5203,67 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .modal-overlay .modal-card[dir="rtl"] .modal-close{justify-content:flex-end;}
   html[dir="rtl"] .modal-overlay .modal-card .modal-close::before,
   .modal-overlay .modal-card[dir="rtl"] .modal-close::before{content:'\2192';}
+
+  /* Course detail becomes a bottom sheet instead of a full page — the
+     course tree stays visible (dimmed) behind it. Every other dialog above
+     is deliberately still a full page; a "quick look at one thing" is the
+     one case a phone actually expects to float over what you were doing
+     rather than replace it outright. #impCourseModalOverlay's ID gives
+     every rule here enough specificity to win against the three-class
+     rules above without needing !important anywhere. */
+  #impCourseModalOverlay{
+    align-items:flex-end; justify-content:center;
+    background:rgba(5,7,15,.6);
+  }
+  #impCourseModalOverlay .modal-card.cd-card{
+    height:auto; max-height:82dvh;
+    border-radius:16px 16px 0 0;
+    padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    position:relative;
+  }
+  /* A drag handle — decorative, no JS drag-to-dismiss behind it, but the
+     one visual cue every phone user already reads as "this is a sheet,
+     tapping outside or swiping it away closes it" without being told. */
+  #impCourseModalOverlay .modal-card.cd-card::before{
+    content:''; position:absolute; top:8px; left:50%; transform:translateX(-50%);
+    width:36px; height:4px; border-radius:3px; background:var(--line);
+  }
+  /* The generic full-width back bar fixed to the viewport's top doesn't
+     make sense floating above a sheet that no longer starts there — a
+     small round ✕ in the sheet's own corner replaces it. */
+  #impCourseModalOverlay .modal-card.cd-card .modal-close{
+    position:absolute; inset:14px 14px auto auto;
+    width:30px; height:30px; border-radius:50%;
+    background:var(--search-bg); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:0; z-index:5;
+  }
+  #impCourseModalOverlay .modal-card.cd-card .modal-close::before{
+    content:'\2715'; font-size:14px; font-weight:400;
+  }
+  html[dir="rtl"] #impCourseModalOverlay .modal-card.cd-card .modal-close{
+    inset:14px auto auto 14px;
+  }
+}
+
+/* Landscape split view — a phone turned sideways gets the course list and
+   the detail sheet side by side, docked to the edge, instead of the bottom
+   sheet above. The backdrop goes fully click-through (pointer-events:none,
+   background transparent) so the course tree behind stays genuinely
+   interactive rather than merely visible-but-dimmed; only the ✕ closes it
+   here; tap-the-backdrop-to-dismiss doesn't apply once "the backdrop" is
+   itself a working pane, not a stand-in for one. */
+@media (max-width:900px) and (orientation:landscape){
+  #impCourseModalOverlay{
+    align-items:stretch; justify-content:flex-end;
+    background:transparent; pointer-events:none;
+  }
+  #impCourseModalOverlay .modal-card.cd-card{
+    width:min(380px, 46vw); max-width:none; height:100dvh; max-height:100dvh;
+    border-radius:0; margin:0; box-shadow:-16px 0 34px rgba(0,0,0,.45);
+    pointer-events:auto;
+  }
+  #impCourseModalOverlay .modal-card.cd-card::before{display:none;}   /* no drag handle — this isn't a bottom sheet here */
 }
 
 /* A dialog whose whole job is to show a lot at once should use the room a
@@ -5267,3 +5328,21 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   body.has-sidebar .asst-panel{bottom:140px;}
   body.has-sidebar .fix-panel{bottom:140px;}
 }
+
+/* ---------- long-press quick actions (js/74-course-gestures.js) ----------
+   Phone-only in practice (only ever opened from a touch long-press), but
+   not media-query-gated itself — its position is computed in JS from the
+   card's real on-screen rect, which already accounts for viewport width. */
+.course-qa-menu{
+  position:fixed; z-index:1500; min-width:170px;
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  box-shadow:0 16px 40px rgba(0,0,0,.5); padding:6px; display:flex; flex-direction:column; gap:2px;
+}
+.course-qa-menu button{
+  display:block; width:100%; text-align:left; padding:9px 10px; border-radius:7px;
+  background:none; border:none; color:var(--text); font-family:inherit; font-size:13px; cursor:pointer;
+}
+.course-qa-menu button:hover,
+.course-qa-menu button:focus-visible{background:var(--search-bg);}
+[dir="rtl"] .course-qa-menu button{text-align:right;}
+
