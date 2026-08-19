@@ -228,20 +228,20 @@
 
     var statuses = window.AAUP_GPA.loadStatuses();
     var currentStatus = isDone ? 'done' : (statuses[pid] || '');
-    // On desktop "Done" stays a disabled reflection of the completion
-    // checkbox, as it always was — clicking it there wouldn't make sense
-    // next to the checkbox right above the tree. On phone, where this row
-    // becomes one tappable segmented control (mockup-matched), leaving one
-    // of four segments dead is worse than the inconsistency it avoids, so
-    // it's a real button there: tapping it calls the same toggle the
-    // checkbox uses (see bind() below), never a second source of truth.
+    // "Done" is a real button on every platform now — tapping/clicking it
+    // calls the exact same completion toggle the checkbox uses (see
+    // bind() below), never a second source of truth. It used to be a
+    // disabled reflection of the checkbox on desktop specifically, on the
+    // reasoning that clicking it there was redundant next to the checkbox
+    // right above the tree — but leaving one of four segments dead reads
+    // as broken everywhere the control appears, not just on phone.
     //
-    // Phone also gets terser labels in the mockup's own order (Not started/
-    // In progress/Planned/Done) — "📌 Planned next semester" simply does not
-    // fit four-across as a segmented control, and a segmented control that
-    // scrolls to reveal its own fourth option defeats the point of showing
-    // all four at once. Desktop keeps the original longer wording exactly
-    // as it always read, wrapped across a row of separate pills.
+    // Phone additionally gets terser labels in the mockup's own order (Not
+    // started/In progress/Planned/Done) — "📌 Planned next semester" does
+    // not fit four-across as a segmented control. This part IS phone-only:
+    // it is a visual/layout call (does the label fit the segmented shape),
+    // not a behavioral one, so desktop keeps its original longer wording
+    // wrapped across a row of separate pills.
     var phoneSegmented = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width:720px)').matches;
     var statusOptions = phoneSegmented ? [
       { v: '', en: 'Not started', ar: 'لم يبدأ' },
@@ -256,9 +256,8 @@
     ];
     var statusHtml = statusOptions.map(function(o){
       var isDoneOption = o.v === 'done';
-      var doneClickable = isDoneOption && phoneSegmented;
       return '<button type="button" class="status-btn' + (currentStatus === o.v ? ' active' : '') + (isDoneOption ? ' status-btn-auto' : '') + '"' +
-        ((isDoneOption && !doneClickable) ? ' disabled' : ' data-status="' + o.v + '"') + '>' +
+        ' data-status="' + o.v + '">' +
         (rtl ? o.ar : o.en) + '</button>';
     }).join('');
 
@@ -352,19 +351,18 @@
         '</p>'
       : '';
 
-    // locked: on phone, the whole planning-status control is hidden while a
-    // course is still locked (nothing to plan yet — see the CSS gate on
-    // .cd-locked-hide) rather than showing four buttons for a course you
-    // can't act on. Desktop is untouched: it never hid this block, and
-    // still doesn't — the class is only ever read inside a phone media query.
+    // locked: the whole planning-status control is hidden (on every
+    // platform, see the unconditional CSS gate on .cd-locked-hide) while a
+    // course is still locked — nothing to plan yet.
     var locked = window.AAUP_COURSE_DETAIL && window.AAUP_COURSE_DETAIL.status(prefix, slug) === 'locked';
 
     // difficulty/workload/notes are wrapped together as .cd-review-block so
-    // phone CSS can hide the whole group until the course is marked Done —
+    // CSS can hide the whole group until the course is marked Done —
     // matches "when pressing Done you see grade, difficulty, workload, and
-    // notes" (the mockup's segmented control implies the sheet stays lean
-    // before that point). Desktop is untouched: nothing here hides them
-    // there, same as it always showed them regardless of completion.
+    // notes." Applies everywhere, not just phone: once Done is a real
+    // button on every platform (see statusOptions above), the same "sheet
+    // stays lean before that point" reasoning holds regardless of screen
+    // size.
     return '<div class="modal-extras' + (isDone ? ' is-done' : '') + (locked ? ' is-locked' : '') + '" data-pid="' + pid + '" data-slug="' + slug + '">' +
       nameFieldHtml +
       '<div class="modal-row-block cd-locked-hide"><span class="k">' + (rtl ? 'حالة التخطيط' : 'Planning status') + '</span>' +

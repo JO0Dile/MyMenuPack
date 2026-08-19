@@ -1887,9 +1887,11 @@
   }
 
   .status-btn.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700;}
-  .status-btn-auto{cursor:default;}
+  /* Done is a real, clickable segment on every platform (js/21-course-
+     modal-extras.js's bind() calls the same completion toggle the
+     checkbox uses) — it used to sit disabled and dimmed here, back when
+     only the checkbox could set completion. */
   .status-btn-auto.active{background:var(--unlock);border-color:var(--unlock);color:#fff;}
-  .status-btn-auto:not(.active){opacity:.4;cursor:default;}
 
   .grade-select{
     background:var(--search-bg);border:1px solid var(--line);border-radius:7px;
@@ -5477,9 +5479,6 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .cd-slides{display:block; overflow:visible;}
   .cd-slides .cd-slide{flex:none; width:auto;}
   .cd-slides .cd-slide:first-child .cd-sec{margin-bottom:20px;}
-  /* Desktop's grade/difficulty/workload/notes block was always shown
-     regardless of completion — is-done only gates the phone rule above. */
-  .modal-extras.is-locked .cd-locked-hide{display:block;}
 }
 
 /* The modal is the full height of a small screen, so the panel scrolls inside
@@ -5511,12 +5510,6 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
      and leave the active segment's on-accent-colored text invisible
      against a transparent background. */
   .cd-extras .status-btn.active{font-weight:800; background:var(--accent);}
-  /* The Done segment is a real button here (see status.v==='done' in
-     js/21-course-modal-extras.js's bind()) — the disabled/dimmed treatment
-     that option keeps on desktop would read as broken on a control where
-     every other segment is obviously tappable. */
-  .cd-extras .status-btn-auto{cursor:pointer; opacity:1;}
-  .cd-extras .status-btn-auto:not(.active){opacity:1;}
 }
 
 /* ==========================================================================
