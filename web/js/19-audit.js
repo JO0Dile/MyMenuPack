@@ -161,7 +161,13 @@
       '<td class="col-completed">' + totalC + 'H</td><td class="col-inprogress">' + totalIP + 'H</td>' +
       '<td class="col-planned">' + totalP + 'H</td><td class="col-missing">' + totalM + 'H</td>' +
       '</tr></tfoot></table>';
-    return html;
+    // Six columns of category data don't fit a phone width even with the
+    // header text wrapping to two lines — the table used to just spill past
+    // the modal's own edge, widening the whole page (and, with it, throwing
+    // off the GPA Studio panels' own swipe-snap sizing above, since their
+    // 100% width then resolved against that now-too-wide page). Its own
+    // scroll container keeps the overflow local to this table.
+    return '<div class="audit-table-wrap">' + html + '</div>';
   }
 
   function renderGpaDashboard(prefix, rtl){

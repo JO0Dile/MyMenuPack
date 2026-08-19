@@ -370,7 +370,11 @@
     // "+ 16 more" was a plain div painted in the accent colour: it looked like
     // a link, and pressing it did nothing. It is a button now and opens the
     // rest of the year in place — which is what anyone pressing it expected.
-    var cardsHTML = '<div class="ro-cards">' +
+    var dotCount = years.length + 1; // one dot per year card, plus the grad summary card
+    var cardsHTML = '<div class="ro-swipe-dots" id="roCardsDots" aria-hidden="true">' +
+        Array.from({ length: dotCount }).map(function(_, i){ return '<span class="' + (i === 0 ? 'active' : '') + '"></span>'; }).join('') +
+      '</div>' +
+      '<div class="ro-cards" id="roCards">' +
       years.map(function(y, i){
         var st = statuses[i];
         var shown = y.courses.slice(0, MAX_PREVIEW);
@@ -432,8 +436,23 @@
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML = layoutHTML(prefix, rtl);
     bindScopeTabs(body, prefix, rtl);
+    bindCardSwipeDots(body);
     overlay.classList.add('open');
     markSeen(prefix);
+  }
+  // .ro-cards is rebuilt fresh on every open() (it lives inside body's own
+  // innerHTML, unlike .ro-timeline/#roBreakdownBody which bindScopeTabs
+  // rebinds delegated on body itself), so a plain listener here — no
+  // once-only guard needed — never goes stale.
+  function bindCardSwipeDots(body){
+    var cards = body.querySelector('#roCards');
+    var dots = body.querySelector('#roCardsDots');
+    if(!cards || !dots) return;
+    var dotEls = dots.querySelectorAll('span');
+    cards.addEventListener('scroll', function(){
+      var idx = Math.round(cards.scrollLeft / Math.max(1, cards.clientWidth));
+      dotEls.forEach(function(d, i){ d.classList.toggle('active', i === idx); });
+    }, { passive: true });
   }
   // Delegated so it survives the breakdown body being replaced on every press.
   function bindScopeTabs(body, prefix, rtl){
