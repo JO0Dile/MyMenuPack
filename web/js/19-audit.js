@@ -136,6 +136,31 @@
     }).filter(function(r){ return r.total > 0; });
   }
 
+  // Phone-only (see .audit-rings in app.css) — the same six rows the table
+  // below states in full, as one glanceable ring per category instead of a
+  // row you have to read across five columns of. Purely additive: the
+  // table underneath still carries every number (Required/Completed/In
+  // Progress/Planned/Missing) exactly as before, this is a summary layer
+  // on top of it, not a replacement — nothing a student could read before
+  // is unreachable now.
+  function auditRingsHtml(rows, prefix, rtl){
+    var R = 18, C = Math.round(2 * Math.PI * R * 100) / 100;
+    return '<div class="audit-rings">' + rows.map(function(r){
+      var lbl = labelFor(prefix, r.cat);
+      var pct = r.total ? Math.min(1, r.completed / r.total) : 0;
+      var offset = Math.round(C * (1 - pct) * 100) / 100;
+      return '<div class="audit-ring-card">' +
+        '<svg class="audit-mini-ring" viewBox="0 0 44 44">' +
+          '<circle class="track" cx="22" cy="22" r="' + R + '"/>' +
+          '<circle class="val" cx="22" cy="22" r="' + R + '" style="stroke:var(--' + r.cat + ');" ' +
+            'stroke-dasharray="' + C + '" stroke-dashoffset="' + offset + '"/>' +
+        '</svg>' +
+        '<div class="ar-lbl">' + (rtl ? lbl.ar : lbl.en) + '</div>' +
+        '<div class="ar-frac">' + r.completed + '/' + r.total + 'H</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
   function renderAuditTable(prefix, rtl){
     var rows = computeAudit(prefix);
     var totalReq = 0, totalC = 0, totalIP = 0, totalP = 0, totalM = 0;
@@ -167,7 +192,7 @@
     // off the GPA Studio panels' own swipe-snap sizing above, since their
     // 100% width then resolved against that now-too-wide page). Its own
     // scroll container keeps the overflow local to this table.
-    return '<div class="audit-table-wrap">' + html + '</div>';
+    return auditRingsHtml(rows, prefix, rtl) + '<div class="audit-table-wrap">' + html + '</div>';
   }
 
   function renderGpaDashboard(prefix, rtl){

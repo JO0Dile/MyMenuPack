@@ -2295,6 +2295,26 @@
 
   .audit-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
+  /* Phone-only glanceable summary above the table (js/19-audit.js's
+     auditRingsHtml) — purely additive, the table below still carries
+     every column. */
+  .audit-rings{display:none;}
+  @media (max-width:720px){
+    .audit-rings{
+      display:flex; gap:10px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      margin:2px 0 14px; padding-bottom:2px;
+    }
+    .audit-ring-card{
+      flex:none; width:88px; background:var(--panel); border-radius:16px;
+      padding:12px 8px; text-align:center; box-shadow:0 4px 14px rgba(0,0,0,.22);
+    }
+    .audit-mini-ring{width:44px; height:44px; margin:0 auto 8px; transform:rotate(-90deg);}
+    .audit-mini-ring .track{fill:none; stroke:var(--header-bg); stroke-width:5;}
+    .audit-mini-ring .val{fill:none; stroke-width:5; stroke-linecap:round;}
+    .ar-lbl{font-size:10px; font-weight:700; color:var(--text-dim); line-height:1.25; height:25px; overflow:hidden;}
+    .ar-frac{font-size:10px; color:var(--text-faint); font-weight:700; margin-top:2px;}
+  }
+
   .audit-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px;}
 
   @media (max-width:720px){
