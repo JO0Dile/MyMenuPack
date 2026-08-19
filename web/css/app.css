@@ -498,6 +498,15 @@
     .plan-card{padding:16px 14px 14px;}
   }
 
+  /* A resting border only earns its keep on a device with hover to promote
+     it to something brighter — on a phone .plan-card just sat there as a
+     thin outline, since :hover's lift/glow below almost never fires on
+     touch. Elevation reads as "tappable" without needing a hover state to
+     prove it, same reasoning as every other card in this redesign. */
+  @media (max-width:720px){
+    .plan-card{border:none; box-shadow:0 4px 14px rgba(0,0,0,.22);}
+  }
+
   .plan-card{position:relative;}
 
   .imp-origin-badge{
