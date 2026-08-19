@@ -5777,3 +5777,11 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   #advisorModalBody .sb-tray-item{border:none; box-shadow:0 2px 8px rgba(0,0,0,.18);}
 }
 
+/* ==========================================================================
+   PHONE SHARE THIS PLAN — same elevation swap for the link field and the
+   QR card (js/72-share.js) as every other bordered box in this series. */
+@media (max-width:720px){
+  .share-link-input{border:none; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  .share-qr-wrap{border:none; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.22);}
+}
+
