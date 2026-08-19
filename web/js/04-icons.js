@@ -207,6 +207,11 @@
     star: stroke('<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>'),
     trophy: stroke('<path d="M8 4h8v5.4a4 4 0 0 1-8 0z"/><path d="M8 5.6H5.4a2.6 2.6 0 0 0 2.6 5.2"/>' +
       '<path d="M16 5.6h2.6a2.6 2.6 0 0 1-2.6 5.2"/><path d="M12 13.4V17"/><path d="M8.6 20.6h6.8L14.4 17H9.6z"/>'),
+    // Achievement badges (js/24-achievements.js) — a graduation cap for the
+    // year-completion milestones and "graduation ready," a medal for the
+    // GPA/honours-tier badges. Same grid/stroke as everything above.
+    cap: stroke('<path d="M12 4 2 9l10 5 10-5z"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5"/><path d="M20 9v6"/>'),
+    medal: stroke('<circle cx="12" cy="15" r="5.2"/><path d="m8.5 11-3-7"/><path d="m15.5 11 3-7"/><path d="M12 12.5v5"/>'),
 
     // ---- the app's own chrome (nav, dashboard, sidebar) — not a major or
     // university, but the same one hand-drawn family throughout ----
