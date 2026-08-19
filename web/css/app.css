@@ -5580,3 +5580,100 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
 .course-qa-menu button:focus-visible{background:var(--search-bg);}
 [dir="rtl"] .course-qa-menu button{text-align:right;}
 
+/* ==========================================================================
+   PHONE STUDY PLAN — course cards become one-line rows
+   A course was a fully category-coloured tile (green/blue/amber background
+   filling the whole card) in a two-up wrapping grid — readable, but loud:
+   every single card is shouting the same category information the year's
+   own legend already states once. A row with a colour STRIPE says the same
+   thing quietly, and switching from a 2-column grid to one column per row
+   means a whole semester fits on screen without the "+N more" style
+   scrolling a dense grid otherwise needs.
+
+   Deliberately last in the file (same reasoning the phone-modal rules give
+   for their own position): every rule below is a compound class selector
+   (.course.core, .course.available, ...) at equal-or-higher specificity
+   than what it overrides, so position mostly doesn't matter here — but the
+   base .course flex-basis override needs to win against the existing
+   @media(max-width:640px) .course{flex:1 1 44%} rule above at the same
+   (0,1,0) specificity, which only source order decides.
+
+   Every interaction this session already built on .course — swipe-to-mark
+   (js/57-card-input.js), long-press quick actions (js/74-course-gestures.js),
+   hold-to-trace prerequisite highlighting (js/28-imported.js) — reads the
+   same DOM structure and class names untouched; nothing here adds or
+   removes an element, only how the existing ones are painted. */
+@media (max-width:720px){
+  .course{
+    flex:1 1 100%; max-width:none; min-width:0; min-height:auto;
+    background:var(--panel); border:none; border-radius:14px;
+    padding:12px 46px 12px 17px;
+    box-shadow:0 4px 14px rgba(0,0,0,.22);
+  }
+  .plan-page.rtl-mode .course,
+  .sheet.rtl-mode .course{padding:12px 17px 12px 46px;}
+  .course::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+    border-radius:4px 0 0 4px; background:var(--core);
+  }
+  .plan-page.rtl-mode .course::before,
+  .sheet.rtl-mode .course::before{left:auto; right:0; border-radius:0 4px 4px 0;}
+  .course.core::before{background:var(--core);}
+  .course.skills::before{background:var(--skills);}
+  .course.math::before{background:var(--math);}
+  .course.dept::before{background:var(--dept);}
+  .course.eng::before{background:var(--eng);}
+  .course.uni::before{background:var(--uni);}
+  .course.free::before{background:var(--free);}
+  .course.misc::before{background:var(--misc);}
+  .course.intern::before{background:var(--intern);}
+  .course.summer::before{background:var(--summer);}
+  /* Undoes the full-colour fill (.core/.skills/etc are also bare classes —
+     see line ~1189 — so a .course carrying one of them matched that rule
+     too; a compound selector here just needs to be more specific, which
+     two classes always is over one, regardless of file position). */
+  .course.core, .course.skills, .course.math, .course.dept, .course.eng,
+  .course.uni, .course.free, .course.misc, .course.intern, .course.summer{
+    background:var(--panel); color:var(--text);
+  }
+  .course.completed{background:var(--panel);}
+
+  .course .name{font-size:14px; padding:0; margin:0;}
+  .plan-page.rtl-mode .course .name,
+  .sheet.rtl-mode .course .name{padding:0;}
+  .course-meta{color:var(--text-dim); font-size:11px;}
+  .course-code{color:var(--text-faint); font-size:9.5px;}
+  .course.completed .course-meta,
+  .course.completed .course-code{color:var(--text-dim);}
+
+  .course-check{
+    top:50%; right:12px; transform:translateY(-50%);
+    width:22px; height:22px; padding:11px; margin:-11px;
+  }
+  .plan-page.rtl-mode .course-check,
+  .sheet.rtl-mode .course-check{right:auto; left:12px; margin:-11px;}
+  /* inset must match the 11px padding above — the padding is an invisible
+     44px tap-target extension (existing convention, see the base rule's
+     own comment above), not part of the drawn circle; inset:0 here would
+     have drawn the circle across the whole padded box instead of just its
+     22px content box, which is what actually happened the first time. */
+  .course-check::before{inset:11px; background:var(--header-bg); border-color:var(--line);}
+  .course.completed .course-check::before{background:#2ecc71; border-color:#2ecc71;}
+  .course.completed .course-check{color:var(--on-accent);}
+
+  /* The pulsing available-glow was designed for a fully colour-filled
+     card, where a thin accent ring was the only way to say "and this one
+     you can register for right now" over the noise. Against the new flat
+     panel it read as loud on every row — including already-completed
+     ones, which also carry .available (see js/28-imported.js: the class
+     is added for done OR available, not available alone) and have no
+     reason to keep pulsing "you can take this" once it's finished. Kept
+     only as a quiet static ring on courses that are genuinely open and
+     not yet done; the elevation shadow already common to every row is
+     what's left everywhere else. */
+  .course.available{box-shadow:0 4px 14px rgba(0,0,0,.22); animation:none;}
+  .course.available:not(.completed){
+    box-shadow:0 4px 14px rgba(0,0,0,.22), 0 0 0 1px rgba(111,140,255,.4);
+  }
+}
+
