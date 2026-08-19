@@ -172,6 +172,40 @@
     padding:20px;
   }
 
+  /* Self-hosted, not linked from Google Fonts — this app precaches its
+     whole shell for offline use (see sw.js's own header comment) and has
+     no other CDN dependency anywhere (even the QR encoder is homegrown for
+     the same reason), so a live font request would be the one thing that
+     silently needed a network connection. Both files are variable fonts —
+     one file each covers their whole weight range via `font-weight:100 900`
+     rather than needing a separate file per weight. Registered in sw.js's
+     CORE list alongside everything else that makes the app open offline. */
+  @font-face{
+    font-family:'Bricolage Grotesque'; font-style:normal; font-weight:100 900;
+    font-display:swap; src:url('assets/fonts/bricolage-grotesque.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Instrument Sans'; font-style:normal; font-weight:100 900;
+    font-display:swap; src:url('assets/fonts/instrument-sans.woff2') format('woff2');
+  }
+
+  /* Phone-only: this typeface pair is the single biggest identity marker of
+     the phone redesign's own reference mockup (Bricolage Grotesque headings
+     over Instrument Sans body text) and was missing from every wave shipped
+     so far — every PR up to this one only changed elevation and color, never
+     the typeface, which is why the phone UI still didn't read as the mockup
+     even after matching its card language. Kept phone-scoped rather than
+     applied globally like the color theme was: unlike a color palette
+     (already multi-theme, page-wide by nature), a font pairing is trivial to
+     scope by breakpoint, and "don't edit the pc web" has been stated
+     repeatedly and specifically enough this session that extending the
+     color exception to typography without being asked isn't a safe
+     assumption to make. */
+  @media (max-width:720px){
+    body{font-family:'Instrument Sans', -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    h1, h2, h3{font-family:'Bricolage Grotesque', -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  }
+
   /* Every scroll container in the app inherits this — the page itself,
      every modal body, every overflow:auto list — so nothing falls back to
      the browser's plain default scrollbar (light gray on every theme,
@@ -4316,7 +4350,7 @@
     .dph-ring .track{fill:none; stroke:var(--header-bg); stroke-width:9;}
     .dph-ring .val{fill:none; stroke:var(--accent); stroke-width:9; stroke-linecap:round; transition:stroke-dashoffset .4s ease;}
     .dph-ring-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
-    .dph-ring-center .n{font-size:21px; font-weight:800; color:var(--text); line-height:1;}
+    .dph-ring-center .n{font-family:'Bricolage Grotesque', inherit; font-size:21px; font-weight:800; color:var(--text); line-height:1;}
     .dph-ring-center .l{font-size:8.5px; color:var(--text-dim); font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-top:3px;}
     .dph-stat-stack{display:flex; flex-direction:column; gap:9px; z-index:1; flex:1; min-width:0;}
     .dph-stat{background:var(--header-bg); border-radius:12px; padding:9px 12px;}
