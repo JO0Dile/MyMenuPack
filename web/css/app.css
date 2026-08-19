@@ -5697,3 +5697,31 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   }
 }
 
+/* ==========================================================================
+   PHONE CONTACTS — a bordered auto-fill grid becomes one elevated list
+   .ct-grid's auto-fill(minmax(230px,1fr)) already collapses to a single
+   column under ~390px, so the layout was never broken on phone — but each
+   .ct-card kept its desktop treatment (thin border, flat background), which
+   reads as a form field repeated N times rather than a directory. Same
+   elevation-over-border language as every other list in this redesign
+   (course rows above, the More sheet's .sb-item rows); markup and js/68-
+   contacts.js are untouched, only how the existing cards are painted. */
+@media (max-width:720px){
+  .ct-search{border-radius:14px; padding:11px 14px; box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  .ct-chips{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px;}
+  .ct-chip{flex:0 0 auto;}
+  .ct-grid{display:flex; flex-direction:column; gap:8px;}
+  .ct-card{
+    border:none; border-radius:14px; padding:13px 14px;
+    box-shadow:0 4px 14px rgba(0,0,0,.22);
+  }
+  .ct-card-top{align-items:center;}
+  .ct-avatar{
+    width:40px; height:40px; flex:0 0 40px; font-size:18px;
+    background:rgba(111,140,255,.14); border:none; color:var(--accent);
+  }
+  .ct-name{font-size:14px;}
+  .ct-email-row{margin-top:2px;}
+  .ct-copy{padding:5px 12px;}
+}
+
