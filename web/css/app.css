@@ -2763,6 +2763,16 @@
       box-shadow:0 6px 16px rgba(0,0,0,.35);
       display:flex;align-items:center;justify-content:center;
     }
+    /* It's appended inside the plan root specifically so it disappears
+       whenever the app switches AWAY from the plan page entirely (see the
+       comment in js/69-phone-header.js), but a dialog opening ON TOP of the
+       still-visible plan page is a different case — position:fixed escapes
+       normal stacking, so at z-index:1399 it kept floating over Settings,
+       Contacts and every other full-page dialog underneath it instead of
+       being covered like the rest of the plan page. Only the study plan
+       page itself should ever show this button. */
+    body:has(.modal-overlay.open) .imp-phone-jump,
+    body:has(.app-sidebar.open) .imp-phone-jump{display:none;}
   }
 
   /* ---------- skeleton loading (js/70-skeleton.js) ----------
@@ -5222,7 +5232,17 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .modal-overlay .modal-card,
   .modal-overlay .modal-card.cd-card{
     width:100%; max-width:none;
-    height:100dvh; max-height:100dvh;
+    /* 100%, not 100dvh: the overlay itself (position:fixed; inset:0) is
+       always exactly the real, current viewport with no unit of its own to
+       go stale — inset re-resolves on every layout pass. 100dvh instead
+       computes its own snapshot of the dynamic viewport, and on a scroll
+       that hides the browser's address bar mid-gesture that snapshot can
+       lag a frame behind the overlay around it, leaving the page short and
+       whatever is behind it showing through the gap at the bottom until
+       something (background/foreground, a resize) forces a fresh layout.
+       Sizing from the parent's own already-live box sidesteps that
+       entirely instead of chasing another dvh recalculation. */
+    height:100%; max-height:100%;
     margin:0; border:0; border-radius:0; box-shadow:none;
     /* 56px clears the fixed back bar below. Cards that carry their own
        .modal-body keep scrolling inside it; the ones that do not scroll here. */
@@ -5315,7 +5335,8 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     background:transparent; pointer-events:none;
   }
   #impCourseModalOverlay .modal-card.cd-card{
-    width:min(380px, 46vw); max-width:none; height:100dvh; max-height:100dvh;
+    /* 100%, not 100dvh — see the comment on the full-page rule above. */
+    width:min(380px, 46vw); max-width:none; height:100%; max-height:100%;
     border-radius:0; margin:0; box-shadow:-16px 0 34px rgba(0,0,0,.45);
     pointer-events:auto;
   }
@@ -5358,18 +5379,32 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     background:var(--header-bg); border-top:1px solid var(--line);
     padding:6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
     box-shadow:0 -6px 20px rgba(0,0,0,.28);
+    transition:transform .2s ease;
   }
   /* A dialog is now a full page on phone (see the modal rules above) — its
      own back arrow is the way out, and the tab bar underneath it would just
      be a second, confusing way to leave. */
   body:has(.modal-overlay.open) .sb-tabbar{display:none;}
+  /* Opening the sidebar itself (the "More" tab) as a drawer isn't a
+     .modal-overlay, so the rule above doesn't catch it — without this the
+     tab bar's own z-index (950, needed to sit above page content) also put
+     it above the drawer, leaving it visibly poking through the drawer's
+     bottom edge instead of getting out of its way. Slide it off the bottom
+     edge instead of the drawer's own translateX so the two motions read as
+     one panel swapping for another, not two unrelated things happening at
+     once. */
+  body:has(.app-sidebar.open) .sb-tabbar{transform:translateY(100%); pointer-events:none;}
 
   .sb-tab{
     flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
     background:none; border:none; padding:4px 2px; color:var(--text-dim);
     font-family:inherit; cursor:pointer;
   }
-  .sb-tab-ic{font-size:19px; line-height:1; position:relative;}
+  .sb-tab-ic{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:22px; height:22px; position:relative;
+  }
+  .sb-tab-ic svg{width:20px; height:20px; display:block;}
   .sb-tab-lbl{font-size:9.5px; font-weight:700;}
   .sb-tab.active{color:var(--accent);}
   .sb-tab-badge{

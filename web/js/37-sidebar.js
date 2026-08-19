@@ -130,15 +130,40 @@
   // the same four most-used destinations, not a second navigation model.
   // Hidden by CSS above 720px, so desktop is untouched.
   //
-  // Icons deliberately reuse ones already meaningful elsewhere in the app
-  // rather than inventing new ones: 🗺️ is "My Study Plan" in this very
-  // sidebar, 💬 is the assistant's own launcher bubble, and ☰ is the exact
-  // glyph that already opens this sidebar as a drawer on phone.
+  // Purpose-drawn line icons, one visual family with js/04-icons.js's own
+  // set (24x24 grid, round stroke, currentColor) but kept local rather than
+  // added to that module's ICONS pool — that pool is for how a university
+  // or a major is pictured, a different concern from this bar's own chrome.
+  function tabIconSvg(paths, extra){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+      paths + (extra || '') + '</svg>';
+  }
+  var TAB_ICON_SVG = {
+    // A roofline over a body with a doorway notch — plainer than a full
+    // house glyph so it still reads at 20px.
+    dashboard: tabIconSvg('<path d="M4 11.5 12 4l8 7.5"/>' +
+      '<path d="M5.6 10.2V19a1.4 1.4 0 0 0 1.4 1.4h10a1.4 1.4 0 0 0 1.4-1.4v-8.8"/>' +
+      '<path d="M9.6 20.4v-4.6a2.4 2.4 0 0 1 4.8 0v4.6"/>'),
+    // A destination pin with a checkmark in place of the usual dot — this
+    // tab is specifically the PLAN, the thing you're working toward.
+    studyplan: tabIconSvg('<path d="M12 21c4-4.2 6.4-7.6 6.4-10.6A6.4 6.4 0 1 0 5.6 10.4C5.6 13.4 8 16.8 12 21Z"/>' +
+      '<path d="m9.2 10.6 1.8 1.8 3.6-3.8"/>'),
+    // A chat bubble with the three-dot "typing" cue instead of the generic
+    // lines the app's own `speech` icon uses elsewhere — this is an AI chat.
+    assistant: tabIconSvg('<path d="M4.6 6.4a2.2 2.2 0 0 1 2.2-2.2h10.4a2.2 2.2 0 0 1 2.2 2.2v7.6a2.2 2.2 0 0 1-2.2 2.2H10l-4 3.4v-3.4H6.8a2.2 2.2 0 0 1-2.2-2.2Z"/>',
+      '<circle cx="9" cy="10.2" r="1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="10.2" r="1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="15" cy="10.2" r="1" fill="currentColor" stroke="none"/>'),
+    // A plain three-line menu — the same idea the ☰ glyph stood in for, now
+    // drawn instead of borrowed from the system font.
+    more: tabIconSvg('<path d="M4.5 7h15M4.5 12h15M4.5 17h9"/>')
+  };
   var TABS = [
-    { key: 'dashboard', icon: '🏠', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
-    { key: 'studyplan', icon: '🗺️', label: 'Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'assistant', icon: '💬', label: 'Assistant', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
-    { key: 'more', icon: '☰', label: 'More', action: function(){ toggleMobile(); } }
+    { key: 'dashboard', icon: TAB_ICON_SVG.dashboard, label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: TAB_ICON_SVG.studyplan, label: 'Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'assistant', icon: TAB_ICON_SVG.assistant, label: 'Assistant', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
+    { key: 'more', icon: TAB_ICON_SVG.more, label: 'More', action: function(){ toggleMobile(); } }
   ];
 
   function ensureTabBar(){
