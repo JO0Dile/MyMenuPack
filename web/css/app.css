@@ -4214,20 +4214,46 @@
   .dash-header p{margin:2px 0 0;font-size:12px;color:var(--text-dim);}
   .dash-actions{display:flex;gap:8px;flex-wrap:wrap;}
   .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px;}
-  /* Below the phone breakpoint the auto-fit grid above already collapses
-     to one column — each stat tile ate a full screen row before you even
-     reached the graduation card. Swipe between them instead. */
   .dash-swipe-dots{display:none;}
+  /* Phone hero (js/36-dashboard.js's phoneHeroHtml) — one progress ring plus
+     two stat chips replaces the three-tile carousel entirely below the
+     breakpoint; desktop never sees this block (display:none here, no phone
+     media query overrides it back on). */
+  .dash-phone-hero{display:none;}
   @media (max-width:720px){
-    .dash-swipe-dots{display:flex; justify-content:center; gap:6px; margin:0 0 8px;}
-    .dash-swipe-dots span{width:6px; height:6px; border-radius:50%; background:var(--line);}
-    .dash-swipe-dots span.active{background:var(--accent);}
-    .dash-grid{
-      display:flex; flex-direction:row; flex-wrap:nowrap;
-      overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+    .dash-swipe-dots, .dash-grid{display:none;}
+    .dash-phone-hero{
+      display:block; background:var(--panel); border-radius:20px; padding:18px 16px;
+      margin-bottom:16px; box-shadow:0 8px 24px rgba(0,0,0,.28);
     }
-    .dash-grid::-webkit-scrollbar{display:none;}
-    .dash-grid > .dash-card{flex:0 0 100%; min-width:100%; scroll-snap-align:start;}
+    .dph-ring-wrap{display:flex; align-items:center; gap:16px; position:relative;}
+    .dph-ring-glow{
+      position:absolute; left:-14px; top:-14px; width:130px; height:130px; z-index:0;
+      background:radial-gradient(circle, rgba(111,140,255,.28), transparent 70%); filter:blur(4px);
+    }
+    .dph-ring{position:relative; width:100px; height:100px; flex:none; z-index:1;}
+    .dph-ring svg{width:100%; height:100%; transform:rotate(-90deg);}
+    .dph-ring .track{fill:none; stroke:var(--header-bg); stroke-width:9;}
+    .dph-ring .val{fill:none; stroke:var(--accent); stroke-width:9; stroke-linecap:round; transition:stroke-dashoffset .4s ease;}
+    .dph-ring-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+    .dph-ring-center .n{font-size:21px; font-weight:800; color:var(--text); line-height:1;}
+    .dph-ring-center .l{font-size:8.5px; color:var(--text-dim); font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-top:3px;}
+    .dph-stat-stack{display:flex; flex-direction:column; gap:9px; z-index:1; flex:1; min-width:0;}
+    .dph-stat{background:var(--header-bg); border-radius:12px; padding:9px 12px;}
+    .dph-stat .n{font-size:16px; font-weight:800; color:var(--text);}
+    .dph-stat .l{font-size:10px; color:var(--text-dim); font-weight:600;}
+
+    /* "Do this next" becomes the glanceable continue card the ring sits
+       above — a border+glow instead of the same flat panel every other
+       card on the screen uses, since this is the one action worth acting
+       on immediately. */
+    .wn-lead{
+      background:linear-gradient(135deg, var(--header-bg), var(--panel));
+      border:1px solid rgba(111,140,255,.35); border-radius:18px; padding:16px 17px;
+      box-shadow:0 10px 26px rgba(0,0,0,.3);
+    }
+    .wn-lead-label{color:var(--connect);}
+    .wn-lead-name{font-size:16.5px;}
   }
   .dash-card{
     background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;
@@ -4244,6 +4270,30 @@
   }
   .dash-quicklink:hover{border-color:var(--accent);transform:translateY(-2px);}
   .dash-quicklink .dq-icon{font-size:22px;display:block;margin-bottom:6px;}
+  /* Icon-grid quicklinks on phone — a circular badge + label instead of a
+     bordered rectangle each, same links, same click targets. Positioned
+     after the base rules above (not inside the earlier phone media block
+     with the ring hero) so it wins the cascade against them regardless of
+     media-query nesting — a later same-specificity rule always wins. */
+  @media (max-width:720px){
+    /* 3, not 4 — this app's own quicklink labels ("Degree Audit & GPA",
+       "Plan My Next Semester") run longer than a 4-up grid has room for
+       and wrapped three lines deep, staggering every row out of line. */
+    .dash-quicklinks{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:16px 6px; background:none; border:none; padding:0;
+    }
+    .dash-quicklink{
+      background:none; border:none; padding:0; display:flex; flex-direction:column; align-items:center; gap:7px;
+      text-align:center; overflow-wrap:normal;
+    }
+    .dash-quicklink:hover{transform:none;}
+    .dash-quicklink .dq-icon{
+      display:flex; align-items:center; justify-content:center; margin-bottom:0;
+      width:46px; height:46px; border-radius:15px; background:var(--panel); box-shadow:0 6px 16px rgba(0,0,0,.25);
+    }
+    .dash-quicklink:active .dq-icon{transform:scale(.94);}
+    .dq-label{font-size:11px; line-height:1.3;}
+  }
   .dash-next-list{display:flex;flex-direction:column;gap:6px;}
   .dash-next-item{
     display:flex;justify-content:space-between;font-size:12.5px;
