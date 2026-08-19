@@ -93,6 +93,11 @@
     document.getElementById('appSidebar').style.display = 'flex';
     document.getElementById('sbToggleBtn').style.display = '';
     document.body.classList.add('has-sidebar');
+    // Visibility is CSS-driven (body.has-sidebar + the phone breakpoint),
+    // deliberately not an inline style here — an inline display would beat
+    // that media query on desktop and force the bar to show everywhere.
+    ensureTabBar();
+    syncTabBar(prefix, activeKey);
   }
   function hide(){
     currentPrefix = null;
@@ -115,6 +120,71 @@
     var overlay = document.getElementById('sbOverlay');
     if(sidebar) sidebar.classList.remove('open');
     if(overlay) overlay.classList.remove('open');
+  }
+
+  // ---------------------------------------------------------------------
+  // PHONE BOTTOM TAB BAR — the same navigation as the sidebar above, in the
+  // shape a thumb actually wants on a phone. Not a rewrite: every tab calls
+  // the exact same action a sidebar item already does (or, for "More",
+  // opens the sidebar itself as a drawer) — this is a second way to reach
+  // the same four most-used destinations, not a second navigation model.
+  // Hidden by CSS above 720px, so desktop is untouched.
+  //
+  // Icons deliberately reuse ones already meaningful elsewhere in the app
+  // rather than inventing new ones: 🗺️ is "My Study Plan" in this very
+  // sidebar, 💬 is the assistant's own launcher bubble, and ☰ is the exact
+  // glyph that already opens this sidebar as a drawer on phone.
+  var TABS = [
+    { key: 'dashboard', icon: '🏠', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: '🗺️', label: 'Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'assistant', icon: '💬', label: 'Assistant', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
+    { key: 'more', icon: '☰', label: 'More', action: function(){ toggleMobile(); } }
+  ];
+
+  function ensureTabBar(){
+    var bar = document.getElementById('sbTabBar');
+    if(bar) return bar;
+    bar = document.createElement('div');
+    bar.id = 'sbTabBar';
+    bar.className = 'sb-tabbar';
+    bar.innerHTML = TABS.map(function(tItem){
+      return '<button type="button" class="sb-tab" data-sb-tab="' + tItem.key + '">' +
+        '<span class="sb-tab-ic">' + tItem.icon + (tItem.key === 'dashboard' ? '<span class="sb-tab-badge" id="sbTabProgress" hidden></span>' : '') + '</span>' +
+        '<span class="sb-tab-lbl">' + tItem.label + '</span>' +
+        '</button>';
+    }).join('');
+    document.body.appendChild(bar);
+    bar.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-sb-tab]');
+      if(!btn || !currentPrefix) return;
+      var tItem = TABS.filter(function(x){ return x.key === btn.getAttribute('data-sb-tab'); })[0];
+      if(tItem) tItem.action(currentPrefix);
+    });
+    return bar;
+  }
+
+  // The "mini persistent progress pill" idea, folded into the Dashboard tab
+  // itself rather than added as a second floating element competing with
+  // this same tab bar for the same corner of the screen — tapping it does
+  // exactly what the idea asked for (jump back to the dashboard), and the
+  // number is genuinely persistent since the tab bar itself always is.
+  function syncTabProgress(prefix){
+    var badge = document.getElementById('sbTabProgress');
+    if(!badge) return;
+    var rows = window.AAUP_AUDIT ? window.AAUP_AUDIT.computeAudit(prefix) : [];
+    var total = 0, done = 0;
+    rows.forEach(function(r){ total += r.total; done += r.completed; });
+    if(total <= 0){ badge.hidden = true; return; }
+    badge.textContent = Math.round((done / total) * 100) + '%';
+    badge.hidden = false;
+  }
+
+  function syncTabBar(prefix, activeKey){
+    var bar = ensureTabBar();
+    bar.querySelectorAll('[data-sb-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-sb-tab') === activeKey);
+    });
+    syncTabProgress(prefix);
   }
 
   // A small settings modal consolidating theme/export/import/reset — the
@@ -469,4 +539,9 @@
   });
 
   window.AAUP_SIDEBAR = { show: show, hide: hide, setActive: setActive, toggleMobile: toggleMobile, closeMobile: closeMobile, openSettings: openSettings };
+  // Called from js/28-imported.js's own post-render hook chain (same one
+  // js/69-phone-header.js's refresh already sits in) so the tab bar's
+  // progress badge updates the moment a course gets checked, not only the
+  // next time the sidebar itself is (re)shown.
+  window.__refreshTabBarProgress = function(prefix){ if(currentPrefix === prefix) syncTabProgress(prefix); };
 })();
