@@ -228,31 +228,20 @@
 
     var statuses = window.AAUP_GPA.loadStatuses();
     var currentStatus = isDone ? 'done' : (statuses[pid] || '');
-    // "Done" is a real button on every platform now — tapping/clicking it
-    // calls the exact same completion toggle the checkbox uses (see
-    // bind() below), never a second source of truth. It used to be a
-    // disabled reflection of the checkbox on desktop specifically, on the
-    // reasoning that clicking it there was redundant next to the checkbox
-    // right above the tree — but leaving one of four segments dead reads
-    // as broken everywhere the control appears, not just on phone.
-    //
-    // Phone additionally gets terser labels in the mockup's own order (Not
-    // started/In progress/Planned/Done) — "📌 Planned next semester" does
-    // not fit four-across as a segmented control. This part IS phone-only:
-    // it is a visual/layout call (does the label fit the segmented shape),
-    // not a behavioral one, so desktop keeps its original longer wording
-    // wrapped across a row of separate pills.
-    var phoneSegmented = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width:720px)').matches;
-    var statusOptions = phoneSegmented ? [
+    // The planning-status control is one real segmented control on every
+    // platform now — mockup's own wording and order (Not started/In
+    // progress/Planned/Done), all four tappable/clickable including Done,
+    // which calls the exact same completion toggle the checkbox uses (see
+    // bind() below), never a second source of truth. This used to be
+    // desktop-only-different (longer wording, wrapped pills, Done disabled)
+    // but that was never a deliberate design decision for desktop
+    // specifically — it was just the original, unstyled shape everywhere
+    // before this control had a real design pass.
+    var statusOptions = [
       { v: '', en: 'Not started', ar: 'لم يبدأ' },
       { v: 'in_progress', en: 'In progress', ar: 'قيد الإنجاز' },
       { v: 'planned', en: 'Planned', ar: 'مخطط' },
       { v: 'done', en: 'Done', ar: 'مكتمل' }
-    ] : [
-      { v: '', en: 'Not planned', ar: 'غير مخطط' },
-      { v: 'planned', en: '📌 Planned next semester', ar: '📌 مخطط للفصل القادم' },
-      { v: 'in_progress', en: '📖 In progress this semester', ar: '📖 قيد الإنجاز هذا الفصل' },
-      { v: 'done', en: '✅ Done / Completed', ar: '✅ مكتمل' }
     ];
     var statusHtml = statusOptions.map(function(o){
       var isDoneOption = o.v === 'done';

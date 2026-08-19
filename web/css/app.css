@@ -5481,6 +5481,29 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .cd-slides .cd-slide:first-child .cd-sec{margin-bottom:20px;}
 }
 
+/* The 4 planning-status buttons become one segmented control (mockup-
+   matched) on every platform, not a wrapped row of separate pills.
+   Unconditional (not phone-scoped) — the user asked for this look on
+   desktop too, not just the click behavior. Scoped to .cd-extras so
+   .status-btn-group elsewhere (there is nowhere else — js/21-course-
+   modal-extras.js is its only user — but scoping costs nothing and
+   documents the intent) can never pick this up by accident. */
+.cd-extras .status-btn-group{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+  background:var(--search-bg); border-radius:12px; padding:3px; margin-bottom:14px;
+}
+.cd-extras .status-btn{
+  text-align:center; white-space:nowrap; border:none; overflow:hidden;
+  text-overflow:ellipsis; min-width:0;
+  border-radius:9px; padding:9px 4px; font-size:11px; background:none;
+}
+/* Equal specificity to the base .status-btn.active rule (two classes
+   each), which sets this same background — restated here only because
+   source order would otherwise let the plain .status-btn rule above win
+   and leave the active segment's on-accent-colored text invisible
+   against a transparent background. */
+.cd-extras .status-btn.active{font-weight:800; background:var(--accent);}
+
 /* The modal is the full height of a small screen, so the panel scrolls inside
    it rather than the page behind it. */
 @media (max-width:719px){
@@ -5489,27 +5512,7 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .cd-head{position:sticky; top:0; background:var(--panel); z-index:2;}
   .cd-head h3{font-size:17px;}
   .cd-arrow{transform:rotate(90deg); display:inline-block;}
-
-  /* The 4 planning-status buttons become one segmented control (mockup-
-     matched) instead of a wrapped row of separate pills. Scoped to
-     .cd-extras so .status-btn-group elsewhere (there is nowhere else —
-     js/21-course-modal-extras.js is its only user — but scoping costs
-     nothing and documents the intent) can never pick this up by accident. */
-  .cd-extras .status-btn-group{
-    display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
-    background:var(--search-bg); border-radius:12px; padding:3px; margin-bottom:14px;
-  }
-  .cd-extras .status-btn{
-    text-align:center; white-space:nowrap; border:none; overflow:hidden;
-    text-overflow:ellipsis; min-width:0;
-    border-radius:9px; padding:9px 4px; font-size:10.5px; background:none;
-  }
-  /* Equal specificity to the base .status-btn.active rule (two classes
-     each), which sets this same background — restated here only because
-     source order would otherwise let the plain .status-btn rule above win
-     and leave the active segment's on-accent-colored text invisible
-     against a transparent background. */
-  .cd-extras .status-btn.active{font-weight:800; background:var(--accent);}
+  .cd-extras .status-btn{font-size:10.5px;}
 }
 
 /* ==========================================================================
