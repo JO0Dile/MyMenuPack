@@ -5761,3 +5761,19 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .ct-copy{padding:5px 12px;}
 }
 
+/* ==========================================================================
+   PHONE PLAN MY NEXT SEMESTER — the pool/tray builder (js/25-advisor.js)
+   loses its thin borders the same way every other list in this redesign
+   did. Every selector is scoped under #advisorModalBody: .sb- here is a
+   pre-existing, unrelated naming collision with the sidebar's own .sb-item/
+   .sb-search (js/37-sidebar.js) — scoping is what keeps this from also
+   repainting the "More" sheet. */
+@media (max-width:720px){
+  #advisorModalBody .sb-meter{border:none; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.22);}
+  #advisorModalBody .sb-search{border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  #advisorModalBody .sb-row{border:none; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.22);}
+  #advisorModalBody .sb-row:hover{box-shadow:0 4px 14px rgba(0,0,0,.22), 0 0 0 1px var(--accent);}
+  #advisorModalBody .sb-tray{border:none; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.22);}
+  #advisorModalBody .sb-tray-item{border:none; box-shadow:0 2px 8px rgba(0,0,0,.18);}
+}
+
