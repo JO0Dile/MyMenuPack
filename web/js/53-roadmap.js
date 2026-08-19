@@ -287,6 +287,16 @@
     var info = dash && dash.planDisplayInfo ? dash.planDisplayInfo(prefix) : { icon: '🎓', name: prefix };
     var uni = (window.APP_UNIVERSITIES || {})[(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix] || {}).university || 'aaup'];
 
+    // info.name is the dashboard's own header string — major name PLUS
+    // "B.Sc. · 129 CH · Program 29112" baked on. Right for a page whose own
+    // heading is the whole plan; too much for "Your path through ___", which
+    // wants just the major's name on its own line, same as My Path's own
+    // mockup ("Your path through" / "Artificial Intelligence & Innovation").
+    var importedPlan = window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix];
+    var majorName = importedPlan && window.AAUP_IMPORTED.nameParts
+      ? (window.AAUP_IMPORTED.nameParts(rtl ? importedPlan.majorName.ar : importedPlan.majorName.en).big || info.name || prefix)
+      : (info.name || prefix);
+
     // The header number and the breakdown panel underneath it used to be
     // computed two different ways and disagreed out loud (137 CH in the panel,
     // 123 in the node). Both read categoryModel now. When the plan declares
@@ -400,11 +410,12 @@
       '</div>' +
     '</div>';
 
-    // info.name (from planDisplayInfo) is already HTML-escaped once by the
-    // sync sanitizer — esc()'ing it again turned a real "&" into a literal
-    // "&amp;" for majors like "Game Design & Development".
+    // majorName/info.name (from nameParts()/planDisplayInfo) are already
+    // HTML-escaped once by the sync sanitizer — esc()'ing them again turned
+    // a real "&" into a literal "&amp;" for majors like "Game Design & Development".
     return '<div class="ro-head">' +
-      '<div><h2 style="margin:0;">' + (rtl ? ('مسارك عبر ' + (info.name || prefix)) : ('Your path through ' + (info.name || prefix))) + '</h2>' +
+      '<div><p class="ro-plan-label">' + (rtl ? 'مسارك عبر' : 'Your path through') + '</p>' +
+      '<h2 style="margin:0;">' + majorName + '</h2>' +
       '<p class="form-note" style="margin-top:4px;">' + (rtl
         ? 'كل مساق، بالترتيب الذي تتطلبه الدرجة — وأين أنت منه الآن.'
         : 'Every course, in the order the degree expects — and where you are on it right now.') + '</p></div>' +

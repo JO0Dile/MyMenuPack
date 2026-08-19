@@ -2561,6 +2561,47 @@
 
   html[dir="rtl"] .ro-course, .plan-page.rtl-mode .ro-course{direction:rtl;}
 
+  .ro-plan-label{margin:0; font-size:11.5px; font-weight:700; color:var(--text-dim);}
+
+  /* My Path's own reference mockup gives this screen a shape none of the
+     app's other tracks use: a connected VERTICAL timeline running top to
+     bottom, one row per year, instead of a horizontal dot-strip you scroll
+     sideways through. Phone-only structural redesign (same convention as
+     the rest of this pass) — the underlying markup, the data-ro-scope
+     click-to-breakdown behaviour, and the category breakdown panel below
+     are all untouched; only how the existing timeline nodes are laid out
+     changes here. */
+  @media (max-width:720px){
+    .ro-head{flex-direction:column; gap:4px;}
+    .ro-uni{padding-top:0;}
+
+    .ro-timeline{
+      flex-direction:column; align-items:stretch; overflow-x:visible; margin:18px 0;
+    }
+    .ro-node-wrap{
+      flex-direction:row; align-items:flex-start; justify-content:flex-start;
+      width:100%; text-align:left; gap:12px; padding:0;
+    }
+    html[dir="rtl"] .ro-node-wrap, .plan-page.rtl-mode .ro-node-wrap{text-align:right;}
+    .ro-node{margin-top:3px; flex:none;}
+    .ro-node-label{margin-top:0; font-size:13.5px;}
+    .ro-node-sub{text-transform:none; letter-spacing:0; font-size:11px;}
+    /* "you are here" / "done" carries real meaning — plain lowercase grey
+       hours text is what future years get, so only the two informative
+       states earn a colour. */
+    .ro-node-wrap:has(.ro-node-current) .ro-node-sub{color:var(--accent); font-weight:700;}
+    .ro-node-wrap:has(.ro-node-done) .ro-node-sub{color:#2ecc71;}
+    /* The connector was a horizontal bar between side-by-side nodes; here it
+       is a short vertical bar under each dot, indented to its centre (the
+       dot is 16px wide) so it reads as one continuous line down the page. */
+    .ro-connector{
+      width:2px; height:20px; min-width:0; flex:none;
+      margin:0 0 0 7px; background:var(--line);
+    }
+    html[dir="rtl"] .ro-connector, .plan-page.rtl-mode .ro-connector{margin:0 7px 0 0;}
+    .ro-connector-current{background:linear-gradient(180deg,#2ecc71,var(--accent));}
+  }
+
   /* ================= PREREQUISITE MAP (what course search opens now) ================= */
   .pg-modal-card{max-width:1200px; width:94vw; max-height:88vh; overflow-y:auto; overflow-x:hidden;}
   .pg-head{margin-bottom:8px;}
