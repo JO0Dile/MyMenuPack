@@ -222,11 +222,27 @@
   // markup so a screen reader or a narrow viewport meets the grades before
   // the summary of them — the grid only reorders them side by side once
   // there is room.
+  // Below 720px the table and the dial/projection column swipe side by
+  // side (scroll-snap, no JS needed for the gesture itself) instead of
+  // stacking vertically — on a phone the dial otherwise sits a full scroll
+  // beneath a possibly-long grade table. The dots are decorative sync only;
+  // scroll-snap already does the actual paging.
   function layoutHTML(prefix, rtl){
-    return '<div class="gs-layout">' +
+    return '<div class="gs-swipe-dots" aria-hidden="true"><span class="active"></span><span></span></div>' +
+      '<div class="gs-layout" id="gsLayout">' +
       '<div class="gs-col-main">' + tableHTML(prefix, rtl) + '</div>' +
       '<div class="gs-col-side">' + dialCardHTML(prefix, rtl) + projectionHTML(prefix, rtl) + '</div>' +
       '</div>';
+  }
+
+  function bindSwipeDots(){
+    var layout = document.getElementById('gsLayout');
+    var dots = document.querySelectorAll('.gs-swipe-dots span');
+    if(!layout || dots.length < 2) return;
+    layout.addEventListener('scroll', function(){
+      var idx = layout.scrollLeft > layout.clientWidth / 2 ? 1 : 0;
+      dots.forEach(function(d, i){ d.classList.toggle('active', i === idx); });
+    }, { passive: true });
   }
 
   function nearestGradeAtLeast(points){
@@ -282,6 +298,6 @@
 
   window.AAUP_GPA_STUDIO = {
     layout: layoutHTML,
-    bind: function(prefix, rtl){ bindTable(prefix); bindProjection(rtl); }
+    bind: function(prefix, rtl){ bindTable(prefix); bindProjection(rtl); bindSwipeDots(); }
   };
 })();

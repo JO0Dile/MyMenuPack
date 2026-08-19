@@ -473,6 +473,57 @@
       var reactBtn = e.target.closest('[data-th-react]');
       if(reactBtn){ toggleReaction(prefix, reactBtn.getAttribute('data-th-id'), reactBtn.getAttribute('data-th-react')); }
     });
+
+    bindPullToRefresh(prefix, rtl);
+  }
+
+  // ---- pull to refresh (phone) --------------------------------------------
+  // Reuses the exact same refresh open() already does in the background —
+  // this just gives a student a way to ask for it on demand, with the one
+  // gesture every phone already trains for "get me the latest."
+  var PULL_THRESHOLD = 64;
+  function bindPullToRefresh(prefix, rtl){
+    var list = document.getElementById('thList');
+    if(!list || !endpoint()) return;   // nothing to pull fresh from
+    var startY = 0, pulling = false, dist = 0, active = false;
+    var hint = document.createElement('div');
+    hint.className = 'th-pull-hint';
+    hint.textContent = rtl ? '↓ اسحب للتحديث' : '↓ Pull to refresh';
+    list.insertBefore(hint, list.firstChild);
+
+    list.addEventListener('touchstart', function(e){
+      if(list.scrollTop > 2 || active || e.touches.length !== 1) return;
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }, { passive: true });
+    list.addEventListener('touchmove', function(e){
+      if(!pulling) return;
+      dist = e.touches[0].clientY - startY;
+      if(dist <= 0){ hint.style.removeProperty('--th-pull'); hint.classList.remove('th-pull-ready'); return; }
+      hint.style.setProperty('--th-pull', Math.min(dist, PULL_THRESHOLD * 1.5) + 'px');
+      hint.classList.toggle('th-pull-ready', dist > PULL_THRESHOLD);
+    }, { passive: true });
+    list.addEventListener('touchend', function(){
+      if(!pulling) return;
+      pulling = false;
+      if(dist > PULL_THRESHOLD && !active){
+        active = true;
+        hint.classList.add('th-pull-active');
+        hint.textContent = rtl ? 'جارٍ التحديث…' : 'Refreshing…';
+        flushQueue().then(function(){ return fetchWall(prefix); })
+          .then(function(){ render(prefix); })
+          .catch(function(){ render(prefix, true); });
+      } else {
+        hint.style.removeProperty('--th-pull');
+        hint.classList.remove('th-pull-ready');
+      }
+      dist = 0;
+    }, { passive: true });
+    list.addEventListener('touchcancel', function(){
+      pulling = false; dist = 0;
+      hint.style.removeProperty('--th-pull');
+      hint.classList.remove('th-pull-ready');
+    }, { passive: true });
   }
 
   function open(prefix){
