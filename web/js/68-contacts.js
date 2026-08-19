@@ -111,9 +111,9 @@
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
       (window.__backBarHTML ? window.__backBarHTML('', 'contactsOverlay', rtl) : '') +
-      '<h2 style="margin-top:0;">📇 ' + t('title', rtl) + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('people', 20) + t('title', rtl) + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' + t('lead', rtl) + '</p>' +
-      '<p class="ct-privacy">🔒 ' + t('noPhones', rtl) + '</p>' +
+      '<p class="ct-privacy">' + window.AAUP_ICONS.preview('lock', 14) + ' ' + t('noPhones', rtl) + '</p>' +
       '<div class="ct-loading">' + (window.__skeletonHTML ? window.__skeletonHTML('card', 5, rtl) : (rtl ? 'جارٍ التحميل…' : 'Loading…')) + '</div>';
 
     load().then(function(data){

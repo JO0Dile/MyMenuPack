@@ -237,7 +237,7 @@
     // that module is missing for any reason, the original three-card
     // summary is the fallback, not a blank space.
     body.innerHTML =
-      '<h2 style="margin-top:0;">📋 ' + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('clipboard', 20) + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
       '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' +
       (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.layout(prefix, rtl) : renderGpaDashboard(prefix, rtl)) +
       (window.AAUP_GPA_TARGET

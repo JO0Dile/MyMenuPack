@@ -8,6 +8,7 @@
 // both register through the same window.__PLAN_DATA bridge.
 (function(){
   var BUILT_IN_ICONS = { robotics: '🤖', cybersecurity: '🔒', medical: '⚕️', cs: '💻' };
+  var BUILT_IN_ICON_KEYS = { robotics: 'robot', cybersecurity: 'shield', medical: 'medical', cs: 'code' };
   var SELECTED_KEY = 'aaup_selectedPlan';
 
   function isImportedPlan(prefix){
@@ -23,7 +24,7 @@
     }
     var page = document.getElementById('page-' + prefix);
     var nameEl = page && page.querySelector('.title-block .en');
-    return { icon: BUILT_IN_ICONS[prefix] || '🎓', name: nameEl ? nameEl.textContent : prefix };
+    return { icon: BUILT_IN_ICONS[prefix] || '🎓', iconKey: BUILT_IN_ICON_KEYS[prefix] || '', name: nameEl ? nameEl.textContent : prefix };
   }
 
   function getSelected(){
@@ -185,7 +186,7 @@
         '<div class="dash-card"><h3>' + (rtl ? 'الإنجازات' : 'Achievements') + '</h3><div class="dash-big">' + achv.unlocked + ' / ' + achv.total + '</div><div class="dash-sub">' + (rtl ? 'مُنجَز' : 'unlocked') + '</div></div>' +
       '</div>' +
       (window.AAUP_GRADUATION
-        ? '<div class="dash-card grad-card" style="margin-bottom:20px;"><h3>🎓 ' + window.AAUP_GRADUATION.title(rtl) +
+        ? '<div class="dash-card grad-card" style="margin-bottom:20px;"><h3 class="mh">' + window.AAUP_ICONS.preview('cap', 18) + window.AAUP_GRADUATION.title(rtl) +
           '</h3><div id="' + prefix + '-dashGradBody"></div></div>'
         : '') +
       '<div class="dash-card" style="margin-bottom:20px;"><h3>' + (rtl ? 'ما الذي يمكنني أخذه الآن؟' : 'What Can I Take Next') + '</h3>' +

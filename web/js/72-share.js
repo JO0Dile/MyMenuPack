@@ -137,19 +137,19 @@
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
       (window.__backBarHTML ? window.__backBarHTML('', 'shareOverlay', rtl) : '') +
-      '<h2 style="margin-top:0;">🔗 ' + t('title', rtl) + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('link', 20) + t('title', rtl) + '</h2>' +
       '<p class="share-loading">' + t('building', rtl) + '</p>';
 
     buildLink(prefix).then(function(res){
       var qrCanvasId = 'shareQrCanvas';
       body.innerHTML =
         (window.__backBarHTML ? window.__backBarHTML('', 'shareOverlay', rtl) : '') +
-        '<h2 style="margin-top:0;">🔗 ' + t('title', rtl) + '</h2>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('link', 20) + t('title', rtl) + '</h2>' +
         '<p class="form-note" style="margin-top:0;">' + t(res.isCustom ? 'customLead' : 'builtinLead', rtl) + '</p>' +
         (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + t('shareVia', rtl) + '</button>' : '') +
         '<div class="share-link-row">' +
           '<input type="text" id="shareLinkInput" class="share-link-input" readonly dir="ltr" value="' + esc(res.url) + '">' +
-          '<button type="button" class="home-btn" id="shareCopyBtn">📋 ' + t('copy', rtl) + '</button>' +
+          '<button type="button" class="home-btn" id="shareCopyBtn">' + window.AAUP_ICONS.preview('copy', 14) + t('copy', rtl) + '</button>' +
         '</div>' +
         '<div class="share-qr-wrap" id="shareQrWrap">' +
           '<p class="share-qr-label">' + t('scan', rtl) + '</p>' +
@@ -174,8 +174,8 @@
       if(copyBtn){
         copyBtn.addEventListener('click', function(){
           var done = function(){
-            copyBtn.textContent = '✓ ' + t('copied', rtl);
-            setTimeout(function(){ copyBtn.textContent = '📋 ' + t('copy', rtl); }, 1500);
+            copyBtn.innerHTML = window.AAUP_ICONS.preview('check', 14) + t('copied', rtl);
+            setTimeout(function(){ copyBtn.innerHTML = window.AAUP_ICONS.preview('copy', 14) + t('copy', rtl); }, 1500);
           };
           if(navigator.clipboard && navigator.clipboard.writeText){
             navigator.clipboard.writeText(res.url).then(done, function(){
@@ -190,12 +190,12 @@
       var canvas = document.getElementById(qrCanvasId);
       var qrWrap = document.getElementById('shareQrWrap');
       if(canvas && !drawQr(canvas, res.url) && qrWrap){
-        qrWrap.innerHTML = '<p class="share-qr-toobig">⚠️ ' + t('tooBig', rtl) + '</p>';
+        qrWrap.innerHTML = '<p class="share-qr-toobig">' + window.AAUP_ICONS.preview('warning', 14) + t('tooBig', rtl) + '</p>';
       }
     }).catch(function(){
       body.innerHTML =
         (window.__backBarHTML ? window.__backBarHTML('', 'shareOverlay', rtl) : '') +
-        '<h2 style="margin-top:0;">🔗 ' + t('title', rtl) + '</h2>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('link', 20) + t('title', rtl) + '</h2>' +
         '<p class="ex-note">' + t('error', rtl) + '</p>';
     });
   }

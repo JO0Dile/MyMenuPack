@@ -428,21 +428,21 @@
     };
 
     var html = '';
-    html += '<h4><span class="badge-ic">✅</span>' + L.needs + '</h4>';
+    html += '<h4><span class="badge-ic">' + window.AAUP_ICONS.preview('check', 16) + '</span>' + L.needs + '</h4>';
     html += needs.length ? listHTML(prefix, needs) : ('<div class="fp-empty">' + L.none + '</div>');
     if(needs.length){
       html += '<h4>' + L.whyNeeds + '</h4>';
       html += '<div class="fp-why">' + escapeHTML(whyNeedsText(prefix, slug, needs, rtl)) + '</div>';
     }
 
-    html += '<h4><span class="badge-ic">🔓</span>' + L.unlocks + '</h4>';
+    html += '<h4><span class="badge-ic">' + window.AAUP_ICONS.preview('unlock', 16) + '</span>' + L.unlocks + '</h4>';
     html += unlocks.length ? listHTML(prefix, unlocks) : ('<div class="fp-empty">' + L.noneUnlocks + '</div>');
     if(unlocks.length){
       html += '<h4>' + L.whyUnlocks + '</h4>';
       html += '<div class="fp-why">' + escapeHTML(whyUnlocksText(prefix, slug, unlocks, rtl)) + '</div>';
     }
 
-    html += '<h4><span class="badge-ic">⚠️</span>' + L.consequence + '</h4>';
+    html += '<h4><span class="badge-ic">' + window.AAUP_ICONS.preview('warning', 16) + '</span>' + L.consequence + '</h4>';
     html += '<div class="fp-warn">' + escapeHTML(consequenceText(prefix, slug, unlocks, rtl)) + '</div>';
 
     return html;

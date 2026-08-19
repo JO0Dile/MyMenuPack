@@ -7,6 +7,7 @@
 // not a new feature surface.
 (function(){
   var BUILT_IN_ICONS = { robotics: '🤖', cybersecurity: '🔒', medical: '⚕️', cs: '💻' };
+  var BUILT_IN_ICON_KEYS = { robotics: 'robot', cybersecurity: 'shield', medical: 'medical', cs: 'code' };
 
   function isImportedPlan(prefix){
     return !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
@@ -96,10 +97,11 @@
     var sidebar = document.getElementById('appSidebar');
     if(!sidebar) return;
     var name = planName(prefix);
-    var icon = isImportedPlan(prefix) ? ((window.AAUP_IMPORTED.loadImportedPlans()[prefix] || {}).icon || '🎓') : (BUILT_IN_ICONS[prefix] || '🎓');
+    var iconEntity = isImportedPlan(prefix) ? (window.AAUP_IMPORTED.loadImportedPlans()[prefix] || {}) :
+      { icon: BUILT_IN_ICONS[prefix] || '🎓', iconKey: BUILT_IN_ICON_KEYS[prefix] || '' };
     var hasLibrary = isImportedPlan(prefix);
 
-    var html = '<div class="sb-brand"><span class="sb-mark">' + icon + '</span><span>' + name + '</span></div>';
+    var html = '<div class="sb-brand"><span class="sb-mark">' + window.AAUP_ICONS.markup(iconEntity, { size: 20 }) + '</span><span>' + name + '</span></div>';
     html += '<div class="sb-flat-list">';
     html += ITEMS.map(function(item){
       return '<button type="button" class="sb-item' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
@@ -308,16 +310,16 @@
   // e.g. toggling the theme), so acting on something never bounces the
   // student back to the first tab.
   var SETTINGS_TABS = [
-    { key: 'account', icon: '👤', en: 'Account', ar: 'الحساب' },
-    { key: 'prefs', icon: '🎨', en: 'Preferences', ar: 'التفضيلات' },
-    { key: 'data', icon: '💾', en: 'Data', ar: 'البيانات' },
-    { key: 'help', icon: '❓', en: 'Help', ar: 'مساعدة' }
+    { key: 'account', iconKey: 'person', en: 'Account', ar: 'الحساب' },
+    { key: 'prefs', iconKey: 'palette', en: 'Preferences', ar: 'التفضيلات' },
+    { key: 'data', iconKey: 'save', en: 'Data', ar: 'البيانات' },
+    { key: 'help', iconKey: 'help', en: 'Help', ar: 'مساعدة' }
   ];
   var activeSettingsTab = 'account';
 
   function accountTabHtml(r, current, others){
     return (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
-      '<h3 style="margin:18px 0 6px;">👤 ' + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
+      '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('person', 18) + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + (r
         ? 'مختلف عن المزامنة السحابية أعلاه: كل ملف هنا يبقى على هذا الجهاز فقط ولا يُزامَن — مفيد إذا كان أكثر من شخص يشارك هذا الجهاز، أو أردت ملفًا محليًا ثانيًا.'
         : 'Different from Cloud Sync above: each profile here stays on this device only and is never synced anywhere — useful if more than one person shares this device, or you want a second local profile of your own.') + '</p>' +
@@ -326,14 +328,14 @@
         ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
           others.map(function(a){
             return '<span class="acct-row">' +
-              '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">🔁 ' + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>' +
-              '<button type="button" class="home-btn acct-delete-btn" data-acct="' + window.__escapeHtml(a) + '" aria-label="' + (r ? 'حذف الحساب' : 'Delete account') + '">🗑</button>' +
+              '<button type="button" class="home-btn acct-switch-btn" data-acct="' + window.__escapeHtml(a) + '">' + window.AAUP_ICONS.preview('refresh', 14) + (r ? 'التبديل إلى ' : 'Switch to ') + window.__escapeHtml(a) + '</button>' +
+              '<button type="button" class="home-btn acct-delete-btn" data-acct="' + window.__escapeHtml(a) + '" aria-label="' + (r ? 'حذف الحساب' : 'Delete account') + '">' + window.AAUP_ICONS.preview('trash', 14) + '</button>' +
               '</span>';
           }).join('') + '</div>'
         : '') +
       '<div class="form-field-row">' +
       '<div class="form-field"><input type="text" id="newAcctName" maxlength="40" placeholder="' + (r ? 'اسم حساب جديد' : 'New account name') + '"></div>' +
-      '<button type="button" class="home-btn" id="newAcctBtn" style="border-color:var(--accent);color:var(--text);align-self:flex-start;">➕ ' + (r ? 'إنشاء' : 'Create') + '</button>' +
+      '<button type="button" class="home-btn" id="newAcctBtn" style="border-color:var(--accent);color:var(--text);align-self:flex-start;">' + window.AAUP_ICONS.preview('plus', 14) + (r ? 'إنشاء' : 'Create') + '</button>' +
       '</div>' +
       '<div id="acctMsg"></div>';
   }
@@ -342,14 +344,14 @@
     if(!window.AAUP_THEME) return '';
     var current = window.AAUP_THEME.current();
     var themes = window.AAUP_THEME.listAll ? window.AAUP_THEME.listAll() : window.AAUP_THEME.list();
-    return '<h3 style="margin:0 0 6px;">🎨 ' + (r ? 'السمة' : 'Theme') + '</h3>' +
+    return '<h3 class="mh" style="margin:0 0 6px;">' + window.AAUP_ICONS.preview('palette', 18) + (r ? 'السمة' : 'Theme') + '</h3>' +
       '<div class="theme-picker-grid" role="group" aria-label="' + (r ? 'السمة' : 'Theme') + '">' +
       themes.map(function(t){
         var active = t.id === current;
         return '<button type="button" class="theme-swatch' + (active ? ' theme-swatch-active' : '') +
           '" data-theme-swatch="' + t.id + '" style="--sw-bg:' + t.bg + ';--sw-accent:' + t.accent + ';" aria-pressed="' + active + '">' +
           '<span class="theme-swatch-preview"></span>' +
-          '<span class="theme-swatch-label"><span>' + t.icon + ' ' + (r ? t.ar : t.en) + '</span><span class="theme-swatch-check">✓</span></span>' +
+          '<span class="theme-swatch-label"><span>' + t.icon + ' ' + (r ? t.ar : t.en) + '</span><span class="theme-swatch-check">' + window.AAUP_ICONS.preview('check', 14) + '</span></span>' +
           '</button>';
       }).join('') +
       '</div>' +
@@ -361,7 +363,7 @@
   function sizePickerHtml(r){
     if(!window.AAUP_THEME || !window.AAUP_THEME.sizes) return '';
     var current = window.AAUP_THEME.currentSize();
-    return '<h3 style="margin:18px 0 6px;">🔠 ' + (r ? 'حجم النص' : 'Reading size') + '</h3>' +
+    return '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('textsize', 18) + (r ? 'حجم النص' : 'Reading size') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' +
       (r ? 'يكبّر بطاقات المساقات في الخطة الدراسية.' : 'Makes the course cards in the study plan bigger or tighter.') +
       '</p>' +
@@ -379,18 +381,18 @@
   function prefsTabHtml(r, selectedPlan, isRtlNow){
     return themePickerHtml(r) + sizePickerHtml(r) +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;margin-top:14px;">' +
-      (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">🌐 ' + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
+      (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">' + window.AAUP_ICONS.preview('globe', 14) + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
       '</div>';
   }
 
   function dataTabHtml(r, devUnlocked){
     return '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="setExportBtn">📤 ' + (r ? 'تصدير التقدّم' : 'Export Progress') + '</button>' +
-      '<button type="button" class="home-btn" id="setImportBtn">📥 ' + (r ? 'استيراد التقدّم' : 'Import Progress') + '</button>' +
-      '<button type="button" class="home-btn" id="setResetBtn">🗑 ' + (r ? 'مسح كل البيانات' : 'Reset All Data') + '</button>' +
+      '<button type="button" class="home-btn" id="setExportBtn">' + window.AAUP_ICONS.preview('upload', 14) + (r ? 'تصدير التقدّم' : 'Export Progress') + '</button>' +
+      '<button type="button" class="home-btn" id="setImportBtn">' + window.AAUP_ICONS.preview('download', 14) + (r ? 'استيراد التقدّم' : 'Import Progress') + '</button>' +
+      '<button type="button" class="home-btn" id="setResetBtn">' + window.AAUP_ICONS.preview('trash', 14) + (r ? 'مسح كل البيانات' : 'Reset All Data') + '</button>' +
       '</div>' +
       (window.APP_PLANS_FEED_URL ? (
-        '<h3 style="margin:18px 0 6px;">🌐 ' + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
+        '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('globe', 18) + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
         '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
         '<button type="button" class="home-btn" id="setSyncBtn">🔄 ' + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
@@ -455,11 +457,11 @@
       : accountTabHtml(r, current, others);
 
     body.innerHTML =
-      '<h2 style="margin-top:0;">⚙️ ' + (r ? 'الإعدادات' : 'Settings') + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('gear', 20) + (r ? 'الإعدادات' : 'Settings') + '</h2>' +
       '<div class="settings-tabbar">' +
       SETTINGS_TABS.map(function(t){
         return '<div class="settings-tab' + (t.key === activeSettingsTab ? ' active' : '') + '" data-settings-tab="' + t.key + '">' +
-          '<span class="settings-tab-icon">' + t.icon + '</span><span>' + (r ? t.ar : t.en) + '</span></div>';
+          '<span class="settings-tab-icon">' + window.AAUP_ICONS.preview(t.iconKey, 16) + '</span><span>' + (r ? t.ar : t.en) + '</span></div>';
       }).join('') +
       '</div>' +
       '<div id="settingsTabContent">' + tabContent + '</div>' +

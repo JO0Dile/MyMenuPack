@@ -97,12 +97,13 @@
     var codeEl = card.querySelector('.meta');
     var courseName = nameEl ? nameEl.textContent.trim() : '';
 
+    var ic = window.AAUP_ICONS ? window.AAUP_ICONS.preview : function(){ return ''; };
     menuEl = document.createElement('div');
     menuEl.className = 'course-qa-menu';
     menuEl.innerHTML =
-      '<button type="button" data-qa="toggle">' + (done ? (rtl ? '↺ إلغاء الإنجاز' : '↺ Mark not done') : (rtl ? '✓ إنجاز' : '✓ Mark done')) + '</button>' +
-      '<button type="button" data-qa="open">' + (rtl ? '📖 عرض التفاصيل' : '📖 View details') + '</button>' +
-      '<button type="button" data-qa="copy">' + (rtl ? '🔗 نسخ اسم المساق' : '🔗 Copy course name') + '</button>';
+      '<button type="button" data-qa="toggle">' + ic(done ? 'undo' : 'check', 16) + '<span>' + (done ? (rtl ? 'إلغاء الإنجاز' : 'Mark not done') : (rtl ? 'إنجاز' : 'Mark done')) + '</span></button>' +
+      '<button type="button" data-qa="open">' + ic('book', 16) + '<span>' + (rtl ? 'عرض التفاصيل' : 'View details') + '</span></button>' +
+      '<button type="button" data-qa="copy">' + ic('copy', 16) + '<span>' + (rtl ? 'نسخ اسم المساق' : 'Copy course name') + '</span></button>';
 
     var r = card.getBoundingClientRect();
     document.body.appendChild(menuEl);

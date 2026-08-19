@@ -211,7 +211,7 @@
       var maxCr = rows[0].cmp.keptCr || 1;
       var bar = Math.max(3, Math.round((r.cmp.keptCr / maxCr) * 100));
       return '<button type="button" class="cp-row" data-cp-plan="' + esc(r.id) + '">' +
-        '<span class="cp-row-icon">' + esc(r.plan.icon || '🎓') + '</span>' +
+        '<span class="cp-row-icon">' + window.AAUP_ICONS.markup(r.plan, { size: 22 }) + '</span>' +
         '<span class="cp-row-main">' +
           '<span class="cp-row-name">' + esc(planName(r.plan, rtl)) + '</span>' +
           '<span class="cp-row-col">' + esc(collegeName(r.plan, rtl)) + '</span>' +
@@ -237,7 +237,7 @@
 
     return '<button type="button" class="cp-back" id="cpBack">' + t('back', rtl) + '</button>' +
       '<div class="cp-head">' +
-        '<span class="cp-head-icon">' + esc(to.icon || '🎓') + '</span>' +
+        '<span class="cp-head-icon">' + window.AAUP_ICONS.markup(to, { size: 30 }) + '</span>' +
         '<div><h3>' + esc(planName(to, rtl)) + '</h3>' +
         '<p>' + esc(collegeName(to, rtl)) + ' · ' + c.total + 'H</p></div>' +
       '</div>' +
@@ -281,7 +281,7 @@
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     var from = plans()[fromId] || {};
     var head = (window.__backBarHTML ? window.__backBarHTML('', 'changePlanOverlay', rtl) : '') +
-      '<h2 style="margin-top:0;">🔀 ' + t('title', rtl) + '</h2>' +
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('shuffle', 20) + t('title', rtl) + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' + t('lead', rtl) + '</p>' +
       '<div class="cp-current"><span>' + t('current', rtl) + '</span><b>' +
         esc(planName(from, rtl)) + '</b><span>' + doneIn(fromId).reduce(function(s, d){ return s + d.cr; }, 0) +
