@@ -3425,6 +3425,16 @@
 
   .dev-modal-card{max-width:420px;}
 
+  /* Course Library row list (js/28-imported.js openLibrary/renderList) —
+     was inline-styled per row; pulled into classes so a phone-only override
+     further down can actually win against it (an inline style attribute
+     beats any stylesheet rule short of !important). Values here reproduce
+     the old inline styles exactly, so desktop is pixel-identical. */
+  .lib-row{font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .lib-row-meta{color:var(--text-dim);}
+  .lib-list{max-height:300px;overflow-y:auto;}
+  .lib-add-btn{padding:3px 10px;font-size:11px;}
+
   /* Settings modal's top tab bar — four groups (Account/Preferences/Data/
      Help) instead of one long scroll of every setting stacked together.
      Scrolls horizontally rather than wrapping on the narrowest phones: a
@@ -5695,6 +5705,21 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .course.available:not(.completed){
     box-shadow:0 4px 14px rgba(0,0,0,.22), 0 0 0 1px rgba(111,140,255,.4);
   }
+}
+
+/* ==========================================================================
+   PHONE COURSE LIBRARY — same elevation-list treatment as Contacts/course
+   rows, applied to the plan-editor's course browser (js/28-imported.js
+   openLibrary). .lib-row/.lib-list/.lib-add-btn exist so this can win
+   against nothing else fighting for it — see the base rule's own comment. */
+@media (max-width:720px){
+  .lib-list{max-height:none; display:flex; flex-direction:column; gap:8px;}
+  .lib-row{
+    border-bottom:none; border-radius:12px; padding:11px 13px;
+    background:var(--panel); box-shadow:0 4px 14px rgba(0,0,0,.22);
+    font-size:13px;
+  }
+  .lib-add-btn{border-radius:999px; flex:0 0 auto;}
 }
 
 /* ==========================================================================

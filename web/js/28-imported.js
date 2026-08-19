@@ -1798,9 +1798,9 @@
         });
         if(filtered.length === 0){ return '<p class="ex-note">No matching courses.</p>'; }
         return filtered.map(function(c){
-          return '<div style="font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;">' +
-            '<span>' + c.name + ' <span style="color:var(--text-dim);">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
-            (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '" style="padding:3px 10px;font-size:11px;">➕ Add</button>') +
+          return '<div class="lib-row">' +
+            '<span>' + c.name + ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
+            (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
             '</div>';
         }).join('');
       }
@@ -1810,7 +1810,7 @@
         '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">🔀 Change plan</button>' +
         (currentIsSame ? '<p class="form-note">This is the plan you\u2019re already editing.</p>' : '') +
         '<div class="form-field"><input type="text" id="libSearch" placeholder="Search by name or course code…"></div>' +
-        '<div id="libList" style="max-height:300px;overflow-y:auto;"></div>' +
+        '<div id="libList" class="lib-list"></div>' +
         '<div class="form-actions"><button type="button" class="home-btn" id="libClose">Close</button></div>';
       document.getElementById('libList').innerHTML = renderList('');
       overlay.classList.add('open');
