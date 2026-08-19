@@ -140,6 +140,8 @@
 
   var TX = {
     title: { en: 'When do I graduate?', ar: 'متى أتخرّج؟' },
+    explain: { en: 'Two things decide this date: how many hours you take each term, and how many semesters your remaining prerequisites still need to unlock — whichever takes longer wins.',
+               ar: 'شيئان يحددان هذا التاريخ: كم ساعة تأخذ كل فصل، وكم فصل لسا محتاجه سلسلة المتطلبات المتبقية لتنفتح — الأطول منهما هو اللي يحسم.' },
     load: { en: 'Load per semester', ar: 'الحمل لكل فصل' },
     finish: { en: 'Projected finish', ar: 'الإنهاء المتوقع' },
     sems: { en: '{n} more semester', ar: '{n} فصل إضافي' },
@@ -147,8 +149,10 @@
     hereNow: { en: 'you are here', ar: 'أنت هنا' },
     caveat: { en: 'An estimate: this app does not know your real enrollment date — it assumes a normal Fall/Spring pace starting today.',
               ar: 'تقدير: التطبيق ما بيعرف تاريخ تسجيلك الحقيقي — بيفترض إيقاع خريف/ربيع عادي ابتداءً من اليوم.' },
-    bound: { en: 'Even at {load}H it stays {term} — {chain} is {n} terms deep whatever load you carry.',
-             ar: 'حتى بحمل {load} ساعة رح يضل {term} — سلسلة {chain} عمقها {n} فصول مهما كان حملك.' },
+    bound: { en: 'Raising your load will not move this date. {chain} has to happen one course after the other, and that alone takes {n} semesters — {term} is the earliest this can finish.',
+             ar: 'زيادة حملك لن يقرّب هذا التاريخ. {chain} لازم يصير مساق بعد التاني، وهذا وحده بياخذ {n} فصول — {term} هو أقرب موعد ممكن للتخرج.' },
+    pace: { en: 'Your course load is what is setting this date — raise it above {load}H and you could finish sooner.',
+            ar: 'حملك الدراسي هو اللي يحدد هذا التاريخ — زوّده فوق {load} ساعة ورح تخلص أبكر.' },
     done: { en: 'Nothing left to plan for — every course is done.', ar: 'ما بقي إشي تخطط له — كل المساقات منجزة.' },
     years1: { en: '(≈1 year)', ar: '(≈سنة)' },
     yearsN: { en: '(≈{n} years)', ar: '(≈{n} سنوات)' }
@@ -228,6 +232,7 @@
     var chainNames = chainSlice.join(arrow);
 
     host.innerHTML =
+      '<p class="grad-explain">' + t('explain', rtl) + '</p>' +
       '<div class="grad-head">' +
         '<span class="grad-load-label">' + t('load', rtl) + '</span>' +
         '<span class="grad-load-val" id="' + hostId + 'LoadVal">' + load + 'H</span>' +
@@ -245,7 +250,9 @@
         ? '<p class="grad-note grad-note-bound">' + t('bound', rtl)
             .replace('{load}', load).replace('{term}', termLabel(finish, rtl))
             .replace('{chain}', chainNames).replace('{n}', bottleneck.depth) + '</p>'
-        : '') +
+        : (semesters > 0
+            ? '<p class="grad-note grad-note-pace">' + t('pace', rtl).replace('{load}', load) + '</p>'
+            : '')) +
       '<p class="grad-caveat">' + t('caveat', rtl) + '</p>';
 
     var slider = document.getElementById(hostId + 'Slider');
