@@ -3113,6 +3113,17 @@
     .cp-nums{grid-template-columns:1fr;}
   }
 
+  @media (max-width:720px){
+    .cp-current, .cp-row, .cp-num, .cp-det{
+      border:none; box-shadow:0 4px 14px rgba(0,0,0,.22);
+    }
+    .cp-current{border-radius:14px;}
+    .cp-row{border-radius:14px;}
+    .cp-row:hover{box-shadow:0 4px 14px rgba(0,0,0,.22), 0 0 0 1px var(--accent);}
+    .cp-num{border-radius:12px;}
+    .cp-det{border-radius:12px;}
+  }
+
   /* ---------- semester builder (js/25-advisor.js) ----------
      Was a read-only list of eight courses; a student picking a semester is
      choosing BETWEEN courses, so this is a pool on one side, a tray on the
