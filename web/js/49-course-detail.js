@@ -48,7 +48,9 @@
       term: 'Planned term', unscheduled: 'not scheduled',
       passed: 'Passed', open: 'Unlocked', locked: 'Locked', progress: 'In progress',
       needAll: 'Still needed:', haveAll: 'All prerequisites passed.',
-      opensCount: function(n){ return 'Taking this keeps ' + n + ' later course' + (n === 1 ? '' : 's') + ' on schedule.'; }
+      opensCount: function(n){ return 'Taking this keeps ' + n + ' later course' + (n === 1 ? '' : 's') + ' on schedule.'; },
+      credits: 'Credits', unlocksN: 'Unlocks', status: 'Status',
+      viewTree: 'View in course tree'
     },
     ar: {
       why: 'لماذا يمكنك أخذ هذا المساق الآن',
@@ -63,7 +65,9 @@
       term: 'الفصل المقرر', unscheduled: 'غير مجدول',
       passed: 'منجز', open: 'متاح', locked: 'مغلق', progress: 'قيد الدراسة',
       needAll: 'ما زال مطلوباً:', haveAll: 'جميع المتطلبات السابقة منجزة.',
-      opensCount: function(n){ return 'أخذه الآن يبقي ' + n + ' مساقاً لاحقاً في موعده.'; }
+      opensCount: function(n){ return 'أخذه الآن يبقي ' + n + ' مساقاً لاحقاً في موعده.'; },
+      credits: 'الساعات', unlocksN: 'يفتح', status: 'الحالة',
+      viewTree: 'اعرضه في شجرة المساقات'
     }
   };
 
@@ -137,6 +141,44 @@
     return '<div class="cd-row"><span>' + k + '</span><b>' + esc(v) + '</b></div>';
   }
 
+  // Phone-only additions below (catChipHTML/statTilesHTML/miniChainHTML) —
+  // desktop keeps the original cd-sub line + chainHTML()/opensHTML() prose
+  // as its only content; these are extra markup hidden on desktop by CSS,
+  // not a replacement for it, so nothing here needs its own RTL-desktop
+  // parity beyond what already exists.
+  function catChipHTML(course, cats){
+    var cat = course && course.category;
+    if(!cat) return '';
+    return '<span class="cd-catchip cd-catchip-' + esc(cat) + '">' + esc(cats[cat] || cat) + '</span>';
+  }
+
+  function statTilesHTML(prefix, slug, course, t, st){
+    var unlocks = ((window.__PLAN_DATA[prefix] || {}).unlocksMap || {})[slug] || [];
+    var cr = course && course.creditHours != null ? course.creditHours : null;
+    var stLabel = t[st === 'passed' ? 'passed' : st === 'locked' ? 'locked' : 'open'];
+    var tiles = [];
+    if(cr != null){
+      tiles.push('<div class="cd-stat"><div class="cd-stat-n">' + esc(cr) + '</div><div class="cd-stat-l">' + t.credits + '</div></div>');
+    }
+    tiles.push('<div class="cd-stat"><div class="cd-stat-n">' + unlocks.length + '</div><div class="cd-stat-l">' + t.unlocksN + '</div></div>');
+    tiles.push('<div class="cd-stat"><div class="cd-stat-n">' + esc(stLabel) + '</div><div class="cd-stat-l">' + t.status + '</div></div>');
+    return '<div class="cd-stats">' + tiles.join('') + '</div>';
+  }
+
+  // A compact always-visible chain (just the chips, no paragraph) — the
+  // verbose "why locked"/"what it opens" prose moves into the swipeable
+  // slides below instead of stacking under this.
+  function miniChainHTML(prefix, slug, rtl){
+    var needs = ((window.__PLAN_DATA[prefix] || {}).needsMap || {})[slug] || [];
+    if(!needs.length) return '';
+    var parts = needs.map(function(n){
+      var ok = isPassed(prefix, n);
+      return '<button type="button" class="cd-prereq-chip' + (ok ? ' is-ok' : '') + '" data-goto="' + esc(n) + '">' +
+        courseName(prefix, n, rtl) + '</button>';
+    });
+    return '<div class="cd-mini-chain">' + parts.join('<span class="cd-prereq-arrow">' + (rtl ? '←' : '→') + '</span>') + '</div>';
+  }
+
   // course is the plan's own record (credit hours, term); info is the
   // registered course table (number, theoretical/practical split, Arabic name).
   function build(prefix, slug, course, rtl){
@@ -153,24 +195,27 @@
       : t.unscheduled;
 
     var whyTitle = st === 'passed' ? t.whyDone : st === 'locked' ? t.whyLocked : t.why;
+    var pid = (window.AAUP_GPA && window.AAUP_GPA.primaryId) ? window.AAUP_GPA.primaryId(prefix, slug) : (prefix + '-c-' + slug);
 
     return '<div class="cd" dir="' + (rtl ? 'rtl' : 'ltr') + '">' +
       '<div class="cd-head">' +
-        '<div class="cd-title"><h3>' + name + '</h3>' +
+        '<div class="cd-title">' + catChipHTML(course, cats) + '<h3>' + name + '</h3>' +
           '<div class="cd-sub">' +
-            [info.num || (course && course.courseNumber),
-             (course && course.creditHours != null ? course.creditHours + ' ' + t.chShort : ''),
-             cats[(course && course.category) || ''] || '',
-             term].filter(Boolean).map(esc).join(' · ') +
+            [info.num || (course && course.courseNumber), term].filter(Boolean).map(esc).join(' · ') +
           '</div></div>' +
         '<span class="cd-pill cd-' + st + '">' + stLabel + '</span>' +
       '</div>' +
+      statTilesHTML(prefix, slug, course, t, st) +
+      miniChainHTML(prefix, slug, rtl) +
       '<div class="cd-body">' +
         '<div class="cd-main">' +
-          '<div class="cd-sec"><div class="cd-lbl">' + whyTitle + '</div>' +
-            chainHTML(prefix, slug, rtl, t) + '</div>' +
-          '<div class="cd-sec"><div class="cd-lbl">' + t.opens + '</div>' +
-            opensHTML(prefix, slug, rtl, t) + '</div>' +
+          '<div class="cd-slides" id="cdSlides">' +
+            '<div class="cd-slide"><div class="cd-sec"><div class="cd-lbl">' + whyTitle + '</div>' +
+              chainHTML(prefix, slug, rtl, t) + '</div></div>' +
+            '<div class="cd-slide"><div class="cd-sec"><div class="cd-lbl">' + t.opens + '</div>' +
+              opensHTML(prefix, slug, rtl, t) + '</div></div>' +
+          '</div>' +
+          '<div class="cd-swipe-dots" id="cdSlideDots"><span class="on"></span><span></span></div>' +
           '<div class="cd-extras"></div>' +
         '</div>' +
         '<div class="cd-side">' +
@@ -183,8 +228,47 @@
           (!rtl && info.ar ? row(t.ar, info.ar) : '') +
           row(t.term, term) +
         '</div>' +
-      '</div></div>';
+      '</div>' +
+      '<div class="cd-actions">' +
+        '<button type="button" class="cd-action-primary" id="cdViewTree" data-cd-view-tree="' + esc(pid) + '">' + t.viewTree + '</button>' +
+      '</div>' +
+      '</div>';
   }
 
-  window.AAUP_COURSE_DETAIL = { build: build, status: statusOf, isPassed: isPassed };
+  // Wires the swipe-dot indicator for #cdSlides and the "View in course
+  // tree" action — called by the caller (js/28-imported.js openCourseModal)
+  // right after the built HTML is inserted, same pattern as
+  // __bindCourseModalExtras. No-ops harmlessly on desktop: .cd-slides
+  // there is a normal stacked block with no scroll, so the scroll listener
+  // just never fires.
+  function bind(prefix, slug, container){
+    if(!container) return;
+    var slides = container.querySelector('#cdSlides');
+    var dots = container.querySelector('#cdSlideDots');
+    if(slides && dots){
+      var dotEls = dots.querySelectorAll('span');
+      slides.addEventListener('scroll', function(){
+        var idx = Math.round(slides.scrollLeft / slides.clientWidth);
+        dotEls.forEach(function(d, i){ d.classList.toggle('on', i === idx); });
+      });
+    }
+    var viewTreeBtn = container.querySelector('[data-cd-view-tree]');
+    if(viewTreeBtn){
+      viewTreeBtn.addEventListener('click', function(){
+        var overlay = container.closest('.modal-overlay');
+        if(overlay) overlay.classList.remove('open');
+        var pid = viewTreeBtn.getAttribute('data-cd-view-tree');
+        var el = pid && document.getElementById(pid);
+        if(el){
+          setTimeout(function(){
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('cd-highlight');
+            setTimeout(function(){ el.classList.remove('cd-highlight'); }, 1600);
+          }, 50);
+        }
+      });
+    }
+  }
+
+  window.AAUP_COURSE_DETAIL = { build: build, bind: bind, status: statusOf, isPassed: isPassed };
 })();

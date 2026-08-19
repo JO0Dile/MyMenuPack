@@ -1129,6 +1129,9 @@
       var extrasEl = body.querySelector('.modal-extras');
       window.__bindCourseModalExtras(planId, slug, extrasEl);
     }
+    if(window.AAUP_COURSE_DETAIL && window.AAUP_COURSE_DETAIL.bind){
+      window.AAUP_COURSE_DETAIL.bind(planId, slug, body);
+    }
 
     // A prerequisite chip is a course too. Following one is the whole point of
     // drawing the chain, and it beats closing the panel and hunting the grid.
