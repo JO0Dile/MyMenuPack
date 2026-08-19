@@ -151,6 +151,25 @@
     var courseInfo = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     function nameFor(slug){ var m = courseInfo[slug]; return m ? (rtl ? m.ar : m.name) : slug; }
 
+    // Phone-only hero (see .dash-phone-hero in app.css) — one glanceable
+    // ring instead of the three equal stat tiles below, which is what
+    // .dash-grid/.dash-swipe-dots still are for desktop. Same three
+    // numbers (pct/gpa/achievements) already computed above; this is a
+    // second rendering of them, not a second source of truth.
+    var ringR = 50, ringC = Math.round(2 * Math.PI * ringR * 100) / 100;
+    var ringOffset = Math.round(ringC * (1 - pct / 100) * 100) / 100;
+    var phoneHeroHtml = '<div class="dash-phone-hero">' +
+      '<div class="dph-ring-wrap"><div class="dph-ring-glow"></div><div class="dph-ring">' +
+        '<svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="' + ringR + '"/>' +
+        '<circle class="val" cx="60" cy="60" r="' + ringR + '" stroke-dasharray="' + ringC + '" stroke-dashoffset="' + ringOffset + '"/></svg>' +
+        '<div class="dph-ring-center"><span class="n">' + pct + '%</span><span class="l">' + (rtl ? 'مكتمل' : 'Complete') + '</span></div>' +
+      '</div>' +
+      '<div class="dph-stat-stack">' +
+        '<div class="dph-stat"><div class="n">' + (gpaResult.gpa != null ? gpaResult.gpa.toFixed(2) : '—') + '</div><div class="l">' + (rtl ? 'المعدل التراكمي' : 'Cumulative GPA') + '</div></div>' +
+        '<div class="dph-stat"><div class="n">' + Math.max(0, totalCr - doneCr) + 'H</div><div class="l">' + (rtl ? 'ساعة متبقية' : 'Credits left') + '</div></div>' +
+      '</div></div>' +
+    '</div>';
+
     var host = document.getElementById('dashboard');
     var html = '<div class="dash-header">' +
       '<div class="dash-title"><span class="dash-icon">' + info.icon + '</span><div><h1>' + info.name + '</h1><p>' + (rtl ? 'لوحة التحكم' : 'Dashboard') + '</p></div></div>' +
@@ -158,6 +177,7 @@
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.choosePlan()">' + window.AAUP_ICONS.preview('refresh', 14) + '<span>' + (rtl ? 'تبديل التخصص' : 'Switch Plan') + '</span></button>' +
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">' + window.AAUP_ICONS.preview('planpin', 14) + '<span>' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</span></button>' +
       '</div></div>' +
+      phoneHeroHtml +
       '<div class="dash-swipe-dots" id="' + prefix + '-dashDots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>' +
       '<div class="dash-grid" id="' + prefix + '-dashGrid">' +
         '<div class="dash-card"><h3>' + (rtl ? 'التقدم' : 'Progress') + '</h3><div class="dash-big">' + pct + '%</div><div class="dash-sub">' + doneCr + ' / ' + totalCr + 'H</div></div>' +
@@ -176,20 +196,20 @@
             : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>')) +
       '</div>' +
       '<div class="dash-quicklinks">' +
-        (window.AAUP_ROADMAP ? '<div class="dash-quicklink" onclick="AAUP_ROADMAP.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('compass', 22) + '</span>' + (rtl ? 'مساري الدراسي' : 'My Path') + '</div>' : '') +
-        '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('clipboard', 22) + '</span>' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</div>' +
-        '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('trophy', 22) + '</span>' + (rtl ? 'الإنجازات' : 'Achievements') + '</div>' +
-        '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('brain', 22) + '</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +
-        '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('planpin', 22) + '</span>' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</div>' +
+        (window.AAUP_ROADMAP ? '<div class="dash-quicklink" onclick="AAUP_ROADMAP.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('compass', 22) + '</span><span class="dq-label">' + (rtl ? 'مساري الدراسي' : 'My Path') + '</span></div>' : '') +
+        '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('clipboard', 22) + '</span><span class="dq-label">' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</span></div>' +
+        '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('trophy', 22) + '</span><span class="dq-label">' + (rtl ? 'الإنجازات' : 'Achievements') + '</span></div>' +
+        '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('brain', 22) + '</span><span class="dq-label">' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</span></div>' +
+        '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('planpin', 22) + '</span><span class="dq-label">' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</span></div>' +
         (window.AAUP_SHARE
-          ? '<div class="dash-quicklink" onclick="AAUP_SHARE.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('link', 22) + '</span>' + (rtl ? 'شارك هذه الخطة' : 'Share this plan') + '</div>'
+          ? '<div class="dash-quicklink" onclick="AAUP_SHARE.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('link', 22) + '</span><span class="dq-label">' + (rtl ? 'شارك هذه الخطة' : 'Share this plan') + '</span></div>'
           : '') +
         (window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured()
-          ? '<div class="dash-quicklink" onclick="AAUP_CLOUD.open()"><span class="dq-icon">' + window.AAUP_ICONS.preview('cloud', 22) + '</span>' +
+          ? '<div class="dash-quicklink" onclick="AAUP_CLOUD.open()"><span class="dq-icon">' + window.AAUP_ICONS.preview('cloud', 22) + '</span><span class="dq-label">' +
             (window.AAUP_CLOUD.isSignedIn()
               ? window.__escapeHtml(window.AAUP_CLOUD.displayName())
               : (rtl ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up')) +
-            '</div>'
+            '</span></div>'
           : '') +
       '</div>';
     // Backup nudge: only when there IS meaningful progress to lose, and no
