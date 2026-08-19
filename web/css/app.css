@@ -1739,6 +1739,19 @@
   .wn-worth-line:last-child{margin-bottom:0;}
   .wn-worth-line:before{content:'—'; color:var(--text-dim); flex:0 0 auto;}
 
+  /* Below 600px even one wrapped row doesn't fit two cards side by side —
+     swipe between them instead, a sliver of the next one peeking in as the
+     "there's more" cue. 600px, not the usual 720px breakpoint elsewhere in
+     this file: between 600-720px the rule right below already lays these
+     out as a wrapping row, which handles that width fine on its own. */
+  @media (max-width:599px){
+    .wn-cards{
+      flex-direction:row; flex-wrap:nowrap;
+      overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+    }
+    .wn-cards::-webkit-scrollbar{display:none;}
+    .wn-card{flex:0 0 85%; scroll-snap-align:start;}
+  }
   @media (min-width:600px){
     .wn-cards{flex-direction:row; flex-wrap:wrap;}
     .wn-card{flex:1 1 220px; min-width:0;}
@@ -2179,6 +2192,22 @@
     .gs-layout{flex-direction:row; align-items:flex-start;}
     .gs-col-main{flex:1.4 1 0;}
     .gs-col-side{flex:1 1 0;}
+  }
+
+  /* Below the phone breakpoint, swipe between the two instead of stacking —
+     scroll-snap does the actual paging, js/51-gpa-studio.js's bindSwipeDots
+     only keeps the two dots in sync with which page is showing. */
+  .gs-swipe-dots{display:none;}
+  @media (max-width:720px){
+    .gs-swipe-dots{display:flex; justify-content:center; gap:6px; margin:0 0 8px;}
+    .gs-swipe-dots span{width:6px; height:6px; border-radius:50%; background:var(--line);}
+    .gs-swipe-dots span.active{background:var(--accent);}
+    .gs-layout{
+      flex-direction:row; flex-wrap:nowrap;
+      overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+    }
+    .gs-layout::-webkit-scrollbar{display:none;}
+    .gs-col-main, .gs-col-side{flex:0 0 100%; min-width:100%; scroll-snap-align:start;}
   }
 
   .gs-card{
@@ -2767,6 +2796,10 @@
 
   /* ---------- share link + QR (js/72-share.js) ---------- */
   .share-loading{font-size:12.5px;color:var(--text-dim);}
+  .share-native-btn{
+    display:flex;width:100%;justify-content:center;margin:14px 0 0;
+    background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:800;
+  }
   .share-link-row{display:flex;gap:8px;margin:12px 0 18px;}
   .share-link-input{
     flex:1 1 auto;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;
@@ -3715,6 +3748,14 @@
   }
   .th-localnote{margin-top:14px;}
   .th-list{display:grid;gap:10px;}
+  .th-pull-hint{
+    height:var(--th-pull, 0px); overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; color:var(--text-dim);
+    transition:height .15s ease;
+  }
+  .th-pull-hint.th-pull-ready{color:var(--accent);}
+  .th-pull-hint.th-pull-active{height:30px;}
   .th-item{
     background:var(--panel);border:1px solid var(--line);border-radius:10px;
     padding:11px 13px;position:relative;
@@ -4122,6 +4163,21 @@
   .dash-header p{margin:2px 0 0;font-size:12px;color:var(--text-dim);}
   .dash-actions{display:flex;gap:8px;flex-wrap:wrap;}
   .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px;}
+  /* Below the phone breakpoint the auto-fit grid above already collapses
+     to one column — each stat tile ate a full screen row before you even
+     reached the graduation card. Swipe between them instead. */
+  .dash-swipe-dots{display:none;}
+  @media (max-width:720px){
+    .dash-swipe-dots{display:flex; justify-content:center; gap:6px; margin:0 0 8px;}
+    .dash-swipe-dots span{width:6px; height:6px; border-radius:50%; background:var(--line);}
+    .dash-swipe-dots span.active{background:var(--accent);}
+    .dash-grid{
+      display:flex; flex-direction:row; flex-wrap:nowrap;
+      overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none;
+    }
+    .dash-grid::-webkit-scrollbar{display:none;}
+    .dash-grid > .dash-card{flex:0 0 100%; min-width:100%; scroll-snap-align:start;}
+  }
   .dash-card{
     background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;
   }

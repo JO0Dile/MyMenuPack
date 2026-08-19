@@ -125,7 +125,8 @@
     tooBig: { en: 'This plan is too large to fit in a QR code — the link above still works, just send it directly.',
               ar: 'هاي الخطة كبيرة كثير على رمز QR — بس الرابط فوق يشتغل تمام، ابعته مباشرة.' },
     building: { en: 'Building your link…', ar: 'عم نجهّز رابطك…' },
-    error: { en: 'Could not build a share link for this plan.', ar: 'ما قدرنا نجهّز رابط مشاركة لهاي الخطة.' }
+    error: { en: 'Could not build a share link for this plan.', ar: 'ما قدرنا نجهّز رابط مشاركة لهاي الخطة.' },
+    shareVia: { en: '📤 Share via…', ar: '📤 شارك عبر…' }
   };
   function t(k, r){ return r ? TX[k].ar : TX[k].en; }
 
@@ -145,6 +146,7 @@
         (window.__backBarHTML ? window.__backBarHTML('', 'shareOverlay', rtl) : '') +
         '<h2 style="margin-top:0;">🔗 ' + t('title', rtl) + '</h2>' +
         '<p class="form-note" style="margin-top:0;">' + t(res.isCustom ? 'customLead' : 'builtinLead', rtl) + '</p>' +
+        (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + t('shareVia', rtl) + '</button>' : '') +
         '<div class="share-link-row">' +
           '<input type="text" id="shareLinkInput" class="share-link-input" readonly dir="ltr" value="' + esc(res.url) + '">' +
           '<button type="button" class="home-btn" id="shareCopyBtn">📋 ' + t('copy', rtl) + '</button>' +
@@ -153,6 +155,19 @@
           '<p class="share-qr-label">' + t('scan', rtl) + '</p>' +
           '<canvas id="' + qrCanvasId + '" class="share-qr-canvas"></canvas>' +
         '</div>';
+
+      // The native share sheet, when the platform has one, goes straight
+      // into whatever app the student actually wants to send this through —
+      // WhatsApp, Telegram, a text message — instead of "copy link, then go
+      // find the app, then paste." Copy-link and the QR code stay exactly
+      // as they were beneath it: still the only option on desktop, and
+      // still there on phone for a chat client this sheet doesn't offer.
+      var nativeBtn = document.getElementById('shareNativeBtn');
+      if(nativeBtn){
+        nativeBtn.addEventListener('click', function(){
+          navigator.share({ title: t('title', rtl), url: res.url }).catch(function(){});
+        });
+      }
 
       var input = document.getElementById('shareLinkInput');
       var copyBtn = document.getElementById('shareCopyBtn');
@@ -213,6 +228,28 @@
   // is happening, so it always wins over whatever was open last.
   function handleIncomingShare(){
     var hash = location.hash || '';
+    // Home-screen shortcuts (web/manifest.json's own "shortcuts" array) land
+    // here the same way a share link does — a fresh launch, hash already
+    // set. They assume "continue with whatever plan I already had open",
+    // the same plan window.AAUP_DASHBOARD already remembers between
+    // visits, so a first-time visitor with no plan yet just quietly lands
+    // on the normal picker instead — there is nothing yet for the shortcut
+    // to act on.
+    if(hash.indexOf('#action=') === 0){
+      var action = hash.slice(8);
+      history.replaceState(null, '', location.pathname + location.search);
+      var actionPrefix = window.AAUP_DASHBOARD ? window.AAUP_DASHBOARD.getSelected() : null;
+      if(!actionPrefix) return;
+      window.AAUP_DASHBOARD.selectAndOpen(actionPrefix);
+      if(action === 'assistant' && window.AAUP_ASSISTANT_UI){
+        setTimeout(function(){ window.AAUP_ASSISTANT_UI.open(); }, 300);
+      } else if(action === 'gpa' && window.AAUP_AUDIT){
+        setTimeout(function(){ window.AAUP_AUDIT.open(actionPrefix); }, 300);
+      } else if(action === 'share' && window.AAUP_SHARE){
+        setTimeout(function(){ window.AAUP_SHARE.open(actionPrefix); }, 300);
+      }
+      return;
+    }
     if(hash.indexOf('#plan=') === 0){
       var prefix = decodeURIComponent(hash.slice(6));
       history.replaceState(null, '', location.pathname + location.search);

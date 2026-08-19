@@ -158,7 +158,8 @@
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.choosePlan()">🔁 ' + (rtl ? 'تبديل التخصص' : 'Switch Plan') + '</button>' +
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">🗺️ ' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</button>' +
       '</div></div>' +
-      '<div class="dash-grid">' +
+      '<div class="dash-swipe-dots" id="' + prefix + '-dashDots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>' +
+      '<div class="dash-grid" id="' + prefix + '-dashGrid">' +
         '<div class="dash-card"><h3>' + (rtl ? 'التقدم' : 'Progress') + '</h3><div class="dash-big">' + pct + '%</div><div class="dash-sub">' + doneCr + ' / ' + totalCr + 'H</div></div>' +
         '<div class="dash-card"><h3>GPA</h3><div class="dash-big">' + (gpaResult.gpa != null ? gpaResult.gpa.toFixed(2) : '\u2014') + '</div><div class="dash-sub">' + (standingLabel || (rtl ? 'لم تُدخل علامات بعد' : 'No grades entered yet')) + '</div></div>' +
         '<div class="dash-card"><h3>' + (rtl ? 'الإنجازات' : 'Achievements') + '</h3><div class="dash-big">' + achv.unlocked + ' / ' + achv.total + '</div><div class="dash-sub">' + (rtl ? 'مُنجَز' : 'unlocked') + '</div></div>' +
@@ -205,6 +206,18 @@
     host.innerHTML = html;
     if(window.AAUP_WHATS_NEXT){ window.AAUP_WHATS_NEXT.render(prefix, prefix + '-dashNextBody'); }
     if(window.AAUP_GRADUATION){ window.AAUP_GRADUATION.render(prefix, prefix + '-dashGradBody'); }
+    // Phone only (see .dash-swipe-dots in app.css) — the three stat tiles
+    // swipe side by side there instead of stacking; the dots are decorative
+    // sync only, scroll-snap already does the actual paging.
+    var dashGrid = document.getElementById(prefix + '-dashGrid');
+    var dashDots = document.getElementById(prefix + '-dashDots');
+    if(dashGrid && dashDots){
+      var dots = dashDots.querySelectorAll('span');
+      dashGrid.addEventListener('scroll', function(){
+        var idx = Math.round(dashGrid.scrollLeft / Math.max(1, dashGrid.clientWidth));
+        dots.forEach(function(d, i){ d.classList.toggle('active', i === idx); });
+      }, { passive: true });
+    }
   }
 
   // showPage('home') now means "take me to my personal landing point" —
