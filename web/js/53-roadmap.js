@@ -325,13 +325,19 @@
       // Deduped the same way as the breakdown below — a lecture and its lab
       // are one registered course, so Year 1 read 48 CH when it is 44.
       var chSum = yearHours(prefix, i);
-      // Each node is a button: pressing a year swaps the breakdown below to
-      // that year's requirement buckets. That is the whole point of the
-      // screen — "what do I still owe, and in which category".
+      // Each node is a button. On desktop, pressing a year swaps the shared
+      // breakdown panel further down the page to that year's requirement
+      // buckets. On phone (see bindScopeTabs) it instead expands the
+      // .ro-inline-panel right below THIS card — an accordion, one open at a
+      // time, with the chevron flipping to say which — because "press a
+      // year, the answer appears somewhere else on the screen" was never
+      // the ask; the answer belongs right where you pressed.
       timelineParts.push(
         '<button type="button" class="ro-node-wrap" data-ro-scope="' + i + '"' +
+          ' aria-expanded="false"' +
           ' aria-label="' + esc((rtl ? 'تفصيل ' : 'Breakdown for ') + (y.label || ((rtl ? 'سنة ' : 'Year ') + (i + 1)))) + '">' +
           '<div class="ro-node ro-node-' + st + '"></div>' +
+          '<div class="ro-node-body">' +
           '<div class="ro-node-label">' + esc(y.label || ((rtl ? 'سنة ' : 'Year ') + (i + 1))) + '</div>' +
           // The status label used to REPLACE the hours, so the year you are
           // actually in was the one year whose size you could not see.
@@ -339,7 +345,10 @@
             (STATUS_LABEL[st] ? esc(STATUS_LABEL[st]) + (chSum ? ' · ' + Math.round(chSum) + ' CH' : '')
                               : (chSum ? Math.round(chSum) + ' CH' : '')) +
           '</div>' +
-        '</button>'
+          '</div>' +
+          '<span class="ro-node-chevron">' + window.AAUP_ICONS.preview('chevron', 16) + '</span>' +
+        '</button>' +
+        '<div class="ro-inline-panel" data-ro-panel="' + i + '"></div>'
       );
       timelineParts.push('<div class="ro-connector ro-connector-' + st + '"></div>');
     });
@@ -355,24 +364,37 @@
     if(electiveCr > 0){
       timelineParts.push(
         '<button type="button" class="ro-node-wrap" data-ro-scope="electives"' +
+          ' aria-expanded="false"' +
           ' aria-label="' + (rtl ? 'تفصيل المواد الاختيارية' : 'Breakdown for the electives you choose') + '">' +
           '<div class="ro-node ro-node-future"></div>' +
+          '<div class="ro-node-body">' +
           '<div class="ro-node-label">' + (rtl ? 'اختيارية' : 'Electives') + '</div>' +
           '<div class="ro-node-sub">' + Math.round(electiveCr) + ' CH' +
             (electivePick ? ' · ' + (rtl
               ? ('اختر ' + electivePick.need + ' من ' + electivePick.from)
               : ('pick ' + electivePick.need + ' of ' + electivePick.from)) : '') +
           '</div>' +
-        '</button>'
+          '</div>' +
+          '<span class="ro-node-chevron">' + window.AAUP_ICONS.preview('chevron', 16) + '</span>' +
+        '</button>' +
+        '<div class="ro-inline-panel" data-ro-panel="electives"></div>'
       );
       timelineParts.push('<div class="ro-connector ro-connector-future"></div>');
     }
+    // "Whole plan" is not part of the accordion — the static summary card
+    // right after the timeline (see the .ro-breakdown section below) already
+    // shows this at all times on phone, so there is nothing here for a press
+    // to reveal; on phone this button just scrolls that card into view (see
+    // bindScopeTabs). Desktop keeps its original behaviour untouched: this
+    // is the shared panel's default selected node.
     timelineParts.push(
-      '<button type="button" class="ro-node-wrap" data-ro-scope="all"' +
+      '<button type="button" class="ro-node-wrap ro-node-wrap-plain" data-ro-scope="all"' +
         ' aria-label="' + (rtl ? 'تفصيل الخطة كاملة' : 'Breakdown for the whole plan') + '">' +
         '<div class="ro-node ro-node-future ro-node-grad"></div>' +
+        '<div class="ro-node-body">' +
         '<div class="ro-node-label">' + (rtl ? 'الخطة كاملة' : 'Whole plan') + '</div>' +
         '<div class="ro-node-sub">' + (totalCr ? (Math.round(totalCr) + ' CH') : '') + '</div>' +
+        '</div>' +
       '</button>'
     );
     var timelineHTML = '<div class="ro-timeline">' + timelineParts.join('') + '</div>';
@@ -391,7 +413,8 @@
         var rest = y.courses.length - shown.length;
         return '<div class="ro-card ro-card-' + st + '" data-ro-card="' + i + '">' +
           y.courses.map(function(c, ci){
-            return '<div class="ro-course' + (ci >= MAX_PREVIEW ? ' ro-course-extra' : '') + '">' +
+            return '<div class="ro-course' + (ci >= MAX_PREVIEW ? ' ro-course-extra' : '') + (c.done ? ' ro-course-done' : '') + '">' +
+              '<span class="ro-course-check" aria-hidden="true">' + window.AAUP_ICONS.preview('check', 13) + '</span>' +
               '<span class="ro-course-name">' + esc(c.name) + '</span>' +
               (c.cr !== '' ? '<span class="ro-course-cr">' + esc(c.cr) + '</span>' : '') + '</div>';
           }).join('') +
@@ -424,9 +447,12 @@
       timelineHTML +
       '<div class="ro-breakdown" id="roBreakdown">' +
         '<div class="ro-bd-head"><h3 id="roBreakdownTitle">' + (rtl ? 'الخطة كاملة' : 'Whole plan') + '</h3>' +
-        '<p class="form-note" style="margin:2px 0 0;">' + (rtl
-          ? 'اضغط أي سنة في الشريط أعلاه لعرض تفصيلها.'
-          : 'Press any year on the track above to see its breakdown.') + '</p></div>' +
+        // On phone this panel never changes — pressing a year expands its
+        // own card in place instead — so the hint has to say that, not the
+        // desktop instruction ("press any year to see its breakdown here").
+        '<p class="form-note" style="margin:2px 0 0;">' + ((window.matchMedia && window.matchMedia('(max-width:720px)').matches)
+          ? (rtl ? 'تفصيل كامل عبر كل فئات المتطلبات.' : 'Your full breakdown across every requirement category.')
+          : (rtl ? 'اضغط أي سنة في الشريط أعلاه لعرض تفصيلها.' : 'Press any year on the track above to see its breakdown.')) + '</p></div>' +
         '<div id="roBreakdownBody">' + breakdownHTML(prefix, null, rtl) + '</div>' +
         planTotalNote(prefix, computedCr, rtl) +
       '</div>' +
@@ -471,6 +497,47 @@
     var titleEl = body.querySelector('#roBreakdownTitle');
     var bodyEl = body.querySelector('#roBreakdownBody');
     if(!track || !bodyEl) return;
+    var isPhone = window.matchMedia && window.matchMedia('(max-width:720px)').matches;
+
+    if(isPhone){
+      // Accordion: pressing a year expands the .ro-inline-panel right below
+      // THAT card — one open at a time, closing whichever other one was
+      // open — instead of a shared panel further down the page changing out
+      // from under a press somewhere else on screen. "Whole plan" sits
+      // outside the accordion: its own numbers are always on screen already
+      // (the static card right after the timeline, #roBreakdown), so a
+      // press there just scrolls to it rather than expanding anything.
+      track.addEventListener('click', function(e){
+        var btn = e.target.closest('[data-ro-scope]');
+        if(!btn) return;
+        var scope = btn.getAttribute('data-ro-scope');
+        if(scope === 'all'){
+          if(bodyEl.closest('#roBreakdown')) bodyEl.closest('#roBreakdown').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+        var panel = track.querySelector('.ro-inline-panel[data-ro-panel="' + scope + '"]');
+        if(!panel) return;
+        var wasOpen = btn.classList.contains('ro-node-open');
+        track.querySelectorAll('.ro-node-wrap.ro-node-open').forEach(function(openBtn){
+          openBtn.classList.remove('ro-node-open');
+          openBtn.setAttribute('aria-expanded', 'false');
+          var openPanel = track.querySelector('.ro-inline-panel[data-ro-panel="' + openBtn.getAttribute('data-ro-scope') + '"]');
+          if(openPanel) openPanel.classList.remove('ro-inline-panel-open');
+        });
+        if(!wasOpen){
+          btn.classList.add('ro-node-open');
+          btn.setAttribute('aria-expanded', 'true');
+          if(!panel.__roFilled){
+            var idx = scope === 'electives' ? 'electives' : Number(scope);
+            panel.innerHTML = breakdownHTML(prefix, idx, rtl);
+            panel.__roFilled = true;
+          }
+          panel.classList.add('ro-inline-panel-open');
+        }
+      });
+      return bindExpandButtons(body);
+    }
+
     var select = function(btn){
       var scope = btn.getAttribute('data-ro-scope');
       track.querySelectorAll('[data-ro-scope]').forEach(function(b){ b.classList.remove('ro-node-active'); });
@@ -489,24 +556,26 @@
     var initial = track.querySelector('[data-ro-scope="all"]');
     if(initial) initial.classList.add('ro-node-active');
 
-    // "+ N more" opens the rest of that year's courses in place.
-    //
-    // Bound to the modal body, which SURVIVES a re-render (only its innerHTML
-    // is replaced), so it must be bound exactly once — open() can run more
-    // than once for the same plan, and two copies of this handler toggled the
-    // class on and straight back off, which looked exactly like the button
-    // being dead.
-    if(!body.__roExpandBound){
-      body.__roExpandBound = true;
-      body.addEventListener('click', function(e){
-        var btn = e.target.closest('[data-ro-expand]');
-        if(!btn) return;
-        var card = btn.closest('.ro-card');
-        if(!card) return;
-        var open = card.classList.toggle('ro-card-open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-    }
+    bindExpandButtons(body);
+  }
+
+  // "+ N more" opens the rest of that year's swipeable-card course list in
+  // place. Bound to the modal body, which SURVIVES a re-render (only its
+  // innerHTML is replaced), so it must be bound exactly once — open() can
+  // run more than once for the same plan, and two copies of this handler
+  // toggled the class on and straight back off, which looked exactly like
+  // the button being dead.
+  function bindExpandButtons(body){
+    if(body.__roExpandBound) return;
+    body.__roExpandBound = true;
+    body.addEventListener('click', function(e){
+      var btn = e.target.closest('[data-ro-expand]');
+      if(!btn) return;
+      var card = btn.closest('.ro-card');
+      if(!card) return;
+      var open = card.classList.toggle('ro-card-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
   }
 
   function close(){
