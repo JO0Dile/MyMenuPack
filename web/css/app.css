@@ -2428,10 +2428,20 @@
   .ro-card{background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px;}
   .ro-card-current{border-color:var(--accent);}
   .ro-card-done{opacity:.72;}
-  .ro-course{display:flex; justify-content:space-between; align-items:baseline; gap:6px; padding:6px 0; border-top:1px solid var(--line); font-size:12px;}
+  .ro-course{display:flex; align-items:baseline; gap:6px; padding:6px 0; border-top:1px solid var(--line); font-size:12px;}
   .ro-course:first-child{border-top:none; padding-top:0;}
-  .ro-course-name{color:var(--text); overflow-wrap:anywhere;}
+  .ro-course-name{flex:1 1 auto; min-width:0; color:var(--text); overflow-wrap:anywhere;}
   .ro-course-cr{color:var(--text-dim); font-size:10.5px; white-space:nowrap; flex:none;}
+  /* Reserved on every row (not just done ones) so the name column still
+     lines up whether or not a course carries the mark — a check that only
+     sometimes exists would shift every other row's text sideways next to it. */
+  .ro-course-check{
+    flex:none; align-self:center; width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; visibility:hidden;
+    background:rgba(111,140,255,.16); border:1.5px solid var(--accent);
+  }
+  .ro-course-check .app-icon-svg{width:9px; height:9px; color:var(--accent);}
+  .ro-course-done .ro-course-check{visibility:visible;}
   /* Was a plain div in the accent colour — it read as a link and did
      nothing when pressed. Now a real button that opens the rest of the year
      in place, and it looks pressable. */
@@ -2600,6 +2610,44 @@
     }
     html[dir="rtl"] .ro-connector, .plan-page.rtl-mode .ro-connector{margin:0 7px 0 0;}
     .ro-connector-current{background:linear-gradient(180deg,#2ecc71,var(--accent));}
+
+    /* .ro-node-body wraps label+sub so the row can hold a third item (the
+       chevron) without the dot/label/sub flex math changing. */
+    .ro-node-body{flex:1 1 auto; min-width:0;}
+    .ro-node-chevron{
+      flex:none; margin-top:3px; color:var(--text-dim);
+      transition:transform .25s ease, color .2s ease;
+    }
+    .ro-node-wrap.ro-node-open .ro-node-chevron{transform:rotate(180deg); color:var(--accent);}
+    .ro-node-wrap.ro-node-open .ro-node-label{color:var(--accent);}
+
+    /* The category breakdown for a pressed year slides out right under that
+       year's own card — an accordion, not a shared panel elsewhere on the
+       page (see bindScopeTabs' isPhone branch). Padding animates alongside
+       max-height so a collapsed panel takes no space at all, not just
+       "no visible content"; .ro-bd-* inside is the exact same breakdown
+       markup/CSS the desktop panel already uses. */
+    .ro-inline-panel{
+      max-height:0; opacity:0; overflow:hidden;
+      margin:0 0 0 28px; padding:0 14px;
+      background:var(--panel); border:1px solid transparent; border-radius:12px;
+      transition:max-height .3s ease, opacity .25s ease, padding .25s ease, margin .25s ease, border-color .25s ease;
+    }
+    html[dir="rtl"] .ro-inline-panel, .plan-page.rtl-mode .ro-inline-panel{margin:0 28px 0 0;}
+    .ro-inline-panel-open{
+      max-height:2000px; opacity:1; padding:14px; margin:10px 0 14px 28px;
+      border-color:var(--line);
+    }
+    html[dir="rtl"] .ro-inline-panel-open, .plan-page.rtl-mode .ro-inline-panel-open{margin:10px 28px 14px 0;}
+    /* The breakdown's own ring/figures crowd a 28px-narrower column — same
+       shrink the 520px breakpoint already gives the shared panel. */
+    .ro-inline-panel .ro-bd-figures{gap:14px;}
+    .ro-inline-panel .ro-bd-ring{width:64px; height:64px;}
+    .ro-inline-panel .ro-bd-ring span{width:48px; height:48px; font-size:14px;}
+
+    @media (prefers-reduced-motion:reduce){
+      .ro-node-chevron, .ro-inline-panel{transition:none;}
+    }
   }
 
   /* ================= PREREQUISITE MAP (what course search opens now) ================= */
