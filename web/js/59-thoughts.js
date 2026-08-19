@@ -353,24 +353,40 @@
     return rtl ? ('قبل ' + d + ' يوم') : (d + 'd ago');
   }
 
+  // Two letters, not a rendered photo — nothing here has an avatar image to
+  // show, and the mockup's own wall gets away with exactly this: initials in
+  // a circle. Arabic names split on the same spaces; RTL just reverses which
+  // glyph reads first, which initials do not care about.
+  function initials(name){
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if(!parts.length) return '?';
+    var first = parts[0].charAt(0);
+    var second = parts.length > 1 ? parts[1].charAt(0) : '';
+    return (first + second).toUpperCase();
+  }
+
   function thoughtHTML(t, rtl){
     var isMine = t.by === deviceId();
+    var name = t.name || (rtl ? 'طالب' : 'A student');
     // Reactions need a real shared wall to mean anything — a device with no
     // server configured only ever sees its own thoughts, so there is nothing
     // to react to.
     var myReaction = endpoint() ? (loadReactions()[t.id] || null) : null;
     return '<div class="th-item' + (isMine ? ' th-mine' : '') + '">' +
-      '<div class="th-head">' +
-        '<span class="th-who">' + esc(t.name || (rtl ? 'طالب' : 'A student')) + '</span>' +
-        '<span class="th-when">' + esc(timeAgo(t.at, rtl)) + '</span>' +
+      '<div class="th-av" aria-hidden="true">' + esc(initials(name)) + '</div>' +
+      '<div class="th-body">' +
+        '<div class="th-head">' +
+          '<span class="th-who">' + esc(name) + '</span>' +
+          '<span class="th-when">' + esc(timeAgo(t.at, rtl)) + '</span>' +
+        '</div>' +
+        '<p class="th-bubble">' + esc(t.text) + '</p>' +
+        (endpoint() ? '<div class="th-react">' +
+          '<button type="button" class="th-react-btn' + (myReaction === 'up' ? ' active' : '') + '" data-th-react="up" data-th-id="' + esc(t.id) + '">👍 <span>' + (t.up || 0) + '</span></button>' +
+          '<button type="button" class="th-react-btn' + (myReaction === 'down' ? ' active' : '') + '" data-th-react="down" data-th-id="' + esc(t.id) + '">👎 <span>' + (t.down || 0) + '</span></button>' +
+        '</div>' : '') +
+        (isMine ? '<button type="button" class="th-del" data-th-del="' + esc(t.id) + '">' +
+          (rtl ? 'حذف' : 'Delete') + '</button>' : '') +
       '</div>' +
-      '<p class="th-text">' + esc(t.text) + '</p>' +
-      (endpoint() ? '<div class="th-react">' +
-        '<button type="button" class="th-react-btn' + (myReaction === 'up' ? ' active' : '') + '" data-th-react="up" data-th-id="' + esc(t.id) + '">👍<span>' + (t.up || 0) + '</span></button>' +
-        '<button type="button" class="th-react-btn' + (myReaction === 'down' ? ' active' : '') + '" data-th-react="down" data-th-id="' + esc(t.id) + '">👎<span>' + (t.down || 0) + '</span></button>' +
-      '</div>' : '') +
-      (isMine ? '<button type="button" class="th-del" data-th-del="' + esc(t.id) + '">' +
-        (rtl ? 'حذف' : 'Delete') + '</button>' : '') +
       '</div>';
   }
 
@@ -388,22 +404,16 @@
       // into the bar with no heading at all, which rendered as one run-on
       // line ("←Back STUDENT THOUGHTS") instead of a page title.
       window.__backBarHTML('', 'thoughtsModalOverlay', rtl) +
-      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('speech', 20) + (rtl ? 'أفكار الطلاب' : 'Student Thoughts') + '</h2>' +
-      '<p class="form-note" style="margin-top:0;">' +
+      '<div class="th-topbar">' +
+        '<h2 class="mh" style="margin:0;">' + window.AAUP_ICONS.preview('speech', 20) + (rtl ? 'أفكار الطلاب' : 'Student Thoughts') + '</h2>' +
+        '<span class="th-live' + (endpoint() ? '' : ' th-live-off') + '"><i></i>' +
+          (endpoint() ? (rtl ? 'مباشر' : 'Live') : (rtl ? 'محلي' : 'Local')) + '</span>' +
+      '</div>' +
+      '<p class="form-note" style="margin-top:2px;">' +
         (rtl
           ? 'اكتب سطرًا يشوفه كل طالب في نفس التخصص. بلا شتائم — الفلتر بيرفضها فورًا.'
           : 'Write one line every student on this plan can see. No abuse — the filter rejects it on the spot.') +
       '</p>' +
-      '<div class="th-compose">' +
-        '<textarea id="thInput" maxlength="' + MAX_LEN + '" rows="3" placeholder="' +
-          (rtl ? 'شو رأيك بهالفصل؟' : 'What is on your mind about this semester?') + '"></textarea>' +
-        '<div class="th-compose-row">' +
-          '<span class="th-count" id="thCount">0 / ' + MAX_LEN + '</span>' +
-          '<button type="button" class="home-btn th-send" id="thSend">' +
-            (rtl ? 'إرسال' : 'Send') + '</button>' +
-        '</div>' +
-        '<p class="th-error" id="thError" role="alert" hidden></p>' +
-      '</div>' +
       (queued ? '<p class="th-queued">' + (rtl
         ? ('في ' + queued + ' فكرة بانتظار الإرسال — رح تُعاد المحاولة تلقائيًا.')
         : (queued + ' thought' + (queued === 1 ? '' : 's') + ' waiting to send — this device will keep retrying automatically.')) + '</p>' : '') +
@@ -417,7 +427,22 @@
       '</div>' +
       (endpoint() ? '' : '<p class="form-note th-localnote">' + (rtl
         ? 'الوضع المحلي: أفكارك محفوظة على جهازك فقط، لأن خادم الأفكار غير مُهيّأ بعد.'
-        : 'Local mode: your thoughts stay on this device — the thoughts server is not configured yet.') + '</p>');
+        : 'Local mode: your thoughts stay on this device — the thoughts server is not configured yet.') + '</p>') +
+      // Pinned to the bottom of the sheet (see the phone-only sticky rule on
+      // .th-compose) — the compose box for a message wall belongs where a
+      // chat app always puts one, not stacked above the messages it is
+      // about to add to.
+      '<div class="th-compose">' +
+        '<p class="th-error" id="thError" role="alert" hidden></p>' +
+        '<div class="th-compose-row">' +
+          '<textarea id="thInput" maxlength="' + MAX_LEN + '" rows="1" placeholder="' +
+            (rtl ? 'شو رأيك بهالفصل؟' : 'What is on your mind about this semester?') + '"></textarea>' +
+          '<button type="button" class="th-send" id="thSend" aria-label="' + (rtl ? 'إرسال' : 'Send') + '">' +
+            window.AAUP_ICONS.preview('send', 16) +
+          '</button>' +
+        '</div>' +
+        '<span class="th-count" id="thCount">0 / ' + MAX_LEN + '</span>' +
+      '</div>';
 
     bind(prefix, rtl);
   }
@@ -429,9 +454,14 @@
     var error = document.getElementById('thError');
     if(!input || !send) return;
 
+    // Starts at one row (a chat input, not a form textarea) and grows only
+    // as far as an actual multi-line thought needs — capped so one very
+    // long line can't push the send button off the bottom of the screen.
     input.addEventListener('input', function(){
       count.textContent = input.value.length + ' / ' + MAX_LEN;
       error.hidden = true;
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 110) + 'px';
     });
 
     send.addEventListener('click', function(){

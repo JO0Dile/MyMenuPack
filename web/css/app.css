@@ -2592,7 +2592,7 @@
       flex-direction:row; align-items:flex-start; justify-content:flex-start;
       width:100%; text-align:left; gap:12px; padding:0;
     }
-    html[dir="rtl"] .ro-node-wrap, .plan-page.rtl-mode .ro-node-wrap{text-align:right;}
+    [dir="rtl"] .ro-node-wrap, .plan-page.rtl-mode .ro-node-wrap{text-align:right;}
     .ro-node{margin-top:3px; flex:none;}
     .ro-node-label{margin-top:0; font-size:13.5px;}
     .ro-node-sub{text-transform:none; letter-spacing:0; font-size:11px;}
@@ -2608,7 +2608,7 @@
       width:2px; height:20px; min-width:0; flex:none;
       margin:0 0 0 7px; background:var(--line);
     }
-    html[dir="rtl"] .ro-connector, .plan-page.rtl-mode .ro-connector{margin:0 7px 0 0;}
+    [dir="rtl"] .ro-connector, .plan-page.rtl-mode .ro-connector{margin:0 7px 0 0;}
     .ro-connector-current{background:linear-gradient(180deg,#2ecc71,var(--accent));}
 
     /* .ro-node-body wraps label+sub so the row can hold a third item (the
@@ -2633,12 +2633,12 @@
       background:var(--panel); border:1px solid transparent; border-radius:12px;
       transition:max-height .3s ease, opacity .25s ease, padding .25s ease, margin .25s ease, border-color .25s ease;
     }
-    html[dir="rtl"] .ro-inline-panel, .plan-page.rtl-mode .ro-inline-panel{margin:0 28px 0 0;}
+    [dir="rtl"] .ro-inline-panel, .plan-page.rtl-mode .ro-inline-panel{margin:0 28px 0 0;}
     .ro-inline-panel-open{
       max-height:2000px; opacity:1; padding:14px; margin:10px 0 14px 28px;
       border-color:var(--line);
     }
-    html[dir="rtl"] .ro-inline-panel-open, .plan-page.rtl-mode .ro-inline-panel-open{margin:10px 28px 14px 0;}
+    [dir="rtl"] .ro-inline-panel-open, .plan-page.rtl-mode .ro-inline-panel-open{margin:10px 28px 14px 0;}
     /* The breakdown's own ring/figures crowd a 28px-narrower column — same
        shrink the 520px breakpoint already gives the shared panel. */
     .ro-inline-panel .ro-bd-figures{gap:14px;}
@@ -3979,30 +3979,24 @@
   }
 
   /* ---------- Thoughts (js/59-thoughts.js) ---------- */
-  .th-compose{
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:12px;margin-bottom:14px;
+  /* A message wall reads like messages — avatar, name, a bubble, reaction
+     pills tucked under it — not a stack of identical bordered cards where
+     every student's post looked like a form entry. */
+  .th-topbar{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .th-live{
+    display:flex; align-items:center; gap:5px; flex:none;
+    font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em;
+    color:#2ecc71; background:rgba(46,204,113,.14); border-radius:999px; padding:4px 10px 4px 8px;
   }
-  .th-compose textarea{
-    width:100%;resize:vertical;min-height:64px;
-    background:var(--search-bg);color:var(--text);
-    border:1px solid var(--line);border-radius:8px;padding:10px;
-    font-family:inherit;font-size:13.5px;line-height:1.5;
-  }
-  .th-compose textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
-  .th-compose-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;}
-  .th-count{font-size:11px;color:var(--text-dim);font-variant-numeric:tabular-nums;}
-  .th-send{min-width:96px;}
-  .th-error{
-    margin:10px 0 0;padding:9px 11px;border-radius:8px;
-    background:rgba(224,83,140,.14);border:1px solid rgba(224,83,140,.45);
-    color:var(--text);font-size:12.5px;line-height:1.5;
-  }
+  .th-live i{width:6px; height:6px; border-radius:50%; background:currentcolor; display:block;}
+  .th-live-off{color:var(--text-dim); background:var(--search-bg);}
+  [dir="rtl"] .th-live, .plan-page.rtl-mode .th-live{padding:4px 8px 4px 10px;}
+
   .th-queued{
     font-size:12px;color:var(--connect);margin:0 0 12px;
   }
   .th-localnote{margin-top:14px;}
-  .th-list{display:grid;gap:10px;}
+  .th-list{display:flex; flex-direction:column; gap:16px; margin:14px 0;}
   .th-pull-hint{
     height:var(--th-pull, 0px); overflow:hidden;
     display:flex; align-items:center; justify-content:center;
@@ -4011,32 +4005,92 @@
   }
   .th-pull-hint.th-pull-ready{color:var(--accent);}
   .th-pull-hint.th-pull-active{height:30px;}
-  .th-item{
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:11px 13px;position:relative;
+
+  .th-item{display:flex; gap:10px; align-items:flex-start;}
+  .th-av{
+    flex:none; width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--search-bg); color:var(--accent);
+    font-size:11.5px; font-weight:800; letter-spacing:.02em;
   }
-  .th-mine{border-color:var(--accent);}
-  .th-head{display:flex;align-items:baseline;gap:10px;margin-bottom:5px;}
-  .th-who{font-size:12px;font-weight:800;color:var(--accent);}
+  .th-body{flex:1 1 auto; min-width:0;}
+  .th-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;}
+  .th-who{font-size:12px;font-weight:800;color:var(--text);}
   .th-when{font-size:10.5px;color:var(--text-dim);}
-  .th-text{margin:0;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
+  .th-bubble{
+    margin:0; font-size:13.5px; line-height:1.5; white-space:pre-wrap; word-break:break-word;
+    background:var(--panel); border:1px solid var(--line); border-radius:4px 14px 14px 14px;
+    padding:9px 12px; color:var(--text);
+  }
+  [dir="rtl"] .th-bubble, .plan-page.rtl-mode .th-bubble{border-radius:14px 4px 14px 14px;}
+  /* Your own post in the wall — the same accent ring the rest of the app
+     uses for "this one is yours/active", now on the bubble instead of a
+     whole-card border. */
+  .th-mine .th-bubble{border-color:var(--accent);}
   .th-del{
-    margin-top:8px;cursor:pointer;font-family:inherit;
+    margin-top:7px;cursor:pointer;font-family:inherit;
     font-size:11px;font-weight:700;color:var(--prereq);
     background:transparent;border:1px solid var(--line);border-radius:999px;padding:3px 10px;
   }
   .th-del:hover{border-color:var(--prereq);}
   .th-del:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  .th-react{display:flex;gap:6px;margin-top:8px;}
+  .th-react{display:flex;gap:6px;margin-top:7px;}
   .th-react-btn{
     display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:inherit;
-    font-size:12px;color:var(--text-dim);background:transparent;border:1px solid var(--line);
+    font-size:12px;color:var(--text-dim);background:var(--panel);border:1px solid var(--line);
     border-radius:999px;padding:3px 9px;
   }
   .th-react-btn span{font-variant-numeric:tabular-nums;}
   .th-react-btn:hover{border-color:var(--accent);color:var(--text);}
   .th-react-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(111,140,255,.12);}
   .th-react-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* The compose bar: one growing row (textarea + a circular send button),
+     not a boxed form sitting above the wall it posts to. */
+  .th-compose{margin-top:16px;}
+  .th-compose-row{display:flex; align-items:flex-end; gap:8px;}
+  .th-compose textarea{
+    flex:1 1 auto; min-width:0; resize:none; height:40px; max-height:110px;
+    background:var(--search-bg);color:var(--text);
+    border:1px solid var(--line);border-radius:20px;padding:9px 14px;
+    font-family:inherit;font-size:13.5px;line-height:1.4;
+  }
+  .th-compose textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .th-send{
+    flex:none; width:38px; height:38px; border-radius:50%; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--accent); color:var(--on-accent); border:none; cursor:pointer;
+  }
+  .th-send .app-icon-svg{color:var(--on-accent);}
+  [dir="rtl"] .th-send .app-icon-svg svg, .plan-page.rtl-mode .th-send .app-icon-svg svg{transform:scaleX(-1);}
+  .th-send:hover{filter:brightness(1.08);}
+  .th-send:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .th-count{display:block; font-size:10.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; text-align:right; margin-top:4px;}
+  [dir="rtl"] .th-count, .plan-page.rtl-mode .th-count{text-align:left;}
+  .th-error{
+    margin:0 0 8px;padding:9px 11px;border-radius:8px;
+    background:rgba(224,83,140,.14);border:1px solid rgba(224,83,140,.45);
+    color:var(--text);font-size:12.5px;line-height:1.5;
+  }
+
+  @media (max-width:720px){
+    /* Pinned to the bottom of the screen. position:sticky looked right at
+       first but this app's phone-modal scroll container isn't consistently
+       .modal-card (some browsers/layouts scroll the document behind the
+       fixed overlay instead) — the sticky threshold ended up wrong and
+       later messages painted through the compose bar instead of under it.
+       position:fixed sidesteps the question entirely: it is always relative
+       to the viewport, the same proven pattern .asst-panel/.fix-panel and
+       the toasts already use elsewhere in this file. #thList gets bottom
+       padding so the last message can still scroll clear of the bar
+       instead of hiding behind it. */
+    #thoughtsModalOverlay .th-compose{
+      position:fixed; left:0; right:0; bottom:0; z-index:1350;
+      margin:0; padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+      background:var(--bg); border-top:1px solid var(--line);
+    }
+    #thoughtsModalOverlay #thList{padding-bottom:76px;}
+  }
 
   /* ---------- Contributions (js/73-contribute.js) ---------- */
   .contrib-list{display:grid;gap:10px;margin-top:10px;}
