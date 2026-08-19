@@ -22,27 +22,31 @@
     return nameEl ? nameEl.textContent : prefix;
   }
 
+  // icon is a js/04-icons.js ICONS key, not an emoji — see that file's own
+  // header for why: a hand-drawn line icon and an emoji next to each other
+  // read as two different apps, so once one nav surface got real icons
+  // every other one showing the same items had to as well.
   var ITEMS = [
-    { key: 'dashboard', icon: '🏠', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
-    { key: 'studyplan', icon: '🗺️', label: 'My Study Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'roadmap', icon: '🧭', label: 'My Path', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
-    { key: 'audit', icon: '📋', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
+    { key: 'dashboard', icon: 'home', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'roadmap', icon: 'compass', label: 'My Path', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
+    { key: 'audit', icon: 'clipboard', label: 'Degree Audit & GPA', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
     // Sits with the GPA screen it plays with, not at the bottom of the
     // list: a student opens the audit, sees a number they do not like,
     // and the next thing they want is right there.
-    { key: 'whatif', icon: '🎯', label: 'What if… (GPA)', action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
-    { key: 'achievements', icon: '🏆', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
-    { key: 'advisor', icon: '🧠', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
-    { key: 'overview', icon: '🖨️', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
+    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
+    { key: 'achievements', icon: 'trophy', label: 'Achievements', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
+    { key: 'advisor', icon: 'brain', label: 'Plan My Next Semester', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
+    { key: 'overview', icon: 'printer', label: 'Overview & Print', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
     // The one place in the app where students talk to each other rather than
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
-    { key: 'thoughts', icon: '💭', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
-    { key: 'contacts', icon: '📇', label: 'Contacts', action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
+    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
+    { key: 'contacts', icon: 'people', label: 'Contacts', action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
     // Not the same thing as "Switch Plan" at the bottom, which only reopens
     // the picker. This one answers the question first: what happens to my
     // progress if I move?
-    { key: 'changeplan', icon: '🔀', label: 'Change Major', action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
+    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
   ];
 
   var currentPrefix = null;
@@ -56,14 +60,14 @@
     var html = '<div class="sb-brand"><span class="sb-mark">' + icon + '</span><span>' + name + '</span></div>';
     html += ITEMS.map(function(item){
       return '<button type="button" class="sb-item' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
-        '<span class="sb-icon">' + item.icon + '</span><span>' + item.label + '</span></button>';
+        '<span class="sb-icon">' + window.AAUP_ICONS.preview(item.icon, 16) + '</span><span>' + item.label + '</span></button>';
     }).join('');
     if(isImportedPlan(prefix)){
-      html += '<button type="button" class="sb-item" data-sb-key="library"><span class="sb-icon">📚</span><span>Course Library</span></button>';
+      html += '<button type="button" class="sb-item" data-sb-key="library"><span class="sb-icon">' + window.AAUP_ICONS.preview('book', 16) + '</span><span>Course Library</span></button>';
     }
     html += '<div class="sb-spacer"></div>';
-    html += '<div class="sb-switch"><button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">⚙️</span><span>Settings</span></button>' +
-      '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">🔁</span><span>Switch Plan</span></button></div>';
+    html += '<div class="sb-switch"><button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>Settings</span></button>' +
+      '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('refresh', 16) + '</span><span>Switch Plan</span></button></div>';
     sidebar.innerHTML = html;
 
     sidebar.querySelectorAll('[data-sb-key]').forEach(function(el){
@@ -130,40 +134,13 @@
   // the same four most-used destinations, not a second navigation model.
   // Hidden by CSS above 720px, so desktop is untouched.
   //
-  // Purpose-drawn line icons, one visual family with js/04-icons.js's own
-  // set (24x24 grid, round stroke, currentColor) but kept local rather than
-  // added to that module's ICONS pool — that pool is for how a university
-  // or a major is pictured, a different concern from this bar's own chrome.
-  function tabIconSvg(paths, extra){
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
-      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
-      paths + (extra || '') + '</svg>';
-  }
-  var TAB_ICON_SVG = {
-    // A roofline over a body with a doorway notch — plainer than a full
-    // house glyph so it still reads at 20px.
-    dashboard: tabIconSvg('<path d="M4 11.5 12 4l8 7.5"/>' +
-      '<path d="M5.6 10.2V19a1.4 1.4 0 0 0 1.4 1.4h10a1.4 1.4 0 0 0 1.4-1.4v-8.8"/>' +
-      '<path d="M9.6 20.4v-4.6a2.4 2.4 0 0 1 4.8 0v4.6"/>'),
-    // A destination pin with a checkmark in place of the usual dot — this
-    // tab is specifically the PLAN, the thing you're working toward.
-    studyplan: tabIconSvg('<path d="M12 21c4-4.2 6.4-7.6 6.4-10.6A6.4 6.4 0 1 0 5.6 10.4C5.6 13.4 8 16.8 12 21Z"/>' +
-      '<path d="m9.2 10.6 1.8 1.8 3.6-3.8"/>'),
-    // A chat bubble with the three-dot "typing" cue instead of the generic
-    // lines the app's own `speech` icon uses elsewhere — this is an AI chat.
-    assistant: tabIconSvg('<path d="M4.6 6.4a2.2 2.2 0 0 1 2.2-2.2h10.4a2.2 2.2 0 0 1 2.2 2.2v7.6a2.2 2.2 0 0 1-2.2 2.2H10l-4 3.4v-3.4H6.8a2.2 2.2 0 0 1-2.2-2.2Z"/>',
-      '<circle cx="9" cy="10.2" r="1" fill="currentColor" stroke="none"/>' +
-      '<circle cx="12" cy="10.2" r="1" fill="currentColor" stroke="none"/>' +
-      '<circle cx="15" cy="10.2" r="1" fill="currentColor" stroke="none"/>'),
-    // A plain three-line menu — the same idea the ☰ glyph stood in for, now
-    // drawn instead of borrowed from the system font.
-    more: tabIconSvg('<path d="M4.5 7h15M4.5 12h15M4.5 17h9"/>')
-  };
+  // icon is a js/04-icons.js ICONS key, same as ITEMS above — reusing
+  // 'home'/'planpin' for the same two destinations the sidebar already has.
   var TABS = [
-    { key: 'dashboard', icon: TAB_ICON_SVG.dashboard, label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
-    { key: 'studyplan', icon: TAB_ICON_SVG.studyplan, label: 'Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'assistant', icon: TAB_ICON_SVG.assistant, label: 'Assistant', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
-    { key: 'more', icon: TAB_ICON_SVG.more, label: 'More', action: function(){ toggleMobile(); } }
+    { key: 'dashboard', icon: 'home', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: 'planpin', label: 'Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'assistant', icon: 'chatdots', label: 'Assistant', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
+    { key: 'more', icon: 'menu', label: 'More', action: function(){ toggleMobile(); } }
   ];
 
   function ensureTabBar(){
@@ -174,7 +151,7 @@
     bar.className = 'sb-tabbar';
     bar.innerHTML = TABS.map(function(tItem){
       return '<button type="button" class="sb-tab" data-sb-tab="' + tItem.key + '">' +
-        '<span class="sb-tab-ic">' + tItem.icon + (tItem.key === 'dashboard' ? '<span class="sb-tab-badge" id="sbTabProgress" hidden></span>' : '') + '</span>' +
+        '<span class="sb-tab-ic">' + window.AAUP_ICONS.preview(tItem.icon, 20) + (tItem.key === 'dashboard' ? '<span class="sb-tab-badge" id="sbTabProgress" hidden></span>' : '') + '</span>' +
         '<span class="sb-tab-lbl">' + tItem.label + '</span>' +
         '</button>';
     }).join('');

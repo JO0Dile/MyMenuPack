@@ -1,7 +1,7 @@
 // ==========================
-// ICONS — how a university or a major is pictured
+// ICONS — how a university, a major, or the app's own chrome is pictured
 // ==========================
-// Three layers, tried in order, so every one of them is optional:
+// Most entries below are the three-layer system for a major/university:
 //
 //   1. imageUrl  — a PNG uploaded through Admin → Assets. Wins when present.
 //   2. iconKey   — one of the built-in line icons below. Ships with the app,
@@ -18,6 +18,13 @@
 // fills, drawn on the same grid. That is why they are hand-written here rather
 // than pulled from an icon font — a font is a network dependency and a licence,
 // and mixing sets is what made the old generic 🎓 look out of place.
+//
+// The last few entries (home, planpin, chatdots, menu, clipboard, printer,
+// shuffle, refresh, link) aren't for a major or university at all — they're
+// the app's own nav chrome (the sidebar, the phone tab bar, the dashboard).
+// Same grid, same reason: a hand-drawn icon and an emoji reads as two
+// different apps side by side, so once the emoji went here it had to go
+// everywhere that visual family shows up.
 (function(){
   'use strict';
 
@@ -199,8 +206,38 @@
       '<path d="M8 3v4M16 3v4"/><path d="M7.6 13.4h2M11 13.4h2M14.4 13.4h2M7.6 17h2M11 17h2"/>'),
     star: stroke('<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>'),
     trophy: stroke('<path d="M8 4h8v5.4a4 4 0 0 1-8 0z"/><path d="M8 5.6H5.4a2.6 2.6 0 0 0 2.6 5.2"/>' +
-      '<path d="M16 5.6h2.6a2.6 2.6 0 0 1-2.6 5.2"/><path d="M12 13.4V17"/><path d="M8.6 20.6h6.8L14.4 17H9.6z"/>')
+      '<path d="M16 5.6h2.6a2.6 2.6 0 0 1-2.6 5.2"/><path d="M12 13.4V17"/><path d="M8.6 20.6h6.8L14.4 17H9.6z"/>'),
 
+    // ---- the app's own chrome (nav, dashboard, sidebar) — not a major or
+    // university, but the same one hand-drawn family throughout ----
+    home: stroke('<path d="M4 11.5 12 4l8 7.5"/>' +
+      '<path d="M5.6 10.2V19a1.4 1.4 0 0 0 1.4 1.4h10a1.4 1.4 0 0 0 1.4-1.4v-8.8"/>' +
+      '<path d="M9.6 20.4v-4.6a2.4 2.4 0 0 1 4.8 0v4.6"/>'),
+    // A destination pin with a checkmark in place of the usual dot — the
+    // plan itself, the thing every path in the app leads back to.
+    planpin: stroke('<path d="M12 21c4-4.2 6.4-7.6 6.4-10.6A6.4 6.4 0 1 0 5.6 10.4C5.6 13.4 8 16.8 12 21Z"/>' +
+      '<path d="m9.2 10.6 1.8 1.8 3.6-3.8"/>'),
+    // A chat bubble with the three-dot "typing" cue, distinct from `speech`
+    // above — this one is specifically the AI assistant.
+    chatdots: stroke('<path d="M4.6 6.4a2.2 2.2 0 0 1 2.2-2.2h10.4a2.2 2.2 0 0 1 2.2 2.2v7.6a2.2 2.2 0 0 1-2.2 2.2H10l-4 3.4v-3.4H6.8a2.2 2.2 0 0 1-2.2-2.2Z"/>' +
+      '<circle cx="9" cy="10.2" r="1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="12" cy="10.2" r="1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="15" cy="10.2" r="1" fill="currentColor" stroke="none"/>'),
+    menu: stroke('<path d="M4.5 7h15M4.5 12h15M4.5 17h9"/>'),
+    clipboard: stroke('<rect x="5.6" y="5" width="12.8" height="16" rx="1.8"/>' +
+      '<rect x="9" y="3.4" width="6" height="3.2" rx="1"/>' +
+      '<path d="m8.8 13 2 2 4.4-4.4"/><path d="M8.8 17.4h6.4"/>'),
+    printer: stroke('<rect x="5" y="8.4" width="14" height="7.2" rx="1.6"/>' +
+      '<path d="M7.4 8.4V4.4h9.2v4"/><path d="M7.4 15.6v4.2h9.2v-4.2"/>' +
+      '<circle cx="16" cy="11" r=".9" fill="currentColor" stroke="none"/>'),
+    shuffle: stroke('<path d="M4 6.4h3.4l9.2 11.2H20"/><path d="m17 4 3 2.4-3 2.4"/>' +
+      '<path d="M4 17.6h3.4l1.8-2.2"/><path d="m17 20-3-2.4 3-2.4"/>' +
+      '<path d="m12.2 9.7 1.4-1.7"/>'),
+    refresh: stroke('<path d="M19.4 12a7.4 7.4 0 0 1-12.6 5.3"/><path d="M4.6 12a7.4 7.4 0 0 1 12.6-5.3"/>' +
+      '<path d="M19.4 6v4.4H15"/><path d="M4.6 18v-4.4H9"/>'),
+    link: stroke('<path d="M9.6 14.4 14.4 9.6"/>' +
+      '<path d="M13 6.6l1.6-1.6a3.2 3.2 0 0 1 4.4 4.4L17.4 11"/>' +
+      '<path d="M11 17.4l-1.6 1.6a3.2 3.2 0 0 1-4.4-4.4L6.6 13"/>')
   };
 
   // An uploaded image is the only one of the three layers that can carry a

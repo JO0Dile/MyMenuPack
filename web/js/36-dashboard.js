@@ -155,8 +155,8 @@
     var html = '<div class="dash-header">' +
       '<div class="dash-title"><span class="dash-icon">' + info.icon + '</span><div><h1>' + info.name + '</h1><p>' + (rtl ? 'لوحة التحكم' : 'Dashboard') + '</p></div></div>' +
       '<div class="dash-actions">' +
-        '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.choosePlan()">🔁 ' + (rtl ? 'تبديل التخصص' : 'Switch Plan') + '</button>' +
-        '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">🗺️ ' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.choosePlan()">' + window.AAUP_ICONS.preview('refresh', 14) + '<span>' + (rtl ? 'تبديل التخصص' : 'Switch Plan') + '</span></button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">' + window.AAUP_ICONS.preview('planpin', 14) + '<span>' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</span></button>' +
       '</div></div>' +
       '<div class="dash-swipe-dots" id="' + prefix + '-dashDots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>' +
       '<div class="dash-grid" id="' + prefix + '-dashGrid">' +
@@ -176,16 +176,16 @@
             : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>')) +
       '</div>' +
       '<div class="dash-quicklinks">' +
-        (window.AAUP_ROADMAP ? '<div class="dash-quicklink" onclick="AAUP_ROADMAP.open(\'' + prefix + '\')"><span class="dq-icon">🧭</span>' + (rtl ? 'مساري الدراسي' : 'My Path') + '</div>' : '') +
-        '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">📋</span>' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</div>' +
-        '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">🏆</span>' + (rtl ? 'الإنجازات' : 'Achievements') + '</div>' +
-        '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">🧠</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +
-        '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">🗺️</span>' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</div>' +
+        (window.AAUP_ROADMAP ? '<div class="dash-quicklink" onclick="AAUP_ROADMAP.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('compass', 22) + '</span>' + (rtl ? 'مساري الدراسي' : 'My Path') + '</div>' : '') +
+        '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('clipboard', 22) + '</span>' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</div>' +
+        '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('trophy', 22) + '</span>' + (rtl ? 'الإنجازات' : 'Achievements') + '</div>' +
+        '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('brain', 22) + '</span>' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</div>' +
+        '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('planpin', 22) + '</span>' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</div>' +
         (window.AAUP_SHARE
-          ? '<div class="dash-quicklink" onclick="AAUP_SHARE.open(\'' + prefix + '\')"><span class="dq-icon">🔗</span>' + (rtl ? 'شارك هذه الخطة' : 'Share this plan') + '</div>'
+          ? '<div class="dash-quicklink" onclick="AAUP_SHARE.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('link', 22) + '</span>' + (rtl ? 'شارك هذه الخطة' : 'Share this plan') + '</div>'
           : '') +
         (window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured()
-          ? '<div class="dash-quicklink" onclick="AAUP_CLOUD.open()"><span class="dq-icon">🗄️</span>' +
+          ? '<div class="dash-quicklink" onclick="AAUP_CLOUD.open()"><span class="dq-icon">' + window.AAUP_ICONS.preview('cloud', 22) + '</span>' +
             (window.AAUP_CLOUD.isSignedIn()
               ? window.__escapeHtml(window.AAUP_CLOUD.displayName())
               : (rtl ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up')) +
