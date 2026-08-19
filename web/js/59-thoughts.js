@@ -236,12 +236,19 @@
       saveQueue(q);
       return { ok: true, queued: true, item: item };
     }
-    postThought(item).catch(function(){
+    // Fire-and-forget, but not silent: a failure here (a Worker returning a
+    // 500, not just a dropped connection) still has to land the item in the
+    // queue AND tell the student — otherwise the UI already said "Posted."
+    // and the thought quietly disappears with no correction on screen, which
+    // is exactly what made a server-side failure look identical to nothing
+    // having happened. `pending` lets the caller react once this settles.
+    var pending = postThought(item).catch(function(){
       var q2 = loadQueue();
       q2.push(item);
       saveQueue(q2);
+      throw new Error('send failed, queued for retry');
     });
-    return { ok: true, queued: false, item: item };
+    return { ok: true, queued: false, item: item, pending: pending };
   }
 
   function removeMine(id){
@@ -296,7 +303,7 @@
       '</div>';
   }
 
-  function render(prefix){
+  function render(prefix, refreshFailed){
     var body = document.getElementById('thoughtsModalBody');
     if(!body) return;
     var rtl = isRtl(prefix);
@@ -327,8 +334,11 @@
         '<p class="th-error" id="thError" role="alert" hidden></p>' +
       '</div>' +
       (queued ? '<p class="th-queued">' + (rtl
-        ? ('في ' + queued + ' فكرة مخزّنة، رح تُنشر أول ما يرجع الإنترنت.')
-        : (queued + ' thought' + (queued === 1 ? '' : 's') + ' waiting to go out when you are back online.')) + '</p>' : '') +
+        ? ('في ' + queued + ' فكرة بانتظار الإرسال — رح تُعاد المحاولة تلقائيًا.')
+        : (queued + ' thought' + (queued === 1 ? '' : 's') + ' waiting to send — this device will keep retrying automatically.')) + '</p>' : '') +
+      (refreshFailed && endpoint() ? '<p class="th-queued">' + (rtl
+        ? 'تعذّر تحديث الحائط من الخادم الآن — جرّب لاحقًا.'
+        : 'Could not refresh the wall from the server just now — try again shortly.') + '</p>' : '') +
       '<div class="th-list" id="thList">' +
         (list.length
           ? list.map(function(t){ return thoughtHTML(t, rtl); }).join('')
@@ -366,10 +376,24 @@
       if(count) count.textContent = '0 / ' + MAX_LEN;
       if(window.__showToast){
         window.__showToast(result.queued
-          ? (rtl ? 'محفوظة — رح تُنشر أول ما يرجع الإنترنت.' : 'Saved — it goes out when you are back online.')
+          ? (rtl ? 'محفوظة — رح تُعاد المحاولة تلقائيًا.' : 'Saved — sending will retry automatically.')
           : (rtl ? 'تم النشر.' : 'Posted.'));
       }
       render(prefix);
+      // The "Posted." toast above is optimistic — it fired the request but
+      // did not wait for it. If the Worker comes back with an error a moment
+      // later, correct the record rather than leaving "Posted." as the last
+      // word: say so and re-render so the queued-count note picks it up
+      // immediately instead of only on the next time the wall is opened.
+      if(result.pending){
+        result.pending.catch(function(){
+          if(window.__showToast){
+            window.__showToast(rtl ? 'تعذّر الإرسال — رح تُعاد المحاولة تلقائيًا.' : 'Could not send — it will retry automatically.');
+          }
+          var overlay = document.getElementById('thoughtsModalOverlay');
+          if(overlay && overlay.classList.contains('open')) render(prefix);
+        });
+      }
     });
 
     document.getElementById('thList').addEventListener('click', function(e){
@@ -386,10 +410,13 @@
     render(prefix);
     overlay.classList.add('open');
     // Refresh from the wall in the background; the cached copy is already on
-    // screen, so a slow or missing network changes nothing the student sees.
+    // screen, so a slow or missing network changes nothing the student sees
+    // right away. A failure used to be swallowed silently, which is exactly
+    // why an empty or stale wall looked like "nobody posted" instead of what
+    // it actually was — the server could not be reached — so it is now shown.
     flushQueue().then(function(){ return fetchWall(prefix); })
-      .then(function(list){ if(list) render(prefix); })
-      .catch(function(){});
+      .then(function(){ render(prefix); })
+      .catch(function(){ render(prefix, true); });
   }
 
   function close(){
