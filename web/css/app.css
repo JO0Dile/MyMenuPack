@@ -5797,6 +5797,47 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
 }
 
 /* ============================================================================
+   CLOUD SYNC — the signed-in status card (js/52-cloud.js sectionHtml)
+
+   Signed in used to render exactly like signed out: same heading, one dim
+   grey line, same button. Nothing on screen said the thing a student signed
+   in FOR had happened. This is the confirmation — who is signed in, that
+   the work is off this device, and when it last went up.
+   ========================================================================= */
+.cloud-live{
+  display:flex; align-items:center; gap:13px;
+  padding:13px 15px; margin:8px 0 0;
+  border-radius:14px;
+  border:1px solid color-mix(in srgb, var(--unlock) 40%, transparent);
+  background:color-mix(in srgb, var(--unlock) 11%, transparent);
+}
+.cloud-live-avatar{
+  position:relative; flex:0 0 auto;
+  width:42px; height:42px; border-radius:50%;
+  background:var(--accent); color:var(--on-accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:800; line-height:1;
+}
+.cloud-live-tick{
+  position:absolute; right:-3px; bottom:-3px;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--unlock); color:var(--unlock-tx);
+  border:2px solid var(--panel);
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:800; line-height:1;
+}
+.cloud-live-body{display:flex; flex-direction:column; gap:2px; min-width:0;}
+.cloud-live-name{
+  font-size:14px; font-weight:800; color:var(--text);
+  line-height:1.3; overflow-wrap:anywhere;
+}
+.cloud-live-sub{font-size:11.5px; color:var(--text-dim); line-height:1.4;}
+.cloud-live-when{
+  font-size:10.5px; font-weight:700; color:var(--unlock);
+  letter-spacing:.02em; font-variant-numeric:tabular-nums;
+}
+
+/* ============================================================================
    COURSE DETAIL PANEL  (js/49-course-detail.js)
 
    Written narrow-first. Every rule here is the phone layout; the two-column

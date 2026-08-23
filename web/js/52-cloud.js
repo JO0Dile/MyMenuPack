@@ -267,14 +267,39 @@
           ? 'المزامنة السحابية غير مُفعّلة لهذا التطبيق بعد. بياناتك تبقى على هذا الجهاز كما هي.'
           : 'Cloud Sync isn’t set up for this app yet. Your data stays on this device exactly as it always has.') + '</p>';
     }
-    var status = isSignedIn()
-      ? ((r ? 'مسجّل الدخول باسم ' : 'Signed in as ') + window.__escapeHtml(displayName()))
-      : (r ? 'غير مسجّل الدخول' : 'Not signed in');
-    return '<h3 style="margin-bottom:6px;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
-      '<p class="form-note" style="margin-top:0;">' + status + '</p>' +
+    var head = '<h3 style="margin-bottom:6px;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>';
+
+    // Signed in used to read exactly like signed out: the same heading, a
+    // dim grey line of text, the same button. Nothing said the thing a
+    // student signed in FOR had actually happened — that their progress is
+    // off this device and safe. It is a status card now: who is signed in,
+    // that the work is backed up, and when it last went up.
+    if(isSignedIn()){
+      var last = lastSyncLabel(r);
+      var initial = (displayName() || '?').trim().charAt(0).toUpperCase();
+      return head +
+        '<div class="cloud-live">' +
+          '<span class="cloud-live-avatar" aria-hidden="true">' + window.__escapeHtml(initial) +
+            '<span class="cloud-live-tick">✓</span></span>' +
+          '<span class="cloud-live-body">' +
+            '<span class="cloud-live-name">' + window.__escapeHtml(displayName()) + '</span>' +
+            '<span class="cloud-live-sub">' + (r
+              ? 'تقدّمك محفوظ على حسابك'
+              : 'Your progress is backed up to your account') + '</span>' +
+            (last ? '<span class="cloud-live-when">' + window.__escapeHtml(last) + '</span>' : '') +
+          '</span>' +
+        '</div>' +
+        '<div class="form-actions" style="justify-content:flex-start;">' +
+        '<button type="button" class="home-btn" id="cloudOpenBtn">' + ICON + ' ' +
+          (r ? 'إدارة المزامنة السحابية' : 'Manage Cloud Sync') +
+        '</button></div>';
+    }
+
+    return head +
+      '<p class="form-note" style="margin-top:0;">' + (r ? 'غير مسجّل الدخول' : 'Not signed in') + '</p>' +
       '<div class="form-actions" style="justify-content:flex-start;">' +
       '<button type="button" class="home-btn" id="cloudOpenBtn" style="border-color:var(--accent);color:var(--text);">' + ICON + ' ' +
-        (isSignedIn() ? (r ? 'إدارة المزامنة السحابية' : 'Manage Cloud Sync') : (r ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up')) +
+        (r ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up') +
       '</button></div>';
   }
 
