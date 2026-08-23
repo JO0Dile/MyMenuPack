@@ -912,6 +912,10 @@
     });
   }
   function handleCourseHoverLeave(planId){
+    // The quick-action sheet holds the trace open. Lifting your finger is
+    // what opens that sheet, and clearing here would wipe the highlight the
+    // sheet exists to sit on top of.
+    if(window.__QA_HOLD) return;
     clearHoverSequence();
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
@@ -1035,7 +1039,16 @@
     var hoursTx = partOfPair
       ? (rtl ? 'ضمن ' + c.creditHours + ' ساعات' : 'part of ' + c.creditHours + 'H')
       : c.creditHours + 'H';
-    var meta = window.__escapeHtml(yearTx + ' · ' + statusTx + ' · ' + hoursTx);
+    // Each part in its own span so the phone layout can drop the year: a
+    // card sitting inside a block headed "Year 1" does not need to say
+    // "Year 1" as well, and at half width that repetition is what pushes the
+    // line onto a second row. The aria-label below keeps all three parts
+    // whatever the layout hides.
+    var meta = '<span class="cm-year">' + window.__escapeHtml(yearTx) + '</span>' +
+      '<span class="cm-sep"> · </span>' +
+      '<span class="cm-status">' + window.__escapeHtml(statusTx) + '</span>' +
+      '<span class="cm-sep"> · </span>' +
+      '<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>';
     // Focusable so the plan can be worked from a keyboard: the card itself is
     // a button (Enter opens the details) and the tick inside it is its own
     // control (Space toggles completion) — see js/57-card-input.js.
@@ -2025,6 +2038,9 @@
     addCoursePrompt: openCourseCreatePopup, ICONS: ICONS, nameParts: nameParts, hasStructure: hasStructure,
     compareByDisplayOrder: compareByDisplayOrder,
     confirmDelete: confirmDelete, deletePlan: deletePlan,
+    // Exposed for js/74-course-gestures.js, which shows the same trace under
+    // its action sheet rather than re-implementing the walk over the edges.
+    traceCourse: handleCourseHoverEnter, untraceCourse: handleCourseHoverLeave,
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,

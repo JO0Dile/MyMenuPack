@@ -6431,10 +6431,35 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    is a full-width row — there is no room beside one for a popover, which is
    why the old positioning ended up dropping the menu on top of the course it
    was acting on. */
+/* Nearly clear. The dimming that matters happens on the plan itself (see
+   .qa-dim below) so the courses this one connects to stay lit through it —
+   an opaque sheet of dark over everything would bury the very thing the
+   long-press just traced. This still catches the tap that dismisses. */
 .course-qa-backdrop{
   position:fixed; inset:0; z-index:1499;
-  background:rgba(3,6,14,.5);
+  background:rgba(3,6,14,.28);
   animation:qa-fade .16s ease-out;
+}
+
+/* Hold a course: the plan drops back and what it connects to stays lit —
+   hold Calculus I and Calculus II is the thing still bright. .node-active is
+   the same class the existing hold-to-trace already sets, so this reuses
+   that walk over the prerequisite edges rather than repeating it. */
+.qa-dim .course{
+  opacity:.28; transition:opacity .2s ease, transform .2s ease;
+}
+.qa-dim .course.node-active,
+.qa-dim .course.qa-subject{opacity:1;}
+.qa-dim .course.qa-subject{
+  transform:scale(1.02);
+  box-shadow:0 0 0 2px var(--accent), 0 10px 26px rgba(0,0,0,.4);
+}
+.qa-dim .course.node-active:not(.qa-subject){
+  box-shadow:0 0 0 2px var(--unlock), 0 8px 20px rgba(0,0,0,.34);
+}
+@media (prefers-reduced-motion:reduce){
+  .qa-dim .course{transition:none;}
+  .qa-dim .course.qa-subject{transform:none;}
 }
 .course-qa-menu{
   position:fixed; z-index:1500;
@@ -6516,14 +6541,22 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      actually answers "what does this connect to" on a single column. */
   .connector-layer{display:none;}
 
+  /* Two across, not one. The row treatment below is right — a colour stripe
+     rather than a full tile — but a semester in a single column is a very
+     long scroll, and this card's content (a name, one meta line, a code) is
+     narrow enough to sit two-up on a phone. Below 360px it drops back to one
+     column: two 150px cards there truncate names rather than fit them. */
   .course{
-    flex:1 1 100%; max-width:none; min-width:0; min-height:auto;
+    flex:1 1 calc(50% - 5px); max-width:none; min-width:0; min-height:auto;
     background:var(--panel); border:none; border-radius:14px;
-    padding:12px 46px 12px 17px;
+    padding:11px 34px 11px 14px;
     box-shadow:0 4px 14px rgba(0,0,0,.22);
   }
+  @media (max-width:359px){
+    .course{flex:1 1 100%;}
+  }
   .plan-page.rtl-mode .course,
-  .sheet.rtl-mode .course{padding:12px 17px 12px 46px;}
+  .sheet.rtl-mode .course{padding:11px 14px 11px 34px;}
   .course::before{
     content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
     border-radius:4px 0 0 4px; background:var(--core);
@@ -6550,26 +6583,40 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
   }
   .course.completed{background:var(--panel);}
 
-  .course .name{font-size:14px; padding:0; margin:0;}
+  /* Two-up means half the width, so the name gets two lines rather than
+     being cut off at one, and the checkbox moves in to buy them back. */
+  .course .name{
+    font-size:13px; padding:0; margin:0; line-height:1.3;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
   .plan-page.rtl-mode .course .name,
   .sheet.rtl-mode .course .name{padding:0;}
-  .course-meta{color:var(--text-dim); font-size:11px;}
+  .course-meta{color:var(--text-dim); font-size:10.5px;}
+  /* The card sits inside a block headed with its year — repeating it here
+     is what pushed this line onto a second row at half width. The card's
+     aria-label still carries all three parts. */
+  .course-meta .cm-year,
+  .course-meta .cm-year + .cm-sep{display:none;}
   .course-code{color:var(--text-faint); font-size:9.5px;}
   .course.completed .course-meta,
   .course.completed .course-code{color:var(--text-dim);}
 
+  /* 18px at the top-right rather than 22px centred: two-up, a vertically
+     centred circle sat in the middle of a two-line name. The 11px padding
+     keeps the tap target at 40px either way. */
   .course-check{
-    top:50%; right:12px; transform:translateY(-50%);
-    width:22px; height:22px; padding:11px; margin:-11px;
+    top:11px; right:9px; transform:none;
+    width:18px; height:18px; padding:11px; margin:-11px;
   }
   .plan-page.rtl-mode .course-check,
-  .sheet.rtl-mode .course-check{right:auto; left:12px; margin:-11px;}
+  .sheet.rtl-mode .course-check{right:auto; left:9px; margin:-11px;}
   /* inset must match the 11px padding above — the padding is an invisible
      44px tap-target extension (existing convention, see the base rule's
      own comment above), not part of the drawn circle; inset:0 here would
      have drawn the circle across the whole padded box instead of just its
      22px content box, which is what actually happened the first time. */
   .course-check::before{inset:11px; background:var(--header-bg); border-color:var(--line);}
+  .course-check{font-size:11px;}
   .course.completed .course-check::before{background:#2ecc71; border-color:#2ecc71;}
   .course.completed .course-check{color:var(--on-accent);}
 

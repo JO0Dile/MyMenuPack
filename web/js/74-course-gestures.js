@@ -82,6 +82,16 @@
   function closeQuickActions(){
     if(menuEl){ menuEl.remove(); menuEl = null; }
     if(backdropEl){ backdropEl.remove(); backdropEl = null; }
+    // Release the trace this sheet was holding open, and undim the plan.
+    if(window.__QA_HOLD){
+      var heldPlan = window.__QA_HOLD;
+      window.__QA_HOLD = null;
+      if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.untraceCourse){
+        window.AAUP_IMPORTED.untraceCourse(heldPlan);
+      }
+    }
+    document.querySelectorAll('.qa-dim').forEach(function(el){ el.classList.remove('qa-dim'); });
+    document.querySelectorAll('.qa-subject').forEach(function(el){ el.classList.remove('qa-subject'); });
     document.removeEventListener('click', onOutsideClick, true);
     document.removeEventListener('keydown', onKeydown, true);
   }
@@ -117,6 +127,19 @@
     menuEl.className = 'course-qa-menu';
     menuEl.setAttribute('role', 'dialog');
     menuEl.setAttribute('aria-label', courseName);
+    // Dim the plan and light up what this course connects to. Holding a
+    // course already traces its prerequisites (js/28-imported.js, at 450ms),
+    // but lifting your finger — which is what opens this sheet — cleared it,
+    // so the sheet arrived over a plan that had just gone dark again. The
+    // trace is re-run and pinned for as long as the sheet is up.
+    window.__QA_HOLD = info.planId;
+    var planRoot = card.closest('.sheet-plan') || document.getElementById('page-' + info.planId);
+    if(planRoot) planRoot.classList.add('qa-dim');
+    card.classList.add('qa-subject');
+    if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.traceCourse){
+      window.AAUP_IMPORTED.traceCourse(info.planId, card);
+    }
+
     menuEl.innerHTML =
       '<div class="course-qa-head"><span class="course-qa-grip" aria-hidden="true"></span>' +
         '<span class="course-qa-title">' + esc(courseName) + '</span></div>' +
