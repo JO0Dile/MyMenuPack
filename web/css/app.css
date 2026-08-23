@@ -6670,6 +6670,11 @@ body:has(.course-qa-backdrop) .sb-tabbar{transform:translateY(100%); pointer-eve
 body:has(.course-qa-backdrop) .asst-launcher,
 body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 
+/* The pair wrapper only means something in the phone layout; everywhere else
+   it must be invisible to layout so the existing grid is unchanged. */
+.cp-pair{display:contents;}
+.cp-pair-label{display:none;}
+
 /* ==========================================================================
    PHONE STUDY PLAN — course cards become one-line rows
    A course was a fully category-coloured tile (green/blue/amber background
@@ -6717,6 +6722,31 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      AND short — which is what flex-start was working around when names could
      run to two lines. */
   .course-row{align-items:stretch; gap:8px;}
+
+  /* A lecture and its lab: one registered course, two meetings. The pair
+     takes a full row and a bracket is drawn down the margin spanning both,
+     labelled — the two cards keep their own boxes and their own checkboxes,
+     because a student really does attend them separately. */
+  .cp-pair{
+    position:relative; flex:1 1 100%; min-width:0;
+    display:flex; flex-direction:column; gap:8px;
+    padding-inline-end:24px;
+  }
+  .cp-pair::after{
+    content:''; position:absolute; inset-inline-end:7px; top:6px; bottom:6px; width:9px;
+    border:2px solid var(--accent); border-inline-start:none;
+    border-start-end-radius:8px; border-end-end-radius:8px;
+    opacity:.7;
+  }
+  .cp-pair > .course{flex:1 1 auto;}
+  .cp-pair-label{
+    display:block;
+    position:absolute; inset-inline-end:-6px; top:50%;
+    transform:translateY(-50%) rotate(90deg); transform-origin:center;
+    font-size:8.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--accent); white-space:nowrap; pointer-events:none;
+  }
+  [dir="rtl"] .cp-pair-label{transform:translateY(-50%) rotate(-90deg);}
 
   .course{
     flex:1 1 calc(50% - 4px); max-width:none; min-width:0; min-height:auto;
