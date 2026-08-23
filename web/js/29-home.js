@@ -63,49 +63,6 @@
     return out;
   }
 
-  // Up to a few real majors from inside a college, for the picker tile's
-  // preview rows — every plan (built-in and community) lives in the same
-  // AAUP_IMPORTED store, so this is one lookup, not two. Distinct majors
-  // stay distinct entries here even when several share a college (e.g. AI &
-  // Robotics and Data Science both under "AI and Data Science") — nothing
-  // here collapses two majors into one row.
-  function majorsForCollege(uniId, collegeId){
-    var imported = importedPlans();
-    var keyFn = window.AAUP_IMPORTED && window.AAUP_IMPORTED.collegeKeyForPlan;
-    var nameFn = window.AAUP_IMPORTED && window.AAUP_IMPORTED.nameParts;
-    var out = [];
-    Object.keys(imported).forEach(function(id){
-      var p = imported[id];
-      if(!p || !p.majorName || (p.university || 'aaup') !== uniId) return;
-      if((keyFn ? keyFn(p) : 'custom:' + uniId + ':unspecified') !== collegeId) return;
-      var courses = Array.isArray(p.courses) ? p.courses : [];
-      var cr = courses.length ? courses.reduce(function(sum, c){ return sum + (parseFloat(c.creditHours) || 0); }, 0) : null;
-      var en = nameFn ? nameFn(p.majorName.en) : { big: p.majorName.en || '', small: '' };
-      var ar = nameFn ? nameFn(p.majorName.ar) : { big: p.majorName.ar || '', small: '' };
-      out.push({
-        en: en.big + (en.small ? ' ' + en.small : ''),
-        ar: (ar.big || en.big) + (ar.small ? ' ' + ar.small : ''),
-        cr: cr,
-        sortOrder: p.sortOrder
-      });
-    });
-    // Majors with a real course list (cr set) come before "coming soon" ones
-    // (cr null, per the same 0-courses check 28-imported.js uses) — otherwise
-    // a coming-soon major that happens to sit earlier in storage can fill the
-    // tile's 3-item preview and bury every actually-available plan behind
-    // "+N more". Within each of those two groups the admin's chosen display
-    // order applies, matching the full plan list one tap deeper.
-    out.sort(function(a, b){
-      var byAvailability = (b.cr != null) - (a.cr != null);
-      if(byAvailability) return byAvailability;
-      return window.AAUP_IMPORTED.compareByDisplayOrder(
-        { sortOrder: a.sortOrder, majorName: { en: { big: a.en } } },
-        { sortOrder: b.sortOrder, majorName: { en: { big: b.en } } }
-      );
-    });
-    return out;
-  }
-
   function collegeDisplayName(college){
     if(college && college.name && (college.name.en || college.name.ar)){
       return { en: college.name.en || college.name.ar, ar: college.name.ar || college.name.en };
@@ -117,18 +74,40 @@
     var el = document.getElementById('homeBreadcrumb');
     if(!el) return;
     if(!state.university){ el.style.display = 'none'; el.innerHTML = ''; return; }
+    var only = soleUniversity();
+    // With one university the faculty list IS the top of the app, so it needs
+    // no crumb of its own and nothing above it to go back to.
+    if(only && !state.college){ el.style.display = 'none'; el.innerHTML = ''; return; }
     el.style.display = 'flex';
     var uni = window.APP_UNIVERSITIES[state.university];
-    var html = '<button type="button" onclick="AAUP_HOME.showUniversities()">🏠 Home</button>';
+    var home = only
+      ? '<button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' +
+        window.AAUP_ICONS.preview('home', 15) + ' ' + (uni ? uni.shortName : 'Home') + '</button>'
+      : '<button type="button" onclick="AAUP_HOME.showUniversities()">' +
+        window.AAUP_ICONS.preview('home', 15) + ' Home</button>';
+    var html = home;
     if(state.college){
       var college = collegesForUniversity(state.university)[state.college];
       var name = collegeDisplayName(college);
-      html += '<span class="hb-sep">/</span><button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' + (uni ? uni.icon + ' ' + uni.shortName : state.university) + '</button>';
+      if(!only){
+        html += '<span class="hb-sep">/</span><button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' + (uni ? uni.icon + ' ' + uni.shortName : state.university) + '</button>';
+      }
       html += '<span class="hb-sep">/</span><span class="hb-current">' + name.en + '</span>';
     } else {
       html += '<span class="hb-sep">/</span><span class="hb-current">' + (uni ? uni.icon + ' ' + uni.name.en : state.university) + '</span>';
     }
     el.innerHTML = html;
+  }
+
+  // The app ships one university. Birzeit and Al-Salem stay in data/, reviewed
+  // and version-controlled, but unpublished — so the first screen was a grid
+  // with a single tile on it, and every student paid a tap to pick the only
+  // option there was. When there is exactly one, it is not a choice: the app
+  // opens on its faculties instead. Publish a second university and the picker
+  // comes back on its own, with nothing to change here.
+  function soleUniversity(){
+    var ids = Object.keys(window.APP_UNIVERSITIES || {});
+    return ids.length === 1 ? ids[0] : null;
   }
 
   function showStep(step){
@@ -141,12 +120,15 @@
     if(resume && step !== 'universities'){ resume.style.display = 'none'; }
     var intro = document.getElementById('homeIntroText');
     if(!intro) return;
+    // One short line per step. These used to run to two sentences each, with
+    // the advisor disclaimer repeated on two of them — students said the app
+    // had "A LOT OF TEXT". The disclaimer now lives once, in the footer.
     if(step === 'universities'){
-      intro.innerHTML = '<strong>Choose your university</strong>, then your college, then your study plan. <span style="opacity:.75;">Unofficial student project — always confirm with your academic advisor.</span>';
+      intro.innerHTML = '<strong>Pick your university.</strong>';
     } else if(step === 'colleges'){
-      intro.innerHTML = '<strong>Choose your college / faculty.</strong> <span style="opacity:.75;">Don’t see it yet? Create a plan below and it gets its own tile.</span>';
+      intro.innerHTML = '<strong>Pick your faculty.</strong>';
     } else {
-      intro.innerHTML = '<strong>Choose a study plan</strong> to view its full four-year course map, prerequisites, and electives. <span style="opacity:.75;">Unofficial student project — always confirm with your academic advisor.</span>';
+      intro.innerHTML = '<strong>Pick your major.</strong>';
     }
   }
 
@@ -172,40 +154,42 @@
     }).join('');
   }
 
-  var COLLEGE_PREVIEW_N = 3;
-
   function renderColleges(uniId){
     var grid = document.getElementById('homeCollegeGrid');
     if(!grid) return;
     var colleges = collegesForUniversity(uniId);
     var ids = Object.keys(colleges);
     var esc = window.__escapeHtml;
+    // A faculty tile is a signpost, not a summary. It used to carry a badge, an
+    // icon, two names, three major names with their credit hours, "+5 more →"
+    // AND "View plans →" — eight lines each, sixteen of them, all of it
+    // repeating what the very next screen says in full. Icon, name, count.
     var tiles = ids.map(function(cid){
       var c = colleges[cid];
       var name = collegeDisplayName(c);
-      var majors = majorsForCollege(uniId, cid);
-      var shown = majors.slice(0, COLLEGE_PREVIEW_N);
-      var rest = majors.length - shown.length;
-      var previewHTML = shown.map(function(m){
-        return '<div class="pc-major-row"><span class="pc-major-name">' + esc(m.en) + '</span>' +
-          '<span class="pc-major-cr">' + (m.cr != null ? m.cr + 'H' : '') + '</span></div>';
-      }).join('') + (rest > 0 ? '<div class="pc-major-more">+ ' + rest + ' more →</div>' : '');
       // Registered colleges (APP_COLLEGES) carry their own icon; a college
       // that only exists because a student's custom plan named it (no
       // registered entry) falls back to a plain building.
-      return '<div class="plan-card" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0">' +
-        '<span class="home-tile-badge">' + c.count + ' plan' + (c.count === 1 ? '' : 's') + '</span>' +
+      // A registered faculty with nothing behind it yet still gets a tile —
+      // APP_COLLEGES lists it — but its count is dimmed rather than sitting in
+      // the accent colour, so "0" doesn't read as something worth tapping.
+      var plans = c.count === 1 ? '1 plan' : (c.count || 0) + ' plans';
+      return '<div class="plan-card plan-card-faculty" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0"' +
+        ' aria-label="' + esc(name.en) + ', ' + plans + '">' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(c, { size: 26, fallback: '🏫' }) + '</div>' +
-        '<h2 style="font-size:14.5px;">' + name.en + '</h2>' +
-        '<p style="direction:rtl;">' + name.ar + '</p>' +
-        (previewHTML ? '<div class="pc-major-list">' + previewHTML + '</div>' : '') +
-        (c.count ? '<div class="pc-cta">View plans →</div>' : '<div class="pc-cta home-tile-empty">No plans yet</div>') +
+        '<div class="pc-faculty-body">' +
+          '<h2>' + esc(name.en) + '</h2>' +
+          '<p style="direction:rtl;">' + esc(name.ar) + '</p>' +
+        '</div>' +
+        '<span class="pc-faculty-count' + (c.count ? '' : ' pc-faculty-count-none') +
+          '" aria-hidden="true" title="' + plans + '">' +
+          (c.count || 0) + '</span>' +
         '</div>';
     }).join('');
     var uni = window.APP_UNIVERSITIES[uniId];
     tiles += '<div class="new-plan-card" onclick="AAUP_HOME.startNewPlan(\'' + uniId + '\')" role="button" tabindex="0">' +
       '<span class="npc-plus">+</span>' +
-      '<p class="npc-label">Don’t see your college? Add a plan and it’ll get its own tile.</p></div>';
+      '<p class="npc-label">Add a plan</p></div>';
     grid.innerHTML = ids.length
       ? tiles
       : '<p class="home-step-empty-note">No colleges registered for ' + (uni ? uni.name.en : uniId) + ' yet.</p>' + tiles;
@@ -272,13 +256,21 @@
     if(!el) return;
     var uniCount = Object.keys(window.APP_UNIVERSITIES || {}).length;
     var planCount = allPlanMeta().length;
+    var faculties = Object.keys(collegesForUniversity(soleUniversity() || state.university) || {}).length;
     el.innerHTML =
       '<span>📚 ' + planCount + ' study plan' + (planCount === 1 ? '' : 's') + '</span>' +
-      '<span>🎓 ' + uniCount + ' universit' + (uniCount === 1 ? 'y' : 'ies') + '</span>' +
+      // "1 university" is not a fact worth a chip when there is no university
+      // to choose. On one university it reports the faculties instead, which
+      // IS what the screen below is about.
+      (uniCount === 1
+        ? (faculties ? '<span>🏛 ' + faculties + ' facult' + (faculties === 1 ? 'y' : 'ies') + '</span>' : '')
+        : '<span>🎓 ' + uniCount + ' universities</span>') +
       '<span>🆓 Free &amp; offline</span>';
   }
 
   function showUniversities(){
+    var only = soleUniversity();
+    if(only){ showColleges(only); return; }
     state.university = null; state.college = null;
     renderResumeCard();
     renderUniversities();
@@ -290,7 +282,9 @@
 
   function showColleges(uniId){
     state.university = uniId; state.college = null;
+    renderResumeCard();
     renderColleges(uniId);
+    renderHeaderStats();
     renderBreadcrumb();
     showStep('colleges');
   }

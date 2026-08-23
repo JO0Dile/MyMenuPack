@@ -1,0 +1,851 @@
+[
+ {
+  "i": 1,
+  "kind": "p",
+  "imgs": [
+   "image1.png"
+  ],
+  "text": "first :"
+ },
+ {
+  "i": 19,
+  "kind": "p",
+  "imgs": [
+   "image2.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 21,
+  "kind": "p",
+  "imgs": [
+   "image3.png",
+   "image4.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 24,
+  "kind": "p",
+  "imgs": [
+   "image5.jpeg"
+  ],
+  "text": "Diploma in Dental Assistance"
+ },
+ {
+  "i": 66,
+  "kind": "p",
+  "imgs": [
+   "image6.png",
+   "image7.jpeg"
+  ],
+  "text": "for univ. elec. : Students must pass ( 2 ) credit hours from any of the following courses"
+ },
+ {
+  "i": 68,
+  "kind": "p",
+  "imgs": [
+   "image8.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 70,
+  "kind": "p",
+  "imgs": [
+   "image9.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 73,
+  "kind": "p",
+  "imgs": [
+   "image10.jpeg"
+  ],
+  "text": "Diploma in Mobile Application Development"
+ },
+ {
+  "i": 102,
+  "kind": "p",
+  "imgs": [
+   "image11.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 104,
+  "kind": "p",
+  "imgs": [
+   "image12.jpeg",
+   "image13.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 106,
+  "kind": "p",
+  "imgs": [
+   "image14.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 108,
+  "kind": "p",
+  "imgs": [
+   "image15.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 111,
+  "kind": "p",
+  "imgs": [
+   "image16.jpeg"
+  ],
+  "text": "Diploma in Property Valuation"
+ },
+ {
+  "i": 140,
+  "kind": "p",
+  "imgs": [
+   "image17.jpeg",
+   "image18.png"
+  ],
+  "text": "this one have 2 academic plans 👍 first one :"
+ },
+ {
+  "i": 142,
+  "kind": "p",
+  "imgs": [
+   "image19.jpeg",
+   "image20.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 144,
+  "kind": "p",
+  "imgs": [
+   "image21.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 146,
+  "kind": "p",
+  "imgs": [
+   "image22.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 148,
+  "kind": "p",
+  "imgs": [
+   "image23.jpeg"
+  ],
+  "text": "now the second plan:"
+ },
+ {
+  "i": 150,
+  "kind": "p",
+  "imgs": [
+   "image24.png",
+   "image25.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 152,
+  "kind": "p",
+  "imgs": [
+   "image26.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 154,
+  "kind": "p",
+  "imgs": [
+   "image27.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 157,
+  "kind": "p",
+  "imgs": [
+   "image28.jpeg"
+  ],
+  "text": "Diploma in Cosmetics and Skincare"
+ },
+ {
+  "i": 171,
+  "kind": "p",
+  "imgs": [
+   "image29.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 173,
+  "kind": "p",
+  "imgs": [
+   "image30.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 175,
+  "kind": "p",
+  "imgs": [
+   "image31.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 177,
+  "kind": "p",
+  "imgs": [
+   "image32.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 179,
+  "kind": "p",
+  "imgs": [
+   "image33.png",
+   "image34.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 182,
+  "kind": "p",
+  "imgs": [
+   "image35.jpeg"
+  ],
+  "text": "Diploma in Dental Technology"
+ },
+ {
+  "i": 199,
+  "kind": "p",
+  "imgs": [
+   "image36.jpeg"
+  ],
+  "text": "first one :"
+ },
+ {
+  "i": 218,
+  "kind": "p",
+  "imgs": [
+   "image37.png"
+  ],
+  "text": "Students must pass ( 2 ) credit hours from any of the following courses"
+ },
+ {
+  "i": 220,
+  "kind": "p",
+  "imgs": [
+   "image38.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 247,
+  "kind": "p",
+  "imgs": [
+   "image39.png"
+  ],
+  "text": "Free Elective"
+ },
+ {
+  "i": 250,
+  "kind": "p",
+  "imgs": [
+   "image40.jpeg",
+   "image41.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 252,
+  "kind": "p",
+  "imgs": [
+   "image42.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 254,
+  "kind": "p",
+  "imgs": [
+   "image43.jpeg"
+  ],
+  "text": "now 2nd plan:"
+ },
+ {
+  "i": 256,
+  "kind": "p",
+  "imgs": [
+   "image44.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 258,
+  "kind": "p",
+  "imgs": [
+   "image45.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 260,
+  "kind": "p",
+  "imgs": [
+   "image46.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 262,
+  "kind": "p",
+  "imgs": [
+   "image47.png",
+   "image48.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 265,
+  "kind": "p",
+  "imgs": [
+   "image49.png"
+  ],
+  "text": "Diploma in Occupational Health and Safety"
+ },
+ {
+  "i": 276,
+  "kind": "p",
+  "imgs": [
+   "image50.png"
+  ],
+  "text": ""
+ },
+ {
+  "i": 278,
+  "kind": "p",
+  "imgs": [
+   "image51.jpeg"
+  ],
+  "text": ""
+ },
+ {
+  "i": 295,
+  "kind": "p",
+  "imgs": [
+   "image52.jpeg"
+  ],
+  "text": "AND THAT’S ALL FOR Junior College"
+ },
+ {
+  "i": 308,
+  "kind": "p",
+  "imgs": [
+   "image53.jpeg"
+  ],
+  "text": "Bachelor in Environmental Sciences and Technology"
+ },
+ {
+  "i": 388,
+  "kind": "p",
+  "imgs": [
+   "image54.png"
+  ],
+  "text": "2nd : Bachelor in Hearing and Speech - Specialization in Speech, Language and Hearing Disorders and Therapy"
+ },
+ {
+  "i": 451,
+  "kind": "p",
+  "imgs": [
+   "image55.png"
+  ],
+  "text": "3rd : Bachelor in Medical Imaging"
+ },
+ {
+  "i": 520,
+  "kind": "p",
+  "imgs": [
+   "image56.jpeg"
+  ],
+  "text": "4th : Bachelor in Occupational Therapy"
+ },
+ {
+  "i": 583,
+  "kind": "p",
+  "imgs": [
+   "image57.png"
+  ],
+  "text": "5th : Bachelor in Prosthetics and Orthotics"
+ },
+ {
+  "i": 639,
+  "kind": "p",
+  "imgs": [
+   "image58.jpeg"
+  ],
+  "text": "6th : Bachelor in Hearing and Speech - Specialization in Audiology"
+ },
+ {
+  "i": 657,
+  "kind": "p",
+  "imgs": [
+   "image59.png"
+  ],
+  "text": "7th : Bachelor in Management – Specialization in Environmental Management and Recycling"
+ },
+ {
+  "i": 715,
+  "kind": "p",
+  "imgs": [
+   "image60.png"
+  ],
+  "text": "8th : Bachelor in Medical Laboratory Sciences"
+ },
+ {
+  "i": 789,
+  "kind": "p",
+  "imgs": [
+   "image61.png"
+  ],
+  "text": "9th plan : Bachelor in Physio-Therapy"
+ },
+ {
+  "i": 889,
+  "kind": "p",
+  "imgs": [
+   "image62.jpeg"
+  ],
+  "text": "first : Bachelor in Industrial Product Design"
+ },
+ {
+  "i": 947,
+  "kind": "p",
+  "imgs": [
+   "image63.png"
+  ],
+  "text": "2nd : Bachelor in Virtual Reality Arts"
+ },
+ {
+  "i": 1000,
+  "kind": "p",
+  "imgs": [
+   "image64.png"
+  ],
+  "text": "3rd : Bachelor in Interior Architecture"
+ },
+ {
+  "i": 1121,
+  "kind": "p",
+  "imgs": [
+   "image65.jpeg"
+  ],
+  "text": "Overview"
+ },
+ {
+  "i": 1142,
+  "kind": "p",
+  "imgs": [
+   "image66.jpeg"
+  ],
+  "text": "2nd : Diploma in Education for Upper Basic Level - Teaching Mathematics"
+ },
+ {
+  "i": 1172,
+  "kind": "p",
+  "imgs": [
+   "image67.jpeg"
+  ],
+  "text": "3rd : Bachelor in Arabic Language and Media"
+ },
+ {
+  "i": 1230,
+  "kind": "p",
+  "imgs": [
+   "image68.png"
+  ],
+  "text": "4th : Bachelor in Educational Administration"
+ },
+ {
+  "i": 1243,
+  "kind": "p",
+  "imgs": [
+   "image69.png"
+  ],
+  "text": "5th : Bachelor in Languages"
+ },
+ {
+  "i": 1330,
+  "kind": "p",
+  "imgs": [
+   "image70.png"
+  ],
+  "text": "6th : Bachelor in Teaching English"
+ },
+ {
+  "i": 1432,
+  "kind": "p",
+  "imgs": [
+   "image71.png"
+  ],
+  "text": "7th : Diploma in Education for Upper Basic Level - Teaching English"
+ },
+ {
+  "i": 1468,
+  "kind": "p",
+  "imgs": [
+   "image72.jpeg"
+  ],
+  "text": "8th : Diploma in Education for Upper Basic Level - Teaching Science"
+ },
+ {
+  "i": 1504,
+  "kind": "p",
+  "imgs": [
+   "image73.jpeg"
+  ],
+  "text": "9th : Bachelor in Basic Elementary Education"
+ },
+ {
+  "i": 1623,
+  "kind": "p",
+  "imgs": [
+   "image74.png"
+  ],
+  "text": "10th : Bachelor in English Language"
+ },
+ {
+  "i": 1712,
+  "kind": "p",
+  "imgs": [
+   "image75.png"
+  ],
+  "text": "11th : Bachelor in Social Work"
+ },
+ {
+  "i": 1728,
+  "kind": "p",
+  "imgs": [
+   "image76.png"
+  ],
+  "text": "first :Bachelor in Accounting"
+ },
+ {
+  "i": 1793,
+  "kind": "p",
+  "imgs": [
+   "image77.png"
+  ],
+  "text": "2nd : Bachelor in Economy and Islamic Banking"
+ },
+ {
+  "i": 1866,
+  "kind": "p",
+  "imgs": [
+   "image78.jpeg"
+  ],
+  "text": "3rd : Bachelor in Human Resources Management"
+ },
+ {
+  "i": 1929,
+  "kind": "p",
+  "imgs": [
+   "image79.png"
+  ],
+  "text": "4th : Bachelor in Marketing"
+ },
+ {
+  "i": 1950,
+  "kind": "p",
+  "imgs": [
+   "image80.jpeg"
+  ],
+  "text": "5th : Bachelor in Operations Management - Specialization in Management Information Systems (MIS)"
+ },
+ {
+  "i": 2022,
+  "kind": "p",
+  "imgs": [
+   "image81.png"
+  ],
+  "text": "6th : Bachelor in Business Administration"
+ },
+ {
+  "i": 2095,
+  "kind": "p",
+  "imgs": [
+   "image82.png"
+  ],
+  "text": "7th : Bachelor in Financial and Banking Sciences"
+ },
+ {
+  "i": 2105,
+  "kind": "p",
+  "imgs": [
+   "image83.png"
+  ],
+  "text": "8th : Bachelor in Land and Property Management"
+ },
+ {
+  "i": 2159,
+  "kind": "p",
+  "imgs": [
+   "image84.jpeg"
+  ],
+  "text": "9th : Bachelor in Operations Management - Specialization in Hospitals and Health Care Management"
+ },
+ {
+  "i": 2197,
+  "kind": "p",
+  "imgs": [
+   "image85.png"
+  ],
+  "text": "Overview"
+ },
+ {
+  "i": 2302,
+  "kind": "p",
+  "imgs": [
+   "image86.png"
+  ],
+  "text": "2nd : Bachelor in Dental Technology"
+ },
+ {
+  "i": 2360,
+  "kind": "p",
+  "imgs": [
+   "image87.jpeg"
+  ],
+  "text": "3rd : Residency Program in Orthodontics"
+ },
+ {
+  "i": 2396,
+  "kind": "p",
+  "imgs": [
+   "image88.png"
+  ],
+  "text": "4th : Bachelor in Doctor of Dental Surgery"
+ },
+ {
+  "i": 2566,
+  "kind": "p",
+  "imgs": [
+   "image89.png"
+  ],
+  "text": "Overview"
+ },
+ {
+  "i": 2569,
+  "kind": "p",
+  "imgs": [
+   "image90.png"
+  ],
+  "text": "2nd : Bachelor in Civil Engineering"
+ },
+ {
+  "i": 2711,
+  "kind": "p",
+  "imgs": [
+   "image91.jpeg"
+  ],
+  "text": "3rd : Bachelor in Cybersecurity Engineering"
+ },
+ {
+  "i": 2876,
+  "kind": "p",
+  "imgs": [
+   "image92.png"
+  ],
+  "text": "4th : Bachelor in Mechatronics Engineering"
+ },
+ {
+  "i": 2948,
+  "kind": "p",
+  "imgs": [
+   "image93.png"
+  ],
+  "text": "5th : Bachelor in Public Safety Engineering"
+ },
+ {
+  "i": 2982,
+  "kind": "p",
+  "imgs": [
+   "image94.jpeg"
+  ],
+  "text": "6th : Bachelor in Architecture Engineering"
+ },
+ {
+  "i": 3145,
+  "kind": "p",
+  "imgs": [
+   "image95.png"
+  ],
+  "text": "7th : Bachelor in Computer Systems Engineering"
+ },
+ {
+  "i": 3325,
+  "kind": "p",
+  "imgs": [
+   "image96.jpeg"
+  ],
+  "text": "8th : Bachelor in Electrical Engineering and Renewable Energy"
+ },
+ {
+  "i": 3543,
+  "kind": "p",
+  "imgs": [
+   "image97.jpeg"
+  ],
+  "text": "9th : Bachelor in Medical Equipment Engineering"
+ },
+ {
+  "i": 3686,
+  "kind": "p",
+  "imgs": [
+   "image98.png"
+  ],
+  "text": "10th : Bachelor in Telecommunications Engineering"
+ },
+ {
+  "i": 3922,
+  "kind": "p",
+  "imgs": [
+   "image99.jpeg"
+  ],
+  "text": "first : Bachelor in Computer Networks - Minor Information Security"
+ },
+ {
+  "i": 4104,
+  "kind": "p",
+  "imgs": [
+   "image100.png"
+  ],
+  "text": "2nd : Bachelor in Computer Science - Minor Computer Information Technology"
+ },
+ {
+  "i": 4123,
+  "kind": "p",
+  "imgs": [
+   "image101.png"
+  ],
+  "text": "3rd : Bachelor in Cyber Security"
+ },
+ {
+  "i": 4284,
+  "kind": "p",
+  "imgs": [
+   "image102.jpeg"
+  ],
+  "text": "forth : Bachelor in Multimedia Technology"
+ },
+ {
+  "i": 4444,
+  "kind": "p",
+  "imgs": [
+   "image103.png"
+  ],
+  "text": "5th : Bachelor in Computer Science"
+ },
+ {
+  "i": 4633,
+  "kind": "p",
+  "imgs": [
+   "image104.jpeg"
+  ],
+  "text": "6th : Bachelor in Computer Science - Specialization in Game Design and Development"
+ },
+ {
+  "i": 4768,
+  "kind": "p",
+  "imgs": [
+   "image105.png"
+  ],
+  "text": "7th : Bachelor in Geographic Information Systems (GIS)"
+ },
+ {
+  "i": 4948,
+  "kind": "p",
+  "imgs": [
+   "image106.png"
+  ],
+  "text": "first : Bachelor in Fiqh And Law"
+ },
+ {
+  "i": 5121,
+  "kind": "p",
+  "imgs": [
+   "image107.png"
+  ],
+  "text": "2nd : Bachelor in Law - Concentration on Law in English"
+ },
+ {
+  "i": 5313,
+  "kind": "p",
+  "imgs": [
+   "image108.png"
+  ],
+  "text": "3rd : Bachelor in Law"
+ },
+ {
+  "i": 5532,
+  "kind": "p",
+  "imgs": [
+   "image109.png"
+  ],
+  "text": "first : Bachelor in Biomedical Sciences"
+ },
+ {
+  "i": 5597,
+  "kind": "p",
+  "imgs": [
+   "image110.png"
+  ],
+  "text": "2nd : Bachelor in Doctor of Medicine"
+ },
+ {
+  "i": 5865,
+  "kind": "p",
+  "imgs": [
+   "image111.jpeg"
+  ],
+  "text": "Faculty of Modern Media"
+ },
+ {
+  "i": 5954,
+  "kind": "p",
+  "imgs": [
+   "image112.png"
+  ],
+  "text": "2nd : Bachelor in Public Relations"
+ },
+ {
+  "i": 6040,
+  "kind": "p",
+  "imgs": [
+   "image113.jpeg"
+  ],
+  "text": "3rd : Bachelor in Modern Media - Specialization in Digital Media and Communication"
+ },
+ {
+  "i": 6095,
+  "kind": "p",
+  "imgs": [
+   "image114.jpeg"
+  ],
+  "text": "done for now. there is also this :"
+ }
+]

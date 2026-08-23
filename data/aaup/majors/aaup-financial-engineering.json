@@ -10,7 +10,7 @@
   "bioAr": null,
   "university": "aaup",
   "college": "aaup-ai-ds",
-  "degreeHours": null,
+  "degreeHours": 133,
   "sourceVersion": 1,
   "courses": [
     {
@@ -28,7 +28,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "010610014",
@@ -45,7 +46,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "010610025",
@@ -62,7 +64,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "010610026",
@@ -79,7 +82,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "010610035",
@@ -96,7 +100,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "010610036",
@@ -113,7 +118,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "040111001",
@@ -130,7 +136,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "040511011",
@@ -147,7 +154,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "040521301",
@@ -164,7 +172,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "110411000",
@@ -181,7 +190,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univReq"
     },
     {
       "slug": "uni-elective-1",
@@ -198,7 +208,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univElec"
     },
     {
       "slug": "uni-elective-2",
@@ -215,7 +226,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univElec"
     },
     {
       "slug": "uni-elective-3",
@@ -232,7 +244,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univElec"
     },
     {
       "slug": "uni-elective-4",
@@ -249,7 +262,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "univElec"
     },
     {
       "slug": "020211010",
@@ -266,7 +280,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "020312100",
@@ -283,7 +298,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "250111010",
@@ -300,7 +316,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "250111030",
@@ -317,7 +334,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "250221020",
@@ -334,7 +352,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "250221040",
@@ -351,7 +370,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "250221060",
@@ -368,7 +388,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "colgReq"
     },
     {
       "slug": "020213110",
@@ -385,7 +406,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222010",
@@ -402,7 +424,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222020",
@@ -419,7 +442,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222030",
@@ -436,7 +460,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222040",
@@ -453,7 +478,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222050",
@@ -470,7 +496,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222060",
@@ -487,7 +514,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250222070",
@@ -504,7 +532,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223010",
@@ -521,7 +550,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223020",
@@ -538,7 +568,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223030",
@@ -555,7 +586,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223040",
@@ -572,7 +604,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223050",
@@ -589,7 +622,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223060",
@@ -606,7 +640,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223070",
@@ -623,7 +658,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223080",
@@ -640,7 +676,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250223090",
@@ -657,7 +694,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250224010",
@@ -674,7 +712,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250224030",
@@ -691,7 +730,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250224040",
@@ -708,7 +748,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250224050",
@@ -725,7 +766,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250224060",
@@ -742,7 +784,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "250224070",
@@ -759,7 +802,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specReq"
     },
     {
       "slug": "020214110",
@@ -776,7 +820,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "020214150",
@@ -793,7 +838,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "020253110",
@@ -810,7 +856,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "020313701",
@@ -827,7 +874,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "020333120",
@@ -844,7 +892,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "020334110",
@@ -861,7 +910,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "020411010",
@@ -878,7 +928,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "210312150",
@@ -895,7 +946,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "240114320",
@@ -912,7 +964,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250112030",
@@ -929,7 +982,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250112200",
@@ -946,7 +1000,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250112210",
@@ -963,7 +1018,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250113010",
@@ -980,7 +1036,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250113020",
@@ -997,7 +1054,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250113060",
@@ -1014,7 +1072,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "250113090",
@@ -1031,7 +1090,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "specElec"
     },
     {
       "slug": "free-elective-1",
@@ -1048,7 +1108,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "freeElec"
     },
     {
       "slug": "free-elective-2",
@@ -1065,7 +1126,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": null
+      "prerequisiteText": null,
+      "requirement": "freeElec"
     }
   ],
   "prerequisites": [
@@ -1215,5 +1277,34 @@
     }
   ],
   "iconKey": "chart",
-  "imageUrl": null
+  "imageUrl": null,
+  "requirementHours": {
+    "univReq": 14.0,
+    "univElec": 6,
+    "colgReq": 24.0,
+    "specReq": 69.0,
+    "specElec": 12,
+    "freeElec": 6
+  },
+  "requirementSource": {
+    "document": "AAUP AI & Data Science catalogue PDF",
+    "program": "Bachelor in Financial Engineering",
+    "via": "tools/merge-catalogue-requirements.py",
+    "matchedByNameNotCode": [
+      {
+        "planCode": "110411000",
+        "course": "Computer Skills"
+      }
+    ]
+  },
+  "requirementHoursDrift": {
+    "univElec": 2.0,
+    "specElec": 36.0
+  },
+  "degreeHoursDiscrepancy": {
+    "statedDegreeHours": 133,
+    "sumOfRequirementHours": 131.0,
+    "difference": -2.0,
+    "reason": "The PDF states this total but does not print enough requirement sections to reach it. Nothing is inferred to close the gap."
+  }
 }

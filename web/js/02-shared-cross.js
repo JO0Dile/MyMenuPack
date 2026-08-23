@@ -56,6 +56,24 @@ window.__normalizeSemester = function(s){
 // practice, and its strings feed the same innerHTML render paths as
 // everything else. Idempotent (see __cleanText), so already-clean plans
 // pass through byte-identical and re-sanitizing is always safe.
+// The university's requirement buckets, in the order a degree audit lists them.
+// Shared by both sanitizers and by the roadmap, so the three cannot drift.
+window.__REQUIREMENT_KEYS = ['univReq','univElec','colgReq','specReq','specElec','freeElec','supportCourses'];
+
+// Hours-per-bucket off a plan, reduced to known keys and finite non-negative
+// numbers. A plan arrives from a feed or a shared file, so this is untrusted
+// input like everything else here; and a bogus value would not throw, it would
+// quietly become a student's degree total.
+window.__cleanRequirementHours = function(h){
+  var out = {};
+  if(!h || typeof h !== 'object') return out;
+  window.__REQUIREMENT_KEYS.forEach(function(k){
+    var n = Number(h[k]);
+    if(isFinite(n) && n >= 0 && n <= 400) out[k] = n;
+  });
+  return out;
+};
+
 window.__sanitizeImportedPlan = function(p){
   if(!p || typeof p !== 'object') return p;
   var clean = window.__cleanText;
@@ -103,6 +121,10 @@ window.__sanitizeImportedPlan = function(p){
       };
       if(c.yearId != null){ out.yearId = safeId(c.yearId, 'y1'); }
       if(c.courseNumber != null){ out.courseNumber = clean(c.courseNumber).slice(0, 30); }
+      // An enum, checked against the known buckets rather than escaped as
+      // text — the same treatment iconKey gets. Anything unrecognised is
+      // dropped, which leaves the reader falling back to the visual category.
+      if(window.__REQUIREMENT_KEYS.indexOf(c.requirement) !== -1){ out.requirement = c.requirement; }
       if(c.num != null){ out.num = clean(c.num).slice(0, 30); }
       if(c.isRetake){ out.isRetake = true; }
       return out;
@@ -113,6 +135,7 @@ window.__sanitizeImportedPlan = function(p){
       return Array.isArray(pair) ? [safeId(pair[0]), safeId(pair[1])] : null;
     }).filter(function(pair){ return pair && pair[0] && pair[1]; });
   }
+  p.requirementHours = window.__cleanRequirementHours(p.requirementHours);
   return p;
 };
 
@@ -208,7 +231,10 @@ window.__applyPrereqEdits = function(prefix, basePrereqs){
   return out;
 };
 
-window.__registerPlanData = function(prefix, courseInfo, prereqs){
+// `extra` carries whatever else the plan knows about itself that is not a
+// course or a prerequisite — today just requirementHours, the university's own
+// hours-per-requirement-bucket. Optional, so every existing caller still works.
+window.__registerPlanData = function(prefix, courseInfo, prereqs, extra){
   var base = Array.isArray(prereqs) ? prereqs : [];
   var effective = window.__applyPrereqEdits(prefix, base);
   // Object.create(null), not {}. Course slugs are data — an imported plan can
@@ -229,6 +255,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   });
   window.__PLAN_DATA[prefix] = {
     courseInfo: courseInfo,
+    requirementHours: (extra && extra.requirementHours) || {},
     prereqs: effective,
     // The plan exactly as shipped/imported, kept so a student's overlay can be
     // recomputed (or cleared back to official) without a page reload.
@@ -242,7 +269,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 window.__rebuildPlanData = function(prefix){
   var d = window.__PLAN_DATA[prefix];
   if(!d) return;
-  window.__registerPlanData(prefix, d.courseInfo, d.basePrereqs || d.prereqs);
+  window.__registerPlanData(prefix, d.courseInfo, d.basePrereqs || d.prereqs,
+                            { requirementHours: d.requirementHours });
   if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
   else if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
 };
@@ -280,6 +308,74 @@ window.__openCourses = function(prefix){
 // number is seen first (GPA's primaryId resolves a "-lab" slug to its
 // lecture), skip a course superseded by a retake, and never dedupe on the
 // "-" placeholder that generic elective slots share.
+// What a plan is WORTH, from the plan object rather than the rendered page.
+//
+// __dedupeForCredit below does this for DOM elements, but the home grid and the
+// plan sheet count from the data, before anything is rendered — and they were
+// counting raw. Two things make a raw sum wrong, and AAUP's plans hit both:
+//
+//   A lecture and its lab are ONE registered course with ONE catalogue number
+//   and ONE credit value, drawn as two cards on purpose. Summing the cards
+//   counted Programming Fundamentals as 4 hours plus another 4.
+//
+//   An elective pool lists every option a student may pick from, so its cards
+//   add up to far more than the requirement is worth.
+//
+// requirementHours settles both at once where a plan has it: it is what the
+// university requires, per bucket. Without it, fall back to summing each
+// catalogue number once.
+window.__planTotalCredits = function(plan){
+  if(!plan) return 0;
+  var req = plan.requirementHours;
+  if(req){
+    var keys = Object.keys(req);
+    if(keys.length){
+      var sum = 0;
+      keys.forEach(function(k){ var n = Number(req[k]); if(isFinite(n)) sum += n; });
+      return sum;
+    }
+  }
+  var seen = Object.create(null), total = 0, pool = [];
+  (plan.courses || []).forEach(function(c){
+    var num = c && c.courseNumber ? String(c.courseNumber).trim() : '';
+    var key = (num && num !== '-') ? num : (c && c.id);
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    var cr = parseFloat(c.creditHours) || 0;
+    if(c.category === 'dept') pool.push(cr);   // the elective pool, capped below
+    else total += cr;
+  });
+  if(pool.length){
+    // How many of the pool a student actually takes. Same per-plan count the
+    // Degree Audit and My Path use, so all three report one number.
+    var need = (window.__DEPT_REQUIRED || {})[plan.id];
+    if(typeof need !== 'number' || need > pool.length) need = pool.length;
+    var counts = {}, unit = pool[0], best = 0;
+    pool.forEach(function(v){
+      counts[v] = (counts[v] || 0) + 1;
+      if(counts[v] > best){ best = counts[v]; unit = v; }
+    });
+    total += unit * need;
+  }
+  return total;
+};
+
+// The credit hours a student has finished, counted the same way: one entry per
+// registered course, so ticking a lecture does not also bank its lab's hours.
+window.__planEarnedCredits = function(plan, isDone){
+  if(!plan) return 0;
+  var seen = Object.create(null), total = 0;
+  (plan.courses || []).forEach(function(c){
+    if(!c || !isDone(c.id)) return;
+    var num = c.courseNumber ? String(c.courseNumber).trim() : '';
+    var key = (num && num !== '-') ? num : c.id;
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    total += parseFloat(c.creditHours) || 0;
+  });
+  return total;
+};
+
 window.__dedupeForCredit = function(prefix, els){
   var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
   var seen = Object.create(null);

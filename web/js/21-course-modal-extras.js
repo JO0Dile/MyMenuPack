@@ -442,28 +442,52 @@
       });
     }
 
+    // Four segments, one state. Three of them (Not started / In progress /
+    // Planned) live in AAUP_GPA's planning-status map; the fourth, Done, is
+    // real completion and lives in the progress map the checkbox writes —
+    // this control never keeps a parallel copy of it.
+    //
+    // That split is why leaving Done used to not work. Pressing "Not started"
+    // on a completed course only deleted the planning-status entry and moved
+    // the active class; nothing touched the progress map, so the very next
+    // render read isDone === true and snapped the control straight back to
+    // Done. The course could only be un-completed by pressing Done a second
+    // time. Choosing any of the other three now un-completes it first, which
+    // is what picking a different segment of a segmented control means.
+    function rerenderExtras(){
+      var parent = container.parentNode;
+      container.outerHTML = render(prefix, slug);
+      bind(prefix, slug, parent.querySelector('.modal-extras'));
+    }
     container.querySelectorAll('.status-btn').forEach(function(btn){
       btn.addEventListener('click', function(){
         var val = btn.getAttribute('data-status');
-        // Phone-only real "Done" segment: the checkbox is the one source of
-        // truth for completion, so this calls the exact same toggle rather
-        // than writing a parallel "done" entry into the statuses map — then
-        // fully re-renders, since isDone gates the grade/difficulty/
-        // workload/notes block below and the planning-status buttons need
-        // to reflect a real progress-map change, not just an active class.
+        // Read completion fresh rather than closing over render()'s isDone —
+        // the checkbox, a swipe or a long-press can all have changed it while
+        // this modal sat open.
+        var nowDone = !!(window.__getProgress ? window.__getProgress()[pid] : null);
         if(val === 'done'){
+          // Already the active segment: a segmented control has nothing to do
+          // when you pick the state you are in. It used to un-complete here,
+          // which was the only way out of Done while "Not started" was broken.
+          if(nowDone) return;
           var el = document.getElementById(pid);
           if(el && window.__toggleCourse){ window.__toggleCourse(el); }
-          var parent = container.parentNode;
-          var freshHtml = render(prefix, slug);
-          container.outerHTML = freshHtml;
-          var freshContainer = parent.querySelector('.modal-extras');
-          bind(prefix, slug, freshContainer);
+          // A full re-render, not just an active class: isDone gates the
+          // grade / difficulty / workload / notes block below it.
+          rerenderExtras();
           return;
         }
         var statuses = window.AAUP_GPA.loadStatuses();
         if(val){ statuses[pid] = val; } else { delete statuses[pid]; }
         window.AAUP_GPA.saveStatuses(statuses);
+        if(nowDone){
+          var doneEl = document.getElementById(pid);
+          if(doneEl && window.__toggleCourse){ window.__toggleCourse(doneEl); }
+          if(window.AAUP_COMMUNITY) window.AAUP_COMMUNITY.pingRating(prefix, slug);
+          rerenderExtras();
+          return;
+        }
         container.querySelectorAll('.status-btn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
         if(window.AAUP_COMMUNITY) window.AAUP_COMMUNITY.pingRating(prefix, slug);

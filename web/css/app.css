@@ -384,6 +384,17 @@
   .home-header-body{flex:1 1 auto;min-width:0;}
 
   .home-header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.02em;}
+  /* The app's name, with the Arabic tagline riding beside it. Baseline-aligned
+     rather than centred, so the two read as one lockup instead of two words
+     that happen to be next to each other. */
+  .home-wordmark{
+    display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+    font-size:23px;font-weight:900;letter-spacing:.09em;
+  }
+  .home-wordmark-ar{
+    font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--accent);
+    direction:rtl;
+  }
 
   .home-header p{margin:4px 0 0;font-size:13px;color:var(--text-dim);}
 
@@ -497,6 +508,55 @@
     display:flex;align-items:center;gap:6px;
   }
 
+  /* A faculty tile is one row: the faculty's icon, its name, and how many
+     plans sit behind it. The stacked .plan-card layout above — icon on its
+     own line, then paragraphs, then a CTA — is for tiles that have something
+     to say. A signpost doesn't, so it gets a row and stays short. */
+  .plan-card-faculty{
+    flex-direction:row;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+  }
+
+  .plan-card-faculty .pc-icon{
+    width:44px;height:44px;border-radius:10px;flex:0 0 auto;
+  }
+
+  .plan-card-faculty .pc-icon svg{width:26px;height:26px;}
+
+  .pc-faculty-body{min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .pc-faculty-body h2{font-size:15px;}
+  .pc-faculty-body p{font-size:12px;}
+
+  /* The count is a number, not a sentence — "8 plans" spelled out is exactly
+     the kind of line this tile stopped carrying. The words are on the tile's
+     aria-label for a screen reader and on this badge's title for a hover. */
+  .pc-faculty-count{
+    flex:0 0 auto;margin-inline-start:auto;
+    min-width:30px;padding:3px 9px;border-radius:999px;
+    background:rgba(111,140,255,.12);color:var(--accent);
+    font-size:13px;font-weight:800;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .pc-faculty-count-none{background:rgba(255,255,255,.05);color:var(--text-dim);}
+
+  /* The faculty screen's "Add a plan" tile shares a grid row with the faculty
+     tiles, so its 150px column height would stretch every row beside it back
+     to the size the tiles just stopped being. On this screen only, it becomes
+     the same row shape they are. */
+  #homeCollegeGrid .new-plan-card{
+    flex-direction:row;justify-content:flex-start;gap:14px;
+    min-height:0;padding:16px 18px;
+  }
+
+  #homeCollegeGrid .new-plan-card .npc-plus{
+    width:44px;height:44px;border-radius:10px;border-width:1px;font-size:24px;
+  }
+
+  #homeCollegeGrid .new-plan-card .npc-label{text-align:left;}
+
 
   .home-footer{
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
@@ -525,6 +585,8 @@
     .search-wrap{margin-left:0;margin-right:0;}
     .plan-grid{gap:10px;}
     .plan-card{padding:16px 14px 14px;}
+    .plan-card-faculty,
+    #homeCollegeGrid .new-plan-card{padding:14px;gap:12px;}
   }
 
   /* A resting border only earns its keep on a device with hover to promote
@@ -2891,7 +2953,16 @@
      sticky bar with the plan name, its progress, and a chevron. All those
      pieces stay exactly where their own modules put them; this only hides
      them with a class-scoped rule and reveals them again on tap. */
-  .imp-phone-bar{display:none;}
+  /* All three phone-header pieces are hidden by default and only turned on
+     inside the breakpoint below. js/69-phone-header.js builds the year tabs
+     and the Legend/Available-only chips from the plan's own data with no
+     width check of its own, so above 720px they were still in the DOM with
+     every one of their rules sitting behind a media query that did not
+     match — bare <button> elements painting themselves white-on-black in
+     the browser's default style, above the plan. */
+  .imp-phone-bar,
+  .imp-phone-years,
+  .imp-phone-chips{display:none;}
   @media (max-width:720px){
     .sheet-plan{position:relative;}
     .imp-phone-bar{
@@ -3457,16 +3528,67 @@
   .community-notes-popover .cnp-close{float:right;cursor:pointer;color:var(--text-dim);background:none;border:none;font-size:14px;}
 
   /* ==========================================================================
-     14b. FIRST-RUN WIZARD — the one guided flow a brand-new student sees
-     (js/55-onboarding.js): welcome, optional name/GPA/gender, theme, ready.
-     Full-bleed card (no padding of its own) so the progress bar can sit
-     flush against the top edge; .wiz-body carries the actual padding.
+     14b. FIRST-RUN LANDING — the first screen a new student sees
+     (js/55-onboarding.js). The name, one line, and the choice of signing in.
+     Full-bleed card (no padding of its own); .wiz-landing and .wiz-body
+     carry the padding.
      ========================================================================== */
 
-  .onboarding-modal-card{max-width:440px;padding:0;overflow:hidden;}
+  .onboarding-modal-card{max-width:420px;padding:0;overflow:hidden;}
 
-  .wiz-progress{height:3px;background:rgba(255,255,255,.08);}
-  .wiz-progress > span{display:block;height:100%;background:var(--accent);transition:width .3s ease;}
+  /* The landing screen. Deliberately tall and mostly empty: the wordmark is
+     the content, and the two buttons are the only things to do. */
+  .wiz-landing{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:52px 30px 30px;gap:0;
+  }
+  .wiz-brand{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .wiz-brand-mark{
+    width:74px;height:74px;object-fit:contain;border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  .wiz-brand-name{
+    font-size:34px;font-weight:900;letter-spacing:.10em;color:var(--text);
+    line-height:1;
+  }
+  /* The Arabic sits under the wordmark as a tagline, not beside it: at 34px
+     the Latin name is the mark, and pairing them on one line makes neither
+     read as the title. */
+  .wiz-brand-ar{
+    font-size:19px;font-weight:700;color:var(--accent);line-height:1;
+    letter-spacing:.02em;
+  }
+  .wiz-landing-line{
+    margin:22px 0 0;font-size:13.5px;line-height:1.65;color:var(--text-dim);
+    max-width:270px;
+  }
+  .wiz-landing-actions{
+    display:flex;flex-direction:column;align-items:stretch;gap:10px;
+    width:100%;max-width:280px;margin-top:30px;
+  }
+  .wiz-landing-actions .wiz-continue{width:100%;padding:14px 22px;font-size:14px;}
+  .wiz-skip{
+    background:none;border:1px solid var(--line);border-radius:999px;
+    color:var(--text-dim);font-size:13px;font-weight:700;font-family:inherit;
+    padding:12px 22px;cursor:pointer;
+  }
+  .wiz-skip:hover{color:var(--text);border-color:var(--text-dim);}
+  .wiz-landing-note{
+    margin:26px 0 0;font-size:11px;line-height:1.6;color:var(--text-dim);
+    opacity:.7;max-width:280px;
+  }
+
+  /* The sign-in panel: one form, one mode switch. */
+  .wiz-fields{display:flex;flex-direction:column;gap:9px;width:100%;}
+  .wiz-fields input{
+    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:13.5px;font-family:inherit;color:var(--text);
+  }
+  .wiz-fields input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .wiz-switch{
+    background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;
+    font-family:inherit;cursor:pointer;padding:10px 4px 0;
+  }
 
   .wiz-skip-link{
     position:absolute;top:14px;right:16px;background:none;border:none;
@@ -3485,7 +3607,6 @@
   .wiz-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
   .wiz-content{width:100%;text-align:left;margin-top:14px;}
   .plan-page.rtl-mode .wiz-content{text-align:right;}
-  .wiz-content .theme-picker-grid{margin-top:0;}
 
   .wiz-foot{
     display:flex;justify-content:space-between;align-items:center;
@@ -4423,6 +4544,26 @@
   .app-sidebar .sb-spacer{flex:1;}
   .app-sidebar .sb-switch{border-top:1px solid var(--line); margin-top:8px; padding-top:12px;}
 
+  /* The Advanced disclosure. Styled as a row of the same weight as the items
+     it hides so it reads as one more destination in the list, with a count so
+     a student can see there is something behind it without opening it. */
+  .app-sidebar .sb-adv-toggle{
+    display:flex; align-items:center; gap:11px; width:100%;
+    padding:10px 18px; background:none; border:none; border-left:3px solid transparent;
+    color:var(--text-dim); font-family:inherit; font-size:13.5px; font-weight:600;
+    cursor:pointer; text-align:start;
+  }
+  .app-sidebar .sb-adv-toggle:hover{background:rgba(255,255,255,.04); color:var(--text);}
+  .app-sidebar .sb-adv-toggle.open{color:var(--text);}
+  .app-sidebar .sb-adv-label{flex:1; min-width:0;}
+  .app-sidebar .sb-adv-count{
+    font-size:11px; font-weight:800; color:var(--text-dim);
+    background:rgba(255,255,255,.06); border-radius:999px; padding:1px 7px;
+    font-variant-numeric:tabular-nums;
+  }
+  .app-sidebar .sb-adv-chevron{color:var(--text-faint); font-size:13px; flex:none;}
+  .app-sidebar .sb-adv-panel[hidden]{display:none;}
+
   /* .sb-groups is the phone-only grouped rendering of the same ITEMS list
      (js/37-sidebar.js moreGroupsHtml) — hidden here so desktop, which never
      asked for grouped sections, keeps exactly the flat list it always had. */
@@ -4508,6 +4649,18 @@
     .app-sidebar .sb-mrow-chevron{color:var(--text-faint); font-size:17px; flex:none;}
     .app-sidebar .sb-mrow.active .sb-mrow-label{color:var(--accent); font-weight:800;}
     .app-sidebar .sb-mrow.active .sb-mrow-icon{background:var(--accent); color:var(--on-accent);}
+
+    /* On the phone sheet the toggle is a section header that can be pressed,
+       so it takes the .sb-group-label's shape rather than the desktop row's —
+       otherwise it would look like a destination sitting outside any card. */
+    .app-sidebar .sb-adv-toggle{
+      width:100%; padding:16px 4px 8px; gap:8px; border-left:none;
+      font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+    }
+    .app-sidebar .sb-adv-toggle .sb-icon{display:none;}
+    .app-sidebar .sb-adv-toggle:hover{background:none;}
+    .app-sidebar .sb-adv-label{flex:0 1 auto;}
+    .app-sidebar .sb-adv-chevron{margin-inline-start:auto; font-size:15px;}
   }
 
   /* ==========================================================================
@@ -5770,6 +5923,22 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
      onboarding wizard) keep that, minus the space for the bar. */
   .modal-overlay .modal-card.cd-card,
   .modal-overlay .onboarding-modal-card{padding:56px 0 0;}
+
+  /* On a phone the onboarding card is the whole screen, so its footer belongs
+     at the bottom of that screen rather than immediately under the last field
+     — which left the Sign in button stranded halfway up with nothing below it.
+     The chain has to reach #onboardingWizardBody: the card's only child is the
+     modal body, and everything the step renders lives inside THAT. */
+  .modal-overlay .onboarding-modal-card{
+    display:flex; flex-direction:column; min-height:100%;
+  }
+  .modal-overlay .onboarding-modal-card > #onboardingWizardBody{
+    display:flex; flex-direction:column; flex:1 1 auto;
+  }
+  .modal-overlay #onboardingWizardBody > .wiz-body{flex:1 1 auto;}
+  .modal-overlay #onboardingWizardBody > .wiz-landing{
+    flex:1 1 auto; justify-content:center; padding-bottom:56px;
+  }
 
   .modal-overlay .modal-card > .modal-body{
     max-height:none;          /* the card owns the height on a phone */

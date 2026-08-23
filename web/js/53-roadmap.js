@@ -87,17 +87,39 @@
     skills: 'univReq', eng: 'univReq', uni: 'univElec',
     math: 'colgReq', core: 'specReq', dept: 'specElec', free: 'freeElec'
   };
-  var BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec'];
+  // supportCourses is the university's seventh bucket — science and language
+  // courses a program requires from outside its own department. Nothing in the
+  // app's visual categories maps to it, so it only appears on plans that carry
+  // an explicit `requirement`; leaving it out of this list dropped its hours
+  // from the total outright, and eight degrees read 10 to 24 hours short.
+  var BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec', 'supportCourses'];
   var BUCKET_META = {
     univReq:  { en: 'Univ. Req.',  ar: 'متطلب جامعي',          optional: false },
     univElec: { en: 'Univ. Elec.', ar: 'اختياري جامعي',        optional: true  },
     colgReq:  { en: 'Colg. Req.',  ar: 'متطلب كلية',           optional: false },
     specReq:  { en: 'Spec. Req.',  ar: 'متطلب تخصص',           optional: false },
     specElec: { en: 'Spec. Elec.', ar: 'اختياري تخصص',         optional: true  },
-    freeElec: { en: 'Free Elec.',  ar: 'اختياري حر',           optional: true  }
+    freeElec: { en: 'Free Elec.',  ar: 'اختياري حر',           optional: true  },
+    supportCourses: { en: 'Support',  ar: 'مساقات مساندة',      optional: false }
   };
 
-  function bucketOf(el){
+  // CAT_BUCKET is a GUESS, and it was wrong wherever the two taxonomies do not
+  // line up. A course's visual category says what colour its card is; the
+  // university's requirement bucket says which requirement it satisfies, and
+  // the same colour serves different buckets in different degrees. That is why
+  // this screen reported 11 University Requirement hours where the student
+  // portal says 14, and why College and Specialization could not be told apart
+  // at all — nothing in the data distinguished them.
+  //
+  // Plans built from a published university plan now carry the real bucket per
+  // course (`req`). Use it when it is there; fall back to the colour for majors
+  // no published plan covers yet.
+  function bucketOf(el, info){
+    if(info){
+      var parts = window.__splitCourseId ? window.__splitCourseId(el.id) : null;
+      var meta = parts ? info[parts.slug] : null;
+      if(meta && meta.req && BUCKET_META[meta.req]) return meta.req;
+    }
     for(var k in CAT_BUCKET){
       if(Object.prototype.hasOwnProperty.call(CAT_BUCKET, k) && el.classList.contains(k)) return CAT_BUCKET[k];
     }
@@ -141,7 +163,7 @@
         ? window.__dedupeForCredit(prefix, block.querySelectorAll('.course[id]:not(.course-removed)'))
         : Array.prototype.slice.call(block.querySelectorAll('.course[id]:not(.course-removed)'));
       countable.forEach(function(el){
-        var b = bucketOf(el);
+        var b = bucketOf(el, info);
         if(!b) return;
         if(seen[el.id]) return;
         seen[el.id] = true;
@@ -154,17 +176,46 @@
       });
     });
 
-    // An elective pool offers more than the degree requires — this plan lists 4
-    // specialization electives but you only take 2. Counting all four made the
-    // whole-plan total read 135 CH against a 129 CH degree. Cap the bucket at
-    // what is actually required, using the same per-plan count the Degree Audit
-    // uses, so the two screens cannot disagree.
-    var deptRequired = (window.__DEPT_REQUIRED || {})[prefix];
-    if(typeof deptRequired === 'number' && acc.specElec.courses > deptRequired){
-      var unit = acc.specElec.hours / acc.specElec.courses;   // even pools: one credit value
-      acc.specElec.hours = unit * deptRequired;
-      acc.specElec.requiredCount = deptRequired;
+    // A bucket is worth what the university REQUIRES, which is not the same as
+    // the sum of the cards drawn in it, in both directions:
+    //
+    //   too many — an elective pool lists every option a student may choose
+    //   from. Computer Science draws 16 specialization electives worth 48
+    //   hours for a 9-hour requirement.
+    //   too few  — a plan can simply be short a slot. GIS drew three 2-hour
+    //   University Electives against a requirement of 8.
+    //
+    // Where the published plan states the hours, they win. This is the whole
+    // degree only: a single YEAR is worth exactly the cards sitting in it, so
+    // year rollups keep counting cards.
+    var required = scopeYearIndex == null
+      ? ((window.__PLAN_DATA[prefix] || {}).requirementHours || {}) : {};
+    BUCKET_ORDER.forEach(function(k){
+      var need = required[k];
+      if(typeof need !== 'number' || acc[k].courses === 0) return;
+      if(need < acc[k].hours && acc[k].courses > 0){
+        // A pool: record how many of the offered courses actually count, so
+        // the row can say "pick 3 of 16" instead of silently shrinking.
+        var unit = acc[k].hours / acc[k].courses;
+        if(unit > 0) acc[k].requiredCount = Math.round(need / unit);
+      }
+      acc[k].hours = need;
       // Earned can never exceed what the requirement is worth.
+      if(acc[k].earned > need) acc[k].earned = need;
+      if(acc[k].requiredCount != null && acc[k].done > acc[k].requiredCount){
+        acc[k].done = acc[k].requiredCount;
+      }
+    });
+
+    // Majors with no published plan behind them keep the old per-plan count,
+    // which is hand-maintained in web/js/11-module11.js and only ever covered
+    // the specialization pool.
+    var deptRequired = (window.__DEPT_REQUIRED || {})[prefix];
+    if(typeof required.specElec !== 'number' &&
+       typeof deptRequired === 'number' && acc.specElec.courses > deptRequired){
+      var du = acc.specElec.hours / acc.specElec.courses;   // even pools: one credit value
+      acc.specElec.hours = du * deptRequired;
+      acc.specElec.requiredCount = deptRequired;
       if(acc.specElec.earned > acc.specElec.hours) acc.specElec.earned = acc.specElec.hours;
       if(acc.specElec.done > deptRequired) acc.specElec.done = deptRequired;
     }

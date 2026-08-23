@@ -13,6 +13,22 @@
   "imageUrl": "",
   "colleges": [
     {
+      "slug": "aaup-allied-medical",
+      "name": "Faculty of Allied Medical Sciences",
+      "nameAr": "كلية العلوم الطبية المساندة",
+      "icon": "🩻",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-architecture-art",
+      "name": "Faculty of Architecture and Art",
+      "nameAr": "كلية العمارة والفنون",
+      "icon": "🏛",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
       "slug": "aaup-ai-ds",
       "name": "Faculty of Artificial Intelligence and Data Science",
       "nameAr": "كلية الذكاء الاصطناعي وعلوم البيانات",
@@ -21,10 +37,74 @@
       "imageUrl": ""
     },
     {
+      "slug": "aaup-arts-education",
+      "name": "Faculty of Arts and Education",
+      "nameAr": "كلية الآداب والعلوم التربوية",
+      "icon": "📖",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-business",
+      "name": "Faculty of Business",
+      "nameAr": "كلية الأعمال والاقتصاد",
+      "icon": "📊",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-dentistry",
+      "name": "Faculty of Dentistry",
+      "nameAr": "كلية طب الأسنان",
+      "icon": "🦷",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-digital-sciences",
+      "name": "Faculty of Digital Sciences",
+      "nameAr": "كلية العلوم الرقمية",
+      "icon": "🌐",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-engineering",
+      "name": "Faculty of Engineering",
+      "nameAr": "كلية الهندسة",
+      "icon": "⚙️",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
       "slug": "aaup-it",
       "name": "Faculty of Information Technology",
       "nameAr": "كلية تكنولوجيا المعلومات",
       "icon": "💻",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-law",
+      "name": "Faculty of Law",
+      "nameAr": "كلية الحقوق",
+      "icon": "⚖️",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-medicine",
+      "name": "Faculty of Medicine",
+      "nameAr": "كلية الطب",
+      "icon": "🩺",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-modern-media",
+      "name": "Faculty of Modern Media",
+      "nameAr": "كلية الإعلام الحديث",
+      "icon": "🎙",
       "iconKey": "",
       "imageUrl": ""
     },
@@ -41,6 +121,14 @@
       "name": "Faculty of Pharmacy",
       "nameAr": "كلية الصيدلة",
       "icon": "💊",
+      "iconKey": "",
+      "imageUrl": ""
+    },
+    {
+      "slug": "aaup-junior-college",
+      "name": "Junior College",
+      "nameAr": "كلية المجتمع",
+      "icon": "🎓",
       "iconKey": "",
       "imageUrl": ""
     },

@@ -52,10 +52,33 @@
     Object.keys(deptCrCounts).forEach(function(k){
       if(deptCrCounts[k] > bestCount){ bestCount = deptCrCounts[k]; deptCreditUnit = parseFloat(k); }
     });
-    var deptNeededCount = (typeof required === 'number') ? required : Object.keys(deptCrCounts).length;
-    var deptNeededCredits = deptNeededCount * deptCreditUnit;
+    // How much the specialization elective pool is actually worth. Three
+    // sources, best first:
+    //
+    //   1. requirementHours.specElec — the university's published figure, on
+    //      plans built from a real catalogue plan.
+    //   2. DEPT_REQUIRED — the hand-maintained per-plan count.
+    //   3. the number of DISTINCT credit-hour values in the pool, a stand-in
+    //      for the number of required courses.
+    //
+    // (3) is the reason this screen and My Path disagreed. It collapses to 1
+    // whenever every slot in a pool costs the same, which is the normal case:
+    // GIS and Multimedia each draw six 3-hour slots for an 18-hour
+    // requirement and were audited as though only 3 hours were owed, 15 hours
+    // short of the degree. The comment on DEPT_REQUIRED has always said so;
+    // there was simply nothing better to fall back to until now.
+    var planReq = (window.__PLAN_DATA[prefix] || {}).requirementHours || {};
+    var deptNeededCredits, deptNeededCount;
+    if(typeof planReq.specElec === 'number'){
+      deptNeededCredits = planReq.specElec;
+      deptNeededCount = deptCreditUnit > 0 ? Math.round(deptNeededCredits / deptCreditUnit) : 0;
+    } else {
+      deptNeededCount = (typeof required === 'number') ? required : Object.keys(deptCrCounts).length;
+      deptNeededCredits = deptNeededCount * deptCreditUnit;
+    }
 
     var seenNum = {};
+    var catBucket = {};        // display category -> requirement bucket -> hours drawn
     courses.forEach(function(el){
       if(el.classList.contains('dept')) return; // dept handled as a pool, below
       var parts = window.__splitCourseId(el.id);
@@ -85,6 +108,15 @@
       var status = statuses[pid];
 
       byCat[cat].total += cr;
+      // Which requirement bucket this course's hours belong to, kept per
+      // category so the published figures can be shared out correctly below.
+      // A single display category can feed TWO buckets: supportCourses and
+      // colgReq are both drawn in 'math', and nothing about the card says
+      // which is which.
+      if(meta.req){
+        catBucket[cat] = catBucket[cat] || {};
+        catBucket[cat][meta.req] = (catBucket[cat][meta.req] || 0) + cr;
+      }
       if(isDone){ byCat[cat].completed += cr; }
       else if(status === 'in_progress'){ byCat[cat].inProgress += cr; }
       else if(status === 'planned'){ byCat[cat].planned += cr; }
@@ -122,6 +154,52 @@
       inProgress: deptInProgCount * deptCreditUnit,
       planned: deptPlannedCount * deptCreditUnit
     };
+
+    // Required, where the university published a figure. This screen groups by
+    // the plan's LEGEND categories while My Path groups by the university's
+    // requirement buckets, and for the same reason as the dept pool above, the
+    // sum of the cards in a group is not what the group is worth: an advisory
+    // plan can schedule a course the requirement tables never list, and a plan
+    // can be short a slot. Left alone, this screen and My Path printed
+    // different degree totals for ten plans - the exact failure this file's
+    // dept-pool handling was written to stop, one row over.
+    //
+    // The split is done from each course's OWN bucket, not from a category ->
+    // bucket table. A table cannot work: 'math' carries both colgReq and
+    // supportCourses, and scaling that row to colgReq's figure alone dropped
+    // supportCourses outright - eight degrees lost 10 to 24 hours.
+    if(Object.keys(planReq).length){
+      var drawnPerBucket = {};
+      Object.keys(catBucket).forEach(function(cat){
+        Object.keys(catBucket[cat]).forEach(function(bkt){
+          drawnPerBucket[bkt] = (drawnPerBucket[bkt] || 0) + catBucket[cat][bkt];
+        });
+      });
+      CATEGORY_ORDER.forEach(function(cat){
+        var mix = catBucket[cat];
+        if(cat === 'dept' || !mix) return;      // dept is settled above
+        var settled = 0, unsettled = 0, mixTotal = 0;
+        Object.keys(mix).forEach(function(bkt){
+          mixTotal += mix[bkt];
+          if(typeof planReq[bkt] === 'number' && drawnPerBucket[bkt] > 0){
+            // This row's share of the bucket's published hours, in proportion
+            // to how much of that bucket it draws.
+            settled += planReq[bkt] * (mix[bkt] / drawnPerBucket[bkt]);
+          } else {
+            unsettled += mix[bkt];              // no published figure: count as drawn
+          }
+        });
+        // Courses with no bucket at all. In a plan with published figures these
+        // are inside the published total, not on top of it - Bachelor in Law's
+        // ADMINISTRATIVE LAW (1) is scheduled in the university's advisory plan
+        // for a 136-hour degree while no requirement table claims it. Adding
+        // its hours to a settled row made this screen say 142 where My Path
+        // said 136. Where the row has no published figure to sit inside, the
+        // hours are all there is, so they stay.
+        var noBucket = Math.max(0, byCat[cat].total - mixTotal);
+        byCat[cat].total = settled > 0 ? settled + unsettled : unsettled + noBucket;
+      });
+    }
 
     // Missing = whatever's left once Completed/In-Progress/Planned are taken
     // out of Required, in that priority order — guarantees every row sums

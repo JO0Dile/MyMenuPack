@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "slug": "aaup-public-safety-engineering",
+  "name": "Public Safety Engineering",
+  "nameAr": null,
+  "subtitle": "B.Sc. · 14 CH",
+  "subtitleAr": null,
+  "icon": "🎓",
+  "iconKey": "",
+  "imageUrl": null,
+  "bio": "The Bachelor of Science in Public Safety Engineering prepares engineers to protect people and communities from industrial, construction, environmental, andhealth-related hazards.The… 14 CH — Univ. Req. 14. Semester order is a suggested prerequisite-valid sequence — no official one was published. Courses, hours and prerequisites are as published.",
+  "bioAr": null,
+  "overview": "The Bachelor of Science in Public Safety Engineering prepares engineers to protect people and communities from industrial, construction, environmental, andhealth-related hazards.The curriculum combines theoretical knowledge and practical applications, covering risk analysis, accident prevention, modern safety systems, and emergency/disaster management, along with related regulations and standards.The Bachelor of Science in Public Safety Engineering prepares engineers to protect people and communities from industrial, construction, environmental, andhealth-related hazards.The curriculum combines theoretical knowledge and practical applications, covering risk analysis, accident prevention, modern safety systems, and emergency/disaster management, along with related regulations and standards.",
+  "university": "aaup",
+  "college": "aaup-engineering",
+  "degreeHours": 14,
+  "requirementHours": {
+    "univReq": 14.0
+  },
+  "requirementSource": {
+    "document": "AAUP catalogue docx (data_600.docx)",
+    "program": "Bachelor in Public Safety Engineering",
+    "placement": "suggested",
+    "via": "tools/import-catalogue-programs.py"
+  },
+  "sourceVersion": 1,
+  "courses": [
+    {
+      "slug": "010610014",
+      "code": "010610014",
+      "name": "Beginning English",
+      "nameAr": null,
+      "credits": "0",
+      "theoretical": 3.0,
+      "practical": null,
+      "year": 1,
+      "semester": 1,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "010610025",
+      "code": "010610025",
+      "name": "Intermediate English",
+      "nameAr": null,
+      "credits": "2.0",
+      "theoretical": 3.0,
+      "practical": null,
+      "year": 1,
+      "semester": 2,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "010610026",
+      "code": "010610026",
+      "name": "Intermediate English Lab",
+      "nameAr": null,
+      "credits": "1.0",
+      "theoretical": 2.0,
+      "practical": null,
+      "year": 1,
+      "semester": 2,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "010610035",
+      "code": "010610035",
+      "name": "Advanced English",
+      "nameAr": null,
+      "credits": "2.0",
+      "theoretical": 3.0,
+      "practical": null,
+      "year": 2,
+      "semester": 1,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "010610036",
+      "code": "010610036",
+      "name": "Advanced English Lab",
+      "nameAr": null,
+      "credits": "1.0",
+      "theoretical": 2.0,
+      "practical": null,
+      "year": 2,
+      "semester": 1,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "040111001",
+      "code": "040111001",
+      "name": "Arabic Language",
+      "nameAr": null,
+      "credits": "2.0",
+      "theoretical": 2.0,
+      "practical": null,
+      "year": 1,
+      "semester": 1,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "040511011",
+      "code": "040511011",
+      "name": "Palestinian Studies",
+      "nameAr": null,
+      "credits": "2.0",
+      "theoretical": 2.0,
+      "practical": null,
+      "year": 1,
+      "semester": 1,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "040521301",
+      "code": "040521301",
+      "name": "Fundamentals of Research Methods",
+      "nameAr": null,
+      "credits": "2.0",
+      "theoretical": 2.0,
+      "practical": null,
+      "year": 2,
+      "semester": 2,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    },
+    {
+      "slug": "240111000",
+      "code": "240111000",
+      "name": "Computer Skills",
+      "nameAr": null,
+      "credits": "2.0",
+      "theoretical": 2.0,
+      "practical": null,
+      "year": 1,
+      "semester": 1,
+      "category": "UNIVERSITY_REQUIREMENT",
+      "requirement": "univReq",
+      "isElective": false,
+      "isPlaceholder": false,
+      "pairGroup": false,
+      "independentGrades": false,
+      "prerequisiteText": null
+    }
+  ],
+  "prerequisites": [
+    {
+      "requires": "010610014",
+      "forCourse": "010610025"
+    },
+    {
+      "requires": "010610014",
+      "forCourse": "010610026"
+    },
+    {
+      "requires": "010610025",
+      "forCourse": "010610035"
+    },
+    {
+      "requires": "010610026",
+      "forCourse": "010610035"
+    },
+    {
+      "requires": "010610025",
+      "forCourse": "010610036"
+    },
+    {
+      "requires": "010610026",
+      "forCourse": "010610036"
+    },
+    {
+      "requires": "010610035",
+      "forCourse": "040521301"
+    }
+  ]
+}
