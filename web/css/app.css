@@ -498,8 +498,11 @@
      caveats) — same clamp-to-3-lines treatment .pc-uni-desc already uses for
      a university's own description, so a long bio doesn't blow out the card
      and bury the "View plans" CTA below the fold. */
+  /* One line. Three lines of a bio on a card in a grid of seventy is a wall
+     of dense grey nobody reads from outside the plan — the full text is on
+     the plan's own page, which is where someone who wants it already is. */
   .plan-card p.pc-bio{
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
   }
 
   .plan-card .pc-cta{
@@ -2365,6 +2368,19 @@
   .gs-lbl{font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
 
   .gs-hint{font-size:11.5px;color:var(--text-dim);margin:0 0 10px;line-height:1.55;}
+
+/* The way out of an empty Degree Audit. Grades are entered from a course,
+   not from this screen, so with none entered it explained where to go and
+   gave no way to go there. */
+.gs-goplan{
+  display:inline-flex; align-items:center; gap:9px; margin-top:14px;
+  padding:13px 22px; border-radius:999px;
+  background:var(--accent); color:var(--on-accent);
+  border:none; font-family:inherit; font-size:14.5px; font-weight:800;
+  cursor:pointer; transition:filter .15s ease;
+}
+.gs-goplan:hover{filter:brightness(1.08);}
+.gs-goplan:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
 
   .gs-empty{font-size:12.5px;color:var(--text-dim);}
 

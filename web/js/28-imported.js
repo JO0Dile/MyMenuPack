@@ -163,7 +163,12 @@
             : 'Course list not added yet \u2014 coming soon.')
         : ((p.bio && p.bio.en) || (courseCount + ' courses \u00b7 community-imported major'));
       var uni = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'];
-      var badge = (uni ? txt(uni.icon) + ' ' + txt(uni.shortName) + ' \u00b7 ' : '') + (p.official ? (p.wasEdited ? '✏️ Official (Edited)' : '✅ Official') : (p.wasEdited ? '✏️ User Edited' : '👤 User Made'));
+      // Words, not emoji. The badge sat over a card whose every other glyph
+      // is drawn, and "✅ Official" next to "👤 User Made" was two unrelated
+      // pictures doing the work one word does.
+      var origin = p.official ? (p.wasEdited ? (rtl ? 'رسمي (معدّل)' : 'Official · edited') : (rtl ? 'رسمي' : 'Official'))
+                              : (p.wasEdited ? (rtl ? 'من طالب (معدّل)' : 'Student · edited') : (rtl ? 'من طالب' : 'Student'));
+      var badge = (uni ? txt(uni.shortName) + ' \u00b7 ' : '') + txt(origin);
       // Reuses the exact .plan-card class the four built-in majors use —
       // same icon box, same two-tone title, same dim bio text, same small
       // blue CTA — rather than a bespoke look-alike that has to be kept in
@@ -173,7 +178,7 @@
         : 'AAUP_DASHBOARD.selectAndOpen(\'' + jsAttr(id) + '\')';
       return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + txt(id) + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + txt(p.university || 'aaup') + '" data-college="' + txt(collegeKeyForPlan(p)) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
-        '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">🗑 Delete</button>' +
+        '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">' + window.AAUP_ICONS.preview('trash', 12) + 'Delete</button>' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(p, { size: 30 }) + '</div>' +
         '<h2>' + txt(en.big) + (en.small ? '<em>' + txt(en.small) + '</em>' : '') + '</h2>' +
         '<p class="pc-bio">' + txt(bio) + '</p>' +
