@@ -862,9 +862,52 @@
     var order = (row && window.AAUP_PLAN_EDITOR) ? window.AAUP_PLAN_EDITOR.orderOfContainerId(row.id) : null;
     return (order === null || order === undefined) ? Infinity : order;
   }
+  // What this course needs, and what it opens up, read from the plan's own
+  // prerequisite data rather than from the lines drawn on screen.
+  //
+  // This used to walk the connector SVG's <path class="edge"> elements and
+  // take data-from/data-to off them. Three things go wrong that way, and a
+  // student reported all three as "some courses light the wrong ones, and
+  // they stay pink":
+  //
+  //   - the app deliberately does not draw every connector (an edge whose
+  //     two ends are too far apart, or would cross the page, is dropped), so
+  //     a course with real prerequisites traced nothing at all;
+  //   - a year that is folded has no laid-out cards, so its edges are stale
+  //     or absent, and the trace pointed at where a card used to be;
+  //   - it returned early when it found no paths, which meant holding a
+  //     course silently did nothing rather than saying what it connects to.
+  //
+  // The relationships are in window.__PLAN_DATA — they are the same data the
+  // lines are generated FROM — so they are always complete and always right.
+  // The lines are still animated when they happen to exist; they are now
+  // decoration on top of the highlight rather than the source of it.
+  function relatedSlugs(planId, slug){
+    var data = (window.__PLAN_DATA || {})[planId] || {};
+    var needs = (data.needsMap && data.needsMap[slug]) || [];
+    var unlocks = (data.unlocksMap && data.unlocksMap[slug]) || [];
+    return { needs: needs, unlocks: unlocks };
+  }
+
   function handleCourseHoverEnter(planId, courseEl){
     clearHoverSequence();
     var id = courseEl.id;
+    var slug = id.slice((planId + '-c-').length);
+    var rel = relatedSlugs(planId, slug);
+
+    // Mark the cards first, so the highlight is correct whether or not a
+    // single line got drawn between them.
+    var marked = [];
+    function mark(s, cls){
+      var el = document.getElementById(planId + '-c-' + s);
+      if(!el) return;
+      el.classList.add('node-active', cls);
+      marked.push(el);
+    }
+    rel.needs.forEach(function(s){ mark(s, 'node-needs'); });
+    rel.unlocks.forEach(function(s){ mark(s, 'node-unlocks'); });
+    courseEl.classList.add('node-active');
+
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
     var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
@@ -900,13 +943,7 @@
       var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var STEP_MS = reducedMotion ? 0 : 650;
       sequence.forEach(function(p, i){
-        var t = setTimeout(function(){
-          p.style.strokeDashoffset = 0;
-          ['data-from', 'data-to'].forEach(function(attr){
-            var otherEl = document.getElementById(p.getAttribute(attr));
-            if(otherEl){ otherEl.classList.add('node-active'); }
-          });
-        }, i * STEP_MS);
+        var t = setTimeout(function(){ p.style.strokeDashoffset = 0; }, i * STEP_MS);
         hoverSequenceTimers.push(t);
       });
     });
@@ -917,6 +954,12 @@
     // sheet exists to sit on top of.
     if(window.__QA_HOLD) return;
     clearHoverSequence();
+    // Cards first and unconditionally. Clearing used to sit behind an early
+    // return when the connector layer was missing, which is exactly how a
+    // course could be left highlighted with no way to un-highlight it.
+    document.querySelectorAll('#page-' + planId + ' .course[id]').forEach(function(c){
+      c.classList.remove('node-active', 'node-needs', 'node-unlocks');
+    });
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
     svg.querySelectorAll('path.edge').forEach(function(p){
@@ -925,7 +968,6 @@
       p.style.strokeDasharray = '';
       p.style.strokeDashoffset = '';
     });
-    document.querySelectorAll('#page-' + planId + ' .course[id]').forEach(function(c){ c.classList.remove('node-active'); });
   }
   var touchHoldTimer = null;
   var touchHoldEl = null;
@@ -1918,10 +1960,17 @@
       }
 
       function rowHtml(c){
+        // The registration number, not the internal slug. Half these rows
+        // were printing things like "arabic-language" beside the name — an
+        // id this app made up, which means nothing to a student and nothing
+        // to the registrar either. Courses whose plan carries no number show
+        // just the hours rather than a placeholder dash.
+        var num = c.num && c.num !== '-' ? window.__escapeHtml(String(c.num)) + ' · ' : '';
         return '<div class="lib-row">' +
           '<span class="lib-row-name">' + window.__escapeHtml(c.name) +
-            ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
-          (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
+            ' <span class="lib-row-meta">' + num + c.cr + 'H</span></span>' +
+          (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + window.__escapeHtml(c.slug) + '">' +
+            window.AAUP_ICONS.preview('plus', 13) + 'Add</button>') +
           '</div>';
       }
 
@@ -1949,7 +1998,7 @@
           return '<div class="lib-shelf' + (openAll ? ' lib-shelf-open' : '') + '">' +
             '<button type="button" class="lib-shelf-head" data-lib-shelf="' + id + '"' +
               ' aria-expanded="' + (openAll ? 'true' : 'false') + '" aria-controls="' + id + '">' +
-              '<span class="lib-shelf-chev" aria-hidden="true">\u203a</span>' +
+              '<span class="lib-shelf-chev" aria-hidden="true">' + window.AAUP_ICONS.preview('chevronRight', 14) + '</span>' +
               '<span class="lib-shelf-label">' + sh.label + '</span>' +
               '<span class="lib-shelf-count">' + sh.items.length + ' · ' + sh.hours + 'H</span>' +
             '</button>' +

@@ -6568,12 +6568,20 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   opacity:.28; transition:opacity .2s ease, transform .2s ease;
 }
 .qa-dim .course.node-active,
+.qa-dim .course.node-needs,
+.qa-dim .course.node-unlocks,
 .qa-dim .course.qa-subject{opacity:1;}
 .qa-dim .course.qa-subject{
   transform:scale(1.02);
   box-shadow:0 0 0 2px var(--accent), 0 10px 26px rgba(0,0,0,.4);
 }
-.qa-dim .course.node-active:not(.qa-subject){
+/* Held: what the course NEEDS is ringed in the prerequisite colour, what it
+   OPENS in the unlock colour, so the two directions are told apart at a
+   glance rather than both reading as "connected". */
+.qa-dim .course.node-needs:not(.qa-subject){
+  box-shadow:0 0 0 2px var(--prereq), 0 8px 20px rgba(0,0,0,.34);
+}
+.qa-dim .course.node-unlocks:not(.qa-subject){
   box-shadow:0 0 0 2px var(--unlock), 0 8px 20px rgba(0,0,0,.34);
 }
 @media (prefers-reduced-motion:reduce){
@@ -6802,9 +6810,22 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      course that's both available/completed AND being traced — silencing
      the one visual cue tracing has left now that the connector line itself
      is hidden on phone (see .connector-layer{display:none} above). Restated
-     after, so it always wins the tie. */
+     after, so it always wins the tie.
+
+     Two colours, not one. This was a single hardcoded pink for everything a
+     held course touched, which said "related" and nothing else — a student
+     holding Calculus I could not tell which of the lit cards it NEEDS and
+     which it OPENS. They are the plan's own prerequisite and unlock colours
+     now, the same two the legend already names, and they come from the
+     theme rather than from a literal. */
   .course.node-active{
-    box-shadow:0 0 0 2px #ff6fb8, 0 0 16px rgba(255,111,184,.55), 0 6px 14px rgba(0,0,0,.35);
+    box-shadow:0 0 0 2px var(--accent), 0 0 16px rgba(111,140,255,.5), 0 6px 14px rgba(0,0,0,.35);
+  }
+  .course.node-needs{
+    box-shadow:0 0 0 2px var(--prereq), 0 0 16px rgba(255,111,184,.45), 0 6px 14px rgba(0,0,0,.35);
+  }
+  .course.node-unlocks{
+    box-shadow:0 0 0 2px var(--unlock), 0 0 16px rgba(74,222,128,.45), 0 6px 14px rgba(0,0,0,.35);
   }
 }
 
