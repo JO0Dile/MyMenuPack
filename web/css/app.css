@@ -207,6 +207,34 @@
      including the dark ones, where it stands out like an error). A few
      spots (.assessment-rows, .line-list) already had their own copy of the
      same rule for a slimmer 5px thumb; those still win by specificity. */
+  /* ---------- tapping something should not repaint it ----------
+     Chrome and Brave on Android paint a translucent blue-grey over the
+     WHOLE box of whatever was tapped, for a moment after the tap. On a
+     small button nobody notices. On the things this app makes tappable —
+     a My Path category card, a year bar, a course card — the tapped box is
+     most of the screen, so the card and every row inside it went flat blue
+     and looked broken, which is what a student reported.
+
+     It is turned off everywhere and replaced with real feedback: each of
+     those controls already has its own :hover, :active and :focus-visible
+     styling, which says the same thing without covering anything up. */
+  button, a, summary, [role="button"], [role="checkbox"], [data-ro-expand],
+  .course, .plan-card, .dash-quicklink, .sb-item, .sb-mrow, .sb-tab, .lib-row{
+    -webkit-tap-highlight-color:transparent;
+  }
+  /* And a long press is a gesture in this app — hold a course to trace it,
+     hold a year to see what is open — so a control's own label must not be
+     selectable, or holding one starts a text selection over it instead.
+     Deliberately scoped to controls: real content (a message on the wall, an
+     email in Contacts, a course name in a popup) stays selectable. */
+  button, [role="button"], .sb-tab, .imp-year-toggle, .course, .ro-node-wrap,
+  .eng-opt, .lib-shelf-head{
+    -webkit-user-select:none; user-select:none;
+  }
+  /* When a selection IS made, it should look like this app rather than like
+     the browser's default blue on top of a dark theme. */
+  ::selection{ background:var(--accent); color:var(--on-accent); }
+
   html{ scrollbar-width:thin; scrollbar-color:var(--line) var(--surface-bg); }
   ::-webkit-scrollbar{ width:10px; height:10px; }
   ::-webkit-scrollbar-track{ background:var(--surface-bg); }
@@ -3713,8 +3741,8 @@
      through it. The fade now only softens the very top of the towers, where
      they would otherwise run into the buttons — it used to erase the whole
      upper half, taking the clock with it. */
-  position:absolute; left:50%; bottom:-14px; transform:translateX(-50%);
-  width:min(560px, 120%); height:auto;
+  position:absolute; left:50%; bottom:-6px; transform:translateX(-50%);
+  width:min(380px, 90%); height:auto;
   /* Visible, not loud: you should be able to make out the book on top and
      read the clock, without the drawing competing with the two buttons. */
   color:var(--accent); opacity:.3;
@@ -3726,14 +3754,6 @@
 }
 /* The accent is darker than the page in the light themes, so the same alpha
    reads stronger there; pulled back to land at the same weight. */
-/* The pavilion is solid stone: it hides the glass roof behind it. Without a
-   fill, every background line drew straight through the clock box and the
-   plaque, which is what made the drawing read as a wireframe rather than as
-   a building standing in front of another one. The fill is the page's own
-   ground, so it occludes without introducing a second colour. */
-.wiz-campus .cs-solid{fill:var(--surface-bg);}
-.wiz-campus .cs-face{fill:var(--panel);}
-
 :root[data-theme="light"] .wiz-campus,
 :root[data-theme="cranberry"] .wiz-campus,
 :root[data-theme="botanical"] .wiz-campus{opacity:.22;}
