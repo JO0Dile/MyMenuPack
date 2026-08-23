@@ -1896,13 +1896,23 @@
         // One shelf and nothing to compare it against is not a shelf — that
         // is the flat list this replaced, with a redundant header on top.
         if(shelves.length === 1){ return shelves[0].items.map(rowHtml).join(''); }
-        return shelves.map(function(sh){
-          return '<div class="lib-shelf">' +
-            '<div class="lib-shelf-head">' +
+        // Closed until asked for. Every shelf open at once put a hundred and
+        // thirty rows on the screen the moment the Library opened, which is
+        // the same wall the shelves were meant to break up — the sections are
+        // the answer to "what counts as a Spec. Elec.", and you only want the
+        // one you asked about. A search that matched is opened, since
+        // hiding the thing someone just searched for would be perverse.
+        var openAll = !!f;
+        return shelves.map(function(sh, i){
+          var id = 'libShelf' + i;
+          return '<div class="lib-shelf' + (openAll ? ' lib-shelf-open' : '') + '">' +
+            '<button type="button" class="lib-shelf-head" data-lib-shelf="' + id + '"' +
+              ' aria-expanded="' + (openAll ? 'true' : 'false') + '" aria-controls="' + id + '">' +
+              '<span class="lib-shelf-chev" aria-hidden="true">\u203a</span>' +
               '<span class="lib-shelf-label">' + sh.label + '</span>' +
               '<span class="lib-shelf-count">' + sh.items.length + ' · ' + sh.hours + 'H</span>' +
-            '</div>' +
-            '<div class="lib-shelf-body">' + sh.items.map(rowHtml).join('') + '</div>' +
+            '</button>' +
+            '<div class="lib-shelf-body" id="' + id + '">' + sh.items.map(rowHtml).join('') + '</div>' +
             '</div>';
         }).join('');
       }
@@ -1924,6 +1934,19 @@
         bindAddButtons();
       });
       bindAddButtons();
+
+      // Delegated on the list, which survives every re-render — only its
+      // innerHTML is replaced — so this binds once instead of once per
+      // keystroke in the search box.
+      var listEl = document.getElementById('libList');
+      listEl.addEventListener('click', function(e){
+        var head = e.target.closest('[data-lib-shelf]');
+        if(!head) return;
+        var shelf = head.closest('.lib-shelf');
+        if(!shelf) return;
+        var isOpen = shelf.classList.toggle('lib-shelf-open');
+        head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
 
       function bindAddButtons(){
         document.querySelectorAll('.lib-add-btn').forEach(function(btn){

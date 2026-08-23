@@ -3911,13 +3911,26 @@
      header is sticky inside the scrolling list — on a 130-course plan the
      shelf you are reading scrolls out of view long before its last row
      does, and then every row looks the same again. */
-  .lib-shelf + .lib-shelf{margin-top:14px;}
+  .lib-shelf + .lib-shelf{margin-top:10px;}
+  /* A button now: every shelf open at once put 130 rows on screen the moment
+     the Library opened, which is the wall the shelves were meant to break
+     up. Closed until asked for. */
   .lib-shelf-head{
     position:sticky; top:0; z-index:1;
-    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
-    padding:6px 0 5px; margin-bottom:2px;
-    background:var(--panel); border-bottom:1px solid var(--accent);
+    display:flex; align-items:center; gap:10px; width:100%;
+    padding:9px 2px; margin-bottom:2px;
+    background:var(--panel); border:none; border-bottom:1px solid var(--accent);
+    font-family:inherit; cursor:pointer; text-align:start;
   }
+  .lib-shelf-chev{
+    flex:none; font-size:16px; line-height:1; color:var(--accent);
+    transition:transform .18s ease;
+  }
+  .lib-shelf-open .lib-shelf-chev{transform:rotate(90deg);}
+  .lib-shelf-count{margin-inline-start:auto;}
+  .lib-shelf-body{display:none;}
+  .lib-shelf-open .lib-shelf-body{display:block; padding-top:4px;}
+  @media (prefers-reduced-motion:reduce){ .lib-shelf-chev{transition:none;} }
   .lib-shelf-label{
     font-size:10.5px; font-weight:800; letter-spacing:.06em;
     text-transform:uppercase; color:var(--accent);
@@ -6605,7 +6618,7 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      a shelf reads as a group without a rule under its header — the header
      just needs to sit clear of the card below it and stay put while the
      shelf scrolls. */
-  .lib-shelf-body{display:flex; flex-direction:column; gap:8px;}
+  .lib-shelf-open .lib-shelf-body{display:flex; flex-direction:column; gap:8px;}
   .lib-shelf-head{
     /* var(--panel), matching the modal card this scrolls inside — the sticky
        header has to be opaque to cover the rows passing under it, and any
