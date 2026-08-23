@@ -3714,11 +3714,43 @@
 
   /* The landing screen. Deliberately tall and mostly empty: the wordmark is
      the content, and the two buttons are the only things to do. */
-  .wiz-landing{
+/* The campus, drawn. A photograph would be a fixed rectangle fighting every
+   theme it is shown on; this is one stroke colour the theme sets, so it
+   belongs to whatever palette is running — including the three light ones.
+   Sits behind the landing content and is never in the way of a tap. */
+.wiz-campus{
+  /* Sunk below the fold so its ground line lands under the note rather than
+     through it, and faded from the top so what does reach the buttons is
+     texture rather than a line drawn across them. */
+  position:absolute; left:50%; bottom:-46px; transform:translateX(-50%);
+  width:min(470px, 106%); height:auto;
+  color:var(--accent); opacity:.13;
+  pointer-events:none; z-index:0;
+  -webkit-mask-image:linear-gradient(to top, #000 0%, #000 30%, transparent 76%);
+  mask-image:linear-gradient(to top, #000 0%, #000 30%, transparent 76%);
+}
+:root[data-theme="light"] .wiz-campus,
+:root[data-theme="cranberry"] .wiz-campus,
+:root[data-theme="botanical"] .wiz-campus{opacity:.2;}
+
+/* A small language switch, before a plan exists to switch. */
+.wiz-lang{
+  position:absolute; top:2px; inset-inline-end:2px; z-index:2;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:56px; padding:7px 13px; border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  color:var(--accent); font-family:inherit; font-size:12px; font-weight:800;
+  cursor:pointer; transition:background .15s ease;
+}
+.wiz-lang:hover{background:color-mix(in srgb, var(--accent) 20%, transparent);}
+.wiz-lang:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .wiz-landing{position:relative;
     display:flex;flex-direction:column;align-items:center;text-align:center;
     padding:52px 30px 30px;gap:0;
   }
-  .wiz-brand{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .wiz-brand{position:relative; z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;}
   .wiz-brand-mark{
     width:74px;height:74px;object-fit:contain;border-radius:20px;
     box-shadow:0 10px 30px rgba(0,0,0,.35);
@@ -3734,11 +3766,11 @@
     font-size:19px;font-weight:700;color:var(--accent);line-height:1;
     letter-spacing:.02em;
   }
-  .wiz-landing-line{
+  .wiz-landing-line{position:relative; z-index:1;
     margin:22px 0 0;font-size:13.5px;line-height:1.65;color:var(--text-dim);
     max-width:270px;
   }
-  .wiz-landing-actions{
+  .wiz-landing-actions{position:relative; z-index:1;
     display:flex;flex-direction:column;align-items:stretch;gap:10px;
     width:100%;max-width:280px;margin-top:30px;
   }
@@ -3749,7 +3781,7 @@
     padding:12px 22px;cursor:pointer;
   }
   .wiz-skip:hover{color:var(--text);border-color:var(--text-dim);}
-  .wiz-landing-note{
+  .wiz-landing-note{position:relative; z-index:1;
     margin:26px 0 0;font-size:11px;line-height:1.6;color:var(--text-dim);
     opacity:.7;max-width:280px;
   }
