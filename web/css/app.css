@@ -2754,6 +2754,27 @@
     overflow:auto; border:1px solid var(--line); border-radius:12px;
     background:rgba(255,255,255,.02); max-height:60vh; cursor:grab;
   }
+
+  /* On a phone the tree is the screen. It used to be sized to its own
+     content, which on a short chain is a ~108px letterbox at the top with
+     the Selected / Legend / Shortest route panels taking everything below —
+     three panels of prose above the thing they describe. The graph now
+     claims most of the viewport and the panels sit under it, reached by
+     scrolling, which is also what "full screen" asked for. */
+  @media (max-width:720px){
+    .pg-graph-wrap{
+      min-height:56vh; max-height:64vh;
+      cursor:default;                    /* no drag-pan; touch scrolls it */
+      overscroll-behavior:contain;       /* and does not drag the page with it */
+    }
+    /* A chain one course wide is the common case, and left-aligning it left
+       the tree hugging one edge with the rest of the box empty. Centres when
+       it fits; a wider layer still scrolls from its natural left edge. */
+    .pg-graph{margin-inline:auto;}
+    .pg-node{padding:7px 9px;}
+    .pg-node-name{font-size:12px;}
+    .pg-node-sub{font-size:9.5px;}
+  }
   .pg-graph-wrap.pg-dragging{cursor:grabbing; user-select:none;}
   .pg-graph{position:relative;}
   .pg-svg{position:absolute; top:0; left:0; pointer-events:none;}
@@ -2766,6 +2787,10 @@
   .pg-node{
     position:relative; background:var(--panel); border:1.5px solid var(--line); border-radius:10px;
     padding:8px 10px; cursor:pointer; transition:border-color .15s ease, transform .15s ease;
+    /* Fills the box the layout reserved for it, so the height the maths
+       assumes and the height on screen are the same number. */
+    height:100%; box-sizing:border-box;
+    display:flex; flex-direction:column; justify-content:center;
   }
   .pg-node:hover{transform:translateY(-1px);}
   /* Clamped to 2 lines with an ellipsis so a long course name can never grow
