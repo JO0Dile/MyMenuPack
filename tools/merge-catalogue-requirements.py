@@ -54,12 +54,13 @@ PAIRS = {
     'aaup-finance-data-science': 'Bachelor in Data Science - Specialization in '
                                  'Finance and Data Science',
     'aaup-financial-engineering': 'Bachelor in Financial Engineering',
+    'aaup-statistics-data-science': 'Bachelor in Data Science - Specialization in '
+                                    'Statistics and Data Science',
     # Deliberately NOT here. Their PDF program does not cover every course the
     # app's plan draws, so writing a taxonomy would leave part of it blank:
-    #   medical      - the PDF prints no Spec. Req. section at all (32 hours
-    #                  short of its own stated 129), leaving 15 courses unplaced
-    #   statistics   - its Colg. Req. table stops after three courses (75 hours
-    #                  short of 125), leaving 22 unplaced
+    #   medical      - "AI and Medical Sciences". The PDF prints no Spec. Req.
+    #                  section at all (32 hours short of its own stated 129),
+    #                  leaving 15 courses unplaced
     #   cybersecurity - reconciles to 127, but the app's plan carries Computer
     #                  Architecture and Differential Equations, which that
     #                  program's tables do not list
@@ -75,6 +76,60 @@ SLOT_BUCKET = {
 }
 
 ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec', 'supportCourses']
+
+
+DISPLAY_CATEGORY = {
+    'univReq': 'UNIVERSITY_REQUIREMENT', 'colgReq': 'MATH',
+    'specReq': 'CORE', 'supportCourses': 'MATH',
+}
+
+
+def title_case(name):
+    """The sources print course names in capitals; these plans use title case."""
+    small = {'a', 'an', 'and', 'the', 'of', 'for', 'in', 'on', 'to', 'with',
+             'from', 'at', 'by', 'or', 'its', 'as'}
+    upper = {'AI', 'IT', 'GIS', 'I', 'II', 'III', 'IV', 'V', 'VI', 'GUI', 'SQL'}
+    words = name.split()
+    out = []
+    for i, w in enumerate(words):
+        core = w.strip('()[],.:-')
+        if core.upper() in upper or any(ch.isdigit() for ch in core):
+            out.append(w.replace(core, core.upper()))
+        elif core.lower() in small and 0 < i < len(words) - 1:
+            out.append(w.lower())
+        else:
+            out.append(w[:1].upper() + w[1:].lower())
+    s = ' '.join(out)
+    return s[:1].upper() + s[1:]
+
+
+def placement_for(major, course, bucket):
+    """Which term to put an added course in.
+
+    A 0-hour university requirement goes in the first term, which is where every
+    plan in this repo already puts Community Service and Beginning English.
+    Anything else goes in the lightest term that still comes after everything it
+    needs - for Robotics' Internship that is the final semester, which carries a
+    single 3-hour capstone. The term is a suggestion and the course says so.
+    """
+    terms = collections.defaultdict(float)
+    position = {}
+    for c in major['courses']:
+        if not c.get('year'):
+            continue
+        key = (c['year'], c['semester'])
+        terms[key] += float(c.get('credits') or 0)
+        position[c.get('code')] = key
+    if not terms:
+        return 1, 1
+    if bucket == 'univReq' and float(course.get('credits', 0) or 0) == 0:
+        return min(terms)
+    earliest = min(terms)
+    for q in course.get('prerequisites', []):
+        if q in position and position[q] > earliest:
+            earliest = position[q]
+    later = [t for t in terms if t > earliest] or [max(terms)]
+    return min(later, key=lambda t: (terms[t], t))
 
 
 def normalize(name):
@@ -155,6 +210,52 @@ def main():
                 matched_by_name.append((renamed, c.get('name')))
             c['requirement'] = bucket
             got[bucket] += float(c.get('credits') or 0)
+
+        # Courses the source REQUIRES that the plan does not draw at all. Found
+        # by comparing the two lists rather than the two totals, which is the
+        # only way it surfaces: Robotics' Spec. Req. added up to the right 25
+        # hours while missing a 3-hour Internship, because a duplicated
+        # Fundamentals of Databases lab card made up the difference. Also
+        # missing across four plans: Community Service and Beginning English,
+        # both 0 credit hours, both things a student still has to pass or be
+        # waived from - and both invisible to any check that only adds up hours.
+        added = []
+        drawn_keys = {c.get('code') for c in major['courses']}
+        drawn_keys |= {normalize(c.get('name')) for c in major['courses']}
+        for key in ('univReq', 'colgReq', 'specReq', 'supportCourses'):
+            section = program['requirements'].get(key)
+            if not section:
+                continue
+            for src in section['courses']:
+                if src['code'] in drawn_keys or normalize(src['name']) in drawn_keys:
+                    continue
+                year, sem = placement_for(major, src, key)
+                major['courses'].append({
+                    'slug': src['code'], 'code': src['code'],
+                    'name': title_case(src['name']), 'nameAr': None,
+                    'credits': str(src.get('credits', 0) or 0),
+                    'theoretical': src.get('theoretical'),
+                    'practical': src.get('practical'),
+                    'year': year, 'semester': sem,
+                    'category': DISPLAY_CATEGORY[key], 'requirement': key,
+                    'isElective': False, 'isPlaceholder': False, 'pairGroup': False,
+                    'independentGrades': False, 'prerequisiteText': None,
+                    'addedFromSource': 'Required by the published plan but missing '
+                                       'from this plan; the term shown is suggested.',
+                })
+                drawn_keys.add(src['code'])
+                added.append((src['code'], src['name'], src.get('credits', 0), year, sem))
+                for q in src.get('prerequisites', []):
+                    if q in drawn_keys:
+                        major.setdefault('prerequisites', []).append(
+                            {'requires': q, 'forCourse': src['code']})
+        if added:
+            major['coursesAddedFromSource'] = [
+                {'code': c, 'name': n, 'credits': cr, 'year': y, 'semester': sm}
+                for c, n, cr, y, sm in added]
+            got = collections.defaultdict(float)
+            for c in major['courses']:
+                got[c['requirement']] += float(c.get('credits') or 0)
 
         major['requirementHours'] = {k: required[k] for k in ORDER if k in required}
         major['degreeHours'] = program.get('degreeHours')

@@ -13,6 +13,7 @@ Output matches catalogue.json's program shape, so the same importer consumes it.
 Nothing is inferred. A value the PDF does not print is absent here.
 """
 import json
+import os
 import re
 import sys
 
@@ -208,6 +209,47 @@ def parse(text):
     return programs
 
 
+SUPPLEMENTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'supplements')
+
+
+def apply_supplements(programs):
+    """Merge in sections the PDF does not print.
+
+    The faculty PDF drops whole sections for some programs - Statistics and
+    Data Science has no Specialization Requirements at all, 75 of its stated
+    125 credit hours. Those sections exist on the AAUP website and are kept in
+    supplements/, separately from anything parsed, so their provenance stays
+    visible: every section merged here is stamped `suppliedFrom`, and a
+    supplement is only accepted if adding it makes the program reconcile to the
+    total the PDF ALREADY states. A supplement never introduces a total.
+    """
+    if not os.path.isdir(SUPPLEMENTS):
+        return []
+    by_name = {p['name']: p for p in programs}
+    applied = []
+    for fn in sorted(os.listdir(SUPPLEMENTS)):
+        if not fn.endswith('.json'):
+            continue
+        sup = json.load(open(os.path.join(SUPPLEMENTS, fn), encoding='utf-8'))
+        prog = by_name.get(sup['program'])
+        if prog is None:
+            print('supplement %s: no program named %r' % (fn, sup['program']))
+            continue
+        key = sup['fills']
+        if key in prog['requirements'] and prog['requirements'][key].get('courses'):
+            print('supplement %s: %s already has %s from the PDF - not overwritten'
+                  % (fn, sup['program'], key))
+            continue
+        section = dict(sup['section'])
+        section['suppliedFrom'] = sup['suppliedFrom']
+        section['notInTheSourcePDF'] = sup['why']
+        prog['requirements'][key] = section
+        if sup.get('programMetadata'):
+            prog['programMetadata'] = sup['programMetadata']
+        applied.append((fn, sup['program'], key))
+    return applied
+
+
 def main():
     if len(sys.argv) < 2:
         print(__doc__)
@@ -220,6 +262,7 @@ def main():
     reader = PdfReader(sys.argv[1])
     text = '\n'.join((p.extract_text() or '') for p in reader.pages)
     programs = parse(text)
+    applied = apply_supplements(programs)
 
     ok = 0
     noplan = [p for p in programs if p.get('noPlanPublished')]
@@ -261,6 +304,8 @@ def main():
     courses = sum(len(s['courses']) for p in programs
                   for s in p['requirements'].values())
     print()
+    for fn, name, key in applied:
+        print('supplement applied  : %s -> %s (%s)' % (fn, name[-46:], key))
     print('programs            : %d' % len(programs))
     print('  the document says they have no plan: %d' % len(noplan))
     for p in noplan:

@@ -1,0 +1,203 @@
+{
+ "program": "Bachelor in Data Science - Specialization in Statistics and Data Science",
+ "faculty": "Faculty of Artificial Intelligence and Data Science",
+ "suppliedFrom": "AAUP website, pasted by the app owner",
+ "fills": "specReq",
+ "why": "The faculty PDF prints this program's Univ. Req., Colg. Req., Univ. Elec., Spec. Elec. and Free Elective but no Specialization Requirements section at all, leaving it 75 of its stated 125 credit hours short. This is that section.",
+ "reconciles": "univReq 14 + univElec 6 + colgReq 12 + specReq 75 + specElec 12 + freeElec 6 = 125, the total the PDF itself states.",
+ "programMetadata": {
+  "programCode": "29011",
+  "degree": "Bachelor's",
+  "department": "Data Science Department",
+  "campuses": [
+   "Jenin Campus",
+   "Ramallah Campus"
+  ],
+  "durationYears": 4,
+  "creditHourFee": "Start from 195 ILS",
+  "teachingLanguage": [
+   "English"
+  ],
+  "semesters": [
+   "First Semester",
+   "Second Semester",
+   "Summer Semester"
+  ],
+  "studyStyle": "In-Person",
+  "metadataSource": "AAUP website program card, screenshot supplied by the app owner"
+ },
+ "section": {
+  "mustPassAll": true,
+  "courses": [
+   {
+    "code": "250111040",
+    "name": "ELEMENTARY PROBABILITY & STATISTICS",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111020"
+    ]
+   },
+   {
+    "code": "250111050",
+    "name": "PROGRAMMING IN PYTHON",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111030"
+    ]
+   },
+   {
+    "code": "250111060",
+    "name": "STATISTICAL METHODS",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111040"
+    ]
+   },
+   {
+    "code": "250111070",
+    "name": "DATA VISUALIZATION",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111010"
+    ]
+   },
+   {
+    "code": "250112010",
+    "name": "FUNDAMENTALS OF DATABASES",
+    "credits": 3.0,
+    "theoretical": 2.0,
+    "practical": 1.0
+   },
+   {
+    "code": "250112020",
+    "name": "LINEAR ALGEBRA I",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111020"
+    ]
+   },
+   {
+    "code": "250112030",
+    "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111010"
+    ]
+   },
+   {
+    "code": "250112040",
+    "name": "APPLIED REGRESSION ANALYSIS",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111060"
+    ]
+   },
+   {
+    "code": "250112050",
+    "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250112060",
+    "name": "GUI PROGRAMMING",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250112070",
+    "name": "R-PROGRAMMING",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250113010",
+    "name": "DATA MANAGEMENT",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250112010"
+    ]
+   },
+   {
+    "code": "250113020",
+    "name": "MULTIVARIATE DATA ANALYSIS",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111040"
+    ]
+   },
+   {
+    "code": "250113030",
+    "name": "DESIGN OF EXPERIMENTS",
+    "credits": 2.0,
+    "theoretical": 2.0,
+    "prerequisites": [
+     "250111060"
+    ]
+   },
+   {
+    "code": "250113040",
+    "name": "KNOWLEDGE AND FEATURE ENGINEERING",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250113050",
+    "name": "ALGORITHMS AND DATA STRUCTURES",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250113060",
+    "name": "APPLIED MACHINE LEARNING",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250112030"
+    ]
+   },
+   {
+    "code": "250113070",
+    "name": "PROBABILITY THEORY",
+    "credits": 3.0,
+    "theoretical": 3.0,
+    "prerequisites": [
+     "250111040"
+    ]
+   },
+   {
+    "code": "250113080",
+    "name": "GRADUATION PROJECT",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250113090",
+    "name": "TIME SERIES",
+    "credits": 3.0,
+    "theoretical": 3.0
+   },
+   {
+    "code": "250114010",
+    "name": "TRAINING COURSE - PHASE 1",
+    "credits": 8.0,
+    "theoretical": 8.0
+   },
+   {
+    "code": "250114020",
+    "name": "TRAINING COURSE - PHASE 2",
+    "credits": 8.0,
+    "theoretical": 8.0
+   }
+  ]
+ }
+}
