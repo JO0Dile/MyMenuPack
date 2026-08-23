@@ -131,6 +131,9 @@
 
   window.AAUP_GPA_TARGET = {
     render: render,
-    title: function(rtl){ return rtl ? '🎯 شو بدي حتى أوصل لمعدل معيّن؟' : '🎯 What do I need to reach…'; }
+    title: function(rtl){
+      return (window.AAUP_ICONS ? window.AAUP_ICONS.preview('target', 16) : '') +
+        (rtl ? 'شو بدي حتى أوصل لمعدل معيّن؟' : 'What do I need to reach…');
+    }
   };
 })();

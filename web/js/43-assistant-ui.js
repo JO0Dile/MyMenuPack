@@ -350,8 +350,6 @@
     var panel = el('asstPanel');
     if (!panel) return;
     panel.classList.add('open');
-    var launcher = el('asstLauncher');
-    if (launcher) launcher.setAttribute('aria-expanded', 'true');
     paintMode();
     var log = el('asstLog');
     if (log && !log.childNodes.length) {
@@ -370,8 +368,6 @@
   function close() {
     var panel = el('asstPanel');
     if (panel) panel.classList.remove('open');
-    var launcher = el('asstLauncher');
-    if (launcher) launcher.setAttribute('aria-expanded', 'false');
   }
 
   function toggle() {
@@ -552,8 +548,6 @@
   // BINDING
   // ---------------------------------------------------------------
   function bind() {
-    var launcher = el('asstLauncher');
-    if (launcher) launcher.addEventListener('click', toggle);
     var closeBtn = el('asstClose');
     if (closeBtn) closeBtn.addEventListener('click', close);
     var modeBtn = el('asstMode');

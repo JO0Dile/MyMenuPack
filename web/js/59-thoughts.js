@@ -381,8 +381,8 @@
         '</div>' +
         '<p class="th-bubble">' + esc(t.text) + '</p>' +
         (endpoint() ? '<div class="th-react">' +
-          '<button type="button" class="th-react-btn' + (myReaction === 'up' ? ' active' : '') + '" data-th-react="up" data-th-id="' + esc(t.id) + '">👍 <span>' + (t.up || 0) + '</span></button>' +
-          '<button type="button" class="th-react-btn' + (myReaction === 'down' ? ' active' : '') + '" data-th-react="down" data-th-id="' + esc(t.id) + '">👎 <span>' + (t.down || 0) + '</span></button>' +
+          '<button type="button" class="th-react-btn' + (myReaction === 'up' ? ' active' : '') + '" data-th-react="up" data-th-id="' + esc(t.id) + '">' + window.AAUP_ICONS.preview('chevronUp', 13) + '<span>' + (t.up || 0) + '</span></button>' +
+          '<button type="button" class="th-react-btn' + (myReaction === 'down' ? ' active' : '') + '" data-th-react="down" data-th-id="' + esc(t.id) + '">' + window.AAUP_ICONS.preview('chevron', 13) + '<span>' + (t.down || 0) + '</span></button>' +
         '</div>' : '') +
         (isMine ? '<button type="button" class="th-del" data-th-del="' + esc(t.id) + '">' +
           (rtl ? 'حذف' : 'Delete') + '</button>' : '') +
@@ -518,7 +518,8 @@
     var startY = 0, pulling = false, dist = 0, active = false;
     var hint = document.createElement('div');
     hint.className = 'th-pull-hint';
-    hint.textContent = rtl ? '↓ اسحب للتحديث' : '↓ Pull to refresh';
+    hint.innerHTML = window.AAUP_ICONS.preview('chevron', 13) +
+      '<span>' + (rtl ? 'اسحب للتحديث' : 'Pull to refresh') + '</span>';
     list.insertBefore(hint, list.firstChild);
 
     list.addEventListener('touchstart', function(e){

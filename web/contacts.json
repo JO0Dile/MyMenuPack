@@ -5,42 +5,50 @@
     "instructor": {
       "en": "Instructors",
       "ar": "المحاضرون",
-      "icon": "🎓"
+      "icon": "🎓",
+      "iconKey": "cap"
     },
     "dean": {
       "en": "Dean's Office",
       "ar": "عمادة الكلية",
-      "icon": "🏛️"
+      "icon": "🏛️",
+      "iconKey": "university"
     },
     "it": {
       "en": "IT",
       "ar": "تقنية المعلومات",
-      "icon": "💻"
+      "icon": "💻",
+      "iconKey": "code"
     },
     "student_affairs": {
       "en": "Student Affairs",
       "ar": "شؤون الطلبة",
-      "icon": "🎒"
+      "icon": "🎒",
+      "iconKey": "people"
     },
     "finance": {
       "en": "Finance",
       "ar": "الشؤون المالية",
-      "icon": "💳"
+      "icon": "💳",
+      "iconKey": "finance"
     },
     "registration": {
       "en": "Registration",
       "ar": "التسجيل",
-      "icon": "📝"
+      "icon": "📝",
+      "iconKey": "pen"
     },
     "language_center": {
       "en": "Language Center",
       "ar": "مركز اللغات",
-      "icon": "🗣️"
+      "icon": "🗣️",
+      "iconKey": "language"
     },
     "administration": {
       "en": "Administration",
       "ar": "الإدارة",
-      "icon": "🏢"
+      "icon": "🏢",
+      "iconKey": "building"
     }
   },
   "contacts": [

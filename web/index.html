@@ -214,7 +214,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     <div class="search-box" id="homeSearchBox">
       <span class="search-ic" data-app-icon="search" aria-hidden="true"></span>
       <input type="text" id="homeSearchInput" class="search-input" placeholder="Search a major… / ابحث عن تخصص…" autocomplete="off">
-      <button type="button" class="search-clear" id="homeSearchClear" aria-label="Clear">&times;</button>
+      <button type="button" class="search-clear" id="homeSearchClear" aria-label="Clear"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     </div>
     <div class="search-dropdown" id="homeSearchDropdown"></div>
   </div>
@@ -253,7 +253,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div class="modal-overlay" id="studentInfoOverlay">
   <div class="modal-card" style="max-width:380px;">
-    <button class="modal-close" id="studentInfoClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="studentInfoClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body">
       <h2 style="margin-top:0;">Welcome!</h2>
       <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6;margin-top:-6px;">
@@ -333,28 +333,28 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div class="modal-overlay" id="aboutOverlay">
   <div class="modal-card" style="max-width:460px;">
-    <button class="modal-close" id="aboutClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="aboutClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="aboutBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="auditModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="auditModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="auditModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="auditModalBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="achievementsModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="achievementsModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="achievementsModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="achievementsModalBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="advisorModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="advisorModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="advisorModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="advisorModalBody"></div>
   </div>
 </div>
@@ -362,7 +362,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- Contacts — instructors and offices, read-only (js/68-contacts.js) -->
 <div class="modal-overlay" id="contactsOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="contactsClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="contactsClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="contactsBody"></div>
   </div>
 </div>
@@ -370,7 +370,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- Share link + QR code for a plan (js/72-share.js) -->
 <div class="modal-overlay" id="shareOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="shareClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="shareClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="shareBody"></div>
   </div>
 </div>
@@ -378,7 +378,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- What-if GPA — retakes and next semester, as a sandbox (js/63-whatif.js) -->
 <div class="modal-overlay" id="whatifOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="whatifClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="whatifClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="whatifBody"></div>
   </div>
 </div>
@@ -386,7 +386,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- Change Major — the transfer comparison before a switch (js/62-change-plan.js) -->
 <div class="modal-overlay" id="changePlanOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="changePlanClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="changePlanClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="changePlanBody"></div>
   </div>
 </div>
@@ -395,14 +395,14 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      js/59-thoughts.js renders the body, including its own back bar. -->
 <div class="modal-overlay" id="thoughtsModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="thoughtsModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="thoughtsModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="thoughtsModalBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="devModalOverlay">
   <div class="modal-card dev-modal-card">
-    <button class="modal-close" id="devModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="devModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="devModalBody"></div>
   </div>
 </div>
@@ -412,7 +412,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      Settings modal above. -->
 <div class="modal-overlay" id="cloudModalOverlay">
   <div class="modal-card dev-modal-card">
-    <button class="modal-close" id="cloudModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="cloudModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="cloudModalBody"></div>
   </div>
 </div>
@@ -422,7 +422,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      420px default. -->
 <div class="modal-overlay" id="roadmapModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="roadmapModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="roadmapModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="roadmapModalBody"></div>
   </div>
 </div>
@@ -432,7 +432,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      own max-width rather than reusing audit-modal-card's 720px cap. -->
 <div class="modal-overlay" id="prereqGraphModalOverlay">
   <div class="modal-card pg-modal-card">
-    <button class="modal-close" id="prereqGraphModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="prereqGraphModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="prereqGraphModalBody"></div>
   </div>
 </div>
@@ -445,7 +445,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      have, instead of a bare tap-to-toggle. -->
 <div class="modal-overlay" id="impCourseModalOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="impCourseModalClose" aria-label="Close">&times;</button>
+    <button class="modal-close" id="impCourseModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="impCourseModalBody"></div>
   </div>
 </div>
@@ -457,9 +457,10 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      js/43-assistant-ui.js with createElement, never innerHTML, because it
      echoes both the student's own words and course names that can have
      arrived from another student's device through the plans feed. -->
-<button type="button" class="asst-launcher" id="asstLauncher"
-        aria-label="Open the Study Plan assistant" aria-expanded="false"><span data-app-icon="chatdots" data-app-icon-size="24" aria-hidden="true"></span></button>
-
+<!-- The floating launcher that used to sit here is gone. The assistant has
+     its own tab in the phone tab bar and its own row in the menu, so the
+     circle was a third way to reach one screen — two of them visible at
+     once on the study plan, which is what a student pointed out. -->
 <div class="asst-panel" id="asstPanel" role="dialog" aria-label="Study Plan assistant">
   <div class="asst-head">
     <span class="asst-head-title"><span data-app-icon="cap" data-app-icon-size="16" aria-hidden="true"></span> Study Plan assistant</span>
@@ -468,7 +469,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
            js/43-assistant-ui.js. Bolt = online brain, clock = offline only. -->
       <button type="button" class="asst-mode" id="asstMode" style="display:none;"
               aria-pressed="false" aria-label="Toggle the smart assistant"><span data-app-icon="clock" data-app-icon-size="15" aria-hidden="true"></span></button>
-      <button type="button" class="asst-close" id="asstClose" aria-label="Close the assistant">&times;</button>
+      <button type="button" class="asst-close" id="asstClose" aria-label="Close the assistant"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     </div>
   </div>
   <div class="asst-log" id="asstLog" role="log" aria-live="polite"></div>
@@ -506,7 +507,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <div class="fix-panel" id="fixPanel" role="dialog" aria-label="Fix">
   <div class="fix-head">
     <span class="fix-head-title" id="fixTitle"><span data-app-icon="gear" data-app-icon-size="15" aria-hidden="true"></span> Fix</span>
-    <button type="button" class="fix-close" id="fixClose" aria-label="Close the Fix panel">&times;</button>
+    <button type="button" class="fix-close" id="fixClose" aria-label="Close the Fix panel"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
   </div>
   <div class="fix-body" id="fixBody"></div>
 </div>
@@ -515,8 +516,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="float-popup-head" id="floatPopupHead">
     <span class="float-popup-title" id="floatPopupTitle">Course</span>
     <div class="float-popup-head-actions">
-      <button type="button" class="float-popup-min" id="floatPopupMin" aria-label="Minimize"><span class="fp-min-arrow">&#9650;</span></button>
-      <button type="button" class="float-popup-close" id="floatPopupClose" aria-label="Close">&times;</button>
+      <button type="button" class="float-popup-min" id="floatPopupMin" aria-label="Minimize"><span class="fp-min-arrow" data-app-icon="chevronUp" data-app-icon-size="13" aria-hidden="true"></span></button>
+      <button type="button" class="float-popup-close" id="floatPopupClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     </div>
   </div>
   <div class="float-popup-body" id="floatPopupBody"></div>

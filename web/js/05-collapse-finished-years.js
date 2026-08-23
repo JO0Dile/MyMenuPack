@@ -1,163 +1,178 @@
 // ==========================
-// COLLAPSE FINISHED YEARS — a "focus on what's left" view. A year every
-// course of which is completed folds down to a one-line "all done" strip,
-// so a later-year student doesn't scroll past semesters of checked-off
-// courses to reach what's current. Works on both built-in majors
-// (.year-row) and imported plans (.imp-year-block) through one generic
-// pass, and is a no-op (its toggle stays hidden) until at least one year
-// is actually finished.
+// YEAR COLLAPSE — every year is a disclosure, and a plan opens folded.
+//
+// This file used to be "collapse finished years": one master toggle that
+// folded away years in which every course was already complete. That is a
+// narrower version of the same idea, and it left a first-year student —
+// who has finished nothing — scrolling through five years of course cards
+// to find the one semester they are actually in.
+//
+// So the fold is per year now and starts closed. A plan opens as a short
+// stack of year bars, each carrying how far through it the student is, and
+// they open the one they want. The old master toggle is gone with the
+// separate row it lived in; this replaces it rather than sitting beside it.
+//
+// The chevron, the counts and the .imp-year-body wrapper are rendered by
+// js/28-imported.js. What lives here is the state (per plan, per year, in
+// localStorage), the click and keyboard handling, and the connector redraw
+// — folding a year reflows the grid the prerequisite lines are drawn over,
+// so every line has to be re-measured or it points at where a course used
+// to be.
+//
+// Also here: HOLD a year's title to see what is open to you inside it.
+// That replaces the app-wide "Show only what I can take" toggle, which was
+// a persistent setting for a momentary question. Holding is momentary: the
+// year dims everything that is done or locked until you let go.
 // ==========================
 (function(){
-  var STATE_KEY = 'aaup_collapseFinished';
-  // Years the student manually re-opened this session, so refresh() doesn't
-  // immediately re-collapse them out from under a deliberate expand. Keyed
-  // by "<prefix>::<year index>". Cleared whenever the master toggle flips.
-  var manuallyExpanded = {};
+  'use strict';
 
-  function isOn(){
-    try{ return localStorage.getItem(STATE_KEY) === '1'; }catch(e){ return false; }
+  var KEY = 'aaup_yearOpen';
+  var HOLD_MS = 320;
+
+  function readOpen(){
+    try{ return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+    catch(e){ return {}; }
   }
-  function setOn(v){
-    try{ localStorage.setItem(STATE_KEY, v ? '1' : '0'); }catch(e){}
+  function writeOpen(map){
+    try{ localStorage.setItem(KEY, JSON.stringify(map)); }catch(e){}
+  }
+  function isOpen(prefix, idx){
+    // Absent means closed. A plan the student has never touched opens
+    // folded, which is the whole point.
+    return readOpen()[prefix + '::' + idx] === 1;
+  }
+  function setOpen(prefix, idx, on){
+    var map = readOpen();
+    if(on){ map[prefix + '::' + idx] = 1; } else { delete map[prefix + '::' + idx]; }
+    writeOpen(map);
   }
 
   function rootFor(prefix){ return document.getElementById('page-' + prefix); }
-  function isImported(prefix){
-    return !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
+
+  function yearBlocks(root){
+    var imported = root.querySelectorAll('.imp-year-block');
+    if(imported.length) return Array.prototype.slice.call(imported);
+    return Array.prototype.slice.call(root.querySelectorAll('.year-row'));
   }
-  function yearContainers(root){
-    var built = root.querySelectorAll('.year-row');
-    if(built.length) return Array.prototype.slice.call(built);
-    return Array.prototype.slice.call(root.querySelectorAll('.imp-year-block'));
-  }
-  // Folding or unfolding a year reflows the grid the prerequisite connector
-  // layer is drawn over, so every line has to be re-measured — otherwise the
-  // lines point at where courses used to be. Redraw in place rather than
-  // re-rendering the plan: a render() would reset scroll position and the
-  // course-search box.
+
+  // Redraw in place rather than re-rendering: a full render() would reset
+  // the scroll position and wipe whatever is typed in the course search.
   function redrawConnectors(prefix){
     try{
-      if(isImported(prefix) && window.AAUP_IMPORTED && window.AAUP_IMPORTED.redrawConnectors){
+      if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.redrawConnectors){
         window.AAUP_IMPORTED.redrawConnectors(prefix);
       } else if(window.__redraw && window.__redraw[prefix]){
         window.__redraw[prefix]();
       }
     }catch(e){}
   }
-  // Which years are currently folded, as a string, so refresh() can tell
-  // whether it actually changed the layout and only redraw when it did.
-  function collapseSignature(root){
-    return yearContainers(root).map(function(y){
-      return y.classList.contains('year-collapsed') ? '1' : '0';
-    }).join('');
-  }
-  function yearIsFinished(yearEl){
-    var courses = yearEl.querySelectorAll('.course[id]:not(.course-removed)');
-    if(!courses.length) return false;
-    for(var i = 0; i < courses.length; i++){
-      if(!courses[i].classList.contains('completed')) return false;
-    }
-    return true;
-  }
-  function yearLabel(yearEl, rtl, index){
-    // Built-in years carry a .year-badge .label; imported ones an
-    // .imp-year-header h3. Fall back to a plain "Year N" either way.
-    var badge = yearEl.querySelector('.year-badge .label') || yearEl.querySelector('.imp-year-header h3');
-    var txt = badge ? badge.textContent.replace(/\s+/g, ' ').trim() : '';
-    if(txt) return txt;
-    return (rtl ? 'السنة ' : 'Year ') + (index + 1);
-  }
 
-  function clearCollapse(root){
-    root.classList.remove('finished-collapsed');
-    yearContainers(root).forEach(function(y){
-      y.classList.remove('year-collapsed');
-      var hint = y.querySelector(':scope > .collapse-hint');
-      if(hint) hint.remove();
-    });
-  }
-
-  function applyCollapse(prefix, root, rtl){
-    root.classList.add('finished-collapsed');
-    yearContainers(root).forEach(function(yearEl, idx){
-      var key = prefix + '::' + idx;
-      var hint = yearEl.querySelector(':scope > .collapse-hint');
-      var finished = yearIsFinished(yearEl);
-      if(finished && !manuallyExpanded[key]){
-        yearEl.classList.add('year-collapsed');
-        if(!hint){
-          hint = document.createElement('div');
-          hint.className = 'collapse-hint';
-          hint.setAttribute('role', 'button');
-          hint.setAttribute('tabindex', '0');
-          hint.innerHTML = '<span>✓ ' + window.__escapeHtml(yearLabel(yearEl, rtl, idx)) + ' — ' +
-            (rtl ? 'كل المساقات مكتملة' : 'all courses completed') + '</span>' +
-            '<span class="ch-expand">' + (rtl ? 'إظهار ▾' : 'Show ▾') + '</span>';
-          var expand = function(){
-            manuallyExpanded[key] = true;
-            yearEl.classList.remove('year-collapsed');
-            if(hint) hint.remove();
-            redrawConnectors(prefix); // the year just came back — so must its lines
-          };
-          hint.addEventListener('click', expand);
-          hint.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); expand(); } });
-          yearEl.insertBefore(hint, yearEl.firstChild);
-        }
-      } else {
-        yearEl.classList.remove('year-collapsed');
-        if(hint) hint.remove();
+  function applyOne(prefix, block, idx){
+    var open = isOpen(prefix, idx);
+    block.classList.toggle('year-collapsed', !open);
+    var toggle = block.querySelector('.imp-year-toggle');
+    if(toggle){
+      toggle.setAttribute('aria-expanded', String(open));
+      var chev = toggle.querySelector('.iy-chev');
+      if(chev && window.AAUP_ICONS){
+        chev.innerHTML = window.AAUP_ICONS.preview(open ? 'chevron' : 'chevronRight', 15);
       }
-    });
-  }
-
-  function anyFinished(root){
-    return yearContainers(root).some(yearIsFinished);
-  }
-
-  function ensureToggle(prefix, root, rtl){
-    var toggle = root.querySelector(':scope .collapse-toggle');
-    if(!toggle){
-      var anchor = root.querySelector('.course-search-wrap');
-      if(!anchor) return null;
-      toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'collapse-toggle';
-      anchor.parentNode.insertBefore(toggle, anchor);
-      toggle.addEventListener('click', function(){
-        var turningOn = !isOn();
-        setOn(turningOn);
-        manuallyExpanded = {}; // a fresh flip re-evaluates every year
-        // refresh() redraws the connectors itself whenever the set of folded
-        // years actually changed — in BOTH directions. It used to redraw only
-        // on the way out of collapse mode, which is why turning collapse on
-        // left the lines behind.
-        refresh(prefix);
-      });
     }
-    var on = isOn();
-    toggle.innerHTML =
-      '<span>' + (rtl ? '📁 طيّ السنوات المكتملة' : '📁 Collapse finished years') + '</span>' +
-      '<span class="ct-state">' + (on ? (rtl ? 'مفعّل' : 'ON') : (rtl ? 'معطّل' : 'OFF')) + '</span>';
-    return toggle;
+  }
+
+  // ---------------------------------------------------------------------
+  // HOLD TO SEE WHAT IS OPEN
+  //
+  // Adds .year-peek to the year block, which dims its done and locked
+  // cards and leaves the available ones at full strength. Deliberately not
+  // persisted anywhere: it lasts exactly as long as the finger is down.
+  function bindHold(prefix, block, toggle){
+    var timer = null, held = false;
+
+    function stop(){
+      if(timer){ clearTimeout(timer); timer = null; }
+      if(held){
+        held = false;
+        block.classList.remove('year-peek');
+      }
+    }
+    function start(){
+      stop();
+      timer = setTimeout(function(){
+        timer = null;
+        // Nothing to show if the year is folded — open it first, so the
+        // hold always has a visible effect rather than silently doing
+        // nothing on the most likely state to hold from.
+        if(block.classList.contains('year-collapsed')){
+          setOpen(prefix, block.getAttribute('data-year-index'), true);
+          applyOne(prefix, block, block.getAttribute('data-year-index'));
+          redrawConnectors(prefix);
+        }
+        held = true;
+        block.classList.add('year-peek');
+        if(navigator.vibrate){ try{ navigator.vibrate(8); }catch(e){} }
+      }, HOLD_MS);
+    }
+
+    toggle.addEventListener('pointerdown', start);
+    toggle.addEventListener('pointerup', function(e){
+      // A hold is not also a tap: without this, letting go after a peek
+      // would fold the year the peek just opened.
+      if(held){ e.preventDefault(); e.stopPropagation(); }
+      stop();
+    });
+    toggle.addEventListener('pointerleave', stop);
+    toggle.addEventListener('pointercancel', stop);
+    toggle.addEventListener('contextmenu', function(e){
+      // Long-press on a touch screen raises the context menu on top of the
+      // peek, which is exactly the thing being looked at.
+      if(held) e.preventDefault();
+    });
+    toggle.__aaupHoldBound = true;
+  }
+
+  function bind(prefix, block){
+    var toggle = block.querySelector('.imp-year-toggle');
+    if(!toggle || toggle.__aaupYearBound) return;
+    toggle.__aaupYearBound = true;
+    toggle.addEventListener('click', function(e){
+      // Swallowed by the hold handler when this "click" is the end of a
+      // press-and-hold rather than a tap.
+      if(e.defaultPrevented) return;
+      var idx = block.getAttribute('data-year-index');
+      setOpen(prefix, idx, !isOpen(prefix, idx));
+      applyOne(prefix, block, idx);
+      redrawConnectors(prefix);
+    });
+    bindHold(prefix, block, toggle);
   }
 
   function refresh(prefix){
     var root = rootFor(prefix);
     if(!root) return;
-    var rtl = root.classList.contains('rtl-mode');
-    var toggle = ensureToggle(prefix, root, rtl);
-    if(!toggle) return;
-    // Only offer the control once there's actually something to fold —
-    // otherwise it's a button that does nothing.
-    toggle.classList.toggle('available', anyFinished(root) || isOn());
-    var before = collapseSignature(root);
-    if(isOn()){ applyCollapse(prefix, root, rtl); }
-    else { clearCollapse(root); }
-    // Folding/unfolding moved every card below it. render() draws the
-    // connectors BEFORE calling us, so this also covers opening a plan with
-    // collapse mode already on.
-    if(collapseSignature(root) !== before){ redrawConnectors(prefix); }
+    yearBlocks(root).forEach(function(block){
+      var idx = block.getAttribute('data-year-index');
+      if(idx == null) return;
+      bind(prefix, block);
+      applyOne(prefix, block, idx);
+    });
+  }
+
+  // Opens a year and scrolls to it — used by search, by "jump to current
+  // semester", and by anything else that needs to point at a course the
+  // student cannot currently see because its year is folded.
+  function reveal(prefix, el){
+    var block = el && el.closest ? el.closest('.imp-year-block, .year-row') : null;
+    if(!block) return false;
+    var idx = block.getAttribute('data-year-index');
+    if(idx == null || isOpen(prefix, idx)) return false;
+    setOpen(prefix, idx, true);
+    applyOne(prefix, block, idx);
+    redrawConnectors(prefix);
+    return true;
   }
 
   window.__refreshCollapse = refresh;
+  window.__revealYearFor = reveal;
 })();

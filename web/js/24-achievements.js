@@ -636,7 +636,7 @@
         shareBtn = '<button type="button" class="ab-share" ' +
           'data-ach-icon="' + window.__escapeHtml(a.icon) + '" ' +
           'data-ach-title="' + window.__escapeHtml(rtl ? title.ar : title.en) + '" ' +
-          'data-ach-sub="' + window.__escapeHtml(majorName) + '">📤 ' + (rtl ? 'مشاركة' : 'Share') + '</button>';
+          'data-ach-sub="' + window.__escapeHtml(majorName) + '">' + window.AAUP_ICONS.preview('upload', 13) + (rtl ? 'مشاركة' : 'Share') + '</button>';
       }
       return '<div class="achievement-badge ' + cls + '">' +
         '<div class="ab-icon">' + badgeIconHtml(a) + '</div>' +
@@ -656,7 +656,8 @@
         '<button type="button" class="ach-grid-save" id="achGridSaveImg" ' +
           'data-ach-major="' + window.__escapeHtml(majorNameForGrid) + '" ' +
           'data-ach-unlocked="' + unlockedCount + '" data-ach-total="' + applicableCount + '">' +
-          (rtl ? '📤 احفظ التقدّم كصورة' : '📤 Save progress as image') + '</button>' +
+          window.AAUP_ICONS.preview('download', 14) +
+          (rtl ? 'احفظ التقدّم كصورة' : 'Save progress as image') + '</button>' +
       '</div>' +
       catChipsHtml(rtl) +
       heroHtml +

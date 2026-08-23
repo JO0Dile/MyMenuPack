@@ -369,6 +369,10 @@
     var el = document.getElementById(prefix + '-c-' + slug);
     if(!el) return;
 
+    // Years start folded, so the course a search just found is usually
+    // inside a closed one. Open it before scrolling, or the page scrolls to
+    // a collapsed bar and the student is told nothing was found.
+    if(window.__revealYearFor) window.__revealYearFor(prefix, el);
     el.scrollIntoView({behavior:'smooth', block:'center'});
     el.classList.add('search-selected');
 

@@ -156,7 +156,7 @@
     done: { en: 'Nothing left to plan for — every course is done.', ar: 'ما بقي إشي تخطط له — كل المساقات منجزة.' },
     years1: { en: '(≈1 year)', ar: '(≈سنة)' },
     yearsN: { en: '(≈{n} years)', ar: '(≈{n} سنوات)' },
-    saveImg: { en: '📤 Save as image', ar: '📤 احفظ كصورة' }
+    saveImg: { en: 'Save as image', ar: 'احفظ كصورة' }
   };
   function t(k, r){ return r ? TX[k].ar : TX[k].en; }
 
@@ -255,7 +255,7 @@
             ? '<p class="grad-note grad-note-pace">' + t('pace', rtl).replace('{load}', load) + '</p>'
             : '')) +
       '<p class="grad-caveat">' + t('caveat', rtl) + '</p>' +
-      '<button type="button" class="grad-save-img" id="' + hostId + 'SaveImg">' + t('saveImg', rtl) + '</button>';
+      '<button type="button" class="grad-save-img" id="' + hostId + 'SaveImg">' + window.AAUP_ICONS.preview('download', 14) + t('saveImg', rtl) + '</button>';
 
     var slider = document.getElementById(hostId + 'Slider');
     if(slider){

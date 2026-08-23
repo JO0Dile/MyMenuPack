@@ -32,7 +32,16 @@
   // to organize this same list into labeled sections instead of one long
   // scroll — the desktop sidebar ignores it and renders ITEMS as one flat
   // list, exactly as it always has.
+  //
+  // 'edit' is deliberately first. It used to be a button on the plan page
+  // itself, in a row with four navigation buttons — which meant the one
+  // control that changes what the page IS looked exactly like the four that
+  // only move you somewhere else. It is a mode, so it belongs where modes
+  // are chosen, at the top of the menu, and the plan page is left showing
+  // the plan.
   var ITEMS = [
+    { key: 'edit', icon: 'pen', label: 'Edit Mode', group: null, planOnly: true,
+      action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.toggleEdit(prefix); } },
     { key: 'dashboard', icon: 'home', label: 'Dashboard', group: null, action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
     { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', group: 'plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
     { key: 'roadmap', icon: 'compass', label: 'My Path', group: 'plan', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
@@ -52,9 +61,35 @@
     // Not the same thing as "Switch Plan" at the bottom, which only reopens
     // the picker. This one answers the question first: what happens to my
     // progress if I move?
-    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', advanced: true, action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
+    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', advanced: true, action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } },
+    // These two also came off the plan header. Neither is an everyday
+    // action, so they land in Advanced rather than the top list — but they
+    // do land somewhere: a control that is removed from one surface and
+    // added to no other is just deleted.
+    { key: 'export', icon: 'download', label: 'Export Plan', group: 'account', advanced: true, planOnly: true,
+      action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.exportPlan(prefix); } },
+    { key: 'contribute', icon: 'mail', label: 'Contribute This Plan', group: 'account', advanced: true, planOnly: true,
+      action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.submitPlan(prefix); } }
   ];
   var GROUP_LABELS = { plan: 'Plan', community: 'Community', account: 'Account' };
+
+  // Edit Mode, Export and Contribute all act on an imported plan through
+  // AAUP_IMPORTED. A built-in major has none of those, so the rows are not
+  // offered there rather than being offered and doing nothing.
+  function itemsFor(prefix){
+    var imported = isImportedPlan(prefix);
+    return ITEMS.filter(function(i){ return imported || !i.planOnly; });
+  }
+  function isEditing(prefix){
+    var page = document.getElementById('page-' + prefix);
+    return !!(page && page.classList.contains('editing'));
+  }
+  // The one row whose label depends on what the page is currently doing:
+  // pressed once it says how to leave again.
+  function labelFor(item, prefix){
+    if(item.key === 'edit' && isEditing(prefix)) return 'Exit Edit Mode';
+    return item.label;
+  }
 
   var currentPrefix = null;
 
@@ -103,7 +138,7 @@
       '<span class="sb-icon">' + window.AAUP_ICONS.preview('menu', 16) + '</span>' +
       '<span class="sb-adv-label">Advanced</span>' +
       '<span class="sb-adv-count">' + count + '</span>' +
-      '<span class="sb-adv-chevron" aria-hidden="true">' + (expanded ? '⌃' : '⌄') + '</span></button>';
+      '<span class="sb-adv-chevron" aria-hidden="true">' + window.AAUP_ICONS.preview(expanded ? 'chevronUp' : 'chevron', 15) + '</span></button>';
   }
 
   // Phone-only markup: the same ITEMS grouped into labeled sections with an
@@ -119,9 +154,11 @@
     // the order they were declared — Plan's extras, then Community, then
     // Change Major — so the section still reads as a sequence rather than a
     // pile of unrelated leftovers.
-    ITEMS.forEach(function(item){
+    var soloItems = [];
+    itemsFor(prefix).forEach(function(item){
       if(item.advanced){ adv.push(item); return; }
       if(item.group && byGroup[item.group]) byGroup[item.group].push(item);
+      else soloItems.push(item);
     });
     if(hasLibrary){
       adv.push({ key: 'library', icon: 'book', label: 'Course Library' });
@@ -130,10 +167,11 @@
     byGroup.account.push({ key: 'switch', icon: 'refresh', label: 'Switch Plan' });
 
     function rowHtml(item){
-      return '<button type="button" class="sb-mrow' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
+      return '<button type="button" class="sb-mrow' + (item.key === activeKey ? ' active' : '') +
+        (item.key === 'edit' && isEditing(prefix) ? ' sb-mrow-on' : '') + '" data-sb-key="' + item.key + '">' +
         '<span class="sb-mrow-icon">' + window.AAUP_ICONS.preview(item.icon, 17) + '</span>' +
-        '<span class="sb-mrow-label">' + item.label + '</span>' +
-        '<span class="sb-mrow-chevron">›</span></button>';
+        '<span class="sb-mrow-label">' + labelFor(item, prefix) + '</span>' +
+        '<span class="sb-mrow-chevron">' + window.AAUP_ICONS.preview('chevronRight', 15) + '</span></button>';
     }
     function groupHtml(key){
       var items = byGroup[key];
@@ -144,7 +182,8 @@
     // Dashboard has no group (it is the app's own Home tab, duplicated here
     // for convenience) — a standalone row above the labeled sections rather
     // than forced into one of them.
-    var dashItem = ITEMS.filter(function(i){ return i.key === 'dashboard'; })[0];
+    // Edit Mode and Dashboard both sit outside the labelled sections, as one
+    // ungrouped block at the very top, in the order ITEMS declares them.
     var expanded = advancedExpanded(activeKey);
     // Advanced sits directly above Account, so Settings stays the last thing
     // in the sheet and the new row is the one immediately before it.
@@ -153,7 +192,7 @@
         '<div class="sb-group sb-adv-panel" id="sbAdvancedPanel-more"' + (expanded ? '' : ' hidden') + '>' +
           adv.map(rowHtml).join('') + '</div>'
       : '';
-    return (dashItem ? '<div class="sb-group sb-group-solo">' + rowHtml(dashItem) + '</div>' : '') +
+    return (soloItems.length ? '<div class="sb-group sb-group-solo">' + soloItems.map(rowHtml).join('') + '</div>' : '') +
       groupHtml('plan') + groupHtml('community') + advHtml + groupHtml('account');
   }
 
@@ -167,15 +206,16 @@
 
     var html = '<div class="sb-brand"><span class="sb-mark">' + window.AAUP_ICONS.markup(iconEntity, { size: 20 }) + '</span><span>' + name + '</span></div>';
     function itemHtml(item){
-      return '<button type="button" class="sb-item' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
-        '<span class="sb-icon">' + window.AAUP_ICONS.preview(item.icon, 16) + '</span><span>' + item.label + '</span></button>';
+      return '<button type="button" class="sb-item' + (item.key === activeKey ? ' active' : '') +
+        (item.key === 'edit' && isEditing(prefix) ? ' sb-item-on' : '') + '" data-sb-key="' + item.key + '">' +
+        '<span class="sb-icon">' + window.AAUP_ICONS.preview(item.icon, 16) + '</span><span>' + labelFor(item, prefix) + '</span></button>';
     }
-    var advItems = ITEMS.filter(function(i){ return i.advanced; });
+    var advItems = itemsFor(prefix).filter(function(i){ return i.advanced; });
     if(hasLibrary){ advItems = advItems.concat([{ key: 'library', icon: 'book', label: 'Course Library' }]); }
     var advExpanded = advancedExpanded(activeKey);
 
     html += '<div class="sb-flat-list">';
-    html += ITEMS.filter(function(i){ return !i.advanced; }).map(itemHtml).join('');
+    html += itemsFor(prefix).filter(function(i){ return !i.advanced; }).map(itemHtml).join('');
     html += '<div class="sb-spacer"></div>';
     html += '<div class="sb-switch">';
     if(advItems.length){
@@ -203,7 +243,7 @@
           t.setAttribute('aria-expanded', open ? 'true' : 'false');
           t.classList.toggle('open', open);
           var chev = t.querySelector('.sb-adv-chevron');
-          if(chev) chev.textContent = open ? '⌃' : '⌄';
+          if(chev) chev.innerHTML = window.AAUP_ICONS.preview(open ? 'chevronUp' : 'chevron', 15);
         });
         sidebar.querySelectorAll('.sb-adv-panel').forEach(function(panel){
           if(open){ panel.removeAttribute('hidden'); } else { panel.setAttribute('hidden', ''); }
@@ -224,9 +264,13 @@
         if(key === 'switch'){ window.AAUP_DASHBOARD.choosePlan(); return; }
         if(key === 'settings'){ openSettings(); tagOpenedFromMore(openedFromMoreDrawer); return; }
         if(key === 'library'){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.openLibrary(prefix); tagOpenedFromMore(openedFromMoreDrawer); return; }
-        var item = ITEMS.filter(function(i){ return i.key === key; })[0];
+        var item = itemsFor(prefix).filter(function(i){ return i.key === key; })[0];
         if(item){
           item.action(prefix);
+          // Edit Mode opens no screen — it changes the one you are on — so
+          // it never becomes the "active" nav row. It re-renders instead, so
+          // the row can redraw itself as Exit Edit Mode.
+          if(key === 'edit'){ render(prefix, activeKey); return; }
           if(key !== 'dashboard' && key !== 'studyplan'){ setActive(key); }
           tagOpenedFromMore(openedFromMoreDrawer);
         }

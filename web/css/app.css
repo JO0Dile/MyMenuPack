@@ -218,7 +218,15 @@
     margin:0 auto;
     border:1px solid var(--line);
     border-radius:10px;
+    /* clip, not hidden. Both clip a child to the rounded corners, but
+       "hidden" also makes this a scroll container — and a position:sticky
+       descendant sticks within its nearest scroll container, which here is
+       a box that never scrolls. That is why the progress meter would not
+       travel. "clip" does the clipping without the scroll port.
+       hidden stays first as the fallback for a browser without clip: the
+       corners are still right, the meter just does not stick. */
     overflow:hidden;
+    overflow:clip;
     background:var(--surface-bg);
   }
 
@@ -1172,6 +1180,9 @@
     top:5px; right:5px;
     width:17px; height:17px;
     display:flex; align-items:center; justify-content:center;
+    /* The tick is an SVG on currentColor, so "colour it transparent" is
+       still how an unticked box hides its mark — same trick as when this
+       was the ✓ character, and it keeps the box's own ::before circle. */
     font-size:11px; line-height:1; color:transparent;
     cursor:pointer;
     z-index:3;
@@ -1398,34 +1409,25 @@
     margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
-  /* ---------- collapse finished years ---------- */
-  .collapse-toggle{
-    display:none;align-items:center;gap:8px;
-    margin:14px 32px 0;padding:9px 14px;
-    background:var(--search-bg);border:1px solid var(--line);border-radius:10px;
-    color:var(--text-dim);font-size:12.5px;font-weight:700;font-family:inherit;
-    cursor:pointer;width:calc(100% - 64px);text-align:left;
-  }
-  .collapse-toggle.available{display:flex;}
-  .collapse-toggle:hover{border-color:var(--accent);color:var(--text);}
-  .collapse-toggle .ct-state{margin-left:auto;color:var(--accent);font-weight:800;}
-  .plan-page.rtl-mode .collapse-toggle, .sheet.rtl-mode .collapse-toggle{text-align:right;}
-  .plan-page.rtl-mode .collapse-toggle .ct-state, .sheet.rtl-mode .collapse-toggle .ct-state{margin-left:0;margin-right:auto;}
-  @media (max-width:640px){
-    .collapse-toggle{margin-left:16px;margin-right:16px;width:calc(100% - 32px);}
-  }
+  /* ---------- hold a year to see what is open in it (js/05-collapse-finished-years.js) ----------
+     Replaces the old app-wide "Show only what I can take" switch, which was
+     a persistent setting answering a momentary question — a student wants
+     to know what is open right now, glance, and carry on, not leave a
+     filter on and later wonder why half the plan is faded.
 
-  /* ---------- focus mode (js/65-focus-mode.js) ----------
-     Same pill, same place, always offered (collapse's toggle only shows up
-     once a year is finished; this one is useful from day one). Dims every
-     course that is neither open nor done — the prerequisite SVG layer is
-     untouched on purpose, since it is what explains why a course is dim. */
-  .plan-focus .course:not(.available):not(.completed){
-    opacity:.32;filter:saturate(.55);transition:opacity .15s ease,filter .15s ease;
+     So it is a hold, scoped to the year being held: everything done or
+     locked inside that year fades back, and what is actually open stays.
+     The prerequisite lines are deliberately left alone, because they are
+     what explains WHY a faded course is faded. */
+  .year-peek .course:not(.available):not(.completed),
+  .year-peek .course.completed{
+    opacity:.26;filter:saturate(.5);transition:opacity .15s ease,filter .15s ease;
   }
-  .plan-focus .course:not(.available):not(.completed):hover{opacity:.62;filter:none;}
+  .year-peek .course.available:not(.completed){
+    box-shadow:0 0 0 2px var(--unlock) inset;
+  }
   @media (prefers-reduced-motion:reduce){
-    .plan-focus .course:not(.available):not(.completed){transition:none;}
+    .year-peek .course{transition:none;}
   }
 
   /* ---------- milestones (js/64-milestones.js) ----------
@@ -1441,18 +1443,12 @@
     margin:6px 2px 0;font-size:11px;color:var(--text-dim);text-align:center;
   }
 
-  /* A finished year in collapse mode: its semesters are hidden and a single
-     compact "all done — tap to expand" strip stands in for them. */
-  .year-row.year-collapsed .semesters,
-  .imp-year-block.year-collapsed .imp-semester-block{display:none;}
-  .collapse-hint{
-    display:flex;align-items:center;gap:8px;cursor:pointer;
-    padding:12px 16px;margin:6px 0;border-radius:10px;
-    background:linear-gradient(180deg, rgba(74,222,128,.12), rgba(74,222,128,.04));
-    border:1px dashed var(--unlock);color:var(--text);font-size:12.5px;font-weight:700;
-  }
-  .collapse-hint .ch-expand{margin-left:auto;color:var(--unlock);font-weight:800;}
-  .plan-page.rtl-mode .collapse-hint .ch-expand, .sheet.rtl-mode .collapse-hint .ch-expand{margin-left:0;margin-right:auto;}
+  /* A folded year hides its body outright rather than height-animating it:
+     the connector SVG is redrawn against the new layout on every toggle
+     (js/05-collapse-finished-years.js), and animating the height would mean
+     redrawing every prerequisite line on every frame of it. */
+  .imp-year-block.year-collapsed > .imp-year-body,
+  .year-row.year-collapsed .semesters{display:none;}
   /* Prerequisite connectors used to be hidden outright while collapse mode
      was on (the layer reflows when years fold, and stale lines pointed at
      now-hidden courses). That threw away every line between two courses that
@@ -1823,10 +1819,6 @@
 
   .elective-subsection .es-fill{height:100%;background:var(--dept);border-radius:4px;transition:width .3s ease;}
 
-  .panel-action-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
-
-  .panel-action-row .pw-reset{flex:1 1 auto;}
-
   /* ==========================================================================
      9. SIDEBAR — WHAT CAN I TAKE NEXT — the unlocked-courses chip list and its
      click-to-jump highlight pulse
@@ -2189,14 +2181,21 @@
     box-shadow:0 20px 60px rgba(0,0,0,.55);
   }
 
+  /* A drawn ✕ on the icon grid rather than the × character, which inherited
+     the body font and never lined up with the icons beside it. The button
+     keeps a 34px box so it stays a real tap target at 15px of glyph. */
   .modal-close{
-    position:absolute; top:10px; right:12px;
+    position:absolute; top:8px; right:10px;
+    display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:50%;
     background:none; border:none;
-    color:var(--text-dim); font-size:22px;
-    cursor:pointer; line-height:1; padding:4px;
+    color:var(--text-dim);
+    cursor:pointer; line-height:1; padding:0;
+    transition:background .15s ease, color .15s ease;
   }
 
-  .modal-close:hover{color:var(--text);}
+  .modal-close:hover{color:var(--text); background:var(--search-bg);}
+  .modal-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
   .modal-body h3{margin:0 6px 4px 0;font-size:16px;font-weight:800;color:var(--text);line-height:1.3;}
 
@@ -3119,128 +3118,46 @@
   }
   /* ================= AI STUDY ADVISOR ================= */
 
-  /* ---------- phone study-plan header (js/69-phone-header.js) ----------
-     Desktop is untouched (nothing here fires above 720px). On a phone the
-     whole pre-course header — brand block, title, buttons, legend, both
-     toggles, search, description, progress bar — collapses behind one
-     sticky bar with the plan name, its progress, and a chevron. All those
-     pieces stay exactly where their own modules put them; this only hides
-     them with a class-scoped rule and reveals them again on tap. */
-  /* All three phone-header pieces are hidden by default and only turned on
-     inside the breakpoint below. js/69-phone-header.js builds the year tabs
-     and the Legend/Available-only chips from the plan's own data with no
-     width check of its own, so above 720px they were still in the DOM with
-     every one of their rules sitting behind a media query that did not
-     match — bare <button> elements painting themselves white-on-black in
-     the browser's default style, above the plan. */
-  .imp-phone-bar,
-  .imp-phone-years,
-  .imp-phone-chips{display:none;}
+  /* ---------- the travelling progress meter (js/69-phone-header.js) ----------
+     The plan's hours bar sticks to the top of the scroll and shrinks once
+     it gets there: caption gone, padding down, so it costs a strip rather
+     than a block while a student scrolls through course cards.
+
+     .imp-body-pad is the scroll container it sticks within, and it wraps
+     everything from the description down to the last year — which is why
+     the meter can travel the whole length of the plan. A sticky element
+     only moves inside its own parent's box; pinning it to a wrapper that
+     is exactly its own height (which is what the old sticky meter in Plan
+     My Next Semester did) means it never moves at all.
+
+     Everything the old phone header built here — the collapsing chrome
+     bar, the Y1..Y5 jump tabs, the Legend and "Available only" chips and
+     the jump-to-current button — is gone. The buttons those chips stood in
+     for moved to the menu, and every year folds on its own now, so there
+     is nothing left to collapse behind a chevron. */
+  .progress-widget{
+    position:sticky;top:0;z-index:30;
+    transition:padding .18s ease, box-shadow .18s ease, border-radius .18s ease;
+  }
+  /* Sticky against a transparent background would let course cards scroll
+     through the meter, so it carries its own ground once it is stuck. */
+  .sheet-plan.pw-stuck .progress-widget{
+    background:var(--panel);
+    box-shadow:0 10px 22px -14px rgba(0,0,0,.75);
+  }
+  .sheet-plan.pw-stuck .progress-widget .pw-gate-caption{
+    display:none;
+  }
+  @media (prefers-reduced-motion:reduce){
+    .progress-widget{transition:none;}
+  }
   @media (max-width:720px){
-    .sheet-plan{position:relative;}
-    .imp-phone-bar{
-      display:block;position:sticky;top:0;z-index:40;
-      background:var(--header-bg);border-bottom:1px solid var(--line);
-      margin:0 -16px 10px;padding-inline-start:58px;   /* clears the fixed ☰ sidebar toggle */
+    /* Narrower and shorter on a phone, and pulled to the full width of the
+       page so the stuck bar spans the screen rather than floating with a
+       margin either side of it. */
+    .sheet-plan.pw-stuck .progress-widget{
+      margin-inline:0;border-radius:0;padding:8px 14px;
     }
-    .imp-phone-bar-btn{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      width:100%;padding:13px 16px;background:none;border:0;
-      font-family:inherit;font-size:13.5px;font-weight:800;color:var(--text);cursor:pointer;
-    }
-    .imp-phone-bar-title{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:start;}
-    .imp-phone-bar-pct{flex:0 0 auto;color:var(--accent);font-weight:800;}
-    .imp-phone-bar-chevron{flex:0 0 auto;font-size:16px;color:var(--text-dim);}
-
-    .sheet-plan > header,
-    .sheet-plan > .legend,
-    .sheet-plan > .collapse-toggle,
-    .sheet-plan > .course-search-wrap,
-    .sheet-plan > .imp-body-pad > .imp-bio-text,
-    .sheet-plan > .imp-body-pad > .progress-widget,
-    .sheet-plan > .imp-body-pad > .imp-stat-chips,
-    .sheet-plan > .imp-body-pad > .panel-action-row{
-      display:none;
-    }
-    .sheet-plan.imp-phone-open > header,
-    .sheet-plan.imp-phone-open > .legend,
-    .sheet-plan.imp-phone-open > .collapse-toggle,
-    .sheet-plan.imp-phone-open > .course-search-wrap,
-    .sheet-plan.imp-phone-open > .imp-body-pad > .imp-bio-text,
-    .sheet-plan.imp-phone-open > .imp-body-pad > .progress-widget,
-    .sheet-plan.imp-phone-open > .imp-body-pad > .imp-stat-chips,
-    .sheet-plan.imp-phone-open > .imp-body-pad > .panel-action-row{
-      display:block;
-    }
-    /* These are flex/block toggles by their own rules elsewhere in this
-       file, which would otherwise win the cascade over the plain "display:
-       block" above and leave them invisible even once revealed. */
-    .sheet-plan.imp-phone-open > .course-search-wrap .search-box{display:flex;}
-    .sheet-plan.imp-phone-open > .imp-body-pad > .progress-widget{display:flex;}
-    .sheet-plan.imp-phone-open > .collapse-toggle{display:flex;}
-    .sheet-plan.imp-phone-open > .imp-body-pad > .imp-stat-chips{display:flex;}
-    .sheet-plan.imp-phone-open > .imp-body-pad > .panel-action-row{display:flex;}
-
-    /* Year tabs — always visible, not gated behind imp-phone-open: reaching
-       a later year is the point, and that should not require opening the
-       full header first. */
-    .imp-phone-years{
-      display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px;
-      scrollbar-width:none;
-    }
-    .imp-phone-years::-webkit-scrollbar{display:none;}
-    .imp-phone-year-tab{
-      flex:0 0 auto;padding:6px 14px;border-radius:999px;border:1px solid var(--line);
-      background:var(--panel);color:var(--text-dim);font-family:inherit;font-size:12px;font-weight:700;
-    }
-    .imp-phone-year-tab:active{border-color:var(--accent);color:var(--text);}
-
-    /* Icon chips replace Legend's and Focus Mode's own full-width rows once
-       the header is open — see js/69-phone-header.js for why Collapse
-       Finished Years is left as its own row instead of a third chip. */
-    .imp-phone-chips{display:none;gap:8px;margin:0 0 10px;}
-    .sheet-plan.imp-phone-open > .imp-phone-chips{display:flex;}
-    .imp-phone-chip{
-      flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-      padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
-      color:var(--text-dim);font-family:inherit;font-size:12px;font-weight:700;
-    }
-    .imp-phone-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(111,140,255,.1);}
-    .sheet-plan.imp-phone-open > .legend > .legend-toggle{display:none;}
-    .sheet-plan.imp-phone-open > .collapse-toggle.focus-toggle{display:none;}
-
-    /* Auto-hide on scroll — the sticky bar, year tabs and chips all ride
-       together as one unit, tucked out of view scrolling down and pulled
-       back scrolling up (js/69-phone-header.js's watchScroll). */
-    .imp-phone-bar,.imp-phone-years,.imp-phone-chips{transition:transform .22s ease, opacity .22s ease;}
-    .sheet-plan.imp-phone-hide > .imp-phone-bar,
-    .sheet-plan.imp-phone-hide > .imp-phone-years,
-    .sheet-plan.imp-phone-hide > .imp-phone-chips{
-      transform:translateY(-14px);opacity:0;pointer-events:none;
-    }
-
-    /* Jump-to-current-semester — small, unlabelled, bottom-left (the
-       assistant/Fix launchers already own bottom-right/left at their own
-       heights, so this sits just above the Fix button rather than
-       competing with it for the same spot). */
-    .imp-phone-jump{
-      position:fixed;left:16px;bottom:130px;z-index:1399;
-      width:34px;height:34px;border-radius:50%;
-      background:var(--panel);color:var(--text-dim);border:1px solid var(--line);
-      font-size:15px;line-height:1;cursor:pointer;
-      box-shadow:0 6px 16px rgba(0,0,0,.35);
-      display:flex;align-items:center;justify-content:center;
-    }
-    /* It's appended inside the plan root specifically so it disappears
-       whenever the app switches AWAY from the plan page entirely (see the
-       comment in js/69-phone-header.js), but a dialog opening ON TOP of the
-       still-visible plan page is a different case — position:fixed escapes
-       normal stacking, so at z-index:1399 it kept floating over Settings,
-       Contacts and every other full-page dialog underneath it instead of
-       being covered like the rest of the plan page. Only the study plan
-       page itself should ever show this button. */
-    body:has(.modal-overlay.open) .imp-phone-jump,
-    body:has(.app-sidebar.open) .imp-phone-jump{display:none;}
   }
 
   /* ---------- skeleton loading (js/70-skeleton.js) ----------
@@ -4251,8 +4168,48 @@
     display:flex;align-items:center;justify-content:space-between;gap:10px;
     margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);
   }
+  /* A folded year is only its header, so the bottom border and the gap
+     under it would draw a line with nothing beneath it. */
+  .imp-year-block.year-collapsed{padding-bottom:14px;}
+  .imp-year-block.year-collapsed > .imp-year-header{
+    margin-bottom:0;padding-bottom:0;border-bottom:0;
+  }
   .imp-year-header h3{margin:0;font-size:15px;color:var(--text);}
   .imp-year-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  /* The whole header row is the toggle. It is one <button> with the
+     chevron, the title and the counts inside it, so the tap target is the
+     full width of the card rather than a chevron a thumb has to find —
+     and the edit-mode year actions stay OUTSIDE it, because a button
+     inside a button is invalid and stops firing. */
+  .imp-year-toggle{
+    flex:1 1 auto;min-width:0;
+    display:flex;align-items:center;gap:10px;
+    background:none;border:0;padding:4px 0;margin:-4px 0;
+    font-family:inherit;color:inherit;cursor:pointer;text-align:start;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .imp-year-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px;}
+  .iy-chev{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;flex:0 0 22px;color:var(--text-dim);
+  }
+  .imp-year-toggle:hover .iy-chev{color:var(--accent);}
+  /* Counts sit at the far end so a folded plan reads as a column of
+     "how far through this year am I" without opening anything. */
+  .iy-count{
+    margin-inline-start:auto;flex:0 0 auto;
+    font-size:12px;font-weight:700;color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
+  .iy-count b{color:var(--text);font-weight:800;}
+  .iy-hours{
+    flex:0 0 auto;font-size:11px;font-weight:800;color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  /* Held down: the year says so, so the dimming reads as deliberate rather
+     than as the page having gone wrong. */
+  .imp-year-block.year-peek{box-shadow:0 0 0 2px var(--accent) inset;}
   .imp-add-course-card{
     background:rgba(255,255,255,.03);border:2px dashed var(--line);border-radius:8px;
     min-width:150px;flex:1 1 170px;display:flex;align-items:center;justify-content:center;
@@ -4290,21 +4247,15 @@
   .course-cr{font-size:10px;opacity:.8;margin-top:2px;}
 
   /* Year, whether it is open to this student, and the hours — the three
-     things checked on every card — plus the official registration code,
-     which is what actually gets typed into the university's system. */
+     things checked on every card. The registration code used to sit under
+     them on a fourth line; it is read once, at registration, and is in the
+     course details popup along with everything else needed then. */
   .course-meta{
     font-size:calc(10px * var(--card-scale, 1));
     margin-top:3px;line-height:1.35;font-weight:600;
     color:rgba(255,255,255,.92);
   }
-  .course-code{
-    font-size:calc(9.5px * var(--card-scale, 1));
-    margin-top:1px;letter-spacing:.03em;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    color:rgba(255,255,255,.78);
-  }
-  .course.completed .course-meta,
-  .course.completed .course-code{color:rgba(255,255,255,.9);}
+  .course.completed .course-meta{color:rgba(255,255,255,.9);}
 
   /* The card is a real button now, so it needs a real focus ring. */
   .course:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
@@ -4382,17 +4333,22 @@
     display:inline-flex;align-items:center;justify-content:center;
     width:32px;height:32px;flex:0 0 32px;border-radius:50%;
     background:var(--search-bg);border:1px solid var(--line);
-    color:var(--text);font-size:17px;line-height:1;
+    color:var(--text);line-height:1;
     transition:background .15s ease,border-color .15s ease,color .15s ease,transform .15s ease;
   }
+  /* One drawn arrow, mirrored for Arabic, rather than two characters: the
+     ← and → glyphs came from the body font and sat a pixel or two off
+     centre in the circle, which is what made the bar look unfinished. */
+  .back-bar-rtl .back-bar-arrow svg{transform:scaleX(-1);}
   /* --panel is the card's own background and --accent is picked to stand out
      against it, so accent-on-panel is readable in all six themes without any
      theme having to declare a seventh colour for this one button. */
   .back-bar-btn:hover{color:var(--text);}
   .back-bar-btn:hover .back-bar-arrow{
-    background:var(--accent);border-color:var(--accent);color:var(--panel);
+    background:var(--accent);border-color:var(--accent);color:var(--on-accent);
     transform:translateX(-2px);
   }
+  .back-bar-rtl .back-bar-btn:hover .back-bar-arrow{transform:translateX(2px);}
   .back-bar-rtl .back-bar-btn:hover .back-bar-arrow{transform:translateX(2px);}
   .back-bar-btn:active .back-bar-arrow{transform:none;}
   .back-bar-btn:focus-visible{outline:none;}
@@ -5216,19 +5172,10 @@
    19. ASSISTANT — launcher, chat window, and Guided Mode
    ========================================================================== */
 
-/* Bottom-RIGHT, lifted clear of the watermark line that sits under it.
-   Its counterpart, the Fix button, owns the bottom-left corner. */
-.asst-launcher{
-  position:fixed; right:16px; bottom:38px; z-index:1400;
-  width:52px; height:52px; border-radius:50%;
-  background:var(--accent); color:var(--on-accent);
-  border:none; font-size:22px; line-height:1; cursor:pointer;
-  box-shadow:0 10px 26px rgba(0,0,0,.45);
-  display:flex; align-items:center; justify-content:center;
-  transition:transform .15s ease, filter .15s ease;
-}
-.asst-launcher:hover{transform:translateY(-2px); filter:brightness(1.08);}
-.asst-launcher:active{transform:translateY(0);}
+/* The assistant's floating launcher used to live here, bottom-right. It is
+   removed: the assistant is a tab in the phone tab bar and a row in the
+   menu, and a third entrance floating over the plan is one entrance too
+   many. Fix keeps the bottom-left corner to itself. */
 
 .asst-panel{
   position:fixed; right:16px; bottom:100px; z-index:1401;
@@ -5530,14 +5477,12 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
   }
   /* Nothing floats over a full-screen conversation. */
   body:has(.asst-panel.open) .sb-tabbar,
-  body:has(.asst-panel.open) .asst-launcher,
   body:has(.asst-panel.open) .fix-launcher{display:none;}
 
   .fix-panel{
     left:8px; right:8px; width:auto;
     bottom:74px; max-height:calc(100vh - 130px);
   }
-  .asst-launcher{right:12px; bottom:34px; width:48px; height:48px; font-size:20px;}
   .fix-launcher{left:12px; bottom:16px; width:42px; height:42px; font-size:17px;}
   /* The sidebar slides off-canvas at this width, so there is nothing to
      clear — put the button back in the corner. */
@@ -6484,9 +6429,7 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    it needs the same treatment or the Fix button sits visibly on top of
    whatever row happens to land under it. */
 @media (max-width:720px){
-  body:has(.modal-overlay.open) .asst-launcher,
   body:has(.modal-overlay.open) .fix-launcher,
-  body:has(.app-sidebar.open) .asst-launcher,
   body:has(.app-sidebar.open) .fix-launcher{display:none !important;}
 }
 
@@ -6571,7 +6514,6 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   /* Raised clear of the tab bar so neither floating button sits under it —
      a few px more than before since the bar itself now floats 14px off the
      bottom edge instead of sitting flush against it. */
-  body.has-sidebar .asst-launcher{bottom:92px;}
   body.has-sidebar .fix-launcher{bottom:92px;}
   body.has-sidebar .asst-panel{bottom:154px;}
   body.has-sidebar .fix-panel{bottom:154px;}
@@ -6670,7 +6612,6 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    visible under the backdrop as if it were still usable. Same slide-away the
    More drawer already gets. */
 body:has(.course-qa-backdrop) .sb-tabbar{transform:translateY(100%); pointer-events:none;}
-body:has(.course-qa-backdrop) .asst-launcher,
 body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 
 /* The pair wrapper only means something in the phone layout; everywhere else
@@ -6807,12 +6748,7 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      aria-label still carries all three parts. */
   .course-meta .cm-year,
   .course-meta .cm-year + .cm-sep{display:none;}
-  .course-code{
-    color:var(--text-faint); font-size:9px; line-height:1.25; margin-top:1px;
-    padding-inline-end:24px;   /* clears the checkbox, which now sits beside it */
-  }
-  .course.completed .course-meta,
-  .course.completed .course-code{color:var(--text-dim);}
+  .course.completed .course-meta{color:var(--text-dim);}
 
   /* 18px at the top-right rather than 22px centred: two-up, a vertically
      centred circle sat in the middle of a two-line name. The 11px padding

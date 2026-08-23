@@ -1,7 +1,7 @@
 // ==========================
 // BACK BAR — an obvious way out of every dialog, on every screen size.
 //
-// Phones already got this: a dialog opens as a full page with a ← bar across
+// Phones already got this: a dialog opens as a full page with a back bar across
 // the top (see the max-width:720px block in css/app.css). On a desktop the
 // only way out was a small ✕ in the corner, Escape, or clicking the backdrop
 // — three things you have to already know. Students said it plainly: they
@@ -53,7 +53,7 @@
     return '<div class="back-bar' + (rtl ? ' back-bar-rtl' : '') + '">' +
       '<button type="button" class="back-bar-btn" data-back-for="' +
         window.__escapeHtml(overlayId || '') + '">' +
-        '<span class="back-bar-arrow" aria-hidden="true">' + (rtl ? '→' : '←') + '</span>' +
+        '<span class="back-bar-arrow" aria-hidden="true">' + window.AAUP_ICONS.preview('back', 16) + '</span>' +
         '<span>' + window.__escapeHtml(label) + '</span>' +
       '</button>' +
       (title ? '<span class="back-bar-title">' + window.__escapeHtml(title) + '</span>' : '') +
@@ -93,7 +93,7 @@
     bar.className = 'back-bar back-bar-auto' + (rtl ? ' back-bar-rtl' : '');
     bar.innerHTML =
       '<button type="button" class="back-bar-btn" data-back-for="' + overlay.id + '">' +
-        '<span class="back-bar-arrow" aria-hidden="true">' + (rtl ? '→' : '←') + '</span>' +
+        '<span class="back-bar-arrow" aria-hidden="true">' + window.AAUP_ICONS.preview('back', 16) + '</span>' +
         '<span>' + (rtl ? LABEL.ar : LABEL.en) + '</span>' +
       '</button>';
     card.insertBefore(bar, card.firstChild);

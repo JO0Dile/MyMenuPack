@@ -22,6 +22,17 @@
     return window.__cleanText ? window.__cleanText(v) : (window.__escapeHtml ? window.__escapeHtml(v) : v);
   }
 
+  // Categories carry both an iconKey (a drawn line icon) and the emoji they
+  // shipped with. Prefer the drawn one, exactly like majors and faculties
+  // do — a hand-drawn icon next to an emoji reads as two different apps.
+  function catIcon(cat, size){
+    if(!cat) return '';
+    if(cat.iconKey && window.AAUP_ICONS && window.AAUP_ICONS.preview(cat.iconKey, size)){
+      return window.AAUP_ICONS.preview(cat.iconKey, size || 16);
+    }
+    return esc(cat.icon || '');
+  }
+
   function load(){
     if(cache) return Promise.resolve(cache);
     return fetch('contacts.json').then(function(r){
@@ -66,7 +77,7 @@
       : esc(c.role || catLabel || '');
     return '<div class="ct-card">' +
       '<div class="ct-card-top">' +
-        '<span class="ct-avatar">' + (cat.icon || '👤') + '</span>' +
+        '<span class="ct-avatar">' + (catIcon(cat, 17) || window.AAUP_ICONS.preview('person', 17)) + '</span>' +
         '<div class="ct-card-main">' +
           '<span class="ct-name">' + esc(c.name) + '</span>' +
           '<span class="ct-sub">' + subtitle + '</span>' +
@@ -88,7 +99,7 @@
     order.forEach(function(key){
       var cat = data.categories[key];
       chips += '<button type="button" class="ct-chip' + (activeCat === key ? ' ct-chip-on' : '') +
-        '" data-ct-cat="' + esc(key) + '">' + (cat.icon || '') + ' ' + esc(rtl ? cat.ar : cat.en) + '</button>';
+        '" data-ct-cat="' + esc(key) + '">' + catIcon(cat, 13) + esc(rtl ? cat.ar : cat.en) + '</button>';
     });
     return chips;
   }
@@ -126,7 +137,7 @@
       var label = rtl ? (cat.ar || key) : (cat.en || key);
       return '<section class="ct-group">' +
         '<div class="ct-group-head">' +
-          '<span class="ct-group-label">' + (cat.icon ? cat.icon + ' ' : '') + esc(label) + '</span>' +
+          '<span class="ct-group-label">' + catIcon(cat, 14) + esc(label) + '</span>' +
           '<span class="ct-group-count">' + byCat[key].length + '</span>' +
         '</div>' +
         '<div class="ct-grid">' + byCat[key].map(function(c){ return cardHtml(c, data, rtl); }).join('') + '</div>' +

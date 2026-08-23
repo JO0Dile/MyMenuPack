@@ -227,13 +227,13 @@
     var label = CAT_LABEL[c.cat] ? (rtl ? CAT_LABEL[c.cat].ar : CAT_LABEL[c.cat].en) : '';
     return '<button type="button" class="sb-row' + (isOn ? ' sb-row-on' : '') + '" data-sb-slug="' +
         esc(c.slug) + '" aria-pressed="' + isOn + '">' +
-      '<span class="sb-row-tick">' + (isOn ? '✓' : '＋') + '</span>' +
+      '<span class="sb-row-tick">' + window.AAUP_ICONS.preview(isOn ? 'check' : 'plus', 14) + '</span>' +
       '<span class="sb-row-main">' +
         '<span class="sb-row-name">' + esc(courseName(prefix, c.slug, rtl)) + '</span>' +
         '<span class="sb-row-meta">' +
           (c.num ? '<span>' + esc(c.num) + '</span>' : '') +
           (label ? '<span class="sb-chip sb-chip-' + c.cat + '">' + esc(label) + '</span>' : '') +
-          (c.unlocksCount ? '<span class="sb-chip sb-chip-unlock">🔓 ' +
+          (c.unlocksCount ? '<span class="sb-chip sb-chip-unlock">' + window.AAUP_ICONS.preview('unlock', 12) + ' ' +
             (rtl ? 'يفتح ' + c.unlocksCount : 'unlocks ' + c.unlocksCount) + '</span>' : '') +
           (c.likelyHard ? '<span class="sb-chip sb-chip-hard">⚡ ' +
             (rtl ? 'صعب عليك سابقًا' : 'hard for you before') + '</span>' : '') +
@@ -260,7 +260,7 @@
         '</div>' +
         '<span class="sb-tray-cr">' + c.cr + 'H</span>' +
         '<button type="button" class="sb-tray-x" data-sb-remove="' + esc(s) + '" aria-label="' +
-          (rtl ? 'إزالة' : 'Remove') + ' ' + esc(courseName(prefix, s, rtl)) + '">✕</button>' +
+          (rtl ? 'إزالة' : 'Remove') + ' ' + esc(courseName(prefix, s, rtl)) + '">' + window.AAUP_ICONS.preview('close', 12) + '</button>' +
         '</div>';
     }).join('');
   }
