@@ -2029,15 +2029,122 @@
     "freeElec": {
      "courses": [],
      "requiredHours": 6
+    },
+    "specReq": {
+     "mustPassAll": true,
+     "courses": [
+      {
+       "code": "060511030",
+       "name": "MEDICAL TERMINOLOGY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "080112202",
+       "name": "HISTOLOGY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "100211620",
+       "name": "BIOLOGY FOR MEDICAL SCIENCES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "100211650",
+       "name": "BIOLOGY LAB FOR MEDICAL STUDENTS",
+       "credits": 1.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "100311620"
+       ]
+      },
+      {
+       "code": "100311620",
+       "name": "CHEMISTRY FOR MEDICAL SCIENCES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "100311650",
+       "name": "CHEMISTRY LAB FOR MEDICAL STUDENTS",
+       "credits": 1.0,
+       "practical": 2.0
+      },
+      {
+       "code": "200232120",
+       "name": "GENERAL MICROBIOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100211620",
+        "100211650"
+       ]
+      },
+      {
+       "code": "290312110",
+       "name": "FUNDAMENTALS OF DATABASES",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290313250",
+       "name": "INTERNSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290314130",
+       "name": "CAPSTONE PROJECT RESEARCH",
+       "credits": 1.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "290314210",
+       "name": "CAPSTONE PROJECT: COGNITIVE ROBOTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290314130"
+       ]
+      },
+      {
+       "code": "290322110",
+       "name": "PHYSICS FOR MEDICAL SCIENCES",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323110",
+       "name": "ANATOMY AND PHYSIOLOGY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "100211620",
+        "100211650"
+       ]
+      },
+      {
+       "code": "290324210",
+       "name": "PATHOPHYSIOLOGY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "080112202"
+       ]
+      }
+     ],
+     "suppliedFrom": "AAUP website, pasted by the app owner",
+     "notInTheSourcePDF": "The faculty PDF runs this program's Colg. Req. table straight into Univ. Elec. and prints no Specialization Requirements section at all, leaving it 32 of its stated 129 credit hours short. This is that section."
     }
    },
-   "degreeHours": 129,
-   "degreeHoursDiscrepancy": {
-    "statedDegreeHours": 129,
-    "sumOfRequirementHours": 97.0,
-    "difference": -32.0,
-    "reason": "The PDF states this total but does not print enough requirement sections to reach it. Nothing is inferred to close the gap."
-   }
+   "degreeHours": 129
   },
   {
    "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Robotics",

@@ -56,11 +56,10 @@ PAIRS = {
     'aaup-financial-engineering': 'Bachelor in Financial Engineering',
     'aaup-statistics-data-science': 'Bachelor in Data Science - Specialization in '
                                     'Statistics and Data Science',
+    'medical': 'Bachelor in Artificial Intelligence - Specialization in '
+               'Artificial Intelligence and Medical Sciences',
     # Deliberately NOT here. Their PDF program does not cover every course the
     # app's plan draws, so writing a taxonomy would leave part of it blank:
-    #   medical      - "AI and Medical Sciences". The PDF prints no Spec. Req.
-    #                  section at all (32 hours short of its own stated 129),
-    #                  leaving 15 courses unplaced
     #   cybersecurity - reconciles to 127, but the app's plan carries Computer
     #                  Architecture and Differential Equations, which that
     #                  program's tables do not list

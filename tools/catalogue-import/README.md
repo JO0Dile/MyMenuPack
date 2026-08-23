@@ -109,20 +109,25 @@ that do, five reconcile to their stated degree total exactly:
 | AI and Financial Technology | 121 | 121 |
 | **AI and Robotics** | **128** | **128** |
 | Finance and Data Science | 127 | 127 |
-| Statistics and Data Science | 125 | 125 — with the supplement below |
-| AI and Medical Sciences | 129 | 97 — no Spec. Req. section in the PDF |
+| Statistics and Data Science | 125 | 125 — with a supplement, see below |
+| AI and Medical Sciences | 129 | 129 — with a supplement, see below |
 | Financial Engineering | 133 | 131 |
 
-The two remaining shortfalls are gaps in the PDF itself and carry
-`degreeHoursDiscrepancy`. Nothing is inferred to close them.
+The one remaining shortfall is a gap in the PDF itself and carries
+`degreeHoursDiscrepancy`. Nothing is inferred to close it.
 
 `supplements/` holds sections the sources do not carry, supplied from the AAUP
 website and kept apart from anything parsed so their provenance stays visible.
 A supplement is only accepted if adding it makes the program reconcile to the
 total the source ALREADY states — it never introduces a total of its own.
-Statistics and Data Science's missing Specialization Requirements is one: 22
-courses, 75 credit hours, which is exactly the gap between what the PDF prints
-and the 125 it claims.
+Two programs need one. The PDF runs each of their Colg. Req. tables straight
+into Univ. Elec. and prints no Specialization Requirements section at all:
+
+- Statistics and Data Science — 22 courses, 75 credit hours
+- AI and Medical Sciences — 14 courses, 32 credit hours
+
+In both cases the supplement is exactly the gap between what the PDF prints and
+the total it claims, to the hour.
 
 AI and Robotics is worth calling out because it can be checked against a
 third, independent source: a student's own registrar portal. The PDF gives
