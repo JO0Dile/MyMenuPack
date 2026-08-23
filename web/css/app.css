@@ -384,6 +384,17 @@
   .home-header-body{flex:1 1 auto;min-width:0;}
 
   .home-header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.02em;}
+  /* The app's name, with the Arabic tagline riding beside it. Baseline-aligned
+     rather than centred, so the two read as one lockup instead of two words
+     that happen to be next to each other. */
+  .home-wordmark{
+    display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+    font-size:23px;font-weight:900;letter-spacing:.09em;
+  }
+  .home-wordmark-ar{
+    font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--accent);
+    direction:rtl;
+  }
 
   .home-header p{margin:4px 0 0;font-size:13px;color:var(--text-dim);}
 
@@ -3457,16 +3468,67 @@
   .community-notes-popover .cnp-close{float:right;cursor:pointer;color:var(--text-dim);background:none;border:none;font-size:14px;}
 
   /* ==========================================================================
-     14b. FIRST-RUN WIZARD — the one guided flow a brand-new student sees
-     (js/55-onboarding.js): welcome, optional name/GPA/gender, theme, ready.
-     Full-bleed card (no padding of its own) so the progress bar can sit
-     flush against the top edge; .wiz-body carries the actual padding.
+     14b. FIRST-RUN LANDING — the first screen a new student sees
+     (js/55-onboarding.js). The name, one line, and the choice of signing in.
+     Full-bleed card (no padding of its own); .wiz-landing and .wiz-body
+     carry the padding.
      ========================================================================== */
 
-  .onboarding-modal-card{max-width:440px;padding:0;overflow:hidden;}
+  .onboarding-modal-card{max-width:420px;padding:0;overflow:hidden;}
 
-  .wiz-progress{height:3px;background:rgba(255,255,255,.08);}
-  .wiz-progress > span{display:block;height:100%;background:var(--accent);transition:width .3s ease;}
+  /* The landing screen. Deliberately tall and mostly empty: the wordmark is
+     the content, and the two buttons are the only things to do. */
+  .wiz-landing{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    padding:52px 30px 30px;gap:0;
+  }
+  .wiz-brand{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .wiz-brand-mark{
+    width:74px;height:74px;object-fit:contain;border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  .wiz-brand-name{
+    font-size:34px;font-weight:900;letter-spacing:.10em;color:var(--text);
+    line-height:1;
+  }
+  /* The Arabic sits under the wordmark as a tagline, not beside it: at 34px
+     the Latin name is the mark, and pairing them on one line makes neither
+     read as the title. */
+  .wiz-brand-ar{
+    font-size:19px;font-weight:700;color:var(--accent);line-height:1;
+    letter-spacing:.02em;
+  }
+  .wiz-landing-line{
+    margin:22px 0 0;font-size:13.5px;line-height:1.65;color:var(--text-dim);
+    max-width:270px;
+  }
+  .wiz-landing-actions{
+    display:flex;flex-direction:column;align-items:stretch;gap:10px;
+    width:100%;max-width:280px;margin-top:30px;
+  }
+  .wiz-landing-actions .wiz-continue{width:100%;padding:14px 22px;font-size:14px;}
+  .wiz-skip{
+    background:none;border:1px solid var(--line);border-radius:999px;
+    color:var(--text-dim);font-size:13px;font-weight:700;font-family:inherit;
+    padding:12px 22px;cursor:pointer;
+  }
+  .wiz-skip:hover{color:var(--text);border-color:var(--text-dim);}
+  .wiz-landing-note{
+    margin:26px 0 0;font-size:11px;line-height:1.6;color:var(--text-dim);
+    opacity:.7;max-width:280px;
+  }
+
+  /* The sign-in panel: one form, one mode switch. */
+  .wiz-fields{display:flex;flex-direction:column;gap:9px;width:100%;}
+  .wiz-fields input{
+    width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:13.5px;font-family:inherit;color:var(--text);
+  }
+  .wiz-fields input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .wiz-switch{
+    background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;
+    font-family:inherit;cursor:pointer;padding:10px 4px 0;
+  }
 
   .wiz-skip-link{
     position:absolute;top:14px;right:16px;background:none;border:none;
@@ -3485,7 +3547,6 @@
   .wiz-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
   .wiz-content{width:100%;text-align:left;margin-top:14px;}
   .plan-page.rtl-mode .wiz-content{text-align:right;}
-  .wiz-content .theme-picker-grid{margin-top:0;}
 
   .wiz-foot{
     display:flex;justify-content:space-between;align-items:center;
@@ -5770,6 +5831,22 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
      onboarding wizard) keep that, minus the space for the bar. */
   .modal-overlay .modal-card.cd-card,
   .modal-overlay .onboarding-modal-card{padding:56px 0 0;}
+
+  /* On a phone the onboarding card is the whole screen, so its footer belongs
+     at the bottom of that screen rather than immediately under the last field
+     — which left the Sign in button stranded halfway up with nothing below it.
+     The chain has to reach #onboardingWizardBody: the card's only child is the
+     modal body, and everything the step renders lives inside THAT. */
+  .modal-overlay .onboarding-modal-card{
+    display:flex; flex-direction:column; min-height:100%;
+  }
+  .modal-overlay .onboarding-modal-card > #onboardingWizardBody{
+    display:flex; flex-direction:column; flex:1 1 auto;
+  }
+  .modal-overlay #onboardingWizardBody > .wiz-body{flex:1 1 auto;}
+  .modal-overlay #onboardingWizardBody > .wiz-landing{
+    flex:1 1 auto; justify-content:center; padding-bottom:56px;
+  }
 
   .modal-overlay .modal-card > .modal-body{
     max-height:none;          /* the card owns the height on a phone */

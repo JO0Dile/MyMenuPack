@@ -422,15 +422,33 @@ def years_of(prog):
     return 4
 
 
-SUGGESTED_NOTE = (
-    'No official semester order was published for this program, so the semester '
-    'placement shown here is a suggested prerequisite-valid sequence — confirm '
-    'the official order with your academic advisor. The course list, credit '
-    'hours, prerequisites and requirement categories are exactly as published.'
-)
-ADVISORY_NOTE = (
-    'The year-by-year layout is the university’s own published Advisory Plan.'
-)
+# The catalogue's overview runs to a page of prose. A plan card shows the bio
+# under the major's name, so pasting that in whole is how a browsing student
+# ends up facing four hundred words per tile - the "A LOT OF TEXT" this app
+# was told it has. One sentence is the introduction; the rest is on the
+# university's own page.
+SUGGESTED_NOTE = ('Semester order is a suggested prerequisite-valid sequence — no official '
+                  'one was published. Courses, hours and prerequisites are as published.')
+ADVISORY_NOTE = 'Year-by-year layout is the university’s published Advisory Plan.'
+
+BUCKET_LABEL = {
+    'univReq': 'Univ. Req.', 'univElec': 'Univ. Elec.', 'colgReq': 'Colg. Req.',
+    'specReq': 'Spec. Req.', 'specElec': 'Spec. Elec.', 'freeElec': 'Free Elec.',
+    'supportCourses': 'Support',
+}
+
+
+def first_sentence(text, limit=190):
+    """The opening sentence of an overview, trimmed to fit on a card."""
+    text = re.sub(r'\s+', ' ', (text or '')).strip()
+    if not text:
+        return ''
+    m = re.search(r'(?<=[.!?])\s', text)
+    out = text[:m.start() + 1] if m else text
+    if len(out) > limit:
+        cut = out[:limit].rsplit(' ', 1)[0]
+        out = cut.rstrip(' ,;:') + '…'
+    return out
 
 
 def make_major(prog, slug, college):
@@ -488,30 +506,27 @@ def make_major(prog, slug, college):
     req = {k: section_hours(prog['requirements'][k])
            for k in ORDER if k in prog['requirements']}
     total = sum(req.values())
-    parts = ', '.join('%s %g' % (k, v) for k, v in req.items())
+    parts = ' · '.join('%s %g' % (BUCKET_LABEL.get(k, k), v) for k, v in req.items())
     bio = []
-    if prog.get('overview'):
-        bio.append(prog['overview'].strip())
-    bio.append('%g credit hours: %s.' % (total, parts))
+    opening = first_sentence(prog.get('overview'))
+    if opening:
+        bio.append(opening)
+    bio.append('%g CH — %s.' % (total, parts))
     bio.append(ADVISORY_NOTE if src == 'advisory' else SUGGESTED_NOTE)
     meta = prog.get('meta') or {}
     if prog.get('sourceIssues'):
-        bio.append('Note: the published document does not agree with itself about this '
-                   'program — see tools/catalogue-import for the recorded discrepancy.')
+        bio.append('Note: the published document does not agree with itself here.')
     if dropped_cycles:
-        bio.append('Note: %d prerequisite pair%s in the published tables point at each '
-                   'other (each listed as the other’s prerequisite). They are treated as '
-                   'co-requisites — taken in the same term — because gating either on the '
-                   'other would make both impossible to take.'
+        bio.append('Note: %d prerequisite pair%s point at each other in the source; they '
+                   'are treated as co-requisites.'
                    % (len(dropped_cycles), '' if len(dropped_cycles) == 1 else 's'))
     if advisory_conflicts:
-        bio.append('Note: the university’s published Advisory Plan schedules %d course%s '
-                   'before something its own tables list as a prerequisite. The plan is '
-                   'shown exactly as published.'
+        bio.append('Note: the published Advisory Plan schedules %d course%s before one of '
+                   'its own prerequisites; shown as published.'
                    % (len(advisory_conflicts), '' if len(advisory_conflicts) == 1 else 's'))
     if meta.get('incompleteInSource'):
-        bio.append('Note: this program’s published plan is cut off in the source '
-                   'document; the courses below are every one it lists.')
+        bio.append('Note: the published plan is cut off in the source; these are every '
+                   'course it lists.')
 
     degree = 'Diploma' if prog['name'].startswith('Diploma') else (
              'Residency' if 'Residency' in prog['name'] else 'B.Sc.')
@@ -533,6 +548,8 @@ def make_major(prog, slug, college):
         'imageUrl': None,
         'bio': ' '.join(bio),
         'bioAr': None,
+        # The overview in full, kept out of the bio so the card stays short.
+        'overview': re.sub(r'\s+', ' ', prog['overview']).strip() if prog.get('overview') else None,
         'university': 'aaup',
         'college': college,
         'degreeHours': prog.get('degreeHours'),

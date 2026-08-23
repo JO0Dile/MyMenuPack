@@ -375,6 +375,15 @@
       try{ localStorage.setItem('aaup_lastSync', String(Date.now())); }catch(e){}
       // A pending item gets its own dialog, so it is not also announced in a
       // toast that would scroll away behind it.
+      //
+      // Nor is anything announced over the first screen a student ever sees.
+      // On a brand-new device every plan in the feed is "new", so the landing
+      // page came up with "🔄 78 new." floating over it — an update to an app
+      // they had not opened yet. A manual check still always reports back,
+      // because then someone asked.
+      var firstRun = document.getElementById('onboardingWizardOverlay');
+      firstRun = !!(firstRun && firstRun.classList.contains('open'));
+      if(!manual && firstRun){ return result; }
       if(manual || result.added || result.updated || result.cosmetic){
         var bits = [];
         if(result.added) bits.push(result.added + ' new');

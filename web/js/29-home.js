@@ -117,18 +117,40 @@
     var el = document.getElementById('homeBreadcrumb');
     if(!el) return;
     if(!state.university){ el.style.display = 'none'; el.innerHTML = ''; return; }
+    var only = soleUniversity();
+    // With one university the faculty list IS the top of the app, so it needs
+    // no crumb of its own and nothing above it to go back to.
+    if(only && !state.college){ el.style.display = 'none'; el.innerHTML = ''; return; }
     el.style.display = 'flex';
     var uni = window.APP_UNIVERSITIES[state.university];
-    var html = '<button type="button" onclick="AAUP_HOME.showUniversities()">🏠 Home</button>';
+    var home = only
+      ? '<button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' +
+        window.AAUP_ICONS.preview('home', 15) + ' ' + (uni ? uni.shortName : 'Home') + '</button>'
+      : '<button type="button" onclick="AAUP_HOME.showUniversities()">' +
+        window.AAUP_ICONS.preview('home', 15) + ' Home</button>';
+    var html = home;
     if(state.college){
       var college = collegesForUniversity(state.university)[state.college];
       var name = collegeDisplayName(college);
-      html += '<span class="hb-sep">/</span><button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' + (uni ? uni.icon + ' ' + uni.shortName : state.university) + '</button>';
+      if(!only){
+        html += '<span class="hb-sep">/</span><button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' + (uni ? uni.icon + ' ' + uni.shortName : state.university) + '</button>';
+      }
       html += '<span class="hb-sep">/</span><span class="hb-current">' + name.en + '</span>';
     } else {
       html += '<span class="hb-sep">/</span><span class="hb-current">' + (uni ? uni.icon + ' ' + uni.name.en : state.university) + '</span>';
     }
     el.innerHTML = html;
+  }
+
+  // The app ships one university. Birzeit and Al-Salem stay in data/, reviewed
+  // and version-controlled, but unpublished — so the first screen was a grid
+  // with a single tile on it, and every student paid a tap to pick the only
+  // option there was. When there is exactly one, it is not a choice: the app
+  // opens on its faculties instead. Publish a second university and the picker
+  // comes back on its own, with nothing to change here.
+  function soleUniversity(){
+    var ids = Object.keys(window.APP_UNIVERSITIES || {});
+    return ids.length === 1 ? ids[0] : null;
   }
 
   function showStep(step){
@@ -141,12 +163,15 @@
     if(resume && step !== 'universities'){ resume.style.display = 'none'; }
     var intro = document.getElementById('homeIntroText');
     if(!intro) return;
+    // One short line per step. These used to run to two sentences each, with
+    // the advisor disclaimer repeated on two of them — students said the app
+    // had "A LOT OF TEXT". The disclaimer now lives once, in the footer.
     if(step === 'universities'){
-      intro.innerHTML = '<strong>Choose your university</strong>, then your college, then your study plan. <span style="opacity:.75;">Unofficial student project — always confirm with your academic advisor.</span>';
+      intro.innerHTML = '<strong>Pick your university.</strong>';
     } else if(step === 'colleges'){
-      intro.innerHTML = '<strong>Choose your college / faculty.</strong> <span style="opacity:.75;">Don’t see it yet? Create a plan below and it gets its own tile.</span>';
+      intro.innerHTML = '<strong>Pick your faculty.</strong>';
     } else {
-      intro.innerHTML = '<strong>Choose a study plan</strong> to view its full four-year course map, prerequisites, and electives. <span style="opacity:.75;">Unofficial student project — always confirm with your academic advisor.</span>';
+      intro.innerHTML = '<strong>Pick your major.</strong>';
     }
   }
 
@@ -272,13 +297,21 @@
     if(!el) return;
     var uniCount = Object.keys(window.APP_UNIVERSITIES || {}).length;
     var planCount = allPlanMeta().length;
+    var faculties = Object.keys(collegesForUniversity(soleUniversity() || state.university) || {}).length;
     el.innerHTML =
       '<span>📚 ' + planCount + ' study plan' + (planCount === 1 ? '' : 's') + '</span>' +
-      '<span>🎓 ' + uniCount + ' universit' + (uniCount === 1 ? 'y' : 'ies') + '</span>' +
+      // "1 university" is not a fact worth a chip when there is no university
+      // to choose. On one university it reports the faculties instead, which
+      // IS what the screen below is about.
+      (uniCount === 1
+        ? (faculties ? '<span>🏛 ' + faculties + ' facult' + (faculties === 1 ? 'y' : 'ies') + '</span>' : '')
+        : '<span>🎓 ' + uniCount + ' universities</span>') +
       '<span>🆓 Free &amp; offline</span>';
   }
 
   function showUniversities(){
+    var only = soleUniversity();
+    if(only){ showColleges(only); return; }
     state.university = null; state.college = null;
     renderResumeCard();
     renderUniversities();
@@ -290,7 +323,9 @@
 
   function showColleges(uniId){
     state.university = uniId; state.college = null;
+    renderResumeCard();
     renderColleges(uniId);
+    renderHeaderStats();
     renderBreadcrumb();
     showStep('colleges');
   }
