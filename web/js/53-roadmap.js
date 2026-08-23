@@ -87,14 +87,20 @@
     skills: 'univReq', eng: 'univReq', uni: 'univElec',
     math: 'colgReq', core: 'specReq', dept: 'specElec', free: 'freeElec'
   };
-  var BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec'];
+  // supportCourses is the university's seventh bucket — science and language
+  // courses a program requires from outside its own department. Nothing in the
+  // app's visual categories maps to it, so it only appears on plans that carry
+  // an explicit `requirement`; leaving it out of this list dropped its hours
+  // from the total outright, and eight degrees read 10 to 24 hours short.
+  var BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec', 'supportCourses'];
   var BUCKET_META = {
     univReq:  { en: 'Univ. Req.',  ar: 'متطلب جامعي',          optional: false },
     univElec: { en: 'Univ. Elec.', ar: 'اختياري جامعي',        optional: true  },
     colgReq:  { en: 'Colg. Req.',  ar: 'متطلب كلية',           optional: false },
     specReq:  { en: 'Spec. Req.',  ar: 'متطلب تخصص',           optional: false },
     specElec: { en: 'Spec. Elec.', ar: 'اختياري تخصص',         optional: true  },
-    freeElec: { en: 'Free Elec.',  ar: 'اختياري حر',           optional: true  }
+    freeElec: { en: 'Free Elec.',  ar: 'اختياري حر',           optional: true  },
+    supportCourses: { en: 'Support',  ar: 'مساقات مساندة',      optional: false }
   };
 
   // CAT_BUCKET is a GUESS, and it was wrong wherever the two taxonomies do not

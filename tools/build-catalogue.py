@@ -129,6 +129,10 @@ def shape_plan(major, scales_by_college, colleges):
         # requirement; and a plan that is short a slot reports 6 where the
         # university requires 8. Both were happening, and both were invisible.
         'requirementHours': major.get('requirementHours') or {},
+        # Present only where the source document disagrees with itself about a
+        # degree's total. tools/check-plan-hours.py reports these separately
+        # instead of failing, because no change to this repo can reconcile them.
+        'degreeHoursDiscrepancy': major.get('degreeHoursDiscrepancy') or None,
         'sortOrder': sort_order_of(major.get('sortOrder')),
         'freeElectiveSuggestions': major.get('freeElectiveSuggestions') or [],
         'gradingScale': scale,

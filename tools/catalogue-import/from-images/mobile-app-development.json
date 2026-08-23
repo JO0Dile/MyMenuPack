@@ -215,66 +215,169 @@
    ]
   }
  },
- "advisoryPlan": [
-  {
-   "year": 1,
-   "semester": "Fall",
-   "courses": [
-    "300131230",
-    "300132250",
-    "300132270",
-    "300311110",
-    "300311120",
-    "300311130",
-    "300311140"
-   ],
-   "statedTotal": 17
-  },
-  {
-   "year": 1,
-   "semester": "Spring",
-   "courses": [
-    "040511011",
-    "300311200",
-    "300311250",
-    "300311260",
-    "300311270",
-    "300311280",
-    "300311290"
-   ],
-   "statedTotal": 16
-  },
-  {
-   "year": 1,
-   "semester": "Summer",
-   "courses": [
-    "300311210"
-   ],
-   "statedTotal": 3
-  },
-  {
-   "year": 2,
-   "semester": "Fall",
-   "courses": [
-    "300132140",
-    "300132210",
-    "300312110",
-    "300312120",
-    "300312130"
-   ],
-   "statedTotal": 17
-  },
-  {
-   "year": 2,
-   "semester": "Spring",
-   "courses": [
-    "300131150",
-    "300312210",
-    "300312230",
-    "300312250",
-    "300312260"
-   ],
-   "statedTotal": 16
-  }
- ]
+ "advisoryPlan": {
+  "source": "images image10.jpeg..image15.png",
+  "terms": [
+   {
+    "year": "First Year",
+    "semester": "Fall Semester",
+    "statedTotal": 17,
+    "courses": [
+     {
+      "code": "300131230",
+      "name": "ENGLISH LANGUAGE",
+      "credits": 3
+     },
+     {
+      "code": "300132250",
+      "name": "PHYSICAL ACTIVITY",
+      "credits": 1
+     },
+     {
+      "code": "300132270",
+      "name": "DIGITAL SKILLS",
+      "credits": 3
+     },
+     {
+      "code": "300311110",
+      "name": "MATH FOR DIPLOMA",
+      "credits": 3
+     },
+     {
+      "code": "300311120",
+      "name": "PROGRAMMING FUNDAMENTALS I FOR IT",
+      "credits": 3
+     },
+     {
+      "code": "300311130",
+      "name": "PROGRAMMING FUNDAMENTALS I LAB FOR IT",
+      "credits": 1
+     },
+     {
+      "code": "300311140",
+      "name": "UI & UX FOR MOBILE APP",
+      "credits": 3
+     }
+    ]
+   },
+   {
+    "year": "First Year",
+    "semester": "Spring Semester",
+    "statedTotal": 16,
+    "courses": [
+     {
+      "code": "040511011",
+      "name": "PALESTINIAN STUDIES",
+      "credits": 2
+     },
+     {
+      "code": "300311200",
+      "name": "DATA STRUCTURES AND ALGORITHMS",
+      "credits": 3
+     },
+     {
+      "code": "300311250",
+      "name": "DISCRETE MATHEMATICS",
+      "credits": 3
+     },
+     {
+      "code": "300311260",
+      "name": "PROGRAMMING FUNDAMENTALS II FOR IT",
+      "credits": 3
+     },
+     {
+      "code": "300311270",
+      "name": "PROGRAMMING FUNDAMENTALS II LAB FOR IT",
+      "credits": 1
+     },
+     {
+      "code": "300311280",
+      "name": "INTRODUCTION TO DATABASE",
+      "credits": 3
+     },
+     {
+      "code": "300311290",
+      "name": "INTRODUCTION TO DATABASE (LAB)",
+      "credits": 1
+     }
+    ]
+   },
+   {
+    "year": "First Year",
+    "semester": "Summer Semester",
+    "statedTotal": 3,
+    "courses": [
+     {
+      "code": "300311210",
+      "name": "INTERNSHIP",
+      "credits": 3
+     }
+    ]
+   },
+   {
+    "year": "Second Year",
+    "semester": "Fall Semester",
+    "statedTotal": 17,
+    "courses": [
+     {
+      "code": "300132140",
+      "name": "ENTREPRENEURSHIP",
+      "credits": 3
+     },
+     {
+      "code": "300132210",
+      "name": "COMBATING CORRUPTION (CHALLENGES AND SOLUTIONS)",
+      "credits": 3
+     },
+     {
+      "code": "300312110",
+      "name": "ANDROID APP DEVELOPMENT I",
+      "credits": 4
+     },
+     {
+      "code": "300312120",
+      "name": "iOS APP DEVELOPMENT I",
+      "credits": 4
+     },
+     {
+      "code": "300312130",
+      "name": "SOFTWARE ANALYSIS AND DESIGN",
+      "credits": 3
+     }
+    ]
+   },
+   {
+    "year": "Second Year",
+    "semester": "Spring Semester",
+    "statedTotal": 16,
+    "courses": [
+     {
+      "code": "300131150",
+      "name": "ARABIC LANGUAGE",
+      "credits": 3
+     },
+     {
+      "code": "300312210",
+      "name": "CROSS-PLATFORM APPS DEVELOPMENT",
+      "credits": 4
+     },
+     {
+      "code": "300312230",
+      "name": "MOBILE APPLICATIONS DEVELOPMENT CAPSTONE PROJECTS",
+      "credits": 3
+     },
+     {
+      "code": "300312250",
+      "name": "ANDROID APP DEVELOPMENT II",
+      "credits": 3
+     },
+     {
+      "code": "300312260",
+      "name": "iOS APP DEVELOPMENT II",
+      "credits": 3
+     }
+    ]
+   }
+  ]
+ }
 }
