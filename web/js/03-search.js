@@ -62,6 +62,40 @@
     return false;
   }
 
+  // ---- why did this match? ------------------------------------------
+  // A result used to be a name, an Arabic name and a code with nothing
+  // saying which of the three the query actually hit — so searching a course
+  // number returned rows whose visible text contained none of it, and a
+  // typo-tolerant hit was indistinguishable from an exact one.
+  //
+  // The match is marked in the text it was found in, and anything the
+  // marking cannot explain on its own gets a short label.
+  var REASON_LABEL = { code: 'code', ar: 'Arabic name', fuzzy: 'closest match' };
+
+  function reasonFor(item, q){
+    if(item.code && item.code.toLowerCase().indexOf(q) !== -1) return 'code';
+    if(normalize(item.en).indexOf(q) !== -1) return 'name';
+    if(item.ar && normalize(item.ar).indexOf(q) !== -1) return 'ar';
+    return 'fuzzy';
+  }
+
+  // Marks the query inside the raw text. Deliberately searches the raw
+  // lowercased string rather than the normalised one: normalise() strips
+  // Arabic diacritics and folds alef variants, so an index taken from it
+  // does not line up with the characters actually being displayed. When the
+  // query only matches after normalising, the mark is skipped and the label
+  // carries the explanation instead — a wrong highlight is worse than none.
+  function markMatch(raw, rawQuery){
+    var text = raw == null ? '' : String(raw);
+    var needle = (rawQuery || '').trim().toLowerCase();
+    if(!needle) return escapeHTML(text);
+    var at = text.toLowerCase().indexOf(needle);
+    if(at === -1) return escapeHTML(text);
+    return escapeHTML(text.slice(0, at)) +
+      '<mark class="sh-mark">' + escapeHTML(text.slice(at, at + needle.length)) + '</mark>' +
+      escapeHTML(text.slice(at + needle.length));
+  }
+
   /* ---------------- generic search-box wiring ---------------- */
   function renderDropdown(dropdownEl, results, opts){
     dropdownEl.innerHTML = '';
@@ -73,23 +107,36 @@
       dropdownEl.classList.add('open');
       return;
     }
+    var rawQuery = opts.rawQuery || '';
     results.forEach(function(r){
       var hit = document.createElement('div');
       hit.className = 'search-hit';
       var en = document.createElement('div');
       en.className = 'sh-en';
-      en.textContent = r.en;
+      en.innerHTML = markMatch(r.en, rawQuery);
       hit.appendChild(en);
       if(r.ar){
         var ar = document.createElement('div');
         ar.className = 'sh-ar';
-        ar.textContent = r.ar;
+        ar.innerHTML = markMatch(r.ar, rawQuery);
         hit.appendChild(ar);
       }
-      if(r.code){
+      if(r.code || r.reason){
         var meta = document.createElement('div');
         meta.className = 'sh-meta';
-        meta.textContent = r.code;
+        if(r.code){
+          var codeEl = document.createElement('span');
+          codeEl.className = 'sh-code';
+          codeEl.innerHTML = markMatch(r.code, rawQuery);
+          meta.appendChild(codeEl);
+        }
+        // 'name' needs no label: the mark in the name above already says it.
+        if(REASON_LABEL[r.reason]){
+          var why = document.createElement('span');
+          why.className = 'sh-why sh-why-' + r.reason;
+          why.textContent = REASON_LABEL[r.reason];
+          meta.appendChild(why);
+        }
         hit.appendChild(meta);
       }
       hit.addEventListener('mousedown', function(e){
@@ -121,10 +168,19 @@
           return fuzzyContains(q, normalize(item.en)) || fuzzyContains(q, normalize(item.ar));
         });
       }
-      currentResults = currentResults.slice(0, 10);
+      // Shallow copies, not the index entries themselves: getIndex() hands
+      // back cached objects that outlive this search, and stamping a reason
+      // onto them would leave every past query's answer sitting on the index.
+      currentResults = currentResults.slice(0, 10).map(function(item){
+        var copy = {};
+        Object.keys(item).forEach(function(k){ copy[k] = item[k]; });
+        copy.reason = reasonFor(item, q);
+        return copy;
+      });
       activeIndex = -1;
       renderDropdown(dropdown, currentResults, {
         emptyText: opts.emptyText,
+        rawQuery: input.value,
         onSelect: function(r){
           input.value = r.en;
           dropdown.classList.remove('open');
@@ -217,9 +273,20 @@
       var nameEl = el.querySelector('.name');
       if(!nameEl) return;
       var slug = el.id.replace(prefix + '-c-', '');
-      var en = (nameEl.dataset.en || nameEl.textContent || '').trim();
-      var ar = nameEl.getAttribute('data-ar') || '';
       var info = data.courseInfo[slug];
+      var en = (nameEl.dataset.en || nameEl.textContent || '').trim();
+      // data-ar is read first because a plan the student has edited carries
+      // its newest name in the DOM. It is almost never actually there — no
+      // renderer writes that attribute — which meant every entry's ar was
+      // '' and searching a course by its Arabic name matched nothing, on
+      // every plan, however the query was typed. courseInfo has the name
+      // all along; the index simply never asked it.
+      // ...but only when it is genuinely a second name. An imported plan
+      // stores ar as `c.ar || c.name`, so a plan with no Arabic names has
+      // ar === the English name throughout, and taking it verbatim printed
+      // every result's name twice in the dropdown.
+      var infoAr = info && info.ar && info.ar !== en ? info.ar : '';
+      var ar = nameEl.getAttribute('data-ar') || infoAr || '';
       idx.push({ slug: slug, id: el.id, en: en, ar: ar, code: info ? info.num : '' });
     });
     data.index = idx;

@@ -57,13 +57,16 @@
     home: [
       { target: '#homeSearchBox',
         title: 'Already know your major?',
-        text: 'Search for it by name — this jumps straight to its plan, skipping the university/college steps below.' },
-      { target: function(){ return document.querySelector('#homeUniversityGrid .plan-card'); },
-        title: 'University → College → Plan',
-        text: 'Pick your university, then your college, then your major — same three taps every time, for every school this app ever covers.' },
+        text: 'Search it by name — that goes straight to its plan.' },
+      // Was '#homeUniversityGrid .plan-card', which stopped existing when the
+      // single-university picker was removed. A step whose target is gone
+      // renders nothing, so this tour ran as one step captioned "3 / 3".
+      { target: function(){ return document.querySelector('#homeCollegeGrid .plan-card'); },
+        title: 'Faculty, then major',
+        text: 'Pick your faculty, then your major. Two taps.' },
       { target: '[onclick*="openSettings"]',
         title: 'Settings',
-        text: 'Export a backup of your progress, switch theme, or manage multiple profiles on this device — all here.' }
+        text: 'Backups, theme, and profiles on this device.' }
     ],
     dashboard: [
       { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 0); },
@@ -223,7 +226,18 @@
     if(!active) return;
     var step = active.steps[active.index];
     var el = step && resolve(step);
-    if(!el || el.offsetParent === null){ advance(); return; } // not on screen right now — skip it, don't get stuck
+    if(!el || el.offsetParent === null){
+      // Not on screen. This used to advance() past it, which left the index
+      // walking over steps nobody saw while the denominator still counted
+      // them: the Home tour opens on a screen where its first two targets no
+      // longer exist, so the one step a student actually got was captioned
+      // "3 / 3". Dropping it from the list instead keeps the numbering
+      // describing the tour that is really being shown.
+      active.steps.splice(active.index, 1);
+      if(active.index >= active.steps.length){ finish(); return; }
+      render();
+      return;
+    }
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
@@ -245,7 +259,14 @@
         document.getElementById('tutText').textContent = step.text;
         document.getElementById('tutProgress').textContent = (active.index + 1) + ' / ' + active.steps.length;
         var waitingOnInteraction = !!(step.interactive && !active._interactionDone);
-        document.getElementById('tutNext').textContent = waitingOnInteraction ? 'Skip' : ((active.index === active.steps.length - 1) ? 'Got it!' : 'Next');
+        // Both buttons used to read "Skip" while a step waited on an
+        // interaction — one meaning "skip this step", the other "skip the
+        // whole tour", with nothing distinguishing them. The primary keeps
+        // its normal label: pressing it moves on without doing the gesture,
+        // which is what skipping the step already meant.
+        document.getElementById('tutNext').textContent =
+          (active.index === active.steps.length - 1) ? 'Got it!' : 'Next';
+        document.getElementById('tutNext').classList.toggle('tut-next-waiting', waitingOnInteraction);
 
         if(step.interactive){
           if(active._watchedIndex !== active.index){
@@ -275,12 +296,28 @@
             belowEdge = Math.max(belowEdge, extra.getBoundingClientRect().bottom);
           }
         }
-        var spaceBelow = window.innerHeight - belowEdge;
-        if(spaceBelow > 180 || r.top < 180){
-          tip.style.top = (belowEdge + pad + 12) + 'px';
-        } else {
-          tip.style.top = Math.max(12, r.top - pad - 12 - tip.offsetHeight) + 'px';
+        // Vertical placement used a fixed 180px guess for "is there room
+        // below" and never clamped the result, so a tooltip taller than the
+        // guess — or one on a phone, where the floating tab bar owns the
+        // last ~90px — was positioned partly or entirely under the edge of
+        // the screen with its buttons unreachable. Measure the tooltip, ask
+        // whether it actually fits, and clamp into the visible band either
+        // way.
+        var tipH = tip.offsetHeight;
+        var bar = document.getElementById('sbTabBar');
+        var barTop = (bar && bar.offsetParent !== null) ? bar.getBoundingClientRect().top : window.innerHeight;
+        var bottomLimit = Math.min(window.innerHeight, barTop) - 12;
+        var below = belowEdge + pad + 12;
+        var above = r.top - pad - 12 - tipH;
+        var top;
+        if(below + tipH <= bottomLimit){ top = below; }
+        else if(above >= 12){ top = above; }
+        else {
+          // Fits nowhere clear of the target — take whichever side has more
+          // room and clamp, so it is always fully on screen and tappable.
+          top = (bottomLimit - belowEdge) >= r.top ? below : above;
         }
+        tip.style.top = Math.max(12, Math.min(top, bottomLimit - tipH)) + 'px';
       });
     });
   }

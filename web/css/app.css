@@ -498,8 +498,11 @@
      caveats) — same clamp-to-3-lines treatment .pc-uni-desc already uses for
      a university's own description, so a long bio doesn't blow out the card
      and bury the "View plans" CTA below the fold. */
+  /* One line. Three lines of a bio on a card in a grid of seventy is a wall
+     of dense grey nobody reads from outside the plan — the full text is on
+     the plan's own page, which is where someone who wants it already is. */
   .plan-card p.pc-bio{
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;
   }
 
   .plan-card .pc-cta{
@@ -928,7 +931,30 @@
 
   .search-hit .sh-ar{font-size:11.5px;color:var(--text-dim);direction:rtl;text-align:left;}
 
-  .search-hit .sh-meta{font-size:10.5px;color:var(--accent);font-weight:700;letter-spacing:.03em;}
+  .search-hit .sh-meta{
+    font-size:10.5px;color:var(--accent);font-weight:700;letter-spacing:.03em;
+    display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:2px;
+  }
+  .search-hit .sh-code{font-variant-numeric:tabular-nums;}
+
+  /* Why this row is here. Only shown when the marked text cannot say so on
+     its own — a code match, an Arabic-name match, or a typo-tolerant one.
+     A plain name match gets no label: the mark in the name is the answer. */
+  .search-hit .sh-why{
+    font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--text-dim);background:rgba(255,255,255,.06);
+    border-radius:999px;padding:1px 7px;
+  }
+  /* A fuzzy hit is the one a student should read before trusting, and
+     "closest match" says so in words. It deliberately gets no colour of its
+     own: the app ships six themes, three of them light, and a chip tinted
+     for one of them is either invisible or shouting on the others. */
+  .search-hit .sh-why-fuzzy{font-style:italic;}
+
+  .search-hit .sh-mark{
+    background:rgba(111,140,255,.22);color:inherit;
+    border-radius:3px;padding:0 1px;font-weight:inherit;
+  }
 
   .search-empty{padding:14px 12px;font-size:12.5px;color:var(--text-dim);text-align:center;}
 
@@ -1451,6 +1477,51 @@
 
   /* ---------- plan overview & print ---------- */
   .po-card{max-width:900px;width:100%;}
+
+  /* A page, not a panel. The preview used to be a dark modal that printed as
+     a white sheet, so what you checked before printing was not what came
+     out. This is white, page-proportioned and shadowed in every theme —
+     including the dark ones — because paper is white wherever you are. */
+  .po-sheet{
+    background:#fff; color:#11161f;
+    padding:clamp(20px, 4vw, 42px);
+    border-radius:4px;
+    box-shadow:0 18px 44px rgba(0,0,0,.4);
+    max-width:820px; margin:0 auto;
+  }
+  /* Every colour on the sheet, restated for paper. The overview was built
+     for a dark modal, so its text is var(--text) — near-white, which on a
+     white page is invisible. Each of these is a real rule in the block
+     below being answered here, not a blanket inherit. */
+  .po-sheet .po-name{color:#11161f;}
+  .po-sheet .po-year{background:#fbfcfe; border-color:#dfe4ec;}
+  .po-sheet .po-year-label{color:#1b4f8c;}
+  .po-sheet .po-courses li{color:#11161f; border-color:#e6e9ef;}
+  .po-sheet .po-cname{color:#11161f;}
+  .po-sheet .po-uni, .po-sheet .po-sem-label, .po-sheet .po-meta span,
+  .po-sheet .po-cr, .po-sheet .po-foot,
+  .po-sheet .po-courses li .po-mark{color:#5a6474;}
+  .po-sheet .po-grade{background:#eef1f6; color:#11161f;}
+  .po-sheet .po-done .po-cname{color:#3c7d55;}
+  .po-sheet .po-header{border-color:#d8dde6;}
+
+  /* Full mode: the catalogue number and what a course waits on — the two
+     things read off a printout at registration, and the two that make it
+     long enough that nobody wants them by default. */
+  .po-code{
+    display:inline-block; margin-inline-start:7px;
+    font-size:10.5px; color:#7b8493; font-variant-numeric:tabular-nums;
+  }
+  .po-needs{display:block; font-size:10.5px; color:#7b8493; line-height:1.4; margin-top:1px;}
+
+  .po-actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .po-modes{display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:2px;}
+  .po-mode{
+    padding:6px 14px; border-radius:999px; border:none; background:none;
+    color:var(--text-dim); font-family:inherit; font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .po-mode.is-on{background:var(--accent); color:var(--on-accent);}
+  .po-print{margin-inline-start:auto; border-color:var(--accent); color:var(--text);}
   /* This modal builds its own markup (js/07-plan-overview-print.js) without
      the standard .modal-close + .modal-body pair every other modal uses, so
      it never picked up the shared ".modal-card > .modal-body{overflow-y:
@@ -1496,6 +1567,12 @@
     #planOverviewOverlay{display:block !important;position:static !important;background:#fff !important;padding:0 !important;}
     #planOverviewOverlay .modal-card{box-shadow:none !important;border:none !important;max-width:100% !important;background:#fff !important;color:#000 !important;padding:0 !important;}
     #planOverviewOverlay .po-actions, #planOverviewOverlay .modal-close{display:none !important;}
+    /* On paper the sheet IS the paper — drop the shadow and the rounded
+       corner it uses to look like one on screen. */
+    #planOverviewOverlay .po-sheet{
+      box-shadow:none !important; border-radius:0 !important;
+      max-width:100% !important; padding:0 !important;
+    }
     /* The on-screen scroll fix above (overflow-y:auto, height-capped by the
        modal's own max-height) must not clip the printed page — printing
        needs every year to actually flow across pages, not stop at whatever
@@ -1826,7 +1903,29 @@
   .wn-panel{
     background:var(--search-bg); border:1px solid var(--line); border-radius:10px; padding:11px 13px;
   }
-  .wn-lbl{font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px;}
+  /* A button now: these two panels sat open under the course cards and were
+     most of the dashboard's text. Worth a look, not worth reading on every
+     open — same tap-to-open pattern as the My Path categories and the
+     Course Library shelves. */
+  .wn-lbl{
+    display:flex; align-items:center; gap:8px; width:100%;
+    font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--text-dim); margin:0; padding:2px 0;
+    background:none; border:none; font-family:inherit; cursor:pointer; text-align:start;
+  }
+  .wn-lbl-count{
+    font-size:9.5px; font-weight:800; color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 14%, transparent);
+    border-radius:999px; padding:1px 6px;
+  }
+  .wn-lbl-chev{
+    margin-inline-start:auto; font-size:15px; line-height:1; color:var(--accent);
+    transition:transform .18s ease;
+  }
+  .wn-panel-open .wn-lbl-chev{transform:rotate(90deg);}
+  .wn-panel-body{display:none;}
+  .wn-panel-open .wn-panel-body{display:block; margin-top:10px;}
+  @media (prefers-reduced-motion:reduce){ .wn-lbl-chev{transition:none;} }
 
   .wn-bar-row{margin-bottom:9px;}
   .wn-bar-row:last-child{margin-bottom:0;}
@@ -2343,6 +2442,19 @@
 
   .gs-hint{font-size:11.5px;color:var(--text-dim);margin:0 0 10px;line-height:1.55;}
 
+/* The way out of an empty Degree Audit. Grades are entered from a course,
+   not from this screen, so with none entered it explained where to go and
+   gave no way to go there. */
+.gs-goplan{
+  display:inline-flex; align-items:center; gap:9px; margin-top:14px;
+  padding:13px 22px; border-radius:999px;
+  background:var(--accent); color:var(--on-accent);
+  border:none; font-family:inherit; font-size:14.5px; font-weight:800;
+  cursor:pointer; transition:filter .15s ease;
+}
+.gs-goplan:hover{filter:brightness(1.08);}
+.gs-goplan:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+
   .gs-empty{font-size:12.5px;color:var(--text-dim);}
 
   .gs-table-wrap{overflow-x:auto; -webkit-overflow-scrolling:touch; border:1px solid var(--line); border-radius:10px;}
@@ -2612,6 +2724,42 @@
   .ro-bd-cats{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
   .ro-bd-cat{border:1px solid var(--line); border-radius:12px; padding:12px 14px;}
   .ro-bd-cat-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+
+/* A category card opens to show the courses it is made of. It reported four
+   numbers and nothing else, and the question a student has reading
+   "Colg. Req. — 59 hours, 0 earned" is which courses those are. */
+.ro-bd-cat-expandable{cursor:pointer;}
+.ro-bd-cat-expandable:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.ro-bd-cat-more{
+  display:flex; align-items:center; gap:6px; margin-top:10px;
+  font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--accent);
+}
+.ro-bd-chev{display:inline-block; transition:transform .18s ease; font-size:15px; line-height:1;}
+.ro-bd-cat-open .ro-bd-chev{transform:rotate(90deg);}
+.ro-bd-courses{
+  display:none; list-style:none; margin:10px 0 0; padding:10px 0 0;
+  border-top:1px solid var(--line);
+}
+.ro-bd-cat-open .ro-bd-courses{display:block;}
+.ro-bd-course{
+  display:flex; align-items:baseline; gap:8px; padding:6px 0;
+  font-size:12.5px; line-height:1.4;
+}
+.ro-bd-course + .ro-bd-course{border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent);}
+.ro-bd-course-name{flex:1; min-width:0; overflow-wrap:anywhere;}
+.ro-bd-course-num{
+  font-size:10.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; flex:none;
+}
+.ro-bd-course-cr{
+  font-size:11px; font-weight:800; color:var(--text-dim);
+  font-variant-numeric:tabular-nums; flex:none;
+}
+.ro-bd-course.is-done .ro-bd-course-name{color:var(--unlock);}
+.ro-bd-course.is-done .ro-bd-course-cr{color:var(--unlock);}
+.ro-bd-course.is-open .ro-bd-course-cr{color:var(--accent);}
+@media (prefers-reduced-motion:reduce){ .ro-bd-chev{transition:none;} }
+
   .ro-bd-cat-name{font-size:13.5px; font-weight:800; color:var(--text);}
   .ro-bd-cat-tag{font-size:11px; font-weight:700; color:var(--text-dim);}
   .ro-bd-cat-tag-opt{color:var(--accent);}
@@ -2731,6 +2879,27 @@
     overflow:auto; border:1px solid var(--line); border-radius:12px;
     background:rgba(255,255,255,.02); max-height:60vh; cursor:grab;
   }
+
+  /* On a phone the tree is the screen. It used to be sized to its own
+     content, which on a short chain is a ~108px letterbox at the top with
+     the Selected / Legend / Shortest route panels taking everything below —
+     three panels of prose above the thing they describe. The graph now
+     claims most of the viewport and the panels sit under it, reached by
+     scrolling, which is also what "full screen" asked for. */
+  @media (max-width:720px){
+    .pg-graph-wrap{
+      min-height:56vh; max-height:64vh;
+      cursor:default;                    /* no drag-pan; touch scrolls it */
+      overscroll-behavior:contain;       /* and does not drag the page with it */
+    }
+    /* A chain one course wide is the common case, and left-aligning it left
+       the tree hugging one edge with the rest of the box empty. Centres when
+       it fits; a wider layer still scrolls from its natural left edge. */
+    .pg-graph{margin-inline:auto;}
+    .pg-node{padding:7px 9px;}
+    .pg-node-name{font-size:12px;}
+    .pg-node-sub{font-size:9.5px;}
+  }
   .pg-graph-wrap.pg-dragging{cursor:grabbing; user-select:none;}
   .pg-graph{position:relative;}
   .pg-svg{position:absolute; top:0; left:0; pointer-events:none;}
@@ -2743,6 +2912,10 @@
   .pg-node{
     position:relative; background:var(--panel); border:1.5px solid var(--line); border-radius:10px;
     padding:8px 10px; cursor:pointer; transition:border-color .15s ease, transform .15s ease;
+    /* Fills the box the layout reserved for it, so the height the maths
+       assumes and the height on screen are the same number. */
+    height:100%; box-sizing:border-box;
+    display:flex; flex-direction:column; justify-content:center;
   }
   .pg-node:hover{transform:translateY(-1px);}
   /* Clamped to 2 lines with an ellipsis so a long course name can never grow
@@ -3102,18 +3275,47 @@
   /* ---------- share link + QR (js/72-share.js) ---------- */
   .share-loading{font-size:12.5px;color:var(--text-dim);}
   .share-native-btn{
-    display:flex;width:100%;justify-content:center;margin:14px 0 0;
+    /* width:100% was for when this button owned its own row; it now shares
+       one with Copy link, and flex sizing in .share-actions does the work. */
+    display:flex;justify-content:center;margin:0;
     background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:800;
   }
-  .share-link-row{display:flex;gap:8px;margin:12px 0 18px;}
+  .share-link-row{display:flex;gap:8px;margin:14px 0 0;}
   .share-link-input{
     flex:1 1 auto;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;
     background:var(--search-bg);color:var(--text);font-family:monospace;font-size:12px;
   }
-  .share-qr-wrap{text-align:center;padding:16px;border:1px solid var(--line);border-radius:10px;background:var(--surface-bg);}
-  .share-qr-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);margin:0 0 10px;}
-  .share-qr-canvas{max-width:100%;height:auto;border-radius:6px;background:#fff;padding:8px;}
+  /* The QR opens the screen. It is the one part of sharing that works
+     across a room, and it used to sit last, under a paragraph, a button and
+     a URL field — below the fold on a phone and captioned like an
+     afterthought. */
+  .share-qr-wrap{
+    text-align:center;padding:20px 16px 16px;border:1px solid var(--line);
+    border-radius:16px;background:var(--surface-bg);margin:4px 0 0;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+  }
+  /* A QR needs a light field around it to scan, in every theme — so the
+     plate is white regardless of which one is on, not a themed surface. */
+  .share-qr-plate{
+    background:#fff;border-radius:14px;padding:12px;line-height:0;
+    box-shadow:0 6px 22px rgba(0,0,0,.28);
+  }
+  .share-qr-canvas{max-width:100%;height:auto;display:block;}
+  .share-qr-for{
+    font-size:14px;font-weight:800;color:var(--text);margin:0;line-height:1.3;
+    overflow-wrap:anywhere;
+  }
+  .share-qr-label{
+    font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--text-dim);margin:0;
+  }
   .share-qr-toobig{font-size:12.5px;color:var(--text-dim);margin:0;}
+
+  /* The two things most people actually came to do, directly under the code
+     and above the link field they mostly do not need. */
+  .share-actions{display:flex;gap:8px;margin:14px 0 0;}
+  .share-actions .home-btn{flex:1;justify-content:center;}
+  .share-lead{margin:16px 0 0;}
 
   /* ---------- contacts (js/68-contacts.js) ---------- */
   .ct-privacy{
@@ -3135,6 +3337,27 @@
   .ct-chip:hover{border-color:var(--accent);color:var(--text);}
   .ct-chip-on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
   .ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+
+  /* Directory sections. Same headed-shelf treatment the Course Library uses,
+     so two lists in the same app that group things group them the same way.
+     The header sticks while its own section scrolls — on a long section the
+     heading leaves the screen well before its last card does, and after
+     that every card looks alike again. */
+  .ct-group + .ct-group{margin-top:16px;}
+  .ct-group-head{
+    position:sticky; top:0; z-index:1;
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    padding:6px 0 5px; margin-bottom:8px;
+    background:var(--panel); border-bottom:1px solid var(--accent);
+  }
+  .ct-group-label{
+    font-size:10.5px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--accent);
+  }
+  .ct-group-count{
+    font-size:10.5px; font-weight:700; color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
   .ct-card{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel);}
   .ct-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
   .ct-avatar{
@@ -3365,10 +3588,30 @@
      one stacked column on a phone with the tray on top — the running total
      is the thing you keep glancing at, so it must not be below the fold. */
   .sb-lead{margin-top:0;}
+  /* Sticky: the running total is the thing you keep glancing at while
+     picking courses, and it used to scroll away with the rest of the page —
+     by the time you were choosing the twelfth course you could no longer see
+     what it added up to. It shrinks as it sticks (see .sb-meter-stuck) so it
+     costs a strip rather than a card once it is doing that job. */
+  /* The HOST sticks, not the meter. position:sticky travels only within its
+     own parent's box, and the host is exactly the meter's height — so
+     sticking the meter to it meant sticking it to nothing and leaving with
+     it. The host is a direct child of the modal's scroll box, which is the
+     full height of the content. */
+  #sbMeterHost{position:sticky; top:0; z-index:5;}
   .sb-meter{
     border:1px solid var(--line);border-radius:12px;padding:12px 14px;
     background:var(--surface-bg);margin-bottom:14px;
+    transition:padding .16s ease, box-shadow .16s ease, border-radius .16s ease;
   }
+  .sb-meter-stuck{
+    padding:8px 12px; border-radius:10px;
+    box-shadow:0 6px 18px rgba(0,0,0,.28);
+  }
+  .sb-meter-stuck .sb-meter-num{font-size:19px;}
+  .sb-meter-stuck .sb-meter-bar{height:7px;margin-top:6px;}
+  .sb-meter-stuck .sb-meter-scale{display:none;}
+  @media (prefers-reduced-motion:reduce){ .sb-meter{transition:none;} }
   .sb-meter-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
   .sb-meter-num{font-size:26px;font-weight:800;color:var(--text);line-height:1.1;}
   .sb-meter-note{font-size:12px;color:var(--text-dim);font-weight:600;}
@@ -3442,11 +3685,17 @@
   }
   .sb-tray-list{display:flex;flex-direction:column;gap:6px;}
   .sb-tray-item{
-    display:flex;align-items:center;gap:8px;padding:7px 9px;
+    display:flex;align-items:flex-start;gap:8px;padding:8px 9px;
     border-radius:8px;background:var(--panel);border:1px solid var(--line);
   }
-  .sb-tray-name{flex:1;min-width:0;font-size:12px;font-weight:700;line-height:1.35;}
-  .sb-tray-cr{font-size:11px;font-weight:800;color:var(--accent);}
+  .sb-tray-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .sb-tray-name{min-width:0;font-size:12px;font-weight:700;line-height:1.35;}
+  /* The argument for the pick, in the terms the recommender actually ranks
+     by. Deliberately quieter than the name: it is there to be checked, not
+     read first. */
+  .sb-tray-why{font-size:10.5px;color:var(--text-dim);line-height:1.4;}
+  .sb-tray-caution{font-size:10.5px;color:var(--text);line-height:1.4;opacity:.85;}
+  .sb-tray-cr{font-size:11px;font-weight:800;color:var(--accent);flex:0 0 auto;padding-top:1px;}
   .sb-tray-x{
     background:none;border:0;color:var(--text-dim);cursor:pointer;
     font-size:13px;line-height:1;padding:3px;font-family:inherit;
@@ -3538,11 +3787,43 @@
 
   /* The landing screen. Deliberately tall and mostly empty: the wordmark is
      the content, and the two buttons are the only things to do. */
-  .wiz-landing{
+/* The campus, drawn. A photograph would be a fixed rectangle fighting every
+   theme it is shown on; this is one stroke colour the theme sets, so it
+   belongs to whatever palette is running — including the three light ones.
+   Sits behind the landing content and is never in the way of a tap. */
+.wiz-campus{
+  /* Sunk below the fold so its ground line lands under the note rather than
+     through it, and faded from the top so what does reach the buttons is
+     texture rather than a line drawn across them. */
+  position:absolute; left:50%; bottom:-46px; transform:translateX(-50%);
+  width:min(470px, 106%); height:auto;
+  color:var(--accent); opacity:.13;
+  pointer-events:none; z-index:0;
+  -webkit-mask-image:linear-gradient(to top, #000 0%, #000 30%, transparent 76%);
+  mask-image:linear-gradient(to top, #000 0%, #000 30%, transparent 76%);
+}
+:root[data-theme="light"] .wiz-campus,
+:root[data-theme="cranberry"] .wiz-campus,
+:root[data-theme="botanical"] .wiz-campus{opacity:.2;}
+
+/* A small language switch, before a plan exists to switch. */
+.wiz-lang{
+  position:absolute; top:2px; inset-inline-end:2px; z-index:2;
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:56px; padding:7px 13px; border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  color:var(--accent); font-family:inherit; font-size:12px; font-weight:800;
+  cursor:pointer; transition:background .15s ease;
+}
+.wiz-lang:hover{background:color-mix(in srgb, var(--accent) 20%, transparent);}
+.wiz-lang:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .wiz-landing{position:relative;
     display:flex;flex-direction:column;align-items:center;text-align:center;
     padding:52px 30px 30px;gap:0;
   }
-  .wiz-brand{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .wiz-brand{position:relative; z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;}
   .wiz-brand-mark{
     width:74px;height:74px;object-fit:contain;border-radius:20px;
     box-shadow:0 10px 30px rgba(0,0,0,.35);
@@ -3558,11 +3839,11 @@
     font-size:19px;font-weight:700;color:var(--accent);line-height:1;
     letter-spacing:.02em;
   }
-  .wiz-landing-line{
+  .wiz-landing-line{position:relative; z-index:1;
     margin:22px 0 0;font-size:13.5px;line-height:1.65;color:var(--text-dim);
     max-width:270px;
   }
-  .wiz-landing-actions{
+  .wiz-landing-actions{position:relative; z-index:1;
     display:flex;flex-direction:column;align-items:stretch;gap:10px;
     width:100%;max-width:280px;margin-top:30px;
   }
@@ -3573,7 +3854,7 @@
     padding:12px 22px;cursor:pointer;
   }
   .wiz-skip:hover{color:var(--text);border-color:var(--text-dim);}
-  .wiz-landing-note{
+  .wiz-landing-note{position:relative; z-index:1;
     margin:26px 0 0;font-size:11px;line-height:1.6;color:var(--text-dim);
     opacity:.7;max-width:280px;
   }
@@ -3729,6 +4010,41 @@
   .lib-row-meta{color:var(--text-dim);}
   .lib-list{max-height:300px;overflow-y:auto;}
   .lib-add-btn{padding:3px 10px;font-size:11px;}
+
+  /* Shelves. A plan's courses are grouped by the requirement each satisfies,
+     so the list is scanned by section rather than read end to end. The
+     header is sticky inside the scrolling list — on a 130-course plan the
+     shelf you are reading scrolls out of view long before its last row
+     does, and then every row looks the same again. */
+  .lib-shelf + .lib-shelf{margin-top:10px;}
+  /* A button now: every shelf open at once put 130 rows on screen the moment
+     the Library opened, which is the wall the shelves were meant to break
+     up. Closed until asked for. */
+  .lib-shelf-head{
+    position:sticky; top:0; z-index:1;
+    display:flex; align-items:center; gap:10px; width:100%;
+    padding:9px 2px; margin-bottom:2px;
+    background:var(--panel); border:none; border-bottom:1px solid var(--accent);
+    font-family:inherit; cursor:pointer; text-align:start;
+  }
+  .lib-shelf-chev{
+    flex:none; font-size:16px; line-height:1; color:var(--accent);
+    transition:transform .18s ease;
+  }
+  .lib-shelf-open .lib-shelf-chev{transform:rotate(90deg);}
+  .lib-shelf-count{margin-inline-start:auto;}
+  .lib-shelf-body{display:none;}
+  .lib-shelf-open .lib-shelf-body{display:block; padding-top:4px;}
+  @media (prefers-reduced-motion:reduce){ .lib-shelf-chev{transition:none;} }
+  .lib-shelf-label{
+    font-size:10.5px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--accent);
+  }
+  .lib-shelf-count{
+    font-size:10.5px; font-weight:700; color:var(--text-dim);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .lib-row-name{min-width:0;}
 
   /* Settings modal's top tab bar — four groups (Account/Preferences/Data/
      Help) instead of one long scroll of every setting stacked together.
@@ -4590,6 +4906,10 @@
   @media (max-width:900px){
     .app-sidebar{transform:translateX(-100%);}
     .app-sidebar.open{transform:translateX(0);}
+    /* Shown between 721 and 900px, where the sidebar collapses but the
+       bottom tab bar (which owns "More") has not appeared yet. Below 720px
+       both existed and opened the same drawer, so the screen carried two
+       identical menu buttons — see the rule after this block. */
     .sb-toggle-btn{display:block;}
     .sb-overlay.open{display:block;}
     body.has-sidebar .dashboard-page,
@@ -4838,6 +5158,13 @@
     padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .tut-next:hover{filter:brightness(1.08);}
+  /* A step waiting on the student to actually perform a gesture. Quieter
+     than the solid button, so the invitation to try it reads before the
+     invitation to move past it — this used to be done by relabelling the
+     button "Skip", which put two buttons reading Skip side by side. */
+  .tut-next.tut-next-waiting{
+    background:none; color:var(--accent); border:1px solid var(--accent);
+  }
   @media (prefers-reduced-motion: reduce){
     .tut-spotlight, .tut-tooltip{transition:none;}
   }
@@ -5181,7 +5508,32 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 /* On a phone both panels become bottom sheets — a 370px-wide floating card
    anchored to a corner is unusable at 360px viewport width. */
 @media (max-width:560px){
-  .asst-panel, .fix-panel{
+  /* The assistant takes the screen. It was a 370px card floating over the
+     plan with roughly a third of the viewport for a conversation — a chat
+     needs room to be read back, and every other dialog in this app is
+     already a full page on a phone. Fix stays a floating panel: it is a
+     status readout you glance at, not something you hold a conversation in.
+     100dvh, not vh, for the same reason .modal-card uses it — vh counts the
+     space behind the browser's own toolbar, which is where the composer
+     would otherwise end up. */
+  .asst-panel{
+    inset:0; left:0; right:0; top:0; bottom:0;
+    width:auto; max-width:none; height:100dvh; max-height:100dvh;
+    border:none; border-radius:0;
+  }
+  .asst-panel .asst-head{
+    padding-top:calc(12px + env(safe-area-inset-top, 0px));
+  }
+  .asst-panel .asst-log{flex:1; min-height:0;}
+  .asst-panel .asst-form{
+    padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  /* Nothing floats over a full-screen conversation. */
+  body:has(.asst-panel.open) .sb-tabbar,
+  body:has(.asst-panel.open) .asst-launcher,
+  body:has(.asst-panel.open) .fix-launcher{display:none;}
+
+  .fix-panel{
     left:8px; right:8px; width:auto;
     bottom:74px; max-height:calc(100vh - 130px);
   }
@@ -5692,6 +6044,86 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
 }
 
 /* ============================================================================
+   CLOUD SYNC — the signed-in status card (js/52-cloud.js sectionHtml)
+
+   Signed in used to render exactly like signed out: same heading, one dim
+   grey line, same button. Nothing on screen said the thing a student signed
+   in FOR had happened. This is the confirmation — who is signed in, that
+   the work is off this device, and when it last went up.
+   ========================================================================= */
+.cloud-live{
+  display:flex; align-items:center; gap:13px;
+  padding:13px 15px; margin:8px 0 0;
+  border-radius:14px;
+  border:1px solid color-mix(in srgb, var(--unlock) 40%, transparent);
+  background:color-mix(in srgb, var(--unlock) 11%, transparent);
+}
+.cloud-live-avatar{
+  position:relative; flex:0 0 auto;
+  width:42px; height:42px; border-radius:50%;
+  background:var(--accent); color:var(--on-accent);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; font-weight:800; line-height:1;
+}
+.cloud-live-tick{
+  position:absolute; right:-3px; bottom:-3px;
+  width:18px; height:18px; border-radius:50%;
+  background:var(--unlock); color:var(--unlock-tx);
+  border:2px solid var(--panel);
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:800; line-height:1;
+}
+.cloud-live-body{display:flex; flex-direction:column; gap:2px; min-width:0;}
+.cloud-live-name{
+  font-size:14px; font-weight:800; color:var(--text);
+  line-height:1.3; overflow-wrap:anywhere;
+}
+.cloud-live-sub{font-size:11.5px; color:var(--text-dim); line-height:1.4;}
+.cloud-live-when{
+  font-size:10.5px; font-weight:700; color:var(--unlock);
+  letter-spacing:.02em; font-variant-numeric:tabular-nums;
+}
+
+/* ============================================================================
+   ABOUT US  (js/75-about.js)
+
+   Replaces three lines of prose that used to sit under every screen of the
+   plan picker. One button, one page.
+   ========================================================================= */
+.ab-lead{font-size:13px; line-height:1.65; color:var(--text-dim); margin:0 0 12px;}
+.ab-flag{
+  display:flex; align-items:center; gap:9px; margin:0 0 18px;
+  font-size:12.5px; color:var(--text-dim); line-height:1.5;
+}
+.ab-flag-mark{font-size:17px; flex:none; line-height:1;}
+.ab-rows{display:flex; flex-direction:column; gap:2px;}
+.ab-row{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 4px; border-top:1px solid var(--line);
+}
+.ab-row-ic{
+  flex:none; width:30px; height:30px; border-radius:9px;
+  background:color-mix(in srgb, var(--accent) 13%, transparent); color:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+}
+.ab-row-body{display:flex; flex-direction:column; gap:3px; min-width:0;}
+.ab-row-label{
+  font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-dim);
+}
+.ab-row-value{font-size:13.5px; line-height:1.5; color:var(--text); overflow-wrap:anywhere;}
+.ab-row-value a{color:var(--accent); text-decoration:none; font-weight:700;}
+.ab-row-value a:hover{text-decoration:underline;}
+/* A fax number sits under its campus switchboard: same row, quieter, and
+   never a link, because nothing dials a fax. */
+.ab-sub{font-size:12px; color:var(--muted); font-weight:600;}
+.ab-row-value code{
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px;
+  background:var(--search-bg); border-radius:6px; padding:2px 7px;
+}
+.ab-more{margin-top:16px;}
+
+/* ============================================================================
    COURSE DETAIL PANEL  (js/49-course-detail.js)
 
    Written narrow-first. Every rule here is the phone layout; the two-column
@@ -6066,6 +6498,11 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    ========================================================================== */
 .sb-tabbar{display:none;}
 @media (max-width:720px){
+  /* The bottom bar's own "More" tab opens this exact drawer, so the floating
+     hamburger at the top-left is the same button twice on the same screen.
+     The tab bar is the one a thumb can reach, so it is the one that stays. */
+  body.has-sidebar .sb-toggle-btn{display:none;}
+
   /* Floating glass pill instead of a bar flush with the screen edge — the
      backdrop-filter blur is the point (content scrolling underneath stays
      legibly visible through it, the way a real app's translucent chrome
@@ -6095,20 +6532,40 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   body:has(.app-sidebar.open) .sb-tabbar{transform:translateY(100%); pointer-events:none;}
 
   .sb-tab{
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
     background:none; border:none; padding:6px 2px; color:var(--text-dim);
-    font-family:inherit; cursor:pointer; border-radius:18px; transition:background .15s ease, color .15s ease;
+    font-family:inherit; cursor:pointer; border-radius:18px;
+    transition:color .15s ease;
   }
+  /* The icon capsule, not the whole tab, carries the active state. A tinted
+     rectangle behind the entire tab was the old treatment and it was barely
+     visible — 16% of the accent over a translucent bar, which on a bright
+     screen outdoors is no signal at all. A filled capsule under the icon is
+     unmistakable at a glance and is the shape a phone tab bar is expected
+     to use. */
   .sb-tab-ic{
     display:inline-flex; align-items:center; justify-content:center;
-    width:22px; height:22px; position:relative;
+    width:46px; height:26px; border-radius:999px; position:relative;
+    transition:background .18s ease, color .18s ease;
   }
-  .sb-tab-lbl{font-size:9.5px; font-weight:700;}
-  .sb-tab.active{background:rgba(111,140,255,.16); color:var(--accent);}
+  .sb-tab-lbl{font-size:9.5px; font-weight:700; transition:color .15s ease;}
+  .sb-tab.active{color:var(--accent);}
+  .sb-tab.active .sb-tab-ic{background:var(--accent); color:var(--on-accent);}
+  .sb-tab.active .sb-tab-lbl{font-weight:800;}
+  /* Tucked into the capsule's own top-right corner. At top:-6px/right:-14px
+     it floated detached above the icon and reached into the neighbouring
+     tab, so the Dashboard percentage read as if it belonged to Plan. */
   .sb-tab-badge{
-    position:absolute; top:-6px; right:-14px; font-size:8.5px; font-weight:800;
-    color:#06172b; background:var(--accent); border-radius:999px; padding:1px 4px;
-    line-height:1.3; white-space:nowrap;
+    position:absolute; top:-4px; right:3px; font-size:8px; font-weight:800;
+    color:var(--on-accent); background:var(--accent);
+    border:1.5px solid var(--header-bg);
+    border-radius:999px; padding:0 3px; line-height:1.5;
+    white-space:nowrap; font-variant-numeric:tabular-nums;
+  }
+  /* On the active tab the capsule is already accent-filled, so an accent
+     badge on top of it would disappear into its own background. */
+  .sb-tab.active .sb-tab-badge{
+    background:var(--on-accent); color:var(--accent); border-color:var(--accent);
   }
 
   /* Raised clear of the tab bar so neither floating button sits under it —
@@ -6118,25 +6575,108 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   body.has-sidebar .fix-launcher{bottom:92px;}
   body.has-sidebar .asst-panel{bottom:154px;}
   body.has-sidebar .fix-panel{bottom:154px;}
+
+  /* Every toast in the app sits at bottom:22px, which was fine when the
+     bottom of the screen was empty. The floating tab bar occupies roughly
+     14px–88px from the bottom edge, so a toast landed squarely inside it —
+     "🔄 78 new." covered the Plan and Assistant tabs outright, and both
+     stayed unreachable for as long as it showed.
+     
+     Clearing the bar alone is not enough: a toast is centred and up to the
+     full width of the screen, and the two floating launchers sit at 92px,
+     so it has to clear those too or .toast-action's own button ends up
+     under one of them. The bottom of a phone screen now stacks in three
+     bands — tab bar, launchers, toasts — none of them overlapping. */
+  body.has-sidebar .toast-msg,
+  body.has-sidebar .toast-action,
+  body.has-sidebar .unlock-toast{bottom:152px;}
 }
 
 /* ---------- long-press quick actions (js/74-course-gestures.js) ----------
    Phone-only in practice (only ever opened from a touch long-press), but
    not media-query-gated itself — its position is computed in JS from the
    card's real on-screen rect, which already accounts for viewport width. */
+/* A bottom sheet. This gesture only exists on phones, where a course card
+   is a full-width row — there is no room beside one for a popover, which is
+   why the old positioning ended up dropping the menu on top of the course it
+   was acting on. */
+/* Nearly clear. The dimming that matters happens on the plan itself (see
+   .qa-dim below) so the courses this one connects to stay lit through it —
+   an opaque sheet of dark over everything would bury the very thing the
+   long-press just traced. This still catches the tap that dismisses. */
+.course-qa-backdrop{
+  position:fixed; inset:0; z-index:1499;
+  background:rgba(3,6,14,.28);
+  animation:qa-fade .16s ease-out;
+}
+
+/* Hold a course: the plan drops back and what it connects to stays lit —
+   hold Calculus I and Calculus II is the thing still bright. .node-active is
+   the same class the existing hold-to-trace already sets, so this reuses
+   that walk over the prerequisite edges rather than repeating it. */
+.qa-dim .course{
+  opacity:.28; transition:opacity .2s ease, transform .2s ease;
+}
+.qa-dim .course.node-active,
+.qa-dim .course.qa-subject{opacity:1;}
+.qa-dim .course.qa-subject{
+  transform:scale(1.02);
+  box-shadow:0 0 0 2px var(--accent), 0 10px 26px rgba(0,0,0,.4);
+}
+.qa-dim .course.node-active:not(.qa-subject){
+  box-shadow:0 0 0 2px var(--unlock), 0 8px 20px rgba(0,0,0,.34);
+}
+@media (prefers-reduced-motion:reduce){
+  .qa-dim .course{transition:none;}
+  .qa-dim .course.qa-subject{transform:none;}
+}
 .course-qa-menu{
-  position:fixed; z-index:1500; min-width:170px;
-  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  position:fixed; z-index:1500;
+  left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+  background:var(--panel); border:1px solid var(--line); border-radius:18px;
   box-shadow:0 16px 40px rgba(0,0,0,.5); padding:6px; display:flex; flex-direction:column; gap:2px;
+  animation:qa-rise .2s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes qa-fade{from{opacity:0;} to{opacity:1;}}
+@keyframes qa-rise{from{transform:translateY(14px); opacity:0;} to{transform:none; opacity:1;}}
+@media (prefers-reduced-motion:reduce){
+  .course-qa-backdrop, .course-qa-menu{animation:none;}
+}
+
+/* Says which course this is about — the card itself is behind the backdrop,
+   and a sheet of three verbs with no subject is a guess. */
+.course-qa-head{
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  padding:6px 12px 10px; border-bottom:1px solid var(--line); margin-bottom:4px;
+}
+.course-qa-grip{
+  width:36px; height:4px; border-radius:999px; background:var(--line); flex:none;
+}
+.course-qa-title{
+  font-size:12.5px; font-weight:800; color:var(--text-dim); text-align:center;
+  line-height:1.35; overflow-wrap:anywhere;
 }
 .course-qa-menu button{
-  display:flex; align-items:center; gap:8px; width:100%; text-align:left; padding:9px 10px; border-radius:7px;
-  background:none; border:none; color:var(--text); font-family:inherit; font-size:13px; cursor:pointer;
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:14px 14px; border-radius:12px;
+  background:none; border:none; color:var(--text); font-family:inherit; font-size:14.5px; font-weight:600; cursor:pointer;
 }
-.course-qa-menu button .app-icon-svg{color:var(--text-dim);}
+.course-qa-menu button .app-icon-svg{color:var(--text-dim); flex:none;}
 .course-qa-menu button:hover,
 .course-qa-menu button:focus-visible{background:var(--search-bg);}
+.course-qa-menu button:active{background:var(--search-bg);}
 [dir="rtl"] .course-qa-menu button{text-align:right;}
+
+/* The tab bar's own z-index (950) is below the sheet, but it would still sit
+   visible under the backdrop as if it were still usable. Same slide-away the
+   More drawer already gets. */
+body:has(.course-qa-backdrop) .sb-tabbar{transform:translateY(100%); pointer-events:none;}
+body:has(.course-qa-backdrop) .asst-launcher,
+body:has(.course-qa-backdrop) .fix-launcher{display:none;}
+
+/* The pair wrapper only means something in the phone layout; everywhere else
+   it must be invisible to layout so the existing grid is unchanged. */
+.cp-pair{display:contents;}
+.cp-pair-label{display:none;}
 
 /* ==========================================================================
    PHONE STUDY PLAN — course cards become one-line rows
@@ -6175,14 +6715,53 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
      actually answers "what does this connect to" on a single column. */
   .connector-layer{display:none;}
 
+  /* Two across, not one. The row treatment below is right — a colour stripe
+     rather than a full tile — but a semester in a single column is a very
+     long scroll, and this card's content (a name, one meta line, a code) is
+     narrow enough to sit two-up on a phone. Below 360px it drops back to one
+     column: two 150px cards there truncate names rather than fit them. */
+  /* Back to stretch, now that every name is one line: with no two-line cards
+     left there is nothing to be stretched TO, so the row comes out uniform
+     AND short — which is what flex-start was working around when names could
+     run to two lines. */
+  .course-row{align-items:stretch; gap:8px;}
+
+  /* A lecture and its lab: one registered course, two meetings. The pair
+     takes a full row and a bracket is drawn down the margin spanning both,
+     labelled — the two cards keep their own boxes and their own checkboxes,
+     because a student really does attend them separately. */
+  .cp-pair{
+    position:relative; flex:1 1 100%; min-width:0;
+    display:flex; flex-direction:column; gap:8px;
+    padding-inline-end:24px;
+  }
+  .cp-pair::after{
+    content:''; position:absolute; inset-inline-end:7px; top:6px; bottom:6px; width:9px;
+    border:2px solid var(--accent); border-inline-start:none;
+    border-start-end-radius:8px; border-end-end-radius:8px;
+    opacity:.7;
+  }
+  .cp-pair > .course{flex:1 1 auto;}
+  .cp-pair-label{
+    display:block;
+    position:absolute; inset-inline-end:-6px; top:50%;
+    transform:translateY(-50%) rotate(90deg); transform-origin:center;
+    font-size:8.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--accent); white-space:nowrap; pointer-events:none;
+  }
+  [dir="rtl"] .cp-pair-label{transform:translateY(-50%) rotate(-90deg);}
+
   .course{
-    flex:1 1 100%; max-width:none; min-width:0; min-height:auto;
-    background:var(--panel); border:none; border-radius:14px;
-    padding:12px 46px 12px 17px;
-    box-shadow:0 4px 14px rgba(0,0,0,.22);
+    flex:1 1 calc(50% - 4px); max-width:none; min-width:0; min-height:auto;
+    background:var(--panel); border:none; border-radius:12px;
+    padding:8px 11px 8px 11px;
+    box-shadow:0 3px 10px rgba(0,0,0,.2);
+  }
+  @media (max-width:359px){
+    .course{flex:1 1 100%;}
   }
   .plan-page.rtl-mode .course,
-  .sheet.rtl-mode .course{padding:12px 17px 12px 46px;}
+  .sheet.rtl-mode .course{padding:8px 11px 8px 11px;}
   .course::before{
     content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
     border-radius:4px 0 0 4px; background:var(--core);
@@ -6209,26 +6788,52 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   }
   .course.completed{background:var(--panel);}
 
-  .course .name{font-size:14px; padding:0; margin:0;}
+  /* Two-up means half the width, so the name gets two lines rather than
+     being cut off at one, and the checkbox moves in to buy them back. */
+  /* One line, ellipsised. Two-line names were what made the cards different
+     heights and what made the tall ones tall — and a card in a grid is a
+     label you scan, not the place you read a full course title. The whole
+     name is still on the card's aria-label and in the detail panel a tap
+     away, and the catalogue code underneath is unabbreviated. */
+  .course .name{
+    font-size:12.5px; padding:0; margin:0; line-height:1.25;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
   .plan-page.rtl-mode .course .name,
   .sheet.rtl-mode .course .name{padding:0;}
-  .course-meta{color:var(--text-dim); font-size:11px;}
-  .course-code{color:var(--text-faint); font-size:9.5px;}
+  .course-meta{color:var(--text-dim); font-size:10px; line-height:1.3; margin-top:2px;}
+  /* The card sits inside a block headed with its year — repeating it here
+     is what pushed this line onto a second row at half width. The card's
+     aria-label still carries all three parts. */
+  .course-meta .cm-year,
+  .course-meta .cm-year + .cm-sep{display:none;}
+  .course-code{
+    color:var(--text-faint); font-size:9px; line-height:1.25; margin-top:1px;
+    padding-inline-end:24px;   /* clears the checkbox, which now sits beside it */
+  }
   .course.completed .course-meta,
   .course.completed .course-code{color:var(--text-dim);}
 
+  /* 18px at the top-right rather than 22px centred: two-up, a vertically
+     centred circle sat in the middle of a two-line name. The 11px padding
+     keeps the tap target at 40px either way. */
+  /* Bottom-right, not top-right. Up beside the title it stole ~26px from
+     the one line the name now gets, and seven names in a first semester were
+     truncating because of it. Down here it sits level with the course code,
+     which is short. */
   .course-check{
-    top:50%; right:12px; transform:translateY(-50%);
-    width:22px; height:22px; padding:11px; margin:-11px;
+    top:auto; bottom:7px; right:7px; transform:none;
+    width:16px; height:16px; padding:12px; margin:-12px;
   }
   .plan-page.rtl-mode .course-check,
-  .sheet.rtl-mode .course-check{right:auto; left:12px; margin:-11px;}
+  .sheet.rtl-mode .course-check{right:auto; left:7px; margin:-12px;}
   /* inset must match the 11px padding above — the padding is an invisible
      44px tap-target extension (existing convention, see the base rule's
      own comment above), not part of the drawn circle; inset:0 here would
      have drawn the circle across the whole padded box instead of just its
      22px content box, which is what actually happened the first time. */
-  .course-check::before{inset:11px; background:var(--header-bg); border-color:var(--line);}
+  .course-check::before{inset:12px; background:var(--header-bg); border-color:var(--line);}
+  .course-check{font-size:11px;}
   .course.completed .course-check::before{background:#2ecc71; border-color:#2ecc71;}
   .course.completed .course-check{color:var(--on-accent);}
 
@@ -6272,6 +6877,20 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     font-size:13px;
   }
   .lib-add-btn{border-radius:999px; flex:0 0 auto;}
+
+  /* On phone the rows are already elevated cards with gaps between them, so
+     a shelf reads as a group without a rule under its header — the header
+     just needs to sit clear of the card below it and stay put while the
+     shelf scrolls. */
+  .lib-shelf-open .lib-shelf-body{display:flex; flex-direction:column; gap:8px;}
+  .lib-shelf-head{
+    /* var(--panel), matching the modal card this scrolls inside — the sticky
+       header has to be opaque to cover the rows passing under it, and any
+       other value paints a visibly darker band across the list. */
+    background:var(--panel); border-bottom:none;
+    padding:8px 2px 6px; margin:0 0 2px;
+  }
+  .lib-shelf + .lib-shelf{margin-top:6px;}
 }
 
 /* ==========================================================================
@@ -6288,6 +6907,10 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .ct-chips{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px;}
   .ct-chip{flex:0 0 auto;}
   .ct-grid{display:flex; flex-direction:column; gap:8px;}
+  /* var(--panel) matches the card this scrolls inside; a sticky header has
+     to be opaque to cover the rows passing under it. */
+  .ct-group-head{background:var(--panel); border-bottom:none; padding:8px 2px 6px; margin-bottom:2px;}
+  .ct-group + .ct-group{margin-top:8px;}
   .ct-card{
     border:none; border-radius:14px; padding:13px 14px;
     box-shadow:0 4px 14px rgba(0,0,0,.22);

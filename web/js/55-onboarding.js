@@ -18,6 +18,63 @@
   var index = 0;
   var mode = 'in';        // the sign-in panel: 'in' or 'up'
 
+  // ---- language ----------------------------------------------------------
+  // The app's per-plan toggleLang() switches one plan page. The landing
+  // screen is not a plan page and comes BEFORE one is chosen, so it needs a
+  // choice of its own — stored, so the About page (and anything added later)
+  // can read it instead of asking again.
+  var LANG_KEY = 'aaup_lang';
+  function lang(){
+    try{ return localStorage.getItem(LANG_KEY) === 'ar' ? 'ar' : 'en'; }catch(e){ return 'en'; }
+  }
+  function setLang(v){
+    try{ localStorage.setItem(LANG_KEY, v); }catch(e){}
+    document.documentElement.setAttribute('lang', v);
+    document.documentElement.setAttribute('dir', v === 'ar' ? 'rtl' : 'ltr');
+  }
+  var TX = {
+    en: { line: 'Every course in your degree, and where you are on it.',
+          signIn: 'Sign in', start: 'Start', notNow: 'Not now',
+          note: 'Free, offline, and made by a student. Always confirm with your academic advisor.',
+          other: 'العربية' },
+    ar: { line: 'كل مساق في تخصصك، وأين أنت منه.',
+          signIn: 'تسجيل الدخول', start: 'ابدأ', notNow: 'ليس الآن',
+          note: 'مجاني، يعمل بدون إنترنت، ومن صنع طالب. تأكّد دائمًا من مرشدك الأكاديمي.',
+          other: 'English' }
+  };
+  function t(){ return TX[lang()]; }
+
+  // The campus, drawn. A photograph would be a fixed rectangle that fights
+  // every theme it is shown on; this is one stroke colour the theme sets, so
+  // it belongs to whatever palette is running. It is the two things on AAUP's
+  // own campus a student recognises from the road: the arched clock-tower
+  // gate, and the faceted glass faculty building beside it — with the walkway
+  // running up to them, which is the "path" the app is named for.
+  function campusSvg(){
+    return '<svg class="wiz-campus" viewBox="0 0 400 220" fill="none" aria-hidden="true" focusable="false">' +
+      // walkway, converging toward the gate
+      '<path d="M96 220 L176 118 M304 220 L224 118" stroke="currentColor" stroke-width="1.4"/>' +
+      '<path d="M140 176 H260 M124 198 H276" stroke="currentColor" stroke-width="1" opacity=".55"/>' +
+      // ground line
+      '<path d="M8 118 H392" stroke="currentColor" stroke-width="1" opacity=".45"/>' +
+      // clock-tower gate: base, pointed arch, clock, cap
+      '<path d="M176 118 V54 h48 v64" stroke="currentColor" stroke-width="1.6"/>' +
+      '<path d="M190 118 V86 q10 -13 20 0 v32" stroke="currentColor" stroke-width="1.3"/>' +
+      '<circle cx="200" cy="64" r="7.5" stroke="currentColor" stroke-width="1.3"/>' +
+      '<path d="M200 60 v4.5 h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<path d="M170 54 h60 l-8 -9 h-44 z" stroke="currentColor" stroke-width="1.3"/>' +
+      // faceted faculty building, right
+      '<path d="M252 118 V78 l44 -22 v62 z" stroke="currentColor" stroke-width="1.4"/>' +
+      '<path d="M252 96 l44 -14 M266 118 V72 M282 118 V64" stroke="currentColor" stroke-width="1" opacity=".6"/>' +
+      // low block, left
+      '<path d="M104 118 V88 h44 v30" stroke="currentColor" stroke-width="1.4"/>' +
+      '<path d="M116 118 V100 h8 v18 M136 118 V100 h8 v18" stroke="currentColor" stroke-width="1" opacity=".6"/>' +
+      // flag poles
+      '<path d="M320 118 V52 M334 118 V60" stroke="currentColor" stroke-width="1.1" opacity=".7"/>' +
+      '<path d="M320 52 h16 v9 h-16 M334 60 h13 v8 h-13" stroke="currentColor" stroke-width="1" opacity=".7"/>' +
+      '</svg>';
+  }
+
   function buildSteps(){
     // One screen when there is nothing to sign into, two when there is.
     return (window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured())
@@ -33,8 +90,8 @@
       var cloud = window.AAUP_CLOUD && window.AAUP_CLOUD.isConfigured();
       return {
         landing: true,
-        primary: cloud ? 'Sign in' : 'Start',
-        secondary: cloud ? 'Not now' : ''
+        primary: cloud ? t().signIn : t().start,
+        secondary: cloud ? t().notNow : ''
       };
     }
     return {
@@ -66,20 +123,23 @@
       // The whole screen is the name and the choice. No progress bar, no step
       // count, no paragraph of welcome — there is nothing here to be partway
       // through.
+      var tx = t();
       b.innerHTML =
-        '<div class="wiz-landing">' +
+        '<div class="wiz-landing" dir="' + (lang() === 'ar' ? 'rtl' : 'ltr') + '">' +
+          campusSvg() +
+          '<button type="button" class="wiz-lang" id="wizLangToggle" lang="' +
+            (lang() === 'ar' ? 'en' : 'ar') + '">' + tx.other + '</button>' +
           '<div class="wiz-brand">' +
             '<img class="wiz-brand-mark" src="assets/icons/icon-any-384.png" alt="">' +
             '<div class="wiz-brand-name">AAUPATH</div>' +
             '<div class="wiz-brand-ar" lang="ar" dir="rtl">طريقك</div>' +
           '</div>' +
-          '<p class="wiz-landing-line">Every course in your degree, and where you are on it.</p>' +
+          '<p class="wiz-landing-line">' + window.__escapeHtml(tx.line) + '</p>' +
           '<div class="wiz-landing-actions">' +
-            '<button type="button" class="wiz-continue" id="onboardingContinue">' + s.primary + '</button>' +
-            (s.secondary ? '<button type="button" class="wiz-skip" id="onboardingSkip">' + s.secondary + '</button>' : '') +
+            '<button type="button" class="wiz-continue" id="onboardingContinue">' + window.__escapeHtml(s.primary) + '</button>' +
+            (s.secondary ? '<button type="button" class="wiz-skip" id="onboardingSkip">' + window.__escapeHtml(s.secondary) + '</button>' : '') +
           '</div>' +
-          '<p class="wiz-landing-note">Free, offline, and made by a student. ' +
-          'Always confirm with your academic advisor.</p>' +
+          '<p class="wiz-landing-note">' + window.__escapeHtml(tx.note) + '</p>' +
         '</div>';
     } else {
       b.innerHTML =
@@ -175,6 +235,13 @@
   }
 
   function bindStep(){
+    var langBtn = document.getElementById('wizLangToggle');
+    if(langBtn){
+      langBtn.addEventListener('click', function(){
+        setLang(lang() === 'ar' ? 'en' : 'ar');
+        render();
+      });
+    }
     var skip = document.getElementById('onboardingSkip');
     var back = document.getElementById('onboardingBack');
     var cont = document.getElementById('onboardingContinue');
@@ -189,6 +256,7 @@
   }
 
   function open(){
+    setLang(lang());   // stamp <html lang/dir> from the stored choice
     STEPS = buildSteps();
     index = 0;
     mode = 'in';

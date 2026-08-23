@@ -78,9 +78,20 @@
   // code for the university's own registration system, without opening
   // the full detail panel first. One popover, reused for every card;
   // closed by tapping outside it, pressing Escape, or acting on it.
-  var menuEl = null;
+  var menuEl = null, backdropEl = null;
   function closeQuickActions(){
     if(menuEl){ menuEl.remove(); menuEl = null; }
+    if(backdropEl){ backdropEl.remove(); backdropEl = null; }
+    // Release the trace this sheet was holding open, and undim the plan.
+    if(window.__QA_HOLD){
+      var heldPlan = window.__QA_HOLD;
+      window.__QA_HOLD = null;
+      if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.untraceCourse){
+        window.AAUP_IMPORTED.untraceCourse(heldPlan);
+      }
+    }
+    document.querySelectorAll('.qa-dim').forEach(function(el){ el.classList.remove('qa-dim'); });
+    document.querySelectorAll('.qa-subject').forEach(function(el){ el.classList.remove('qa-subject'); });
     document.removeEventListener('click', onOutsideClick, true);
     document.removeEventListener('keydown', onKeydown, true);
   }
@@ -98,21 +109,44 @@
     var courseName = nameEl ? nameEl.textContent.trim() : '';
 
     var ic = window.AAUP_ICONS ? window.AAUP_ICONS.preview : function(){ return ''; };
+
+    // A bottom sheet, not a popover beside the card. This gesture is
+    // phone-only and a course card is a full-width row there, so there is no
+    // "beside" to put a 170px menu in: the old positioning tried the card's
+    // right edge, then its left, then gave up and clamped to x:10 — which
+    // dropped the menu squarely on top of the course it was acting on, with
+    // nothing left on screen saying which one that was. A sheet keeps the
+    // card visible, names the course it belongs to, and puts the actions
+    // where a thumb already is.
+    var esc = window.__escapeHtml || function(x){ return x; };
+    backdropEl = document.createElement('div');
+    backdropEl.className = 'course-qa-backdrop';
+    document.body.appendChild(backdropEl);
+
     menuEl = document.createElement('div');
     menuEl.className = 'course-qa-menu';
-    menuEl.innerHTML =
-      '<button type="button" data-qa="toggle">' + ic(done ? 'undo' : 'check', 16) + '<span>' + (done ? (rtl ? 'إلغاء الإنجاز' : 'Mark not done') : (rtl ? 'إنجاز' : 'Mark done')) + '</span></button>' +
-      '<button type="button" data-qa="open">' + ic('book', 16) + '<span>' + (rtl ? 'عرض التفاصيل' : 'View details') + '</span></button>' +
-      '<button type="button" data-qa="copy">' + ic('copy', 16) + '<span>' + (rtl ? 'نسخ اسم المساق' : 'Copy course name') + '</span></button>';
+    menuEl.setAttribute('role', 'dialog');
+    menuEl.setAttribute('aria-label', courseName);
+    // Dim the plan and light up what this course connects to. Holding a
+    // course already traces its prerequisites (js/28-imported.js, at 450ms),
+    // but lifting your finger — which is what opens this sheet — cleared it,
+    // so the sheet arrived over a plan that had just gone dark again. The
+    // trace is re-run and pinned for as long as the sheet is up.
+    window.__QA_HOLD = info.planId;
+    var planRoot = card.closest('.sheet-plan') || document.getElementById('page-' + info.planId);
+    if(planRoot) planRoot.classList.add('qa-dim');
+    card.classList.add('qa-subject');
+    if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.traceCourse){
+      window.AAUP_IMPORTED.traceCourse(info.planId, card);
+    }
 
-    var r = card.getBoundingClientRect();
+    menuEl.innerHTML =
+      '<div class="course-qa-head"><span class="course-qa-grip" aria-hidden="true"></span>' +
+        '<span class="course-qa-title">' + esc(courseName) + '</span></div>' +
+      '<button type="button" data-qa="toggle">' + ic(done ? 'undo' : 'check', 18) + '<span>' + (done ? (rtl ? 'إلغاء الإنجاز' : 'Mark not done') : (rtl ? 'إنجاز' : 'Mark done')) + '</span></button>' +
+      '<button type="button" data-qa="open">' + ic('book', 18) + '<span>' + (rtl ? 'عرض التفاصيل' : 'View details') + '</span></button>' +
+      '<button type="button" data-qa="copy">' + ic('copy', 18) + '<span>' + (rtl ? 'نسخ اسم المساق' : 'Copy course name') + '</span></button>';
     document.body.appendChild(menuEl);
-    var mr = menuEl.getBoundingClientRect();
-    var top = Math.min(window.innerHeight - mr.height - 10, r.top + r.height / 2 - mr.height / 2);
-    var left = Math.min(window.innerWidth - mr.width - 10, r.right + 8);
-    if(left + mr.width > window.innerWidth - 10){ left = Math.max(10, r.left - mr.width - 8); }
-    menuEl.style.top = Math.max(10, top) + 'px';
-    menuEl.style.left = Math.max(10, left) + 'px';
 
     menuEl.addEventListener('click', function(e){
       var btn = e.target.closest('[data-qa]');

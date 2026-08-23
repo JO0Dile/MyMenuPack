@@ -59,7 +59,10 @@
       var cr = meta.cr != null ? meta.cr : '';
       var pid = (window.AAUP_GPA && window.AAUP_GPA.primaryId) ? window.AAUP_GPA.primaryId(prefix, parts.slug) : el.id;
       var grade = grades[pid] || '';
-      out.push({ name: name, credits: cr, done: !!progress[el.id], grade: grade });
+      var needs = ((window.__PLAN_DATA[prefix] || {}).needsMap || {})[parts.slug] || [];
+      out.push({ name: name, credits: cr, done: !!progress[el.id], grade: grade,
+                 code: meta.num || '',
+                 needs: needs.map(function(n){ return (info[n] && info[n].name) || n; }) });
     });
     return out;
   }
@@ -90,6 +93,12 @@
       '</div>';
   }
 
+  // Compact is the plan as a checklist; full adds each course's catalogue
+  // number and what it waits on — the two things a student reads off a
+  // printout when they are actually registering, and the two that make it
+  // long enough that nobody wants them by default.
+  var fullMode = false;
+
   function renderOverview(prefix){
     var model = buildModel(prefix);
     if(!model) return '<p class="ex-note">Open a study plan first.</p>';
@@ -105,8 +114,16 @@
           var mark = c.done ? '✓' : '○';
           var gradeTag = c.grade ? ' <span class="po-grade">' + esc(c.grade) + '</span>' : '';
           var crTag = c.credits !== '' ? ' <span class="po-cr">' + esc(String(c.credits)) + 'H</span>' : '';
+          var codeTag = (fullMode && c.code) ? '<span class="po-code">' + esc(c.code) + '</span>' : '';
+          // Course names come out of courseInfo already escaped once by the
+          // shared sanitizer — esc()'ing them again printed a real "&" as a
+          // literal "&amp;" ("Elementary Probability &amp; Statistics"). The
+          // label around them is a literal, so it needs no escaping either.
+          var needsTag = (fullMode && c.needs && c.needs.length)
+            ? '<span class="po-needs">' + (rtl ? 'يتطلب: ' : 'needs: ') + c.needs.join(', ') + '</span>'
+            : '';
           html += '<li class="' + (c.done ? 'po-done' : '') + '"><span class="po-mark">' + mark + '</span>' +
-            '<span class="po-cname">' + esc(c.name) + '</span>' + crTag + gradeTag + '</li>';
+            '<span class="po-cname">' + esc(c.name) + codeTag + needsTag + '</span>' + crTag + gradeTag + '</li>';
         });
         html += '</ul></div>';
       });
@@ -126,8 +143,17 @@
     overlay.innerHTML =
       '<div class="modal-card po-card">' +
         '<button class="modal-close" id="planOverviewClose" aria-label="Close">&times;</button>' +
-        '<div class="po-actions"><button type="button" class="home-btn" id="planOverviewPrintBtn" style="border-color:var(--accent);color:var(--text);">🖨️ Print / Save PDF</button></div>' +
-        '<div id="planOverviewPrintRoot"><div id="planOverviewBody"></div></div>' +
+        '<div class="po-actions">' +
+          '<div class="po-modes" role="group" aria-label="Detail level">' +
+            '<button type="button" class="po-mode is-on" data-po-mode="compact">Compact</button>' +
+            '<button type="button" class="po-mode" data-po-mode="full">Full plan</button>' +
+          '</div>' +
+          '<button type="button" class="home-btn po-print" id="planOverviewPrintBtn">' +
+            (window.AAUP_ICONS ? window.AAUP_ICONS.preview('printer', 15) : '') + 'Print / Save PDF</button>' +
+        '</div>' +
+        // .po-sheet is a page, not a panel: white, page-proportioned and with
+        // a shadow, so what is on screen is what comes out of the printer.
+        '<div id="planOverviewPrintRoot"><div class="po-sheet" id="planOverviewBody"></div></div>' +
       '</div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function(e){ if(e.target === overlay){ overlay.classList.remove('open'); } });
@@ -139,10 +165,23 @@
     // everything except #planOverviewPrintRoot, so window.print() yields a
     // clean one-page plan with none of the app chrome around it.
     document.getElementById('planOverviewPrintBtn').addEventListener('click', function(){ window.print(); });
+    overlay.querySelectorAll('[data-po-mode]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        fullMode = btn.getAttribute('data-po-mode') === 'full';
+        overlay.querySelectorAll('[data-po-mode]').forEach(function(b){
+          b.classList.toggle('is-on', b === btn);
+        });
+        if(currentPrefix){
+          document.getElementById('planOverviewBody').innerHTML = renderOverview(currentPrefix);
+        }
+      });
+    });
     return overlay;
   }
 
+  var currentPrefix = null;
   function open(prefix){
+    currentPrefix = prefix;
     var overlay = ensureOverlay();
     document.getElementById('planOverviewBody').innerHTML = renderOverview(prefix);
     overlay.classList.add('open');

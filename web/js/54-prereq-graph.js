@@ -19,7 +19,29 @@
 // recomputing everything from one fixed anchor on every render.
 (function(){
   var MAX_ANCESTOR_DEPTH = 4; // matches the mockup's visible depth; deep curricula get "closest N levels," not an unreadable wall
-  var NODE_W = 168, NODE_H = 66, COL_GAP = 52, ROW_GAP = 16, PAD = 20;
+  // NODE_H is the height the layout maths assumes AND the height every node
+  // is actually given — the two have to agree. They did not: a node with a
+  // two-line name measured 85px against an assumed 66, so two nodes in the
+  // same layer, pitched 66+16 apart, overlapped by three pixels. The name is
+  // clamped to two lines (see .pg-node-name) precisely so this height is a
+  // worst case and not a guess, and the card is now pinned to it.
+  var NODE_W = 168, NODE_H = 86, COL_GAP = 52, ROW_GAP = 16, PAD = 20;
+  // Phone. The wide layout puts each prerequisite layer in its own column, so
+  // a three-deep chain is 648px across inside a ~358px window: the tree
+  // arrives as a letterboxed strip that has to be dragged sideways, with the
+  // node you are standing on clipped off the left edge. Turned on its side it
+  // scrolls the way a phone already scrolls, and a chain reads top-to-bottom,
+  // which is the direction a prerequisite chain is usually drawn anyway.
+  var NARROW_NODE_W = 150, NARROW_COL_GAP = 14, NARROW_ROW_GAP = 40;
+  function isNarrow(){
+    return typeof window.matchMedia === 'function' &&
+      window.matchMedia('(max-width:720px)').matches;
+  }
+  function metrics(){
+    return isNarrow()
+      ? { w: NARROW_NODE_W, colGap: NARROW_COL_GAP, rowGap: NARROW_ROW_GAP, vertical: true }
+      : { w: NODE_W, colGap: COL_GAP, rowGap: ROW_GAP, vertical: false };
+  }
 
   function esc(s){ return window.__escapeHtml ? window.__escapeHtml(String(s)) : String(s); }
 
@@ -131,15 +153,20 @@
     });
 
     var levels = Object.keys(columns).map(Number).sort(function(a, b){ return a - b; });
+    var m = metrics();
     var pos = {}; // slug -> {x, y}
-    levels.forEach(function(level, colIndex){
-      columns[level].forEach(function(s, rowIndex){
-        pos[s] = { x: PAD + colIndex * (NODE_W + COL_GAP), y: PAD + rowIndex * (NODE_H + ROW_GAP) };
+    levels.forEach(function(level, layerIndex){
+      columns[level].forEach(function(s, withinLayer){
+        // Vertical: a layer is a ROW and its members sit side by side.
+        // Horizontal: a layer is a COLUMN, exactly as before.
+        pos[s] = m.vertical
+          ? { x: PAD + withinLayer * (m.w + m.colGap), y: PAD + layerIndex * (NODE_H + m.rowGap) }
+          : { x: PAD + layerIndex * (m.w + m.colGap), y: PAD + withinLayer * (NODE_H + m.rowGap) };
       });
     });
 
     var allSlugs = Object.keys(pos);
-    var width = Math.max.apply(null, allSlugs.map(function(s){ return pos[s].x; })) + NODE_W + PAD;
+    var width = Math.max.apply(null, allSlugs.map(function(s){ return pos[s].x; })) + m.w + PAD;
     var height = Math.max.apply(null, allSlugs.map(function(s){ return pos[s].y; })) + NODE_H + PAD;
 
     // Every edge worth drawing: prerequisite -> dependent, for pairs where
@@ -150,7 +177,8 @@
       needs.forEach(function(n){ if(pos[n]){ edges.push([n, s]); } });
     });
 
-    return { pos: pos, edges: edges, width: width, height: height, info: info, truncated: collected.truncated };
+    return { pos: pos, edges: edges, width: width, height: height, info: info,
+             truncated: collected.truncated, nodeW: m.w, vertical: m.vertical };
   }
 
   function statusColor(st){
@@ -161,10 +189,10 @@
     var meta = ((window.__PLAN_DATA[prefix] || {}).courseInfo || {})[slug] || {};
     var name = rtl && meta.ar ? meta.ar : (meta.name || slug);
     var st = statusFor(prefix, slug);
-    var sub = st === 'passed' ? (t.passed + (gradeFor(prefix, slug) ? ' · ' + esc(gradeFor(prefix, slug)) : ''))
-      : st === 'in_progress' ? t.inProgress
-      : st === 'unlocked' ? t.unlocked
-      : t.locked;
+    var sub = st === 'passed' ? (t.nodePassed + (gradeFor(prefix, slug) ? ' · ' + esc(gradeFor(prefix, slug)) : ''))
+      : st === 'in_progress' ? t.nodeInProgress
+      : st === 'unlocked' ? t.nodeUnlocked
+      : t.nodeLocked;
     // name comes from courseInfo, which every plan (built-in or imported)
     // already ran through the shared sanitizer's clean()/__cleanText before
     // it landed here — it's HTML-safe text, already escaped once. Escaping
@@ -177,8 +205,19 @@
     '</div>';
   }
 
-  function edgePath(a, b){
-    var x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2;
+  // Leaves the prerequisite and enters the dependent on the faces that
+  // actually point at each other — right/left when layers run across,
+  // bottom/top when they run down. Drawing the horizontal curve on a
+  // vertical layout sends every edge out of a node's side and back into the
+  // side of the one directly beneath it.
+  function edgePath(a, b, nodeW, vertical){
+    if(vertical){
+      var vx1 = a.x + nodeW / 2, vy1 = a.y + NODE_H;
+      var vx2 = b.x + nodeW / 2, vy2 = b.y;
+      var midY = (vy1 + vy2) / 2;
+      return 'M ' + vx1 + ',' + vy1 + ' C ' + vx1 + ',' + midY + ' ' + vx2 + ',' + midY + ' ' + vx2 + ',' + vy2;
+    }
+    var x1 = a.x + nodeW, y1 = a.y + NODE_H / 2;
     var x2 = b.x, y2 = b.y + NODE_H / 2;
     var midX = (x1 + x2) / 2;
     return 'M ' + x1 + ',' + y1 + ' C ' + midX + ',' + y1 + ' ' + midX + ',' + y2 + ' ' + x2 + ',' + y2;
@@ -357,6 +396,11 @@
       subtitle: function(n){ return n + ' links across this plan'; },
       selectedLabel: 'SELECTED', legendLabel: 'LEGEND', routeLabel: 'SHORTEST ROUTE',
       passed: 'passed', inProgress: 'in progress', unlocked: 'unlocked — you can take it', locked: 'locked behind something',
+      // The legend explains; a node labels. Its four strings above are
+      // sentences written for the legend, and on a node they wrapped to
+      // three lines and pushed the card past the fixed height the layout
+      // maths assumes ("100411020 · LOCKED BEHIND SOMETHING").
+      nodePassed: 'passed', nodeInProgress: 'now', nodeUnlocked: 'open', nodeLocked: 'locked',
       alreadyDone: 'Already completed.', noPrereqs: 'No prerequisites — open to take now.',
       needsList: function(names){ return 'Needs ' + names.join(' and ') + '.'; },
       routeStats: function(hops, ch){ return hops + (hops === 1 ? ' course' : ' courses') + ' · ' + Math.round(ch) + ' credit hours'; },
@@ -373,6 +417,7 @@
       subtitle: function(n){ return n + ' رابطًا في هذه الخطة'; },
       selectedLabel: 'المحدد', legendLabel: 'المفتاح', routeLabel: 'أقصر مسار',
       passed: 'منجز', inProgress: 'قيد الدراسة', unlocked: 'متاح — يمكنك أخذه', locked: 'مغلق خلف مساق آخر',
+      nodePassed: 'منجز', nodeInProgress: 'الآن', nodeUnlocked: 'متاح', nodeLocked: 'مغلق',
       alreadyDone: 'أُنجز بالفعل.', noPrereqs: 'لا متطلبات سابقة — متاح الآن.',
       needsList: function(names){ return 'يتطلب ' + names.join(' و') + '.'; },
       routeStats: function(hops, ch){ return hops + ' مساق · ' + Math.round(ch) + ' ساعة معتمدة'; },
@@ -393,9 +438,13 @@
   var expandedSlugs = [];
   var currentSelected = null;
 
-  function scrollToCenter(wrapEl, pos, slug, animate){
+  function scrollToCenter(wrapEl, pos, slug, animate, nodeW){
     if(!wrapEl || !pos[slug]) return;
-    var centerX = pos[slug].x + NODE_W / 2;
+    // The width the layout actually used, not the desktop constant — on a
+    // phone that is 18px narrower, and centring on the wrong half of a node
+    // is how the selected course ends up sitting off the edge it was
+    // scrolled to.
+    var centerX = pos[slug].x + (nodeW || NODE_W) / 2;
     var centerY = pos[slug].y + NODE_H / 2;
     var targetLeft = Math.max(0, centerX - wrapEl.clientWidth / 2);
     var targetTop = Math.max(0, centerY - wrapEl.clientHeight / 2);
@@ -450,7 +499,8 @@
     var g = layout(prefix, expandedSlugs);
 
     var nodesHTML = Object.keys(g.pos).map(function(s){
-      return '<div style="position:absolute; left:' + g.pos[s].x + 'px; top:' + g.pos[s].y + 'px; width:' + NODE_W + 'px;">' +
+      return '<div style="position:absolute; left:' + g.pos[s].x + 'px; top:' + g.pos[s].y +
+        'px; width:' + g.nodeW + 'px; height:' + NODE_H + 'px;">' +
         nodeHTML(prefix, s, s === sel, rtl, t) + '</div>';
     }).join('');
     // Matches the mockup: a solid edge is colored by what it leads to (green
@@ -468,7 +518,7 @@
       else if(toStatus === 'in_progress'){ cls += ' pg-edge-progress'; }
       else if(toStatus === 'unlocked'){ cls += ' pg-edge-unlocked'; }
       else if(fromStatus === 'passed'){ cls += ' pg-edge-passed'; }
-      return '<path class="' + cls + '" d="' + edgePath(g.pos[e[0]], g.pos[e[1]]) + '"></path>';
+      return '<path class="' + cls + '" d="' + edgePath(g.pos[e[0]], g.pos[e[1]], g.nodeW, g.vertical) + '"></path>';
     }).join('');
 
     var meta = g.info[sel] || {};
@@ -505,7 +555,7 @@
     var wrapEl = document.getElementById('pgGraphWrap');
     dragBound = false; // the wrap is a fresh element every render; rebind against it
     bindDragPan(wrapEl);
-    scrollToCenter(wrapEl, g.pos, sel, !!animateScroll);
+    scrollToCenter(wrapEl, g.pos, sel, !!animateScroll, g.nodeW);
   }
 
   function open(prefix, slug){

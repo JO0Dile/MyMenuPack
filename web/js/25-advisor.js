@@ -120,6 +120,26 @@
     return meta ? (rtl ? (meta.ar || meta.name) : (meta.name || meta.ar)) : slug;
   }
 
+  // ---- why this course is in the suggestion -------------------------------
+  // Read straight off the two things recommend() actually ranks by: how many
+  // later courses a pass in this one opens, and its credit hours (the tie
+  // break, and what decides whether it still fits under the cap). The tray
+  // listed a name and an hour count and nothing else, so the app's own
+  // suggestion arrived with no argument for itself — a student could see
+  // what it picked but not why, which is the part worth disagreeing with.
+  function reasonFor(c, rtl){
+    if(c.unlocksCount > 0){
+      return rtl
+        ? 'يفتح ' + c.unlocksCount + (c.unlocksCount === 1 ? ' مساق لاحق' : ' مساقات لاحقة')
+        : 'opens ' + c.unlocksCount + (c.unlocksCount === 1 ? ' later course' : ' later courses');
+    }
+    return rtl ? 'يملأ الساعات المتبقية' : 'fills the remaining hours';
+  }
+  function cautionFor(c, rtl){
+    if(!c.likelyHard) return '';
+    return rtl ? 'من فئة قيّمتها صعبة سابقًا' : 'in a category you rated Hard before';
+  }
+
   // ---- the suggestion (also used by the dashboard) ------------------------
   function recommend(prefix){
     var candidates = poolFor(prefix);
@@ -231,8 +251,13 @@
     }
     return chosen.map(function(s){
       var c = t.index[s];
+      var caution = cautionFor(c, rtl);
       return '<div class="sb-tray-item">' +
-        '<span class="sb-tray-name">' + esc(courseName(prefix, s, rtl)) + '</span>' +
+        '<div class="sb-tray-main">' +
+          '<span class="sb-tray-name">' + esc(courseName(prefix, s, rtl)) + '</span>' +
+          '<span class="sb-tray-why">' + esc(reasonFor(c, rtl)) + '</span>' +
+          (caution ? '<span class="sb-tray-caution">⚡ ' + esc(caution) + '</span>' : '') +
+        '</div>' +
         '<span class="sb-tray-cr">' + c.cr + 'H</span>' +
         '<button type="button" class="sb-tray-x" data-sb-remove="' + esc(s) + '" aria-label="' +
           (rtl ? 'إزالة' : 'Remove') + ' ' + esc(courseName(prefix, s, rtl)) + '">✕</button>' +
@@ -306,6 +331,10 @@
       '<p class="form-note sb-lead">' + (rtl
         ? 'ابدأ من اقتراح التطبيق، وبدّل فيه زي ما بدك. الأرقام (12 / 15–18 ساعة) دليل هذا التطبيق نفسه، مش قاعدة رسمية — أكّدها مع مرشدك.'
         : 'Start from the app’s suggestion and change it however you like. The 12 and 15–18H numbers are this app’s own guide, not an official rule — confirm them with your advisor.') + '</p>' +
+      // A zero-height marker directly above the meter. When it scrolls out of
+      // the modal's own scroll box the meter is stuck, which is the only
+      // reliable way to know: position:sticky fires no event of its own.
+      '<div id="sbStickSentinel" aria-hidden="true"></div>' +
       '<div id="sbMeterHost">' + meterHtml(t, rtl) + '</div>' +
       '<div class="sb-cols">' +
         '<section class="sb-pool">' +
@@ -321,9 +350,12 @@
           '<div class="sb-tray-list" id="sbTray">' + trayHtml(prefix, pool, chosen, t, rtl) + '</div>' +
           '<div id="sbExtra">' + breakdownHtml(t, rtl) + warningsHtml(t, rtl) + '</div>' +
           '<div class="sb-actions">' +
-            '<button type="button" class="home-btn" id="sbReset">↺ ' +
+            '<button type="button" class="home-btn" id="sbReset">' + window.AAUP_ICONS.preview('undo', 14) +
               (rtl ? 'ارجع للاقتراح' : 'Use the suggestion') + '</button>' +
-            '<button type="button" class="home-btn" id="sbCopy">📋 ' +
+            // Starting over meant un-picking a dozen courses one at a time.
+            '<button type="button" class="home-btn" id="sbClear">' + window.AAUP_ICONS.preview('trash', 14) +
+              (rtl ? 'امسح الكل' : 'Clear all') + '</button>' +
+            '<button type="button" class="home-btn" id="sbCopy">' + window.AAUP_ICONS.preview('copy', 14) +
               (rtl ? 'انسخ القائمة' : 'Copy list') + '</button>' +
           '</div>' +
           '<p class="form-note" id="sbCopyMsg" aria-live="polite"></p>' +
@@ -365,6 +397,21 @@
     refresh(prefix);
   }
 
+  var stickObserver = null;
+  function bindStickyMeter(){
+    if(stickObserver){ stickObserver.disconnect(); stickObserver = null; }
+    var sentinel = document.getElementById('sbStickSentinel');
+    var host = document.getElementById('sbMeterHost');
+    if(!sentinel || !host || typeof window.IntersectionObserver !== "function") return;
+    var scroller = host.closest('.modal-body') || null;
+    stickObserver = new window.IntersectionObserver(function(entries){
+      var meterEl = host.querySelector('.sb-meter');
+      if(!meterEl) return;
+      meterEl.classList.toggle('sb-meter-stuck', !entries[0].isIntersecting);
+    }, { root: scroller, threshold: 0 });
+    stickObserver.observe(sentinel);
+  }
+
   function bindTray(prefix){
     document.querySelectorAll('[data-sb-remove]').forEach(function(btn){
       if(btn.__sbBound) return;
@@ -396,6 +443,13 @@
     if(reset){
       reset.addEventListener('click', function(){
         setPicked(prefix, recommend(prefix).chosen.map(function(c){ return c.slug; }));
+        refresh(prefix);
+      });
+    }
+    var clear = document.getElementById('sbClear');
+    if(clear){
+      clear.addEventListener('click', function(){
+        setPicked(prefix, []);
         refresh(prefix);
       });
     }
@@ -432,6 +486,7 @@
     body.innerHTML = render(prefix);
     overlay.classList.add('open');
     bindBody(prefix);
+    bindStickyMeter();
   }
 
   function bind(){

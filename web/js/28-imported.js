@@ -163,7 +163,12 @@
             : 'Course list not added yet \u2014 coming soon.')
         : ((p.bio && p.bio.en) || (courseCount + ' courses \u00b7 community-imported major'));
       var uni = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'];
-      var badge = (uni ? txt(uni.icon) + ' ' + txt(uni.shortName) + ' \u00b7 ' : '') + (p.official ? (p.wasEdited ? '✏️ Official (Edited)' : '✅ Official') : (p.wasEdited ? '✏️ User Edited' : '👤 User Made'));
+      // Words, not emoji. The badge sat over a card whose every other glyph
+      // is drawn, and "✅ Official" next to "👤 User Made" was two unrelated
+      // pictures doing the work one word does.
+      var origin = p.official ? (p.wasEdited ? (rtl ? 'رسمي (معدّل)' : 'Official · edited') : (rtl ? 'رسمي' : 'Official'))
+                              : (p.wasEdited ? (rtl ? 'من طالب (معدّل)' : 'Student · edited') : (rtl ? 'من طالب' : 'Student'));
+      var badge = (uni ? txt(uni.shortName) + ' \u00b7 ' : '') + txt(origin);
       // Reuses the exact .plan-card class the four built-in majors use —
       // same icon box, same two-tone title, same dim bio text, same small
       // blue CTA — rather than a bespoke look-alike that has to be kept in
@@ -173,7 +178,7 @@
         : 'AAUP_DASHBOARD.selectAndOpen(\'' + jsAttr(id) + '\')';
       return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + txt(id) + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + txt(p.university || 'aaup') + '" data-college="' + txt(collegeKeyForPlan(p)) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
-        '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">🗑 Delete</button>' +
+        '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">' + window.AAUP_ICONS.preview('trash', 12) + 'Delete</button>' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(p, { size: 30 }) + '</div>' +
         '<h2>' + txt(en.big) + (en.small ? '<em>' + txt(en.small) + '</em>' : '') + '</h2>' +
         '<p class="pc-bio">' + txt(bio) + '</p>' +
@@ -907,6 +912,10 @@
     });
   }
   function handleCourseHoverLeave(planId){
+    // The quick-action sheet holds the trace open. Lifting your finger is
+    // what opens that sheet, and clearing here would wipe the highlight the
+    // sheet exists to sit on top of.
+    if(window.__QA_HOLD) return;
     clearHoverSequence();
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
@@ -1008,7 +1017,7 @@
     // anything else still calls it directly.
     var cardButtons = editing
       ? '<div class="imp-card-btn-row">' +
-        '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">✏️</button>' +
+        '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">' + window.AAUP_ICONS.preview('pen', 13) + '</button>' +
         '<button type="button" class="imp-remove-course-btn" title="Remove course" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmRemoveCourse(\'' + planId + '\',\'' + c.id + '\');">✕</button>' +
         '</div>'
       : '';
@@ -1030,7 +1039,16 @@
     var hoursTx = partOfPair
       ? (rtl ? 'ضمن ' + c.creditHours + ' ساعات' : 'part of ' + c.creditHours + 'H')
       : c.creditHours + 'H';
-    var meta = window.__escapeHtml(yearTx + ' · ' + statusTx + ' · ' + hoursTx);
+    // Each part in its own span so the phone layout can drop the year: a
+    // card sitting inside a block headed "Year 1" does not need to say
+    // "Year 1" as well, and at half width that repetition is what pushes the
+    // line onto a second row. The aria-label below keeps all three parts
+    // whatever the layout hides.
+    var meta = '<span class="cm-year">' + window.__escapeHtml(yearTx) + '</span>' +
+      '<span class="cm-sep"> · </span>' +
+      '<span class="cm-status">' + window.__escapeHtml(statusTx) + '</span>' +
+      '<span class="cm-sep"> · </span>' +
+      '<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>';
     // Focusable so the plan can be worked from a keyboard: the card itself is
     // a button (Enter opens the details) and the tick inside it is its own
     // control (Space toggles completion) — see js/57-card-input.js.
@@ -1323,15 +1341,15 @@
       '</div></div>' +
       '<div class="ar-block"><div class="ar1">' + ar.big + '</div>' + (ar.small ? '<div class="ar2">' + ar.small + '</div>' : '') + '</div>' +
       '<div class="header-actions">' +
-        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">🏠</span><span class="home-lbl">Home</span></button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">' + window.AAUP_ICONS.preview('home', 15) + '</span><span class="home-lbl">Home</span></button>' +
         (canEdit ? (editing
           ? '<button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
-          : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">✏️ Edit Mode</button>') : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">📚 Course Library</button>' : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">📤 Export Plan</button>' : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">📨 Contribute</button>' : '') +
+          : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">' + window.AAUP_ICONS.preview('pen', 14) + 'Edit Mode</button>') : '') +
+        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">' + window.AAUP_ICONS.preview('book', 14) + 'Course Library</button>' : '') +
+        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">' + window.AAUP_ICONS.preview('download', 14) + 'Export Plan</button>' : '') +
+        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">' + window.AAUP_ICONS.preview('mail', 14) + 'Contribute</button>' : '') +
         (p.contributing && window.AAUP_CONTRIBUTE
-          ? '<button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">📮 Submit contribution</button>'
+          ? '<button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">' + window.AAUP_ICONS.preview('send', 14) + 'Submit contribution</button>'
           : '') +
       '</div></header>' +
       '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">▶</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
@@ -1340,7 +1358,7 @@
       '<span class="arrow-sample"><span class="ln"></span><span>' + (rtl ? 'متطلب سابق (مرر المؤشر فوق المساق لتتبعه)' : 'Prerequisite (hover a course to trace it)') + '</span></span>' +
       '</div></div>' +
       '<div class="course-search-wrap"><div class="search-box" id="' + id + '-courseSearchBox">' +
-      '<span class="search-ic">🔍</span>' +
+      '<span class="search-ic">' + window.AAUP_ICONS.preview('search', 15) + '</span>' +
       '<input type="text" id="' + id + '-courseSearchInput" class="search-input" placeholder="' + (rtl ? 'ابحث عن مساق بالاسم أو الرقم…' : 'Search a course by name or code…') + '" autocomplete="off">' +
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
@@ -1365,9 +1383,9 @@
 
     if(canEdit){
       html += '<div class="panel-action-row">' +
-        '<button type="button" class="pw-reset" onclick="AAUP_AUDIT.open(\'' + id + '\')">📋 Degree Audit &amp; GPA</button>' +
-        '<button type="button" class="pw-reset" onclick="AAUP_ACHIEVEMENTS.open(\'' + id + '\')">🏆 Achievements</button>' +
-        '<button type="button" class="pw-reset" onclick="AAUP_ADVISOR.open(\'' + id + '\')">🧠 Plan My Next Semester</button>' +
+        '<button type="button" class="pw-reset" onclick="AAUP_AUDIT.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('clipboard', 14) + 'Degree Audit &amp; GPA</button>' +
+        '<button type="button" class="pw-reset" onclick="AAUP_ACHIEVEMENTS.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('trophy', 14) + 'Achievements</button>' +
+        '<button type="button" class="pw-reset" onclick="AAUP_ADVISOR.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('brain', 14) + 'Plan My Next Semester</button>' +
         '</div>';
     }
 
@@ -1516,7 +1534,7 @@
   var SEARCH_HINT_KEY = 'aaup_searchHintSeen';
   function searchHintHtml(id, rtl){
     try{ if(localStorage.getItem(SEARCH_HINT_KEY)) return ''; }catch(e){}
-    return '<p class="search-hint" id="' + id + '-searchHint">💡 ' +
+    return '<p class="search-hint" id="' + id + '-searchHint">' + window.AAUP_ICONS.preview('help', 14) + '' +
       (rtl ? 'ابحث عن مساق مباشرة، أو مرر لأسفل فقط — كل شيء قابل للتصفح أيضًا.'
            : 'Search a course directly, or just scroll — everything’s browsable too.') +
       '<button type="button" class="search-hint-x" onclick="AAUP_IMPORTED.dismissSearchHint()" aria-label="Dismiss">&times;</button></p>';
@@ -1560,7 +1578,7 @@
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
 
     var html = '<div class="sheet sheet-plan sheet-plan-simple">' +
-      '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>🏠</span><span>Home</span></button></div>' +
+      '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>' + window.AAUP_ICONS.preview('home', 15) + '</span><span>Home</span></button></div>' +
       '<h1>' + txt(en.big) + (en.small ? ' ' + txt(en.small) : '') + ' <em style="opacity:.6;font-size:.6em;">' + txt(ar.big) + (ar.small ? ' ' + txt(ar.small) : '') + '</em></h1></header>' +
       '<div class="imp-body-pad">' +
       '<p style="font-size:12px;color:var(--text-dim);">This is a community-imported plan \u2014 a simplified view without the custom prerequisite-arrow diagram the built-in majors have, but progress tracking and prerequisite locking both work normally.</p>' +
@@ -1752,6 +1770,17 @@
   // already exists somewhere before typing it in again with a slightly
   // different id. Read-only; it doesn't add anything to the plan by
   // itself. ----------
+  // Just the plan's name. planLabel() below appends the "small" subtitle so
+  // two plans sharing a big name stay distinguishable in a dropdown — but on
+  // the Library's own heading that subtitle is the degree line ("B.Sc. · 121
+  // CH (as stated) · Program 29033"), which wrapped the title onto three
+  // lines to tell a student which plan they are already inside.
+  function planTitle(prefix){
+    var label = planLabel(prefix);
+    var cut = label.indexOf(' — ');
+    return cut === -1 ? label : label.slice(0, cut);
+  }
+
   function planLabel(prefix){
     var BUILT_IN = { robotics: 'AI & Robotics', cybersecurity: 'AI & Cybersecurity', medical: 'AI & Medical Sciences', cs: 'Computer Science' };
     if(BUILT_IN[prefix]) return BUILT_IN[prefix];
@@ -1782,11 +1811,22 @@
     Object.keys(data).forEach(function(prefix){
       var info = data[prefix].courseInfo || {};
       Object.keys(info).forEach(function(slug){
-        out.push({ prefix: prefix, slug: slug, name: info[slug].name, ar: info[slug].ar, cr: info[slug].cr, num: info[slug].num });
+        out.push({ prefix: prefix, slug: slug, name: info[slug].name, ar: info[slug].ar,
+                    cr: info[slug].cr, num: info[slug].num, req: info[slug].req || '' });
       });
     });
     return out;
   }
+  // Same order and wording the Degree Audit and My Path use (js/53-roadmap.js
+  // BUCKET_ORDER / BUCKET_META), so a bucket is named identically wherever a
+  // student meets it.
+  var LIB_BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec', 'supportCourses'];
+  var LIB_BUCKET_LABEL = {
+    univReq: 'Univ. Req.', univElec: 'Univ. Elec.', colgReq: 'Colg. Req.',
+    specReq: 'Spec. Req.', specElec: 'Spec. Elec.', freeElec: 'Free Elec.',
+    supportCourses: 'Support', _none: 'Not categorised'
+  };
+
   function openLibrary(currentPlanId){
     var overlay = document.getElementById('devModalOverlay');
     var body = document.getElementById('devModalBody');
@@ -1826,6 +1866,37 @@
       var list = courses.filter(function(c){ return c.prefix === browsePrefix; });
       var currentIsSame = browsePrefix === currentPlanId;
 
+      // Shelves, not one undifferentiated scroll. A plan's courses are
+      // grouped by the requirement each one satisfies — the university's own
+      // taxonomy, now that every course carries it — so browsing answers the
+      // question a student actually arrives with ("what counts as a Spec.
+      // Elec.?") instead of making them read 130 rows to find out. Each shelf
+      // states its own count and hours, and courses whose plan published no
+      // requirement data fall into one honest "Not categorised" shelf rather
+      // than being silently assigned to a bucket nobody said they were in.
+      function shelvesFor(filtered){
+        var byBucket = {};
+        filtered.forEach(function(c){
+          var k = LIB_BUCKET_ORDER.indexOf(c.req) !== -1 ? c.req : '_none';
+          (byBucket[k] = byBucket[k] || []).push(c);
+        });
+        return LIB_BUCKET_ORDER.concat(['_none']).filter(function(k){
+          return byBucket[k] && byBucket[k].length;
+        }).map(function(k){
+          var items = byBucket[k];
+          var hours = items.reduce(function(a, c){ return a + (Number(c.cr) || 0); }, 0);
+          return { key: k, label: LIB_BUCKET_LABEL[k], items: items, hours: hours };
+        });
+      }
+
+      function rowHtml(c){
+        return '<div class="lib-row">' +
+          '<span class="lib-row-name">' + window.__escapeHtml(c.name) +
+            ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
+          (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
+          '</div>';
+      }
+
       function renderList(filterText){
         var f = (filterText || '').toLowerCase();
         // Match the course code as well as the name — the code is what a
@@ -1834,16 +1905,33 @@
           return !f || c.name.toLowerCase().indexOf(f) !== -1 || String(c.slug).toLowerCase().indexOf(f) !== -1;
         });
         if(filtered.length === 0){ return '<p class="ex-note">No matching courses.</p>'; }
-        return filtered.map(function(c){
-          return '<div class="lib-row">' +
-            '<span>' + c.name + ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
-            (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
+        var shelves = shelvesFor(filtered);
+        // One shelf and nothing to compare it against is not a shelf — that
+        // is the flat list this replaced, with a redundant header on top.
+        if(shelves.length === 1){ return shelves[0].items.map(rowHtml).join(''); }
+        // Closed until asked for. Every shelf open at once put a hundred and
+        // thirty rows on the screen the moment the Library opened, which is
+        // the same wall the shelves were meant to break up — the sections are
+        // the answer to "what counts as a Spec. Elec.", and you only want the
+        // one you asked about. A search that matched is opened, since
+        // hiding the thing someone just searched for would be perverse.
+        var openAll = !!f;
+        return shelves.map(function(sh, i){
+          var id = 'libShelf' + i;
+          return '<div class="lib-shelf' + (openAll ? ' lib-shelf-open' : '') + '">' +
+            '<button type="button" class="lib-shelf-head" data-lib-shelf="' + id + '"' +
+              ' aria-expanded="' + (openAll ? 'true' : 'false') + '" aria-controls="' + id + '">' +
+              '<span class="lib-shelf-chev" aria-hidden="true">\u203a</span>' +
+              '<span class="lib-shelf-label">' + sh.label + '</span>' +
+              '<span class="lib-shelf-count">' + sh.items.length + ' · ' + sh.hours + 'H</span>' +
+            '</button>' +
+            '<div class="lib-shelf-body" id="' + id + '">' + sh.items.map(rowHtml).join('') + '</div>' +
             '</div>';
         }).join('');
       }
 
       body.innerHTML =
-        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('book', 20) + planLabel(browsePrefix) + '</h2>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('book', 20) + window.__escapeHtml(planTitle(browsePrefix)) + '</h2>' +
         '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">' + window.AAUP_ICONS.preview('shuffle', 14) + 'Change plan</button>' +
         (currentIsSame ? '<p class="form-note">This is the plan you\u2019re already editing.</p>' : '') +
         '<div class="form-field"><input type="text" id="libSearch" placeholder="Search by name or course code…"></div>' +
@@ -1859,6 +1947,19 @@
         bindAddButtons();
       });
       bindAddButtons();
+
+      // Delegated on the list, which survives every re-render — only its
+      // innerHTML is replaced — so this binds once instead of once per
+      // keystroke in the search box.
+      var listEl = document.getElementById('libList');
+      listEl.addEventListener('click', function(e){
+        var head = e.target.closest('[data-lib-shelf]');
+        if(!head) return;
+        var shelf = head.closest('.lib-shelf');
+        if(!shelf) return;
+        var isOpen = shelf.classList.toggle('lib-shelf-open');
+        head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
 
       function bindAddButtons(){
         document.querySelectorAll('.lib-add-btn').forEach(function(btn){
@@ -1937,6 +2038,9 @@
     addCoursePrompt: openCourseCreatePopup, ICONS: ICONS, nameParts: nameParts, hasStructure: hasStructure,
     compareByDisplayOrder: compareByDisplayOrder,
     confirmDelete: confirmDelete, deletePlan: deletePlan,
+    // Exposed for js/74-course-gestures.js, which shows the same trace under
+    // its action sheet rather than re-implementing the walk over the edges.
+    traceCourse: handleCourseHoverEnter, untraceCourse: handleCourseHoverLeave,
     toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
     dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,

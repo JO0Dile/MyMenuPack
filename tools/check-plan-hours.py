@@ -125,10 +125,6 @@ def main():
     for plan in catalogue.get('plans', []):
         if not plan.get('courses'):
             continue
-        # test-major is a fixture for the plan editor, not a curriculum; its
-        # "999H" is a deliberately silly number and means nothing here.
-        if plan['id'].startswith('test-'):
-            continue
         declared = plan.get('degreeHours')
         computed, detail = plan_total(plan, required_map)
         if not declared:

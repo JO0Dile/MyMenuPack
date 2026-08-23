@@ -39,7 +39,8 @@
       title: 'Your grades', hint: 'Change any grade below and the dial updates immediately.',
       term: 'Term', course: 'Course', ch: 'CH', grade: 'Grade', pts: 'Points',
       excluded: 'excluded — retaken', none: 'Not counted',
-      empty: 'No graded courses yet. Grades are entered from each course’s own info popup once it is marked done.',
+      empty: 'No grades yet — they are entered from each course, once it is marked done.',
+      goPlan: 'Enter marks from my plan',
       project: 'Reach a target GPA', projectHint: 'Uses your real credit hours and this plan’s required total — not a guess.',
       target: 'Target cumulative GPA', remaining: 'Credit hours remaining',
       need: function(grade, n){ return 'Average at least ' + grade + ' across the remaining ' + n + ' CH.'; },
@@ -54,7 +55,8 @@
       title: 'علاماتك', hint: 'غيّر أي علامة أدناه وستتحدث الدائرة فوراً.',
       term: 'الفصل', course: 'المساق', ch: 'س.م', grade: 'العلامة', pts: 'النقاط',
       excluded: 'مستبعدة — أُعيد أخذه', none: 'غير محتسبة',
-      empty: 'لا توجد علامات بعد. تُدخَل العلامات من نافذة معلومات كل مساق بعد إنجازه.',
+      empty: 'لا توجد علامات بعد — تُدخَل من كل مساق بعد إنجازه.',
+      goPlan: 'أدخل العلامات من خطتي',
       project: 'الوصول إلى معدل مستهدف', projectHint: 'يعتمد على ساعاتك الفعلية وإجمالي هذه الخطة — وليس تخميناً.',
       target: 'المعدل التراكمي المستهدف', remaining: 'الساعات المتبقية',
       need: function(grade, n){ return 'حافظ على معدل ' + grade + ' على الأقل خلال الساعات المتبقية (' + n + ' س.م).'; },
@@ -123,7 +125,14 @@
     var t = T[rtl ? 'ar' : 'en'];
     var rows = gradedRows(prefix);
     if(!rows.length){
-      return '<div class="gs-block"><div class="gs-lbl">' + t.title + '</div><p class="gs-empty">' + t.empty + '</p></div>';
+      // Grades are entered from a course, not from here, so with none entered
+      // this screen was a dead end: it explained where to go and gave no way
+      // to go there. The button is the whole point of the empty state.
+      return '<div class="gs-block"><div class="gs-lbl">' + t.title + '</div>' +
+        '<p class="gs-empty">' + t.empty + '</p>' +
+        '<button type="button" class="gs-goplan" data-gs-goplan="' + esc(prefix) + '">' +
+          (window.AAUP_ICONS ? window.AAUP_ICONS.preview('planpin', 16) : '') + t.goPlan +
+        '</button></div>';
     }
     var optsFor = function(current){
       return '<option value="">—</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
@@ -292,6 +301,14 @@
         // table and this table all recompute from the one save — there is no
         // partial-refresh path here to fall out of sync with the others.
         if(window.AAUP_AUDIT && window.AAUP_AUDIT.open) window.AAUP_AUDIT.open(prefix);
+      });
+    });
+    document.querySelectorAll('[data-gs-goplan]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var pid = btn.getAttribute('data-gs-goplan');
+        var ov = document.getElementById('auditModalOverlay');
+        if(ov) ov.classList.remove('open');
+        if(window.AAUP_DASHBOARD) window.AAUP_DASHBOARD.openStudyPlan(pid);
       });
     });
   }

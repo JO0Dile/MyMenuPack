@@ -179,6 +179,12 @@ def main():
             'logoUrl': uni.get('logoUrl') or uni.get('imageUrl') or '',
             'description': uni.get('description') or '',
             'website': uni.get('website') or '',
+            # Switchboard and fax numbers for the university's own campuses,
+            # as it publishes them itself. These are institutional numbers on
+            # a public page — unlike the per-instructor numbers build-contacts
+            # deliberately refuses to ship — so they travel with the record
+            # and the About screen reads them from here rather than hardcoding.
+            'contacts': uni.get('contacts') or {},
             'electivePool': rules.get('universityElectives') or [],
         }
 

@@ -7,6 +7,24 @@
   "icon": "🏛️",
   "iconKey": "",
   "website": "https://www.aaup.edu",
+  "contacts": {
+    "source": "https://www.aaup.edu/arab-american-university-official-offices",
+    "email": "info@aaup.edu",
+    "campuses": [
+      {
+        "name": "Jenin Campus",
+        "nameAr": "حرم جنين",
+        "phone": "+970 4 2418888",
+        "fax": "+970 4 2510971"
+      },
+      {
+        "name": "Ramallah Campus",
+        "nameAr": "حرم رام الله",
+        "phone": "+970 2 2941999",
+        "fax": "+970 2 2941979"
+      }
+    ]
+  },
   "country": null,
   "logoUrl": "assets/uploads/main-logo-transparent.png",
   "description": "Arab American University (AAUP), established in 2000, is the first private Palestinian university. Founded in collaboration with California State University and Utah State University, AAUP is committed to providing high-quality education through diverse academic programs.\n\nThe University promotes excellence in education, research, innovation, and entrepreneurship while providing a dynamic learning environment that supports student success. AAUP continues to advance its academic programs and facilities in accordance with international quality standards, preparing graduates to contribute to Palestinian and global development.",
@@ -17,7 +35,7 @@
       "name": "Faculty of Allied Medical Sciences",
       "nameAr": "كلية العلوم الطبية المساندة",
       "icon": "🩻",
-      "iconKey": "",
+      "iconKey": "microscope",
       "imageUrl": ""
     },
     {
@@ -25,7 +43,7 @@
       "name": "Faculty of Architecture and Art",
       "nameAr": "كلية العمارة والفنون",
       "icon": "🏛",
-      "iconKey": "",
+      "iconKey": "ruler",
       "imageUrl": ""
     },
     {
@@ -33,7 +51,7 @@
       "name": "Faculty of Artificial Intelligence and Data Science",
       "nameAr": "كلية الذكاء الاصطناعي وعلوم البيانات",
       "icon": "🤖",
-      "iconKey": "",
+      "iconKey": "robot",
       "imageUrl": ""
     },
     {
@@ -41,7 +59,7 @@
       "name": "Faculty of Arts and Education",
       "nameAr": "كلية الآداب والعلوم التربوية",
       "icon": "📖",
-      "iconKey": "",
+      "iconKey": "ruler",
       "imageUrl": ""
     },
     {
@@ -49,7 +67,7 @@
       "name": "Faculty of Business",
       "nameAr": "كلية الأعمال والاقتصاد",
       "icon": "📊",
-      "iconKey": "",
+      "iconKey": "briefcase",
       "imageUrl": ""
     },
     {
@@ -57,7 +75,7 @@
       "name": "Faculty of Dentistry",
       "nameAr": "كلية طب الأسنان",
       "icon": "🦷",
-      "iconKey": "",
+      "iconKey": "tooth",
       "imageUrl": ""
     },
     {
@@ -65,7 +83,7 @@
       "name": "Faculty of Digital Sciences",
       "nameAr": "كلية العلوم الرقمية",
       "icon": "🌐",
-      "iconKey": "",
+      "iconKey": "globe",
       "imageUrl": ""
     },
     {
@@ -73,7 +91,7 @@
       "name": "Faculty of Engineering",
       "nameAr": "كلية الهندسة",
       "icon": "⚙️",
-      "iconKey": "",
+      "iconKey": "gear",
       "imageUrl": ""
     },
     {
@@ -81,7 +99,7 @@
       "name": "Faculty of Information Technology",
       "nameAr": "كلية تكنولوجيا المعلومات",
       "icon": "💻",
-      "iconKey": "",
+      "iconKey": "code",
       "imageUrl": ""
     },
     {
@@ -89,7 +107,7 @@
       "name": "Faculty of Law",
       "nameAr": "كلية الحقوق",
       "icon": "⚖️",
-      "iconKey": "",
+      "iconKey": "scales",
       "imageUrl": ""
     },
     {
@@ -97,7 +115,7 @@
       "name": "Faculty of Medicine",
       "nameAr": "كلية الطب",
       "icon": "🩺",
-      "iconKey": "",
+      "iconKey": "medical",
       "imageUrl": ""
     },
     {
@@ -105,7 +123,7 @@
       "name": "Faculty of Modern Media",
       "nameAr": "كلية الإعلام الحديث",
       "icon": "🎙",
-      "iconKey": "",
+      "iconKey": "news",
       "imageUrl": ""
     },
     {
@@ -113,7 +131,7 @@
       "name": "Faculty of Nursing",
       "nameAr": "كلية التمريض",
       "icon": "🩺",
-      "iconKey": "",
+      "iconKey": "health",
       "imageUrl": ""
     },
     {
@@ -121,7 +139,7 @@
       "name": "Faculty of Pharmacy",
       "nameAr": "كلية الصيدلة",
       "icon": "💊",
-      "iconKey": "",
+      "iconKey": "pharmacy",
       "imageUrl": ""
     },
     {
@@ -129,15 +147,7 @@
       "name": "Junior College",
       "nameAr": "كلية المجتمع",
       "icon": "🎓",
-      "iconKey": "",
-      "imageUrl": ""
-    },
-    {
-      "slug": "test-faculty",
-      "name": "test faculty",
-      "nameAr": "كلية تجريبية",
-      "icon": "💀",
-      "iconKey": "",
+      "iconKey": "people",
       "imageUrl": ""
     }
   ]

@@ -278,7 +278,8 @@
     b.setAttribute('dir', dir);
     var h = document.createElement('div');
     h.className = 'asst-title';
-    h.textContent = '✨ ' + (CONSENT.title[l] || CONSENT.title.en);
+    h.innerHTML = (window.AAUP_ICONS ? window.AAUP_ICONS.preview('bolt', 15) : '') +
+      window.__escapeHtml(CONSENT.title[l] || CONSENT.title.en);
     b.appendChild(h);
     (CONSENT.body[l] || CONSENT.body.en).forEach(function (line) {
       var p = document.createElement('p');
@@ -321,7 +322,9 @@
     if (!AI || !AI.configured()) { btn.style.display = 'none'; return; }
     btn.style.display = '';
     var on = AI.mode() === 'on';
-    btn.textContent = on ? '✨' : '💤';
+    // A bolt when it is allowed online, a moon when it is not — the two
+    // states of one switch, drawn, rather than two unrelated emoji.
+    btn.innerHTML = window.AAUP_ICONS ? window.AAUP_ICONS.preview(on ? 'bolt' : 'clock', 15) : (on ? '' : '');
     btn.classList.toggle('asst-mode-on', on);
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.title = on
