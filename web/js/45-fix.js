@@ -446,7 +446,12 @@
     var closeBtn = el('fixClose');
     if (closeBtn) closeBtn.addEventListener('click', close);
     var title = el('fixTitle');
-    if (title) title.textContent = '🛠 ' + pick(L.title);
+    // innerHTML, not textContent: this overwrote the icon the markup carries,
+    // putting a raw 🛠 back on a panel whose every other glyph is drawn.
+    if (title) {
+      title.innerHTML = (window.AAUP_ICONS ? window.AAUP_ICONS.preview('gear', 15) : '') +
+        window.__escapeHtml(pick(L.title));
+    }
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       var panel = el('fixPanel');

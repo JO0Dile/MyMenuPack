@@ -45,7 +45,7 @@
     toggle.classList.add('available');   // always offered, unlike collapse
     toggle.setAttribute('aria-pressed', String(on));
     toggle.innerHTML =
-      '<span>🎯 ' + (rtl ? 'أظهر ما يمكنني أخذه فقط' : 'Show only what I can take') + '</span>' +
+      '<span>' + window.AAUP_ICONS.preview('target', 15) + (rtl ? 'أظهر ما يمكنني أخذه فقط' : 'Show only what I can take') + '</span>' +
       '<span class="ct-state">' + (on ? (rtl ? 'مفعّل' : 'ON') : (rtl ? 'معطّل' : 'OFF')) + '</span>';
     return toggle;
   }

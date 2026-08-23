@@ -1008,7 +1008,7 @@
     // anything else still calls it directly.
     var cardButtons = editing
       ? '<div class="imp-card-btn-row">' +
-        '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">✏️</button>' +
+        '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">' + window.AAUP_ICONS.preview('pen', 13) + '</button>' +
         '<button type="button" class="imp-remove-course-btn" title="Remove course" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmRemoveCourse(\'' + planId + '\',\'' + c.id + '\');">✕</button>' +
         '</div>'
       : '';
@@ -1323,15 +1323,15 @@
       '</div></div>' +
       '<div class="ar-block"><div class="ar1">' + ar.big + '</div>' + (ar.small ? '<div class="ar2">' + ar.small + '</div>' : '') + '</div>' +
       '<div class="header-actions">' +
-        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">🏠</span><span class="home-lbl">Home</span></button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">' + window.AAUP_ICONS.preview('home', 15) + '</span><span class="home-lbl">Home</span></button>' +
         (canEdit ? (editing
           ? '<button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
-          : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">✏️ Edit Mode</button>') : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">📚 Course Library</button>' : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">📤 Export Plan</button>' : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">📨 Contribute</button>' : '') +
+          : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">' + window.AAUP_ICONS.preview('pen', 14) + 'Edit Mode</button>') : '') +
+        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">' + window.AAUP_ICONS.preview('book', 14) + 'Course Library</button>' : '') +
+        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">' + window.AAUP_ICONS.preview('download', 14) + 'Export Plan</button>' : '') +
+        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">' + window.AAUP_ICONS.preview('mail', 14) + 'Contribute</button>' : '') +
         (p.contributing && window.AAUP_CONTRIBUTE
-          ? '<button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">📮 Submit contribution</button>'
+          ? '<button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">' + window.AAUP_ICONS.preview('send', 14) + 'Submit contribution</button>'
           : '') +
       '</div></header>' +
       '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">▶</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
@@ -1340,7 +1340,7 @@
       '<span class="arrow-sample"><span class="ln"></span><span>' + (rtl ? 'متطلب سابق (مرر المؤشر فوق المساق لتتبعه)' : 'Prerequisite (hover a course to trace it)') + '</span></span>' +
       '</div></div>' +
       '<div class="course-search-wrap"><div class="search-box" id="' + id + '-courseSearchBox">' +
-      '<span class="search-ic">🔍</span>' +
+      '<span class="search-ic">' + window.AAUP_ICONS.preview('search', 15) + '</span>' +
       '<input type="text" id="' + id + '-courseSearchInput" class="search-input" placeholder="' + (rtl ? 'ابحث عن مساق بالاسم أو الرقم…' : 'Search a course by name or code…') + '" autocomplete="off">' +
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
@@ -1365,9 +1365,9 @@
 
     if(canEdit){
       html += '<div class="panel-action-row">' +
-        '<button type="button" class="pw-reset" onclick="AAUP_AUDIT.open(\'' + id + '\')">📋 Degree Audit &amp; GPA</button>' +
-        '<button type="button" class="pw-reset" onclick="AAUP_ACHIEVEMENTS.open(\'' + id + '\')">🏆 Achievements</button>' +
-        '<button type="button" class="pw-reset" onclick="AAUP_ADVISOR.open(\'' + id + '\')">🧠 Plan My Next Semester</button>' +
+        '<button type="button" class="pw-reset" onclick="AAUP_AUDIT.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('clipboard', 14) + 'Degree Audit &amp; GPA</button>' +
+        '<button type="button" class="pw-reset" onclick="AAUP_ACHIEVEMENTS.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('trophy', 14) + 'Achievements</button>' +
+        '<button type="button" class="pw-reset" onclick="AAUP_ADVISOR.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('brain', 14) + 'Plan My Next Semester</button>' +
         '</div>';
     }
 
@@ -1516,7 +1516,7 @@
   var SEARCH_HINT_KEY = 'aaup_searchHintSeen';
   function searchHintHtml(id, rtl){
     try{ if(localStorage.getItem(SEARCH_HINT_KEY)) return ''; }catch(e){}
-    return '<p class="search-hint" id="' + id + '-searchHint">💡 ' +
+    return '<p class="search-hint" id="' + id + '-searchHint">' + window.AAUP_ICONS.preview('help', 14) + '' +
       (rtl ? 'ابحث عن مساق مباشرة، أو مرر لأسفل فقط — كل شيء قابل للتصفح أيضًا.'
            : 'Search a course directly, or just scroll — everything’s browsable too.') +
       '<button type="button" class="search-hint-x" onclick="AAUP_IMPORTED.dismissSearchHint()" aria-label="Dismiss">&times;</button></p>';
@@ -1560,7 +1560,7 @@
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
 
     var html = '<div class="sheet sheet-plan sheet-plan-simple">' +
-      '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>🏠</span><span>Home</span></button></div>' +
+      '<header><div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span>' + window.AAUP_ICONS.preview('home', 15) + '</span><span>Home</span></button></div>' +
       '<h1>' + txt(en.big) + (en.small ? ' ' + txt(en.small) : '') + ' <em style="opacity:.6;font-size:.6em;">' + txt(ar.big) + (ar.small ? ' ' + txt(ar.small) : '') + '</em></h1></header>' +
       '<div class="imp-body-pad">' +
       '<p style="font-size:12px;color:var(--text-dim);">This is a community-imported plan \u2014 a simplified view without the custom prerequisite-arrow diagram the built-in majors have, but progress tracking and prerequisite locking both work normally.</p>' +

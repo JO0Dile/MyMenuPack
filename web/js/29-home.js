@@ -258,14 +258,14 @@
     var planCount = allPlanMeta().length;
     var faculties = Object.keys(collegesForUniversity(soleUniversity() || state.university) || {}).length;
     el.innerHTML =
-      '<span>📚 ' + planCount + ' study plan' + (planCount === 1 ? '' : 's') + '</span>' +
+      '<span>' + window.AAUP_ICONS.preview('book', 13) + planCount + ' study plan' + (planCount === 1 ? '' : 's') + '</span>' +
       // "1 university" is not a fact worth a chip when there is no university
       // to choose. On one university it reports the faculties instead, which
       // IS what the screen below is about.
       (uniCount === 1
-        ? (faculties ? '<span>🏛 ' + faculties + ' facult' + (faculties === 1 ? 'y' : 'ies') + '</span>' : '')
-        : '<span>🎓 ' + uniCount + ' universities</span>') +
-      '<span>🆓 Free &amp; offline</span>';
+        ? (faculties ? '<span>' + window.AAUP_ICONS.preview('university', 13) + faculties + ' facult' + (faculties === 1 ? 'y' : 'ies') + '</span>' : '')
+        : '<span>' + window.AAUP_ICONS.preview('cap', 13) + uniCount + ' universities</span>') +
+      '<span>' + window.AAUP_ICONS.preview('unlock', 13) + 'Free &amp; offline</span>';
   }
 
   function showUniversities(){

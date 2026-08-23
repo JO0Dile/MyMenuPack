@@ -186,11 +186,11 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div class="watermark-layer" aria-hidden="true">@Dile (AL-Hammam_Natsha)</div>
 <div class="update-bar" id="updateBar">
-  <span>🔄 A new version of the app is ready.</span>
+  <span><span data-app-icon="refresh" data-app-icon-size="15" aria-hidden="true"></span> A new version of the app is ready.</span>
   <button type="button" onclick="location.reload()">Refresh</button>
 </div>
 
-<button type="button" class="sb-toggle-btn" id="sbToggleBtn" onclick="AAUP_SIDEBAR.toggleMobile()" aria-label="Menu">☰</button>
+<button type="button" class="sb-toggle-btn" id="sbToggleBtn" onclick="AAUP_SIDEBAR.toggleMobile()" aria-label="Menu"><span data-app-icon="menu" data-app-icon-size="18" aria-hidden="true"></span></button>
 <div class="sb-overlay" id="sbOverlay" onclick="AAUP_SIDEBAR.closeMobile()"></div>
 <div id="appSidebar" class="app-sidebar" style="display:none;"></div>
 
@@ -212,7 +212,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
   <div class="search-wrap" id="homeSearchWrap">
     <div class="search-box" id="homeSearchBox">
-      <span class="search-ic">🔍</span>
+      <span class="search-ic" data-app-icon="search" aria-hidden="true"></span>
       <input type="text" id="homeSearchInput" class="search-input" placeholder="Search a major… / ابحث عن تخصص…" autocomplete="off">
       <button type="button" class="search-clear" id="homeSearchClear" aria-label="Clear">&times;</button>
     </div>
@@ -244,7 +244,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="home-footer">
     <span>👥 An unofficial, open student project — always confirm with your academic advisor</span>
     <span>🇵🇸 Made by students in Palestine, for students everywhere</span>
-    <button type="button" class="dev-link" onclick="AAUP_SIDEBAR.openSettings()">⚙️ Settings</button>
+    <button type="button" class="dev-link" onclick="AAUP_SIDEBAR.openSettings()"><span data-app-icon="gear" data-app-icon-size="14" aria-hidden="true"></span> Settings</button>
     <span class="dev-link app-version-badge"></span>
     <button type="button" class="dev-link" onclick="AAUP_DEV.openDialog()">Developer</button>
   </div>
@@ -256,7 +256,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="modal-card" style="max-width:380px;">
     <button class="modal-close" id="studentInfoClose" aria-label="Close">&times;</button>
     <div class="modal-body">
-      <h2 style="margin-top:0;">👋 Welcome!</h2>
+      <h2 style="margin-top:0;">Welcome!</h2>
       <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6;margin-top:-6px;">
         Tell us a bit about yourself so your progress panel can say hello. Everything here is optional and only saved in this browser.
       </p>
@@ -279,7 +279,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
         <button type="button" class="home-btn" id="studentInfoSkip">Skip for now</button>
         <button type="button" class="home-btn" id="studentInfoSave" style="border-color:var(--accent);color:var(--text);">Save</button>
       </div>
-      <p class="form-note">You can change this anytime from the "✏️ Edit" link in the My Progress panel.</p>
+      <p class="form-note">You can change this anytime from the "Edit" link in the My Progress panel.</p>
     </div>
   </div>
 </div>
@@ -452,11 +452,11 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      echoes both the student's own words and course names that can have
      arrived from another student's device through the plans feed. -->
 <button type="button" class="asst-launcher" id="asstLauncher"
-        aria-label="Open the Study Plan assistant" aria-expanded="false">💬</button>
+        aria-label="Open the Study Plan assistant" aria-expanded="false"><span data-app-icon="chatdots" data-app-icon-size="24" aria-hidden="true"></span></button>
 
 <div class="asst-panel" id="asstPanel" role="dialog" aria-label="Study Plan assistant">
   <div class="asst-head">
-    <span class="asst-head-title">🎓 Study Plan assistant</span>
+    <span class="asst-head-title"><span data-app-icon="cap" data-app-icon-size="16" aria-hidden="true"></span> Study Plan assistant</span>
     <div class="asst-head-actions">
       <!-- Hidden until a Worker is configured (window.APP_AI_URL); painted by
            js/43-assistant-ui.js. ✨ = online brain, 💤 = offline only. -->
@@ -469,7 +469,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <form class="asst-form" id="asstForm" autocomplete="off">
     <input type="text" id="asstInput" class="asst-input" aria-label="Ask the assistant"
            placeholder="Ask about this app… / اسأل عن التطبيق…" maxlength="200">
-    <button type="submit" class="asst-send" aria-label="Send">➤</button>
+    <button type="submit" class="asst-send" aria-label="Send"><span data-app-icon="send" data-app-icon-size="16" aria-hidden="true"></span></button>
   </form>
 </div>
 
@@ -495,11 +495,11 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- ===== Fix ===============================================================
      Bottom-left, on every screen, at all times. -->
 <button type="button" class="fix-launcher" id="fixLauncher"
-        aria-label="Fix — check this app for problems" aria-expanded="false">🛠</button>
+        aria-label="Fix — check this app for problems" aria-expanded="false"><span data-app-icon="gear" data-app-icon-size="18" aria-hidden="true"></span></button>
 
 <div class="fix-panel" id="fixPanel" role="dialog" aria-label="Fix">
   <div class="fix-head">
-    <span class="fix-head-title" id="fixTitle">🛠 Fix</span>
+    <span class="fix-head-title" id="fixTitle"><span data-app-icon="gear" data-app-icon-size="15" aria-hidden="true"></span> Fix</span>
     <button type="button" class="fix-close" id="fixClose" aria-label="Close the Fix panel">&times;</button>
   </div>
   <div class="fix-body" id="fixBody"></div>
