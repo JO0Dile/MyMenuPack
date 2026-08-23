@@ -1,0 +1,617 @@
+{
+ "faculty": "Junior College",
+ "name": "Diploma in Property Valuation",
+ "source": "images image16.jpeg,image17.jpeg,image18.png,image19.jpeg,image20.jpeg,image21.jpeg,image22.jpeg,image23.jpeg,image24.png,image25.png,image26.png,image27.jpeg",
+ "programCode": "30041",
+ "degree": "Intermediate diploma",
+ "department": "Department of Investment and Real Estate Development",
+ "campuses": [
+  "Jenin Campus",
+  "Ramallah Campus"
+ ],
+ "durationYears": 2,
+ "creditHourFee": "Start From 230 ILS",
+ "teachingLanguage": [
+  "Arabic"
+ ],
+ "semesters": [
+  "First Semester",
+  "Second Semester",
+  "Summer Semester"
+ ],
+ "studyStyle": "In-Person",
+ "status": "Admission Available",
+ "sourceConflict": {
+  "what": "This program carries TWO complete academic plans with different course-code families and different degree totals.",
+  "twoPlansAreIntentional": "The document says so in the author's own words at block 140: 'this one have 2 academic plans 👍 first one :', then 'now the second plan:' (block 148). Both are stored below.",
+  "planA": "67 credit hours, course codes in the 02081xxxx family, with a Univ. Req. section and a 6-hour Spec. Elec. section (images image17.jpeg, image18.png, image19.jpeg, image20.jpeg). Sums to exactly 67.",
+  "planB": "74 credit hours, course codes in the 30041xxxx family, with a Colg. Req. section and no elective section (images image23.jpeg, image24.png, image25.png). Sums to exactly 74.",
+  "resolution": "NOT resolved by inference. Plan B is stored as the primary because the Advisory Plan (images image21.jpeg+image22.jpeg, repeated verbatim as image26.png+image27.jpeg) uses plan B's 30041xxxx codes exclusively and totals exactly 74 (19+18+18+19); it references no plan A code. The 3xxxxxxxx code family also matches the other current Junior College programs in this document. Plan A is preserved in full under alternatePlanA. A human must confirm which catalogue year applies."
+ },
+ "degreeHours": 74,
+ "requirements": {
+  "colgReq": {
+   "mustPassAll": true,
+   "courses": [
+    {
+     "code": "000011110",
+     "name": "COMMUNITY SERVICE",
+     "theoretical": 1,
+     "credits": 0
+    },
+    {
+     "code": "040511011",
+     "name": "PALESTINIAN STUDIES",
+     "theoretical": 2,
+     "credits": 2
+    },
+    {
+     "code": "300131150",
+     "name": "ARABIC LANGUAGE",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300131230",
+     "name": "ENGLISH LANGUAGE",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300132140",
+     "name": "ENTREPRENEURSHIP",
+     "theoretical": 2,
+     "credits": 3
+    },
+    {
+     "code": "300132210",
+     "name": "COMBATING CORRUPTION (CHALLENGES AND SOLUTIONS)",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300132250",
+     "name": "PHYSICAL ACTIVITY",
+     "credits": 1
+    },
+    {
+     "code": "300132270",
+     "name": "DIGITAL SKILLS",
+     "theoretical": 1,
+     "credits": 3
+    }
+   ]
+  },
+  "specReq": {
+   "mustPassAll": true,
+   "courses": [
+    {
+     "code": "300411110",
+     "name": "BUSINESS MATHEMATICS",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300411120",
+     "name": "ACCOUNTING, FINANCE AND TAX PRINCIPLES IN PROPERTY VALUATION",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300411130",
+     "name": "INTRODUCTION TO BUSINESS ADMINISTRATION",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300411140",
+     "name": "INTRODUCTION TO THE SCIENCE OF VALUATION AND REAL ESTATE APPRAISAL",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300411150",
+     "name": "PRINCIPLES OF SURVEYING",
+     "theoretical": 1,
+     "practical": 2,
+     "credits": 3
+    },
+    {
+     "code": "300411200",
+     "name": "BUSINESS LAW",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411130"
+     ]
+    },
+    {
+     "code": "300411210",
+     "name": "PRINCIPLES OF ECONOMICS",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300411220",
+     "name": "PRINCIPLES OF REAL ESTATE ANALYSIS AND VALUATION",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411140"
+     ]
+    },
+    {
+     "code": "300411230",
+     "name": "QUANTITY SURVEYING AND SPECIFICATIONS",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411110"
+     ]
+    },
+    {
+     "code": "300411240",
+     "name": "BUILDING, REAL ESTATE AND LAND LAW IN PALESTINE",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300412110",
+     "name": "PROPERTY VALUATION METHODS: MARKET, INCOME, AND RESIDUAL VALUE",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411220",
+      "300411230"
+     ]
+    },
+    {
+     "code": "300412120",
+     "name": "LAND ECONOMICS AND QUANTITATIVE ANALYSIS FOR REAL ESTATE INVESTMENT",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411220"
+     ]
+    },
+    {
+     "code": "300412130",
+     "name": "GEOGRAPHICAL INFORMATION SYSTEMS AND DIGITAL MAPS",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300412140",
+     "name": "CONSTRUCTION TECHNOLOGY",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411230"
+     ]
+    },
+    {
+     "code": "300412210",
+     "name": "GEOLOGY AND EARTH SCIENCES",
+     "theoretical": 3,
+     "credits": 3
+    },
+    {
+     "code": "300412220",
+     "name": "INTERNATIONAL VALUATION STANDARDS",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300412110"
+     ]
+    },
+    {
+     "code": "300412230",
+     "name": "BUSINESS ETHICS",
+     "theoretical": 3,
+     "credits": 3,
+     "prerequisites": [
+      "300411130"
+     ]
+    },
+    {
+     "code": "300412240",
+     "name": "INTERNSHIP IN PROPERTY VALUATION",
+     "credits": 3,
+     "prerequisites": [
+      "300412110"
+     ]
+    },
+    {
+     "code": "300412250",
+     "name": "GRADUATION PROJECT",
+     "credits": 2,
+     "prerequisites": [
+      "300412110"
+     ]
+    }
+   ]
+  }
+ },
+ "advisoryPlan": {
+  "source": "images image21.jpeg,image22.jpeg (duplicated verbatim as image26.png,image27.jpeg)",
+  "terms": [
+   {
+    "year": "First Year",
+    "semester": "Fall Semester",
+    "statedTotal": 19,
+    "courses": [
+     {
+      "code": "300131150",
+      "name": "ARABIC LANGUAGE",
+      "credits": 3
+     },
+     {
+      "code": "300132250",
+      "name": "PHYSICAL ACTIVITY",
+      "credits": 1
+     },
+     {
+      "code": "300411110",
+      "name": "BUSINESS MATHEMATICS",
+      "credits": 3
+     },
+     {
+      "code": "300411120",
+      "name": "ACCOUNTING, FINANCE AND TAX PRINCIPLES IN PROPERTY VALUATION",
+      "credits": 3
+     },
+     {
+      "code": "300411130",
+      "name": "INTRODUCTION TO BUSINESS ADMINISTRATION",
+      "credits": 3
+     },
+     {
+      "code": "300411140",
+      "name": "INTRODUCTION TO THE SCIENCE OF VALUATION AND REAL ESTATE APPRAISAL",
+      "credits": 3
+     },
+     {
+      "code": "300411150",
+      "name": "PRINCIPLES OF SURVEYING",
+      "credits": 3
+     }
+    ]
+   },
+   {
+    "year": "First Year",
+    "semester": "Spring Semester",
+    "statedTotal": 18,
+    "courses": [
+     {
+      "code": "300131230",
+      "name": "ENGLISH LANGUAGE",
+      "credits": 3
+     },
+     {
+      "code": "300411200",
+      "name": "BUSINESS LAW",
+      "credits": 3
+     },
+     {
+      "code": "300411210",
+      "name": "PRINCIPLES OF ECONOMICS",
+      "credits": 3
+     },
+     {
+      "code": "300411220",
+      "name": "PRINCIPLES OF REAL ESTATE ANALYSIS AND VALUATION",
+      "credits": 3
+     },
+     {
+      "code": "300411230",
+      "name": "QUANTITY SURVEYING AND SPECIFICATIONS",
+      "credits": 3
+     },
+     {
+      "code": "300411240",
+      "name": "BUILDING, REAL ESTATE AND LAND LAW IN PALESTINE",
+      "credits": 3
+     }
+    ]
+   },
+   {
+    "year": "Second Year",
+    "semester": "Fall Semester",
+    "statedTotal": 18,
+    "courses": [
+     {
+      "code": "300132210",
+      "name": "COMBATING CORRUPTION (CHALLENGES AND SOLUTIONS)",
+      "credits": 3
+     },
+     {
+      "code": "300132270",
+      "name": "DIGITAL SKILLS",
+      "credits": 3
+     },
+     {
+      "code": "300412110",
+      "name": "PROPERTY VALUATION METHODS: MARKET, INCOME, AND RESIDUAL VALUE",
+      "credits": 3
+     },
+     {
+      "code": "300412120",
+      "name": "LAND ECONOMICS AND QUANTITATIVE ANALYSIS FOR REAL ESTATE INVESTMENT",
+      "credits": 3
+     },
+     {
+      "code": "300412130",
+      "name": "GEOGRAPHICAL INFORMATION SYSTEMS AND DIGITAL MAPS",
+      "credits": 3
+     },
+     {
+      "code": "300412140",
+      "name": "CONSTRUCTION TECHNOLOGY",
+      "credits": 3
+     }
+    ]
+   },
+   {
+    "year": "Second Year",
+    "semester": "Spring Semester",
+    "statedTotal": 19,
+    "courses": [
+     {
+      "code": "040511011",
+      "name": "PALESTINIAN STUDIES",
+      "credits": 2
+     },
+     {
+      "code": "300132140",
+      "name": "ENTREPRENEURSHIP",
+      "credits": 3
+     },
+     {
+      "code": "300412210",
+      "name": "GEOLOGY AND EARTH SCIENCES",
+      "credits": 3
+     },
+     {
+      "code": "300412220",
+      "name": "INTERNATIONAL VALUATION STANDARDS",
+      "credits": 3
+     },
+     {
+      "code": "300412230",
+      "name": "BUSINESS ETHICS",
+      "credits": 3
+     },
+     {
+      "code": "300412240",
+      "name": "INTERNSHIP IN PROPERTY VALUATION",
+      "credits": 3
+     },
+     {
+      "code": "300412250",
+      "name": "GRADUATION PROJECT",
+      "credits": 2
+     }
+    ]
+   }
+  ],
+  "note": "COMMUNITY SERVICE (000011110, 0 credit hours) is a Colg. Req. course and does not appear in any advisory term."
+ },
+ "alternatePlanA": {
+  "note": "The document's 'first one :' plan (block 140). Preserved verbatim from images image17.jpeg, image18.png, image19.jpeg, image20.jpeg. Not merged into the app; see sourceConflict.",
+  "degreeHours": 67,
+  "requirements": {
+   "univReq": {
+    "mustPassAll": true,
+    "courses": [
+     {
+      "code": "000011110",
+      "name": "COMMUNITY SERVICE",
+      "theoretical": 1,
+      "credits": 0
+     },
+     {
+      "code": "040111001",
+      "name": "ARABIC LANGUAGE",
+      "theoretical": 2,
+      "credits": 2
+     },
+     {
+      "code": "040511011",
+      "name": "PALESTINIAN STUDIES",
+      "theoretical": 2,
+      "credits": 2
+     },
+     {
+      "code": "240111000",
+      "name": "COMPUTER SKILLS",
+      "theoretical": 2,
+      "credits": 2
+     }
+    ]
+   },
+   "specReq": {
+    "mustPassAll": true,
+    "courses": [
+     {
+      "code": "020811020",
+      "name": "INTRODUCTION TO BUSINESS ADMINISTRATION",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020811100",
+      "name": "ACCOUNTING, FINANCE AND TAX PRINCIPLES IN PROPERTY VALUATION",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020811150",
+      "name": "INTRODUCTION TO THE SCIENCE OF VALUATION AND REAL ESTATE APPRAISAL",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020811200",
+      "name": "PRINCIPLES OF SURVEYING",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020811250",
+      "name": "PRINCIPLES OF ECONOMICS",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020811300",
+      "name": "PRINCIPLES OF REAL ESTATE ANALYSIS AND VALUATION",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811150"
+      ]
+     },
+     {
+      "code": "020811350",
+      "name": "QUANTITY SURVEYING AND SPECIFICATIONS",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811500"
+      ]
+     },
+     {
+      "code": "020811400",
+      "name": "BUILDING, REAL ESTATE AND LAND LAW IN PALESTINE",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020811500",
+      "name": "BUSINESS MATHEMATICS",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020812100",
+      "name": "BUSINESS LAW",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811020"
+      ]
+     },
+     {
+      "code": "020812150",
+      "name": "PROPERTY VALUATION METHODS: MARKET, INCOME, AND RESIDUAL VALUE",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811350"
+      ]
+     },
+     {
+      "code": "020812200",
+      "name": "LAND ECONOMICS AND QUANTITATIVE ANALYSIS FOR REAL ESTATE INVESTMENT",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811300"
+      ]
+     },
+     {
+      "code": "020812250",
+      "name": "GEOGRAPHICAL INFORMATION SYSTEMS AND DIGITAL MAPS",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020812300",
+      "name": "GEOLOGY AND EARTH SCIENCES",
+      "theoretical": 3,
+      "credits": 3
+     },
+     {
+      "code": "020812350",
+      "name": "INTERNATIONAL VALUATION STANDARDS",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020812150"
+      ]
+     },
+     {
+      "code": "020812400",
+      "name": "BUSINESS ETHICS",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811020"
+      ]
+     },
+     {
+      "code": "020812450",
+      "name": "INTERNSHIP IN PROPERTY VALUATION",
+      "credits": 3,
+      "prerequisites": [
+       "020812150"
+      ]
+     },
+     {
+      "code": "020812490",
+      "name": "ENGLISH FOR PROPERTY VALUATION STUDENTS",
+      "theoretical": 2,
+      "credits": 2
+     },
+     {
+      "code": "020812500",
+      "name": "GRADUATION PROJECT",
+      "credits": 2,
+      "prerequisites": [
+       "020812150"
+      ]
+     }
+    ]
+   },
+   "specElec": {
+    "requiredHours": 6,
+    "courses": [
+     {
+      "code": "020811450",
+      "name": "BUILDINGS RESTORATION",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811350"
+      ]
+     },
+     {
+      "code": "020812550",
+      "name": "CONSTRUCTIONS STUDIES",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811400"
+      ]
+     },
+     {
+      "code": "020812600",
+      "name": "PROPERTY MARKETS ANALYSIS",
+      "theoretical": 3,
+      "credits": 3,
+      "prerequisites": [
+       "020811300"
+      ]
+     },
+     {
+      "code": "020812650",
+      "name": "CONSTRUCTIONS TECHNOLOGY",
+      "theoretical": 3,
+      "credits": 3
+     }
+    ]
+   }
+  },
+  "legacyElectiveListIncomplete": "image20.jpeg is cut off after 020812650 CONSTRUCTIONS TECHNOLOGY; the Spec. Elec. list may continue past the bottom of the capture. The 6 required elective hours are stated, so the degree total is unaffected."
+ }
+}

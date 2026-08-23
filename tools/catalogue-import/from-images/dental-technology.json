@@ -1,0 +1,150 @@
+{
+ "faculty": "Junior College",
+ "name": "Diploma in Dental Technology",
+ "source": "images image35.jpeg,image36.jpeg,image37.png,image38.png,image39.png,image40.jpeg,image41.png,image42.png,image43.jpeg,image44.png,image45.png,image46.png,image47.png,image48.png; text blocks 194-198, 218, 247-248, 254",
+ "programCode": "30011",
+ "degree": "Intermediate diploma",
+ "department": "Department of Health Professions",
+ "campuses": ["Jenin Campus", "Ramallah Campus"],
+ "durationYears": 2,
+ "creditHourFee": "Start from 330 ILS",
+ "teachingLanguage": ["English"],
+ "semesters": ["First Semester", "Second Semester", "Summer Semester"],
+ "studyStyle": "In-Person",
+ "status": "Admission Available",
+ "overview": "The Diploma in Dental Technology and Manufacturing is a specialized academic program designed to train skilled professionals in the fabrication and maintenance of dental prosthetics. Students receive comprehensive training in restorative dentistry techniques, dental prosthetics, crown and bridge fabrication, and orthodontic appliance manufacturing.",
+
+ "sourceConflict": {
+  "what": "This program carries TWO academic plans and THREE different stated credit-hour totals.",
+  "twoPlansAreIntentional": "The document says so in the author's own words at block 198: 'it have to academic plans:', then 'first one :' (block 199) and 'now 2nd plan:' (block 254). Both are stored below.",
+  "planA": "70 credit hours, course codes in the 0806xxxxx / 0106xxxxx / 04xxxxxxx families (images image36.jpeg, image37.png, image38.png, image39.png). Sums to exactly 70.",
+  "planB": "78 credit hours, course codes in the 30011xxxx / 30012xxxx families (images image43.jpeg, image44.png, image45.png). Sums to exactly 78.",
+  "thirdNumber": "The Overview prose at block 196 states a third figure: 'The curriculum consists of 69 credit hours completed over two academic years, including 29 credit hours of theoretical coursework and 40 credit hours of hands-on training.' 69 matches neither plan. 29 + 40 = 69 is internally consistent, so it is not a typo for 70 or 78 — it appears to describe an earlier revision.",
+  "resolution": "NOT resolved by inference. Plan B is stored as the primary because its own Advisory Plan (images image40.jpeg,image41.png,image42.png, repeated as image46.png,image47.png,image48.png) totals exactly 78 and uses plan B's codes. Plan A is preserved in full under alternatePlanA. The 69 figure is recorded here only. A human must confirm which catalogue year applies."
+ },
+
+ "degreeHours": 78,
+ "requirements": {
+  "colgReq": {"mustPassAll": true, "courses": [
+   {"code":"000011110","name":"COMMUNITY SERVICE","theoretical":1,"credits":0},
+   {"code":"040511011","name":"PALESTINIAN STUDIES","theoretical":2,"credits":2},
+   {"code":"300131150","name":"ARABIC LANGUAGE","theoretical":3,"credits":3},
+   {"code":"300131230","name":"ENGLISH LANGUAGE","theoretical":3,"credits":3},
+   {"code":"300132140","name":"ENTREPRENEURSHIP","theoretical":2,"credits":3},
+   {"code":"300132210","name":"COMBATING CORRUPTION (CHALLENGES AND SOLUTIONS)","theoretical":3,"credits":3},
+   {"code":"300132250","name":"PHYSICAL ACTIVITY","credits":1},
+   {"code":"300132270","name":"DIGITAL SKILLS","theoretical":1,"credits":3}]},
+  "specReq": {"mustPassAll": true, "courses": [
+   {"code":"300111110","name":"ENGLISH FOR DENTAL TECHNOLOGY STUDENT","theoretical":2,"credits":2},
+   {"code":"300111120","name":"ENGLISH FOR DENTAL TECHNOLOGY STUDENT LAB","practical":2,"credits":1,"prerequisites":["300111110"]},
+   {"code":"300111130","name":"INTRODUCTION TO DENTAL SCIENCE AND DENTAL TERMINOLOGY","theoretical":2,"credits":2},
+   {"code":"300111140","name":"MAINTENANCE OF EQUIPMENT AND GENERAL SAFETY IN DENTAL TECHNOLOGY LABORATORIES","theoretical":1,"credits":1},
+   {"code":"300111210","name":"REMOVABLE PARTIAL DENTURE I","theoretical":1,"practical":4,"credits":3},
+   {"code":"300111220","name":"COMPLETE DENTURE I","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111130"]},
+   {"code":"300111230","name":"CROWN AND BRIDGE I","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111130"]},
+   {"code":"300111240","name":"DENTAL MATERIALS","theoretical":100,"practical":110,"credits":3,"prerequisites":["300111130"],"weeklyHoursSuspect":true,"note":"image44.png prints Theoretical = 100 and Practical = 110 for this row. Every neighbouring row prints single digits, and 100/110 weekly hours is not physically possible, so this is a defect in the source page. Recorded verbatim rather than corrected. Cr. Hrs. 3 is unaffected and is what the totals use. Plan A's equivalent course 080612000 DENTAL MATERIALS prints 2 / 2 / 3."},
+   {"code":"300111250","name":"DENTAL MORPHOLOGY I","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111130"]},
+   {"code":"300111260","name":"FUNDAMENTAL OF DENTAL TECHNOLOGY","theoretical":2,"practical":2,"credits":3},
+   {"code":"300111270","name":"ORTHODONTICS (1)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111130"]},
+   {"code":"300111280","name":"DENTAL MORPHOLOGY (2)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111250"]},
+   {"code":"300111290","name":"ENGLISH COMMUNICATIONS SKILLS","theoretical":1,"practical":2,"credits":2},
+   {"code":"300112110","name":"REMOVABLE PARTIAL DENTURE(2)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111130"]},
+   {"code":"300112120","name":"COMPLETE DENTURE (2)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111220"]},
+   {"code":"300112130","name":"CROWN AND BRIDGE (2)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111230"]},
+   {"code":"300112140","name":"ORTHODONTICS (2)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300111270"]},
+   {"code":"300112150","name":"FIRST AID","practical":2,"credits":2},
+   {"code":"300112160","name":"BASIC LIFE SUPPORT","practical":1,"credits":0},
+   {"code":"300112210","name":"CROWN AND BRIDGE (3)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300112130"]},
+   {"code":"300112220","name":"REMOVABLE PARTIAL DENTURE(3)","theoretical":1,"practical":4,"credits":3,"prerequisites":["300112110"]},
+   {"code":"300112230","name":"ADVANCED REMOVABLE PROSTHODONTICS","theoretical":1,"practical":4,"credits":3,"prerequisites":["300112120"]},
+   {"code":"300112240","name":"AESTHETICS PROSTHODONTICS","theoretical":1,"credits":1,"prerequisites":["300112210"]},
+   {"code":"300112250","name":"DENTAL IMPLANTS","theoretical":1,"practical":4,"credits":3,"prerequisites":["300112210","300112230"]},
+   {"code":"300112260","name":"ETHICS AND PROFESSIONAL ISSUES","theoretical":1,"credits":1}]}
+ },
+
+ "advisoryPlan": {
+  "source": "images image40.jpeg,image41.png,image42.png (repeated verbatim as image46.png,image47.png,image48.png)",
+  "terms": [
+   {"year": "First Year", "semester": "Fall Semester", "statedTotal": 18, "courses": [
+    {"code":"040511011","name":"PALESTINIAN STUDIES","credits":2},
+    {"code":"300131150","name":"ARABIC LANGUAGE","credits":3},
+    {"code":"300131230","name":"ENGLISH LANGUAGE","credits":3},
+    {"code":"300132210","name":"COMBATING CORRUPTION (CHALLENGES AND SOLUTIONS)","credits":3},
+    {"code":"300132250","name":"PHYSICAL ACTIVITY","credits":1},
+    {"code":"300111110","name":"ENGLISH FOR DENTAL TECHNOLOGY STUDENT","credits":2},
+    {"code":"300111120","name":"ENGLISH FOR DENTAL TECHNOLOGY STUDENT LAB","credits":1},
+    {"code":"300111130","name":"INTRODUCTION TO DENTAL SCIENCE AND DENTAL TERMINOLOGY","credits":2},
+    {"code":"300111140","name":"MAINTENANCE OF EQUIPMENT AND GENERAL SAFETY IN DENTAL TECHNOLOGY LABORATORIES","credits":1}]},
+   {"year": "First Year", "semester": "Spring Semester", "statedTotal": 18, "courses": [
+    {"code":"300111210","name":"REMOVABLE PARTIAL DENTURE I","credits":3},
+    {"code":"300111220","name":"COMPLETE DENTURE I","credits":3},
+    {"code":"300111230","name":"CROWN AND BRIDGE I","credits":3},
+    {"code":"300111240","name":"DENTAL MATERIALS","credits":3},
+    {"code":"300111250","name":"DENTAL MORPHOLOGY I","credits":3},
+    {"code":"300111260","name":"FUNDAMENTAL OF DENTAL TECHNOLOGY","credits":3}]},
+   {"year": "First Year", "semester": "Summer Semester", "statedTotal": 8, "courses": [
+    {"code":"300111270","name":"ORTHODONTICS (1)","credits":3},
+    {"code":"300111280","name":"DENTAL MORPHOLOGY (2)","credits":3},
+    {"code":"300111290","name":"ENGLISH COMMUNICATIONS SKILLS","credits":2}]},
+   {"year": "Second Year", "semester": "Fall Semester", "statedTotal": 17, "courses": [
+    {"code":"300132270","name":"DIGITAL SKILLS","credits":3},
+    {"code":"300112110","name":"REMOVABLE PARTIAL DENTURE(2)","credits":3},
+    {"code":"300112120","name":"COMPLETE DENTURE (2)","credits":3},
+    {"code":"300112130","name":"CROWN AND BRIDGE (2)","credits":3},
+    {"code":"300112140","name":"ORTHODONTICS (2)","credits":3},
+    {"code":"300112150","name":"FIRST AID","credits":2},
+    {"code":"300112160","name":"BASIC LIFE SUPPORT","credits":0}]},
+   {"year": "Second Year", "semester": "Spring Semester", "statedTotal": 17, "courses": [
+    {"code":"300132140","name":"ENTREPRENEURSHIP","credits":3},
+    {"code":"300112210","name":"CROWN AND BRIDGE (3)","credits":3},
+    {"code":"300112220","name":"REMOVABLE PARTIAL DENTURE(3)","credits":3},
+    {"code":"300112230","name":"ADVANCED REMOVABLE PROSTHODONTICS","credits":3},
+    {"code":"300112240","name":"AESTHETICS PROSTHODONTICS","credits":1},
+    {"code":"300112250","name":"DENTAL IMPLANTS","credits":3},
+    {"code":"300112260","name":"ETHICS AND PROFESSIONAL ISSUES","credits":1}]}
+  ],
+  "note": "COMMUNITY SERVICE (000011110, 0 credit hours) is a Colg. Req. course and does not appear in any advisory term."
+ },
+
+ "alternatePlanA": {
+  "note": "The document's 'first one :' plan (block 199). Preserved verbatim from images image36.jpeg, image37.png, image38.png, image39.png and text blocks 218, 247-248. Not merged into the app; see sourceConflict.",
+  "degreeHours": 70,
+  "requirements": {
+   "univReq": {"mustPassAll": true, "courses": [
+    {"code":"040111001","name":"ARABIC LANGUAGE","theoretical":2,"credits":2},
+    {"code":"040511011","name":"PALESTINIAN STUDIES","theoretical":2,"credits":2},
+    {"code":"240111000","name":"COMPUTER SKILLS","theoretical":2,"credits":2}]},
+   "univElec": {"requiredHours": 2, "courses": [],
+    "courseListMissing": "image36.jpeg captures only the selected 'Univ. Req.' tab; the 'Univ. Elec.' tab is visible but its table was never screenshotted. The requirement text survives as block 218: 'Students must pass ( 2 ) credit hours from any of the following courses'. The eligible course list is not in the source, so none is stored."},
+   "colgReq": {"mustPassAll": true, "courses": [
+    {"code":"010611750","name":"ENGLISH FOR DENTAL TECHNOLOGY STUDENT","theoretical":2,"credits":2},
+    {"code":"010611800","name":"ENGLISH FOR DENTAL TECHNOLOGY STUDENT LAB","practical":2,"credits":1,"prerequisites":["010611750"]},
+    {"code":"040212241","name":"ENGLISH COMMUNICATIONS SKILLS","theoretical":2,"credits":2},
+    {"code":"060511021","name":"FIRST AID","theoretical":2,"credits":2},
+    {"code":"080611100","name":"INTRODUCTION TO DENTAL SCIENCE AND DENTAL TERMINOLOGY","theoretical":2,"credits":2},
+    {"code":"080622030","name":"ETHICS AND PROFESSIONAL ISSUES","theoretical":1,"credits":1},
+    {"code":"080622150","name":"MAINTENANCE OF EQUIPMENT AND GENERAL SAFETY IN DENTAL TECHNOLOGY LABORATORIES","theoretical":1,"credits":1},
+    {"code":"170112161","name":"BASIC LIFE SUPPORT (BLS)","credits":0}]},
+   "specReq": {"mustPassAll": true, "courses": [
+    {"code":"080611110","name":"REMOVABLE PARTIAL DENTURE I","theoretical":1,"practical":4,"credits":3},
+    {"code":"080611120","name":"COMPLETE DENTURE I","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611100"]},
+    {"code":"080611130","name":"DENTAL MORPHOLOGY I","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611100"]},
+    {"code":"080611150","name":"CROWN AND BRIDGE I","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611100"]},
+    {"code":"080611350","name":"REMOVABLE PARTIAL DENTURE II","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611100"]},
+    {"code":"080611400","name":"COMPLETE DENTURE II","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611120"]},
+    {"code":"080611450","name":"DENTAL MORPHOLOGY II","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611130"]},
+    {"code":"080611550","name":"CROWN AND BRIDGE II","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611150"]},
+    {"code":"080611650","name":"ORTHODONTICS I","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611100"]},
+    {"code":"080612000","name":"DENTAL MATERIALS","theoretical":2,"practical":2,"credits":3,"prerequisites":["080611100"]},
+    {"code":"080612010","name":"FUNDAMENTAL OF DENTAL TECHNOLOGY","theoretical":2,"practical":2,"credits":3},
+    {"code":"080612050","name":"REMOVABLE PARTIAL DENTURE III","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611350"]},
+    {"code":"080612150","name":"CROWN AND BRIDGE III","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611550"]},
+    {"code":"080612200","name":"ORTHODONTICS II","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611650"]},
+    {"code":"080612550","name":"ADVANCED REMOVABLE PROSTHODONTICS","theoretical":1,"practical":4,"credits":3,"prerequisites":["080611400"]},
+    {"code":"080612600","name":"AESTHETICS PROSTHODONTICS","theoretical":1,"credits":1,"prerequisites":["080612150"]},
+    {"code":"080612650","name":"DENTAL IMPLANTS","theoretical":1,"practical":4,"credits":3,"prerequisites":["080612150","080612550"]}]},
+   "freeElec": {"requiredHours": 2, "courses": [],
+    "sourceText": "Free Elective — Each student must pass ( 2 ) credit hours from any courses offered by the university. (text blocks 247-248)"}
+  }
+ }
+}

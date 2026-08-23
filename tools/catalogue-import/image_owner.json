@@ -1,0 +1,956 @@
+[
+ {
+  "block": 1,
+  "imgs": [
+   "image1.png"
+  ],
+  "kind": "fac",
+  "owner": "Junior College",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 19,
+  "imgs": [
+   "image2.jpeg"
+  ],
+  "kind": "fac",
+  "owner": "Junior College",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 21,
+  "imgs": [
+   "image3.png",
+   "image4.png"
+  ],
+  "kind": "fac",
+  "owner": "Junior College",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 24,
+  "imgs": [
+   "image5.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Assistance",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 66,
+  "imgs": [
+   "image6.png",
+   "image7.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Assistance",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 68,
+  "imgs": [
+   "image8.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Assistance",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 70,
+  "imgs": [
+   "image9.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Assistance",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 73,
+  "imgs": [
+   "image10.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Mobile Application Development",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 102,
+  "imgs": [
+   "image11.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Mobile Application Development",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 104,
+  "imgs": [
+   "image12.jpeg",
+   "image13.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Mobile Application Development",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 106,
+  "imgs": [
+   "image14.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Mobile Application Development",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 108,
+  "imgs": [
+   "image15.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Mobile Application Development",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 111,
+  "imgs": [
+   "image16.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 140,
+  "imgs": [
+   "image17.jpeg",
+   "image18.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 142,
+  "imgs": [
+   "image19.jpeg",
+   "image20.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 144,
+  "imgs": [
+   "image21.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 146,
+  "imgs": [
+   "image22.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 148,
+  "imgs": [
+   "image23.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 150,
+  "imgs": [
+   "image24.png",
+   "image25.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 152,
+  "imgs": [
+   "image26.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 154,
+  "imgs": [
+   "image27.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Property Valuation",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 157,
+  "imgs": [
+   "image28.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Cosmetics and Skincare",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 171,
+  "imgs": [
+   "image29.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Cosmetics and Skincare",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 173,
+  "imgs": [
+   "image30.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Cosmetics and Skincare",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 175,
+  "imgs": [
+   "image31.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Cosmetics and Skincare",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 177,
+  "imgs": [
+   "image32.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Cosmetics and Skincare",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 179,
+  "imgs": [
+   "image33.png",
+   "image34.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Cosmetics and Skincare",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 182,
+  "imgs": [
+   "image35.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 199,
+  "imgs": [
+   "image36.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 218,
+  "imgs": [
+   "image37.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 220,
+  "imgs": [
+   "image38.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 247,
+  "imgs": [
+   "image39.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 250,
+  "imgs": [
+   "image40.jpeg",
+   "image41.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 252,
+  "imgs": [
+   "image42.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 254,
+  "imgs": [
+   "image43.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 256,
+  "imgs": [
+   "image44.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 258,
+  "imgs": [
+   "image45.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 260,
+  "imgs": [
+   "image46.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 262,
+  "imgs": [
+   "image47.png",
+   "image48.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Dental Technology",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 265,
+  "imgs": [
+   "image49.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Occupational Health and Safety",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 276,
+  "imgs": [
+   "image50.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Occupational Health and Safety",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 278,
+  "imgs": [
+   "image51.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Occupational Health and Safety",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 295,
+  "imgs": [
+   "image52.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Occupational Health and Safety",
+  "faculty": "Junior College"
+ },
+ {
+  "block": 308,
+  "imgs": [
+   "image53.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Environmental Sciences and Technology",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 388,
+  "imgs": [
+   "image54.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Hearing and Speech - Specialization in Speech, Language and Hearing Disorders and Therapy",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 451,
+  "imgs": [
+   "image55.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Medical Imaging",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 520,
+  "imgs": [
+   "image56.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Occupational Therapy",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 583,
+  "imgs": [
+   "image57.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Prosthetics and Orthotics",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 639,
+  "imgs": [
+   "image58.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Hearing and Speech - Specialization in Audiology",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 657,
+  "imgs": [
+   "image59.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Management – Specialization in Environmental Management and Recycling",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 715,
+  "imgs": [
+   "image60.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Medical Laboratory Sciences",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 789,
+  "imgs": [
+   "image61.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Physio-Therapy",
+  "faculty": "Faculty of Allied Medical Sciences"
+ },
+ {
+  "block": 889,
+  "imgs": [
+   "image62.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Industrial Product Design",
+  "faculty": "Faculty of Architecture and Art"
+ },
+ {
+  "block": 947,
+  "imgs": [
+   "image63.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Virtual Reality Arts",
+  "faculty": "Faculty of Architecture and Art"
+ },
+ {
+  "block": 1000,
+  "imgs": [
+   "image64.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Interior Architecture",
+  "faculty": "Faculty of Architecture and Art"
+ },
+ {
+  "block": 1121,
+  "imgs": [
+   "image65.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Education for Upper Basic Level - Teaching Arabic",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1142,
+  "imgs": [
+   "image66.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Education for Upper Basic Level - Teaching Mathematics",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1172,
+  "imgs": [
+   "image67.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Arabic Language and Media",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1230,
+  "imgs": [
+   "image68.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Educational Administration",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1243,
+  "imgs": [
+   "image69.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Languages",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1330,
+  "imgs": [
+   "image70.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Teaching English",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1432,
+  "imgs": [
+   "image71.png"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Education for Upper Basic Level - Teaching English",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1468,
+  "imgs": [
+   "image72.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Diploma in Education for Upper Basic Level - Teaching Science",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1504,
+  "imgs": [
+   "image73.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Basic Elementary Education",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1623,
+  "imgs": [
+   "image74.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in English Language",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1712,
+  "imgs": [
+   "image75.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Social Work",
+  "faculty": "Faculty of Arts and Education"
+ },
+ {
+  "block": 1728,
+  "imgs": [
+   "image76.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Accounting",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 1793,
+  "imgs": [
+   "image77.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Economy and Islamic Banking",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 1866,
+  "imgs": [
+   "image78.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Human Resources Management",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 1929,
+  "imgs": [
+   "image79.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Marketing",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 1950,
+  "imgs": [
+   "image80.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Operations Management - Specialization in Management Information Systems (MIS)",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 2022,
+  "imgs": [
+   "image81.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Business Administration",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 2095,
+  "imgs": [
+   "image82.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Financial and Banking Sciences",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 2105,
+  "imgs": [
+   "image83.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Land and Property Management",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 2159,
+  "imgs": [
+   "image84.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Operations Management - Specialization in Hospitals and Health Care Management",
+  "faculty": "Faculty of Business"
+ },
+ {
+  "block": 2197,
+  "imgs": [
+   "image85.png"
+  ],
+  "kind": "prog",
+  "owner": "Advanced Residency in Prosthodontics",
+  "faculty": "Faculty of Dentistry"
+ },
+ {
+  "block": 2302,
+  "imgs": [
+   "image86.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Dental Technology",
+  "faculty": "Faculty of Dentistry"
+ },
+ {
+  "block": 2360,
+  "imgs": [
+   "image87.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Residency Program in Orthodontics",
+  "faculty": "Faculty of Dentistry"
+ },
+ {
+  "block": 2396,
+  "imgs": [
+   "image88.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Doctor of Dental Surgery",
+  "faculty": "Faculty of Dentistry"
+ },
+ {
+  "block": 2566,
+  "imgs": [
+   "image89.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in AI and Robotics Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 2569,
+  "imgs": [
+   "image90.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Civil Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 2711,
+  "imgs": [
+   "image91.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Cybersecurity Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 2876,
+  "imgs": [
+   "image92.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Mechatronics Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 2948,
+  "imgs": [
+   "image93.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Public Safety Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 2982,
+  "imgs": [
+   "image94.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Architecture Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 3145,
+  "imgs": [
+   "image95.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Computer Systems Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 3325,
+  "imgs": [
+   "image96.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Electrical Engineering and Renewable Energy",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 3543,
+  "imgs": [
+   "image97.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Medical Equipment Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 3686,
+  "imgs": [
+   "image98.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Telecommunications Engineering",
+  "faculty": "Faculty of Engineering"
+ },
+ {
+  "block": 3922,
+  "imgs": [
+   "image99.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Computer Networks - Minor Information Security",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4104,
+  "imgs": [
+   "image100.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Computer Science - Minor Computer Information Technology",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4123,
+  "imgs": [
+   "image101.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Cyber Security",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4284,
+  "imgs": [
+   "image102.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Multimedia Technology",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4444,
+  "imgs": [
+   "image103.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Computer Science",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4633,
+  "imgs": [
+   "image104.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Computer Science - Specialization in Game Design and Development",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4768,
+  "imgs": [
+   "image105.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Geographic Information Systems (GIS)",
+  "faculty": "Faculty of Information Technology"
+ },
+ {
+  "block": 4948,
+  "imgs": [
+   "image106.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Fiqh And Law",
+  "faculty": "Faculty of Law"
+ },
+ {
+  "block": 5121,
+  "imgs": [
+   "image107.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Law - Concentration on Law in English",
+  "faculty": "Faculty of Law"
+ },
+ {
+  "block": 5313,
+  "imgs": [
+   "image108.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Law",
+  "faculty": "Faculty of Law"
+ },
+ {
+  "block": 5532,
+  "imgs": [
+   "image109.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Biomedical Sciences",
+  "faculty": "Faculty of Medicine"
+ },
+ {
+  "block": 5597,
+  "imgs": [
+   "image110.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Doctor of Medicine",
+  "faculty": "Faculty of Medicine"
+ },
+ {
+  "block": 5865,
+  "imgs": [
+   "image111.jpeg"
+  ],
+  "kind": "fac",
+  "owner": "Faculty of Modern Media",
+  "faculty": "Faculty of Modern Media"
+ },
+ {
+  "block": 5954,
+  "imgs": [
+   "image112.png"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Public Relations",
+  "faculty": "Faculty of Modern Media"
+ },
+ {
+  "block": 6040,
+  "imgs": [
+   "image113.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Modern Media - Specialization in Digital Media and Communication",
+  "faculty": "Faculty of Modern Media"
+ },
+ {
+  "block": 6095,
+  "imgs": [
+   "image114.jpeg"
+  ],
+  "kind": "prog",
+  "owner": "Bachelor in Modern Media - Specialization in Digital Media and Communication",
+  "faculty": "Faculty of Modern Media"
+ }
+]
