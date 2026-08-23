@@ -5403,7 +5403,32 @@ body.has-sidebar .fix-panel{left:calc(230px + 16px);}
 /* On a phone both panels become bottom sheets — a 370px-wide floating card
    anchored to a corner is unusable at 360px viewport width. */
 @media (max-width:560px){
-  .asst-panel, .fix-panel{
+  /* The assistant takes the screen. It was a 370px card floating over the
+     plan with roughly a third of the viewport for a conversation — a chat
+     needs room to be read back, and every other dialog in this app is
+     already a full page on a phone. Fix stays a floating panel: it is a
+     status readout you glance at, not something you hold a conversation in.
+     100dvh, not vh, for the same reason .modal-card uses it — vh counts the
+     space behind the browser's own toolbar, which is where the composer
+     would otherwise end up. */
+  .asst-panel{
+    inset:0; left:0; right:0; top:0; bottom:0;
+    width:auto; max-width:none; height:100dvh; max-height:100dvh;
+    border:none; border-radius:0;
+  }
+  .asst-panel .asst-head{
+    padding-top:calc(12px + env(safe-area-inset-top, 0px));
+  }
+  .asst-panel .asst-log{flex:1; min-height:0;}
+  .asst-panel .asst-form{
+    padding-bottom:calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  /* Nothing floats over a full-screen conversation. */
+  body:has(.asst-panel.open) .sb-tabbar,
+  body:has(.asst-panel.open) .asst-launcher,
+  body:has(.asst-panel.open) .fix-launcher{display:none;}
+
+  .fix-panel{
     left:8px; right:8px; width:auto;
     bottom:74px; max-height:calc(100vh - 130px);
   }
