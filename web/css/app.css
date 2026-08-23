@@ -3212,6 +3212,27 @@
   .ct-chip:hover{border-color:var(--accent);color:var(--text);}
   .ct-chip-on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
   .ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+
+  /* Directory sections. Same headed-shelf treatment the Course Library uses,
+     so two lists in the same app that group things group them the same way.
+     The header sticks while its own section scrolls — on a long section the
+     heading leaves the screen well before its last card does, and after
+     that every card looks alike again. */
+  .ct-group + .ct-group{margin-top:16px;}
+  .ct-group-head{
+    position:sticky; top:0; z-index:1;
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    padding:6px 0 5px; margin-bottom:8px;
+    background:var(--panel); border-bottom:1px solid var(--accent);
+  }
+  .ct-group-label{
+    font-size:10.5px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--accent);
+  }
+  .ct-group-count{
+    font-size:10.5px; font-weight:700; color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
   .ct-card{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel);}
   .ct-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
   .ct-avatar{
@@ -6521,6 +6542,10 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
   .ct-chips{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px;}
   .ct-chip{flex:0 0 auto;}
   .ct-grid{display:flex; flex-direction:column; gap:8px;}
+  /* var(--panel) matches the card this scrolls inside; a sticky header has
+     to be opaque to cover the rows passing under it. */
+  .ct-group-head{background:var(--panel); border-bottom:none; padding:8px 2px 6px; margin-bottom:2px;}
+  .ct-group + .ct-group{margin-top:8px;}
   .ct-card{
     border:none; border-radius:14px; padding:13px 14px;
     box-shadow:0 4px 14px rgba(0,0,0,.22);

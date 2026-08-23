@@ -93,6 +93,14 @@
     return chips;
   }
 
+  // A directory, not a stack. 27 identical cards in one flat grid meant
+  // finding the registration office was reading every instructor first —
+  // the category was on each card as a small avatar icon and nowhere as
+  // structure. Grouped under their own headed sections, in the order
+  // contacts.json declares its categories, each stating its count.
+  //
+  // Same shelf treatment the Course Library uses, deliberately: two lists in
+  // the same app that group things should not group them two different ways.
   function listHtml(data, rtl){
     var q = search.trim().toLowerCase();
     var rows = data.contacts.filter(function(c){
@@ -101,7 +109,29 @@
     if(!rows.length){
       return '<p class="ct-empty">' + t('empty', rtl) + '</p>';
     }
-    return '<div class="ct-grid">' + rows.map(function(c){ return cardHtml(c, data, rtl); }).join('') + '</div>';
+    var byCat = {};
+    rows.forEach(function(c){ (byCat[c.category] = byCat[c.category] || []).push(c); });
+    var order = Object.keys(data.categories || {}).filter(function(k){ return byCat[k]; });
+    // Anything carrying a category the file does not declare still gets
+    // listed, at the end, rather than vanishing from the directory.
+    Object.keys(byCat).forEach(function(k){ if(order.indexOf(k) === -1){ order.push(k); } });
+
+    // One section is the flat grid this replaced with a redundant header on
+    // top — which is exactly what filtering to a single chip produces.
+    if(order.length === 1){
+      return '<div class="ct-grid">' + rows.map(function(c){ return cardHtml(c, data, rtl); }).join('') + '</div>';
+    }
+    return order.map(function(key){
+      var cat = (data.categories || {})[key] || {};
+      var label = rtl ? (cat.ar || key) : (cat.en || key);
+      return '<section class="ct-group">' +
+        '<div class="ct-group-head">' +
+          '<span class="ct-group-label">' + (cat.icon ? cat.icon + ' ' : '') + esc(label) + '</span>' +
+          '<span class="ct-group-count">' + byCat[key].length + '</span>' +
+        '</div>' +
+        '<div class="ct-grid">' + byCat[key].map(function(c){ return cardHtml(c, data, rtl); }).join('') + '</div>' +
+        '</section>';
+    }).join('');
   }
 
   function render(prefix){
