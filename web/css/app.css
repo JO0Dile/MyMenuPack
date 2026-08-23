@@ -6114,6 +6114,9 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
 .ab-row-value{font-size:13.5px; line-height:1.5; color:var(--text); overflow-wrap:anywhere;}
 .ab-row-value a{color:var(--accent); text-decoration:none; font-weight:700;}
 .ab-row-value a:hover{text-decoration:underline;}
+/* A fax number sits under its campus switchboard: same row, quieter, and
+   never a link, because nothing dials a fax. */
+.ab-sub{font-size:12px; color:var(--muted); font-weight:600;}
 .ab-row-value code{
   font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px;
   background:var(--search-bg); border-radius:6px; padding:2px 7px;

@@ -5,10 +5,13 @@
 // disclaimer, a made-in-Palestine line, and a row of links — under every
 // screen of the picker. It is one button now, and this is what opens.
 //
-// Everything factual here (the university's name and website) comes from
+// Everything factual about the university here — its name, website, campus
+// switchboards, fax lines and public inbox — comes from
 // data/aaup/university.json via APP_UNIVERSITIES, so it cannot drift from
-// the rest of the app. The credits and contact details are the maintainer's
-// own, given deliberately.
+// the rest of the app. Those are institutional numbers the university
+// publishes itself; the Contacts screen still ships no phone number at all,
+// because the numbers there would belong to individual people. The credits
+// and the maintainer's own number are given deliberately.
 (function(){
   'use strict';
 
@@ -35,6 +38,8 @@
       discord: 'Discord',
       phone: 'Phone',
       uniPhone: 'University switchboard',
+      uniEmail: 'University email',
+      fax: 'fax',
       more: 'More ways to reach us are coming.'
     },
     ar: {
@@ -47,6 +52,8 @@
       discord: 'ديسكورد',
       phone: 'هاتف',
       uniPhone: 'مقسم الجامعة',
+      uniEmail: 'بريد الجامعة',
+      fax: 'فاكس',
       more: 'وسائل تواصل أخرى قريبًا.'
     }
   };
@@ -54,6 +61,22 @@
   function uni(){
     var all = window.APP_UNIVERSITIES || {};
     return all.aaup || all[Object.keys(all)[0]] || null;
+  }
+
+  // The record carries the university's name in both languages; the Arabic
+  // screen should read the Arabic one when there is one.
+  function uniName(u, rtl){
+    var n = u.name;
+    if(!n) return '';
+    if(typeof n === 'string') return n;
+    return (rtl && n.ar) ? n.ar : (n.en || n.ar || '');
+  }
+
+  // A tel: href must not carry spaces; the visible text keeps them, because
+  // that is the form the university prints and the form people recognise.
+  function telLink(num){
+    var n = String(num);
+    return '<a href="tel:' + esc(n.replace(/[^+0-9]/g, '')) + '">' + esc(n) + '</a>';
   }
 
   function row(iconKey, label, valueHtml){
@@ -74,18 +97,41 @@
       ? '<a href="' + esc(site) + '" target="_blank" rel="noopener noreferrer">' + esc(host) + '</a>'
       : esc(host);
 
+    // A campus contributes one row: its switchboard as a tel: link, with the
+    // fax number under it when the record carries one. A campus with no
+    // phone on file is skipped rather than printed as an empty row.
+    var campuses = (u && u.contacts && u.contacts.campuses) || [];
+    var campusRows = '';
+    for(var i = 0; i < campuses.length; i++){
+      var cm = campuses[i];
+      if(!cm || !cm.phone) continue;
+      var cname = rtl && cm.nameAr ? cm.nameAr : (cm.name || '');
+      var value = telLink(cm.phone);
+      if(cm.fax){
+        value += '<br><span class="ab-sub">' + esc(t.fax) + ' ' + esc(cm.fax) + '</span>';
+      }
+      campusRows += row('mobile', cname || t.uniPhone, value);
+    }
+
+    var uniEmail = u && u.contacts && u.contacts.email;
+    var emailRow = uniEmail
+      ? row('mail', t.uniEmail,
+          '<a href="mailto:' + esc(uniEmail) + '">' + esc(uniEmail) + '</a>')
+      : '';
+
     return (window.__backBarHTML ? window.__backBarHTML('', 'aboutOverlay', rtl) : '') +
       '<h2 class="mh" style="margin-top:0;">' + ic('people', 20) + esc(t.title) + '</h2>' +
       '<p class="ab-lead">' + esc(t.what) + '</p>' +
       '<p class="ab-flag"><span class="ab-flag-mark" aria-hidden="true">🇵🇸</span>' + esc(t.madeIn) + '</p>' +
       '<div class="ab-rows">' +
         (u ? row('university', t.uniLabel,
-          '<b>' + esc(u.name && u.name.en ? u.name.en : (u.name || '')) + '</b><br>' + siteHtml) : '') +
+          '<b>' + esc(uniName(u, rtl)) + '</b><br>' + siteHtml) : '') +
+        campusRows +
+        emailRow +
         row('person', t.makerLabel,
           '<b>' + esc(MAKER.name) + '</b><br>' + esc(MAKER.handles.join(' · '))) +
         row('speech', t.discord, '<code>' + esc(MAKER.discord) + '</code>') +
-        row('mobile', t.phone,
-          '<a href="tel:' + esc(MAKER.phone.replace(/\s+/g, '')) + '">' + esc(MAKER.phone) + '</a>') +
+        row('mobile', t.phone, telLink(MAKER.phone)) +
       '</div>' +
       '<p class="form-note ab-more">' + esc(t.more) + '</p>';
   }
