@@ -4752,6 +4752,10 @@
   @media (max-width:900px){
     .app-sidebar{transform:translateX(-100%);}
     .app-sidebar.open{transform:translateX(0);}
+    /* Shown between 721 and 900px, where the sidebar collapses but the
+       bottom tab bar (which owns "More") has not appeared yet. Below 720px
+       both existed and opened the same drawer, so the screen carried two
+       identical menu buttons — see the rule after this block. */
     .sb-toggle-btn{display:block;}
     .sb-overlay.open{display:block;}
     body.has-sidebar .dashboard-page,
@@ -6276,6 +6280,11 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    ========================================================================== */
 .sb-tabbar{display:none;}
 @media (max-width:720px){
+  /* The bottom bar's own "More" tab opens this exact drawer, so the floating
+     hamburger at the top-left is the same button twice on the same screen.
+     The tab bar is the one a thumb can reach, so it is the one that stays. */
+  body.has-sidebar .sb-toggle-btn{display:none;}
+
   /* Floating glass pill instead of a bar flush with the screen edge — the
      backdrop-filter blur is the point (content scrolling underneath stays
      legibly visible through it, the way a real app's translucent chrome

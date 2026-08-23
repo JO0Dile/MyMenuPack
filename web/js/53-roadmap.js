@@ -688,6 +688,18 @@
   // seen) opens straight to the Dashboard as always.
   function openIfFirstVisit(prefix){
     if(hasSeen(prefix)) return;
+    // A brand-new plan opens this screen at 0%: an empty track, every
+    // category reading "0 earned", and a graduation estimate built on no
+    // information — shown before the student has seen the plan it describes.
+    // It is worth showing once there is a path to show. Deliberately does
+    // NOT mark the plan seen, so the first visit that HAS progress still
+    // gets it.
+    var root = document.getElementById('page-' + prefix);
+    var progress = window.__getProgress ? window.__getProgress() : {};
+    var any = root && Array.prototype.some.call(
+      root.querySelectorAll('.course[id]:not(.course-removed)'),
+      function(el){ return !!progress[el.id]; });
+    if(!any) return;
     open(prefix);
   }
 
