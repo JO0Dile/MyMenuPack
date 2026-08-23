@@ -3730,6 +3730,28 @@
   .lib-list{max-height:300px;overflow-y:auto;}
   .lib-add-btn{padding:3px 10px;font-size:11px;}
 
+  /* Shelves. A plan's courses are grouped by the requirement each satisfies,
+     so the list is scanned by section rather than read end to end. The
+     header is sticky inside the scrolling list — on a 130-course plan the
+     shelf you are reading scrolls out of view long before its last row
+     does, and then every row looks the same again. */
+  .lib-shelf + .lib-shelf{margin-top:14px;}
+  .lib-shelf-head{
+    position:sticky; top:0; z-index:1;
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    padding:6px 0 5px; margin-bottom:2px;
+    background:var(--panel); border-bottom:1px solid var(--accent);
+  }
+  .lib-shelf-label{
+    font-size:10.5px; font-weight:800; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--accent);
+  }
+  .lib-shelf-count{
+    font-size:10.5px; font-weight:700; color:var(--text-dim);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .lib-row-name{min-width:0;}
+
   /* Settings modal's top tab bar — four groups (Account/Preferences/Data/
      Help) instead of one long scroll of every setting stacked together.
      Scrolls horizontally rather than wrapping on the narrowest phones: a
@@ -6307,6 +6329,20 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     font-size:13px;
   }
   .lib-add-btn{border-radius:999px; flex:0 0 auto;}
+
+  /* On phone the rows are already elevated cards with gaps between them, so
+     a shelf reads as a group without a rule under its header — the header
+     just needs to sit clear of the card below it and stay put while the
+     shelf scrolls. */
+  .lib-shelf-body{display:flex; flex-direction:column; gap:8px;}
+  .lib-shelf-head{
+    /* var(--panel), matching the modal card this scrolls inside — the sticky
+       header has to be opaque to cover the rows passing under it, and any
+       other value paints a visibly darker band across the list. */
+    background:var(--panel); border-bottom:none;
+    padding:8px 2px 6px; margin:0 0 2px;
+  }
+  .lib-shelf + .lib-shelf{margin-top:6px;}
 }
 
 /* ==========================================================================

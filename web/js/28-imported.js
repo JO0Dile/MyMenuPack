@@ -1752,6 +1752,17 @@
   // already exists somewhere before typing it in again with a slightly
   // different id. Read-only; it doesn't add anything to the plan by
   // itself. ----------
+  // Just the plan's name. planLabel() below appends the "small" subtitle so
+  // two plans sharing a big name stay distinguishable in a dropdown — but on
+  // the Library's own heading that subtitle is the degree line ("B.Sc. · 121
+  // CH (as stated) · Program 29033"), which wrapped the title onto three
+  // lines to tell a student which plan they are already inside.
+  function planTitle(prefix){
+    var label = planLabel(prefix);
+    var cut = label.indexOf(' — ');
+    return cut === -1 ? label : label.slice(0, cut);
+  }
+
   function planLabel(prefix){
     var BUILT_IN = { robotics: 'AI & Robotics', cybersecurity: 'AI & Cybersecurity', medical: 'AI & Medical Sciences', cs: 'Computer Science' };
     if(BUILT_IN[prefix]) return BUILT_IN[prefix];
@@ -1782,11 +1793,22 @@
     Object.keys(data).forEach(function(prefix){
       var info = data[prefix].courseInfo || {};
       Object.keys(info).forEach(function(slug){
-        out.push({ prefix: prefix, slug: slug, name: info[slug].name, ar: info[slug].ar, cr: info[slug].cr, num: info[slug].num });
+        out.push({ prefix: prefix, slug: slug, name: info[slug].name, ar: info[slug].ar,
+                    cr: info[slug].cr, num: info[slug].num, req: info[slug].req || '' });
       });
     });
     return out;
   }
+  // Same order and wording the Degree Audit and My Path use (js/53-roadmap.js
+  // BUCKET_ORDER / BUCKET_META), so a bucket is named identically wherever a
+  // student meets it.
+  var LIB_BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec', 'supportCourses'];
+  var LIB_BUCKET_LABEL = {
+    univReq: 'Univ. Req.', univElec: 'Univ. Elec.', colgReq: 'Colg. Req.',
+    specReq: 'Spec. Req.', specElec: 'Spec. Elec.', freeElec: 'Free Elec.',
+    supportCourses: 'Support', _none: 'Not categorised'
+  };
+
   function openLibrary(currentPlanId){
     var overlay = document.getElementById('devModalOverlay');
     var body = document.getElementById('devModalBody');
@@ -1826,6 +1848,37 @@
       var list = courses.filter(function(c){ return c.prefix === browsePrefix; });
       var currentIsSame = browsePrefix === currentPlanId;
 
+      // Shelves, not one undifferentiated scroll. A plan's courses are
+      // grouped by the requirement each one satisfies — the university's own
+      // taxonomy, now that every course carries it — so browsing answers the
+      // question a student actually arrives with ("what counts as a Spec.
+      // Elec.?") instead of making them read 130 rows to find out. Each shelf
+      // states its own count and hours, and courses whose plan published no
+      // requirement data fall into one honest "Not categorised" shelf rather
+      // than being silently assigned to a bucket nobody said they were in.
+      function shelvesFor(filtered){
+        var byBucket = {};
+        filtered.forEach(function(c){
+          var k = LIB_BUCKET_ORDER.indexOf(c.req) !== -1 ? c.req : '_none';
+          (byBucket[k] = byBucket[k] || []).push(c);
+        });
+        return LIB_BUCKET_ORDER.concat(['_none']).filter(function(k){
+          return byBucket[k] && byBucket[k].length;
+        }).map(function(k){
+          var items = byBucket[k];
+          var hours = items.reduce(function(a, c){ return a + (Number(c.cr) || 0); }, 0);
+          return { key: k, label: LIB_BUCKET_LABEL[k], items: items, hours: hours };
+        });
+      }
+
+      function rowHtml(c){
+        return '<div class="lib-row">' +
+          '<span class="lib-row-name">' + window.__escapeHtml(c.name) +
+            ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
+          (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
+          '</div>';
+      }
+
       function renderList(filterText){
         var f = (filterText || '').toLowerCase();
         // Match the course code as well as the name — the code is what a
@@ -1834,16 +1887,23 @@
           return !f || c.name.toLowerCase().indexOf(f) !== -1 || String(c.slug).toLowerCase().indexOf(f) !== -1;
         });
         if(filtered.length === 0){ return '<p class="ex-note">No matching courses.</p>'; }
-        return filtered.map(function(c){
-          return '<div class="lib-row">' +
-            '<span>' + c.name + ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
-            (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
+        var shelves = shelvesFor(filtered);
+        // One shelf and nothing to compare it against is not a shelf — that
+        // is the flat list this replaced, with a redundant header on top.
+        if(shelves.length === 1){ return shelves[0].items.map(rowHtml).join(''); }
+        return shelves.map(function(sh){
+          return '<div class="lib-shelf">' +
+            '<div class="lib-shelf-head">' +
+              '<span class="lib-shelf-label">' + sh.label + '</span>' +
+              '<span class="lib-shelf-count">' + sh.items.length + ' · ' + sh.hours + 'H</span>' +
+            '</div>' +
+            '<div class="lib-shelf-body">' + sh.items.map(rowHtml).join('') + '</div>' +
             '</div>';
         }).join('');
       }
 
       body.innerHTML =
-        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('book', 20) + planLabel(browsePrefix) + '</h2>' +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('book', 20) + window.__escapeHtml(planTitle(browsePrefix)) + '</h2>' +
         '<button type="button" class="home-btn" id="libBack" style="margin-bottom:10px;">' + window.AAUP_ICONS.preview('shuffle', 14) + 'Change plan</button>' +
         (currentIsSame ? '<p class="form-note">This is the plan you\u2019re already editing.</p>' : '') +
         '<div class="form-field"><input type="text" id="libSearch" placeholder="Search by name or course code…"></div>' +
