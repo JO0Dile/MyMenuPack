@@ -38,7 +38,12 @@
   // ids (the actual ones are onboardingWizardOverlay and storyStackOverlay;
   // the other two never existed), so neither dialog was actually being
   // skipped despite the comment saying they would be.
-  var SKIP = ['onboardingWizardOverlay', 'storyStackOverlay'];
+  //
+  // englishLevelOverlay joins them for a different reason: it is the one
+  // dialog in the app that deliberately has no way out but an answer, and a
+  // "Back" bar injected into it would be exactly the escape hatch it exists
+  // without.
+  var SKIP = ['onboardingWizardOverlay', 'storyStackOverlay', 'englishLevelOverlay'];
 
   function isRtlNow(card){
     if(card && card.getAttribute('dir') === 'rtl') return true;

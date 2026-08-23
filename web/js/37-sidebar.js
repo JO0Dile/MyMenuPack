@@ -517,10 +517,27 @@
   }
 
   function prefsTabHtml(r, selectedPlan, isRtlNow){
+    // The English placement is asked once, on the way in, and cannot be
+    // skipped there (js/77-english-level.js). This is the way to correct it
+    // — a one-shot question with no way back would be a trap, and a student
+    // who mis-taps it would be looking at the wrong degree total forever.
+    var engLabel = window.AAUP_ENGLISH ? window.AAUP_ENGLISH.label(r) : '';
+    var engRow = (selectedPlan && window.AAUP_ENGLISH && engLabel)
+      ? '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('language', 18) +
+          (r ? 'مستوى الإنجليزي' : 'English level') + '</h3>' +
+        '<p class="form-note" style="margin-top:0;">' + (r
+          ? 'المستويات اللي تحت مستواك بتطلع من خطتك وبتوقف تظهر كمساقات باقية عليك. مجموع ساعات التخصص المنشور ما بتغيّر.'
+          : 'The levels below yours leave your plan and stop showing as courses you still owe. Your degree’s published total is unchanged.') + '</p>' +
+        '<p style="font-size:12.5px;margin:6px 0 8px;">' + (r ? 'مستواك: ' : 'Placed at: ') +
+          '<b>' + window.__escapeHtml(engLabel) + '</b></p>' +
+        '<div class="form-actions" style="justify-content:flex-start;">' +
+        '<button type="button" class="home-btn" id="setEnglishBtn">' + window.AAUP_ICONS.preview('pen', 14) +
+          (r ? 'تغيير' : 'Change') + '</button></div>'
+      : '';
     return themePickerHtml(r) + sizePickerHtml(r) +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;margin-top:14px;">' +
       (selectedPlan ? '<button type="button" class="home-btn" id="setLangBtn">' + window.AAUP_ICONS.preview('globe', 14) + (isRtlNow ? 'English' : 'العربية') + '</button>' : '') +
-      '</div>';
+      '</div>' + engRow;
   }
 
   function dataTabHtml(r, devUnlocked){
@@ -533,7 +550,7 @@
         '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('globe', 18) + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
         '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
-        '<button type="button" class="home-btn" id="setSyncBtn">🔄 ' + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
+        '<button type="button" class="home-btn" id="setSyncBtn">' + window.AAUP_ICONS.preview('refresh', 14) + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
         '</div>' +
         '<p class="form-note" id="setSyncStatus" style="margin-top:4px;">' + (window.AAUP_SYNC ? window.AAUP_SYNC.lastSyncLabel() : '') + '</p>'
       ) : '') +
@@ -647,6 +664,16 @@
         if(isImported){ window.AAUP_IMPORTED.toggleLang(selectedPlan); }
         else if(window.toggleLang){ window.toggleLang(selectedPlan); }
         renderSettingsBody(body); // refresh so the button label reflects the new state
+      });
+    }
+    if(document.getElementById('setEnglishBtn')){
+      document.getElementById('setEnglishBtn').addEventListener('click', function(){
+        // Close Settings first: the placement question deliberately has no
+        // way out but its four options, and it must not open behind a dialog
+        // whose ✕ would then be the only thing on top of it.
+        var ov = document.getElementById('devModalOverlay');
+        if(ov) ov.classList.remove('open');
+        if(window.AAUP_ENGLISH) window.AAUP_ENGLISH.change(selectedPlan);
       });
     }
     if(document.getElementById('setExportBtn')){

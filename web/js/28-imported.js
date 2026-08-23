@@ -1489,6 +1489,14 @@
       window.AAUP_COMMUNITY.refreshAllCommunityBadges();
       if(window.AAUP_COMMUNITY.syncLive) window.AAUP_COMMUNITY.syncLive(id);
     }
+    // A course the student dropped out of their own plan (js/12-removed.js —
+    // placed out of Intermediate English, and so on) is marked by adding a
+    // class to its card. render() rebuilds every card from scratch, so that
+    // class has to be re-applied here or it survives exactly until the next
+    // tick of a checkbox. It never was, which meant removing a course from
+    // an imported plan appeared to work and silently came back — and every
+    // plan in the app is an imported plan.
+    if(window.__applyRemovedCourses){ window.__applyRemovedCourses(id); }
     if(window.__refreshCollapse){ window.__refreshCollapse(id); }
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }

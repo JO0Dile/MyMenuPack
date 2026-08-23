@@ -97,6 +97,12 @@
     // plan data these rules read has finished registering.
     if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
     if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'studyplan'); }
+    // Before the tour, and before anything else can be read as an answer:
+    // which English level this student was placed into decides how many
+    // hours their degree actually is (js/77-english-level.js). It asks once
+    // and only on a plan that has English levels in it; after that this is
+    // just re-applying an answer already given.
+    if(window.AAUP_ENGLISH){ window.AAUP_ENGLISH.ensure(prefix); }
     if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('studyplan'); }
   }
 
