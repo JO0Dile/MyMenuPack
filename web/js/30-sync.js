@@ -54,6 +54,13 @@
       // every course synced from the online feed showed "-" for its course
       // number in the popup and couldn't be found by searching its code.
       if(c.courseNumber != null){ out.courseNumber = esc(String(c.courseNumber)).slice(0, 30); }
+      // The university's requirement bucket. Like courseNumber above, this
+      // sanitizer is a strict whitelist, so a field that is not named here is
+      // silently dropped — which is exactly how every synced course lost its
+      // course number once already.
+      if(window.__REQUIREMENT_KEYS && window.__REQUIREMENT_KEYS.indexOf(c.requirement) !== -1){
+        out.requirement = c.requirement;
+      }
       return out;
     }) : [];
     var prerequisites = Array.isArray(fp.prerequisites) ? fp.prerequisites.slice(0, 800).map(function(pair){
@@ -79,6 +86,8 @@
       structure: { years: years },
       courses: courses,
       prerequisites: prerequisites,
+      requirementHours: window.__cleanRequirementHours
+        ? window.__cleanRequirementHours(fp.requirementHours) : {},
       official: true,
       feedVersion: Number(fp.version) || 1,
       importedAt: new Date().toISOString()

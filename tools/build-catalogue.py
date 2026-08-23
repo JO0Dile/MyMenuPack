@@ -79,6 +79,14 @@ def shape_plan(major, scales_by_college, colleges):
             'ar': c.get('nameAr') or '',
             'creditHours': float(c.get('credits') or 0),
             'category': CATEGORY_OUT.get(c.get('category'), 'core'),
+            # The university's own requirement bucket, when the published plan
+            # for this program says which one it is. `category` above is a
+            # DISPLAY choice (what colour the card is); this is the taxonomy the
+            # student portal and the degree audit actually use, and the two are
+            # not the same thing. Absent where no published plan covers the
+            # major — the app falls back to guessing from `category` there, as
+            # it always has.
+            'requirement': c.get('requirement') or '',
             'yearId': None if c.get('year') is None else f"y{c['year']}",
             'semester': None if c.get('semester') is None else f"s{c['semester']}",
             'courseNumber': c.get('code') or '',
@@ -114,6 +122,13 @@ def shape_plan(major, scales_by_college, colleges):
         },
         'bio': {'en': major.get('bio') or '', 'ar': major.get('bioAr') or ''},
         'degreeHours': major.get('degreeHours'),
+        # How many hours each requirement bucket needs, from the published
+        # plan. This is what a bucket's total must be — NOT the sum of the
+        # cards drawn in it. An elective pool lists every option a student may
+        # pick from, so summing its cards reports 48 hours for a 9-hour
+        # requirement; and a plan that is short a slot reports 6 where the
+        # university requires 8. Both were happening, and both were invisible.
+        'requirementHours': major.get('requirementHours') or {},
         'sortOrder': sort_order_of(major.get('sortOrder')),
         'freeElectiveSuggestions': major.get('freeElectiveSuggestions') or [],
         'gradingScale': scale,

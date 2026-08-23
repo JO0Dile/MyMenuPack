@@ -56,6 +56,24 @@ window.__normalizeSemester = function(s){
 // practice, and its strings feed the same innerHTML render paths as
 // everything else. Idempotent (see __cleanText), so already-clean plans
 // pass through byte-identical and re-sanitizing is always safe.
+// The university's requirement buckets, in the order a degree audit lists them.
+// Shared by both sanitizers and by the roadmap, so the three cannot drift.
+window.__REQUIREMENT_KEYS = ['univReq','univElec','colgReq','specReq','specElec','freeElec','supportCourses'];
+
+// Hours-per-bucket off a plan, reduced to known keys and finite non-negative
+// numbers. A plan arrives from a feed or a shared file, so this is untrusted
+// input like everything else here; and a bogus value would not throw, it would
+// quietly become a student's degree total.
+window.__cleanRequirementHours = function(h){
+  var out = {};
+  if(!h || typeof h !== 'object') return out;
+  window.__REQUIREMENT_KEYS.forEach(function(k){
+    var n = Number(h[k]);
+    if(isFinite(n) && n >= 0 && n <= 400) out[k] = n;
+  });
+  return out;
+};
+
 window.__sanitizeImportedPlan = function(p){
   if(!p || typeof p !== 'object') return p;
   var clean = window.__cleanText;
@@ -103,6 +121,10 @@ window.__sanitizeImportedPlan = function(p){
       };
       if(c.yearId != null){ out.yearId = safeId(c.yearId, 'y1'); }
       if(c.courseNumber != null){ out.courseNumber = clean(c.courseNumber).slice(0, 30); }
+      // An enum, checked against the known buckets rather than escaped as
+      // text — the same treatment iconKey gets. Anything unrecognised is
+      // dropped, which leaves the reader falling back to the visual category.
+      if(window.__REQUIREMENT_KEYS.indexOf(c.requirement) !== -1){ out.requirement = c.requirement; }
       if(c.num != null){ out.num = clean(c.num).slice(0, 30); }
       if(c.isRetake){ out.isRetake = true; }
       return out;
@@ -113,6 +135,7 @@ window.__sanitizeImportedPlan = function(p){
       return Array.isArray(pair) ? [safeId(pair[0]), safeId(pair[1])] : null;
     }).filter(function(pair){ return pair && pair[0] && pair[1]; });
   }
+  p.requirementHours = window.__cleanRequirementHours(p.requirementHours);
   return p;
 };
 
@@ -208,7 +231,10 @@ window.__applyPrereqEdits = function(prefix, basePrereqs){
   return out;
 };
 
-window.__registerPlanData = function(prefix, courseInfo, prereqs){
+// `extra` carries whatever else the plan knows about itself that is not a
+// course or a prerequisite — today just requirementHours, the university's own
+// hours-per-requirement-bucket. Optional, so every existing caller still works.
+window.__registerPlanData = function(prefix, courseInfo, prereqs, extra){
   var base = Array.isArray(prereqs) ? prereqs : [];
   var effective = window.__applyPrereqEdits(prefix, base);
   // Object.create(null), not {}. Course slugs are data — an imported plan can
@@ -229,6 +255,7 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
   });
   window.__PLAN_DATA[prefix] = {
     courseInfo: courseInfo,
+    requirementHours: (extra && extra.requirementHours) || {},
     prereqs: effective,
     // The plan exactly as shipped/imported, kept so a student's overlay can be
     // recomputed (or cleared back to official) without a page reload.
@@ -242,7 +269,8 @@ window.__registerPlanData = function(prefix, courseInfo, prereqs){
 window.__rebuildPlanData = function(prefix){
   var d = window.__PLAN_DATA[prefix];
   if(!d) return;
-  window.__registerPlanData(prefix, d.courseInfo, d.basePrereqs || d.prereqs);
+  window.__registerPlanData(prefix, d.courseInfo, d.basePrereqs || d.prereqs,
+                            { requirementHours: d.requirementHours });
   if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
   else if(window.AAUP_IMPORTED && window.AAUP_IMPORTED.refresh){ window.AAUP_IMPORTED.refresh(prefix); }
 };

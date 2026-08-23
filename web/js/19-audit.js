@@ -52,8 +52,30 @@
     Object.keys(deptCrCounts).forEach(function(k){
       if(deptCrCounts[k] > bestCount){ bestCount = deptCrCounts[k]; deptCreditUnit = parseFloat(k); }
     });
-    var deptNeededCount = (typeof required === 'number') ? required : Object.keys(deptCrCounts).length;
-    var deptNeededCredits = deptNeededCount * deptCreditUnit;
+    // How much the specialization elective pool is actually worth. Three
+    // sources, best first:
+    //
+    //   1. requirementHours.specElec — the university's published figure, on
+    //      plans built from a real catalogue plan.
+    //   2. DEPT_REQUIRED — the hand-maintained per-plan count.
+    //   3. the number of DISTINCT credit-hour values in the pool, a stand-in
+    //      for the number of required courses.
+    //
+    // (3) is the reason this screen and My Path disagreed. It collapses to 1
+    // whenever every slot in a pool costs the same, which is the normal case:
+    // GIS and Multimedia each draw six 3-hour slots for an 18-hour
+    // requirement and were audited as though only 3 hours were owed, 15 hours
+    // short of the degree. The comment on DEPT_REQUIRED has always said so;
+    // there was simply nothing better to fall back to until now.
+    var planReq = (window.__PLAN_DATA[prefix] || {}).requirementHours || {};
+    var deptNeededCredits, deptNeededCount;
+    if(typeof planReq.specElec === 'number'){
+      deptNeededCredits = planReq.specElec;
+      deptNeededCount = deptCreditUnit > 0 ? Math.round(deptNeededCredits / deptCreditUnit) : 0;
+    } else {
+      deptNeededCount = (typeof required === 'number') ? required : Object.keys(deptCrCounts).length;
+      deptNeededCredits = deptNeededCount * deptCreditUnit;
+    }
 
     var seenNum = {};
     courses.forEach(function(el){

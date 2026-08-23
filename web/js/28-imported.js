@@ -328,13 +328,20 @@
         // even when the plan data had one.
         num: c.num || c.courseNumber || '-', name: c.name, th: '-', pr: '-',
         cr: String(c.creditHours != null ? c.creditHours : 0),
+        // The university's requirement bucket for this course, when the
+        // published plan says which one it is. Empty for a major no published
+        // plan covers; readers fall back to guessing from the visual category.
+        req: c.requirement || '',
         prereq: '-', ar: c.ar || c.name
       };
     });
     return info;
   }
   function registerPlan(id, plan){
-    if(window.__registerPlanData){ window.__registerPlanData(id, buildCourseInfo(plan), plan.prerequisites || []); }
+    if(window.__registerPlanData){
+      window.__registerPlanData(id, buildCourseInfo(plan), plan.prerequisites || [],
+                                { requirementHours: plan.requirementHours || {} });
+    }
   }
 
   // ---------- progress (shares the SAME storage + object as every built-in major) ----------

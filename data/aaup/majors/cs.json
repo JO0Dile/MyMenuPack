@@ -5,7 +5,7 @@
   "nameAr": "قسم علم الحاسوب",
   "university": "aaup",
   "college": "aaup-it",
-  "degreeHours": null,
+  "degreeHours": 134,
   "courses": [
     {
       "slug": "arabic-language",
@@ -22,7 +22,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "beginning-english",
@@ -39,7 +40,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "calc-1",
@@ -56,7 +58,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "computer-skills",
@@ -73,7 +76,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "intro-it",
@@ -90,7 +94,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specReq"
     },
     {
       "slug": "intro-it-lab",
@@ -107,7 +112,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specReq"
     },
     {
       "slug": "uni-elective-1",
@@ -124,7 +130,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "uni-elective-2",
@@ -141,7 +148,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "calc-2",
@@ -158,7 +166,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Calculus I (100411010)"
+      "prerequisiteText": "Calculus I (100411010)",
+      "requirement": "colgReq"
     },
     {
       "slug": "digital-logic",
@@ -175,7 +184,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specReq"
     },
     {
       "slug": "discrete-math",
@@ -192,7 +202,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "intermediate-english",
@@ -209,7 +220,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "Beginning English (010610014)"
+      "prerequisiteText": "Beginning English (010610014)",
+      "requirement": "univReq"
     },
     {
       "slug": "intermediate-english-lab",
@@ -226,7 +238,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "progfund1",
@@ -243,7 +256,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "progfund1-lab",
@@ -260,7 +274,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (C++) (240111011)"
+      "prerequisiteText": "Programming Fundamentals (C++) (240111011)",
+      "requirement": "colgReq"
     },
     {
       "slug": "advanced-english",
@@ -277,7 +292,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "Intermediate English (010610025) & Intermediate English Lab (010610026)"
+      "prerequisiteText": "Intermediate English (010610025) & Intermediate English Lab (010610026)",
+      "requirement": "univReq"
     },
     {
       "slug": "advanced-english-lab",
@@ -294,7 +310,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "free-elective-1",
@@ -311,7 +328,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "freeElec"
     },
     {
       "slug": "research-methods",
@@ -328,7 +346,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Advanced English (010610035) &amp; Advanced English Lab (010610036)"
+      "prerequisiteText": "Advanced English (010610035) &amp; Advanced English Lab (010610036)",
+      "requirement": "univReq"
     },
     {
       "slug": "comp-org",
@@ -345,7 +364,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Digital Logic Design (110411100)"
+      "prerequisiteText": "Digital Logic Design (110411100)",
+      "requirement": "specReq"
     },
     {
       "slug": "math-it",
@@ -362,7 +382,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Calculus II (100411020)"
+      "prerequisiteText": "Calculus II (100411020)",
+      "requirement": "colgReq"
     },
     {
       "slug": "progfund2",
@@ -379,7 +400,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (C++) (240111011)"
+      "prerequisiteText": "Programming Fundamentals (C++) (240111011)",
+      "requirement": "specReq"
     },
     {
       "slug": "progfund2-lab",
@@ -396,7 +418,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "elective-networks-1",
@@ -413,7 +436,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Digital Logic Design (110411100)"
+      "prerequisiteText": "Digital Logic Design (110411100)",
+      "requirement": "specReq"
     },
     {
       "slug": "comp-net-lab",
@@ -430,7 +454,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Computer Networks I (240223041)"
+      "prerequisiteText": "Computer Networks I (240223041)",
+      "requirement": "specReq"
     },
     {
       "slug": "data-struct-lab",
@@ -447,7 +472,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Discrete Mathematics (100413750) &amp; Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Discrete Mathematics (100413750) &amp; Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "data-structures",
@@ -464,7 +490,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Discrete Mathematics (100413750) &amp; Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Discrete Mathematics (100413750) &amp; Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "intro-db",
@@ -481,7 +508,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "intro-db-lab",
@@ -498,7 +526,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "palestinian-studies",
@@ -515,7 +544,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "speech-comm",
@@ -532,7 +562,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Advanced English (010610035) &amp; Advanced English Lab (010610036)"
+      "prerequisiteText": "Advanced English (010610035) &amp; Advanced English Lab (010610036)",
+      "requirement": "specReq"
     },
     {
       "slug": "uni-elective-3",
@@ -549,7 +580,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "algo-prog-tech",
@@ -566,7 +598,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Data Structures (240112031)"
+      "prerequisiteText": "Data Structures (240112031)",
+      "requirement": "specReq"
     },
     {
       "slug": "free-elective-2",
@@ -583,7 +616,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "freeElec"
     },
     {
       "slug": "intro-os",
@@ -600,7 +634,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Data Structures (240112031) &amp; Introduction to Computer Organization (240112111)"
+      "prerequisiteText": "Data Structures (240112031) &amp; Introduction to Computer Organization (240112111)",
+      "requirement": "specReq"
     },
     {
       "slug": "oop-principles",
@@ -617,7 +652,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "web-dev-1",
@@ -634,7 +670,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Database (240113121)"
+      "prerequisiteText": "Introduction to Database (240113121)",
+      "requirement": "specReq"
     },
     {
       "slug": "advanced-oop",
@@ -651,7 +688,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Principles of Object Oriented Programming (240212010)"
+      "prerequisiteText": "Principles of Object Oriented Programming (240212010)",
+      "requirement": "specReq"
     },
     {
       "slug": "it-proj-mgmt",
@@ -668,7 +706,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "intro-se",
@@ -685,7 +724,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Data Structures (240112031)"
+      "prerequisiteText": "Data Structures (240112031)",
+      "requirement": "specReq"
     },
     {
       "slug": "mobile-prog",
@@ -702,7 +742,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "uni-elective-4",
@@ -719,7 +760,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "comp-arch",
@@ -736,7 +778,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Computer Organization (240112111)"
+      "prerequisiteText": "Introduction to Computer Organization (240112111)",
+      "requirement": "specReq"
     },
     {
       "slug": "comp-graphics",
@@ -753,7 +796,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Mathematics for Information Technology (100412040) &amp; Programming Fundamentals (C++) (240111011)"
+      "prerequisiteText": "Mathematics for Information Technology (100412040) &amp; Programming Fundamentals (C++) (240111011)",
+      "requirement": "specReq"
     },
     {
       "slug": "senior-proj-1",
@@ -770,7 +814,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Completion of 90 credit hours"
+      "prerequisiteText": "Completion of 90 credit hours",
+      "requirement": "specReq"
     },
     {
       "slug": "sw-testing",
@@ -787,7 +832,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Software Engineering (240113171)"
+      "prerequisiteText": "Introduction to Software Engineering (240113171)",
+      "requirement": "specReq"
     },
     {
       "slug": "spec-elective-1",
@@ -804,7 +850,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specElec"
     },
     {
       "slug": "unix-lab",
@@ -821,7 +868,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Operating Systems (240113311)"
+      "prerequisiteText": "Introduction to Operating Systems (240113311)",
+      "requirement": "specReq"
     },
     {
       "slug": "visual-prog",
@@ -838,7 +886,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specReq"
     },
     {
       "slug": "artificial-intelligence",
@@ -855,7 +904,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Algorithms and Programming Techniques (240113020)"
+      "prerequisiteText": "Algorithms and Programming Techniques (240113020)",
+      "requirement": "specReq"
     },
     {
       "slug": "senior-proj-2",
@@ -872,7 +922,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Senior Project I (240114974)"
+      "prerequisiteText": "Senior Project I (240114974)",
+      "requirement": "specReq"
     },
     {
       "slug": "info-security",
@@ -889,7 +940,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Operating Systems (240113311)"
+      "prerequisiteText": "Introduction to Operating Systems (240113311)",
+      "requirement": "specReq"
     },
     {
       "slug": "spec-elective-2",
@@ -906,7 +958,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specElec"
     },
     {
       "slug": "spec-elective-3",
@@ -923,7 +976,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specElec"
     },
     {
       "slug": "theory-computation",
@@ -940,7 +994,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Algorithms and Programming Techniques (240113020)"
+      "prerequisiteText": "Algorithms and Programming Techniques (240113020)",
+      "requirement": "specReq"
     },
     {
       "slug": "elective-adv-os",
@@ -957,7 +1012,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Operating Systems (240113311)"
+      "prerequisiteText": "Introduction to Operating Systems (240113311)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-business-basics",
@@ -974,7 +1030,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-cloud-computing",
@@ -991,7 +1048,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Operating Systems (240113311)"
+      "prerequisiteText": "Introduction to Operating Systems (240113311)",
+      "requirement": "specElec"
     },
     {
       "slug": "community-service",
@@ -1008,7 +1066,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "elective-compiler-design",
@@ -1025,7 +1084,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Theory of Computation (240114081)"
+      "prerequisiteText": "Theory of Computation (240114081)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-data-mining",
@@ -1042,7 +1102,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Database (240113121)"
+      "prerequisiteText": "Introduction to Database (240113121)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-distributed-sys",
@@ -1059,7 +1120,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Operating Systems (240113311)"
+      "prerequisiteText": "Introduction to Operating Systems (240113311)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-entrepreneurship",
@@ -1076,7 +1138,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specElec"
     },
     {
       "slug": "internship",
@@ -1093,7 +1156,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specReq"
     },
     {
       "slug": "elective-neural-net",
@@ -1110,7 +1174,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Principles of Object Oriented Programming (240212010)"
+      "prerequisiteText": "Principles of Object Oriented Programming (240212010)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-machine-learning",
@@ -1127,7 +1192,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Algorithms and Programming Techniques (240113020) &amp; Principles of Object Oriented Programming (240212010)"
+      "prerequisiteText": "Algorithms and Programming Techniques (240113020) &amp; Principles of Object Oriented Programming (240212010)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-parallel-prog",
@@ -1144,7 +1210,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Algorithms and Programming Techniques (240113020)"
+      "prerequisiteText": "Algorithms and Programming Techniques (240113020)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-special-topic-it",
@@ -1161,7 +1228,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals II (240112003)"
+      "prerequisiteText": "Programming Fundamentals II (240112003)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-special-topics-cs",
@@ -1178,7 +1246,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-web-dev-2",
@@ -1195,7 +1264,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Web Development I (240213081)"
+      "prerequisiteText": "Web Development I (240213081)",
+      "requirement": "specElec"
     }
   ],
   "prerequisites": [
@@ -1418,5 +1488,21 @@
   ],
   "iconKey": "code",
   "icon": "💻",
-  "imageUrl": null
+  "imageUrl": null,
+  "requirementHours": {
+    "univReq": 14.0,
+    "univElec": 8,
+    "colgReq": 16.0,
+    "specReq": 81.0,
+    "specElec": 9,
+    "freeElec": 6
+  },
+  "requirementSource": {
+    "document": "AAUP catalogue docx (data_600.docx)",
+    "program": "Bachelor in Computer Science",
+    "via": "tools/merge-catalogue-requirements.py"
+  },
+  "requirementHoursDrift": {
+    "specElec": 39.0
+  }
 }
