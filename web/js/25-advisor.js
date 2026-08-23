@@ -331,6 +331,10 @@
       '<p class="form-note sb-lead">' + (rtl
         ? 'ابدأ من اقتراح التطبيق، وبدّل فيه زي ما بدك. الأرقام (12 / 15–18 ساعة) دليل هذا التطبيق نفسه، مش قاعدة رسمية — أكّدها مع مرشدك.'
         : 'Start from the app’s suggestion and change it however you like. The 12 and 15–18H numbers are this app’s own guide, not an official rule — confirm them with your advisor.') + '</p>' +
+      // A zero-height marker directly above the meter. When it scrolls out of
+      // the modal's own scroll box the meter is stuck, which is the only
+      // reliable way to know: position:sticky fires no event of its own.
+      '<div id="sbStickSentinel" aria-hidden="true"></div>' +
       '<div id="sbMeterHost">' + meterHtml(t, rtl) + '</div>' +
       '<div class="sb-cols">' +
         '<section class="sb-pool">' +
@@ -346,9 +350,12 @@
           '<div class="sb-tray-list" id="sbTray">' + trayHtml(prefix, pool, chosen, t, rtl) + '</div>' +
           '<div id="sbExtra">' + breakdownHtml(t, rtl) + warningsHtml(t, rtl) + '</div>' +
           '<div class="sb-actions">' +
-            '<button type="button" class="home-btn" id="sbReset">↺ ' +
+            '<button type="button" class="home-btn" id="sbReset">' + window.AAUP_ICONS.preview('undo', 14) +
               (rtl ? 'ارجع للاقتراح' : 'Use the suggestion') + '</button>' +
-            '<button type="button" class="home-btn" id="sbCopy">📋 ' +
+            // Starting over meant un-picking a dozen courses one at a time.
+            '<button type="button" class="home-btn" id="sbClear">' + window.AAUP_ICONS.preview('trash', 14) +
+              (rtl ? 'امسح الكل' : 'Clear all') + '</button>' +
+            '<button type="button" class="home-btn" id="sbCopy">' + window.AAUP_ICONS.preview('copy', 14) +
               (rtl ? 'انسخ القائمة' : 'Copy list') + '</button>' +
           '</div>' +
           '<p class="form-note" id="sbCopyMsg" aria-live="polite"></p>' +
@@ -390,6 +397,21 @@
     refresh(prefix);
   }
 
+  var stickObserver = null;
+  function bindStickyMeter(){
+    if(stickObserver){ stickObserver.disconnect(); stickObserver = null; }
+    var sentinel = document.getElementById('sbStickSentinel');
+    var host = document.getElementById('sbMeterHost');
+    if(!sentinel || !host || typeof window.IntersectionObserver !== "function") return;
+    var scroller = host.closest('.modal-body') || null;
+    stickObserver = new window.IntersectionObserver(function(entries){
+      var meterEl = host.querySelector('.sb-meter');
+      if(!meterEl) return;
+      meterEl.classList.toggle('sb-meter-stuck', !entries[0].isIntersecting);
+    }, { root: scroller, threshold: 0 });
+    stickObserver.observe(sentinel);
+  }
+
   function bindTray(prefix){
     document.querySelectorAll('[data-sb-remove]').forEach(function(btn){
       if(btn.__sbBound) return;
@@ -421,6 +443,13 @@
     if(reset){
       reset.addEventListener('click', function(){
         setPicked(prefix, recommend(prefix).chosen.map(function(c){ return c.slug; }));
+        refresh(prefix);
+      });
+    }
+    var clear = document.getElementById('sbClear');
+    if(clear){
+      clear.addEventListener('click', function(){
+        setPicked(prefix, []);
         refresh(prefix);
       });
     }
@@ -457,6 +486,7 @@
     body.innerHTML = render(prefix);
     overlay.classList.add('open');
     bindBody(prefix);
+    bindStickyMeter();
   }
 
   function bind(){

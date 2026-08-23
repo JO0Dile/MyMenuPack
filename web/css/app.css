@@ -3515,10 +3515,30 @@
      one stacked column on a phone with the tray on top — the running total
      is the thing you keep glancing at, so it must not be below the fold. */
   .sb-lead{margin-top:0;}
+  /* Sticky: the running total is the thing you keep glancing at while
+     picking courses, and it used to scroll away with the rest of the page —
+     by the time you were choosing the twelfth course you could no longer see
+     what it added up to. It shrinks as it sticks (see .sb-meter-stuck) so it
+     costs a strip rather than a card once it is doing that job. */
+  /* The HOST sticks, not the meter. position:sticky travels only within its
+     own parent's box, and the host is exactly the meter's height — so
+     sticking the meter to it meant sticking it to nothing and leaving with
+     it. The host is a direct child of the modal's scroll box, which is the
+     full height of the content. */
+  #sbMeterHost{position:sticky; top:0; z-index:5;}
   .sb-meter{
     border:1px solid var(--line);border-radius:12px;padding:12px 14px;
     background:var(--surface-bg);margin-bottom:14px;
+    transition:padding .16s ease, box-shadow .16s ease, border-radius .16s ease;
   }
+  .sb-meter-stuck{
+    padding:8px 12px; border-radius:10px;
+    box-shadow:0 6px 18px rgba(0,0,0,.28);
+  }
+  .sb-meter-stuck .sb-meter-num{font-size:19px;}
+  .sb-meter-stuck .sb-meter-bar{height:7px;margin-top:6px;}
+  .sb-meter-stuck .sb-meter-scale{display:none;}
+  @media (prefers-reduced-motion:reduce){ .sb-meter{transition:none;} }
   .sb-meter-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
   .sb-meter-num{font-size:26px;font-weight:800;color:var(--text);line-height:1.1;}
   .sb-meter-note{font-size:12px;color:var(--text-dim);font-weight:600;}
