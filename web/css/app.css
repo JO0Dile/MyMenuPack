@@ -6546,17 +6546,23 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      long scroll, and this card's content (a name, one meta line, a code) is
      narrow enough to sit two-up on a phone. Below 360px it drops back to one
      column: two 150px cards there truncate names rather than fit them. */
+  /* align-items:flex-start, so a one-line card is a one-line card. The row
+     stretches by default, which meant "Beginning English" was padded out to
+     match "Community Service" beside it — half the height of the short cards
+     was empty space held open by their tallest neighbour. */
+  .course-row{align-items:flex-start; gap:8px;}
+
   .course{
-    flex:1 1 calc(50% - 5px); max-width:none; min-width:0; min-height:auto;
-    background:var(--panel); border:none; border-radius:14px;
-    padding:11px 34px 11px 14px;
-    box-shadow:0 4px 14px rgba(0,0,0,.22);
+    flex:1 1 calc(50% - 4px); max-width:none; min-width:0; min-height:auto;
+    background:var(--panel); border:none; border-radius:12px;
+    padding:8px 26px 8px 11px;
+    box-shadow:0 3px 10px rgba(0,0,0,.2);
   }
   @media (max-width:359px){
     .course{flex:1 1 100%;}
   }
   .plan-page.rtl-mode .course,
-  .sheet.rtl-mode .course{padding:11px 14px 11px 34px;}
+  .sheet.rtl-mode .course{padding:8px 11px 8px 26px;}
   .course::before{
     content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
     border-radius:4px 0 0 4px; background:var(--core);
@@ -6585,19 +6591,23 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 
   /* Two-up means half the width, so the name gets two lines rather than
      being cut off at one, and the checkbox moves in to buy them back. */
+  /* Tight: two-up these were 85px tall, most of which was leading. Line
+     heights close to 1.2, the padding down to 8px, and the type a size
+     smaller — the card carries three short lines, so the space between them
+     was doing more work than the lines were. */
   .course .name{
-    font-size:13px; padding:0; margin:0; line-height:1.3;
+    font-size:12.5px; padding:0; margin:0; line-height:1.2;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
   }
   .plan-page.rtl-mode .course .name,
   .sheet.rtl-mode .course .name{padding:0;}
-  .course-meta{color:var(--text-dim); font-size:10.5px;}
+  .course-meta{color:var(--text-dim); font-size:10px; line-height:1.3; margin-top:2px;}
   /* The card sits inside a block headed with its year — repeating it here
      is what pushed this line onto a second row at half width. The card's
      aria-label still carries all three parts. */
   .course-meta .cm-year,
   .course-meta .cm-year + .cm-sep{display:none;}
-  .course-code{color:var(--text-faint); font-size:9.5px;}
+  .course-code{color:var(--text-faint); font-size:9px; line-height:1.25; margin-top:1px;}
   .course.completed .course-meta,
   .course.completed .course-code{color:var(--text-dim);}
 
@@ -6605,17 +6615,17 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
      centred circle sat in the middle of a two-line name. The 11px padding
      keeps the tap target at 40px either way. */
   .course-check{
-    top:11px; right:9px; transform:none;
-    width:18px; height:18px; padding:11px; margin:-11px;
+    top:8px; right:7px; transform:none;
+    width:16px; height:16px; padding:12px; margin:-12px;
   }
   .plan-page.rtl-mode .course-check,
-  .sheet.rtl-mode .course-check{right:auto; left:9px; margin:-11px;}
+  .sheet.rtl-mode .course-check{right:auto; left:7px; margin:-12px;}
   /* inset must match the 11px padding above — the padding is an invisible
      44px tap-target extension (existing convention, see the base rule's
      own comment above), not part of the drawn circle; inset:0 here would
      have drawn the circle across the whole padded box instead of just its
      22px content box, which is what actually happened the first time. */
-  .course-check::before{inset:11px; background:var(--header-bg); border-color:var(--line);}
+  .course-check::before{inset:12px; background:var(--header-bg); border-color:var(--line);}
   .course-check{font-size:11px;}
   .course.completed .course-check::before{background:#2ecc71; border-color:#2ecc71;}
   .course.completed .course-check{color:var(--on-accent);}
