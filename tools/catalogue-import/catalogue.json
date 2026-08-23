@@ -4,24 +4,78 @@
   "blockIndex": 0,
   "programs": [
    {
+    "name": "Diploma in Ambulance and Emergency",
+    "blockIndex": 17,
+    "requirements": {},
+    "nameFoundOnlyInProse": true,
+    "overview": "The Diploma in Ambulance and Emergency is an applied professional program that aims to prepare qualified staffs to handle medical emergencies and injuries in a highly professional manner.This program combines theoretical knowledge with practical skills in the field of emergency medical care, including health assessment, rapid intervention, critical case management, as well as dealing with disasters.This program focuses on practical training through field training in hospitals and accident sites.OverviewThe Diploma in Ambulance and Emergency is an applied professional program that aims to prepare qualified staffs to handle medical emergencies and injuries in a highly professional manner.This program combines theoretical knowledge with practical skills in the field of emergency medical care, including health assessment, rapid intervention, critical case management, as well as dealing with disasters.This program focuses on practical training through field training in hospitals and accident sites.",
+    "sourceNotes": [
+     {
+      "blockIndex": 23,
+      "text": "second :"
+     }
+    ]
+   },
+   {
     "name": "Diploma in Dental Assistance",
     "blockIndex": 24,
-    "requirements": {}
+    "requirements": {
+     "univElec": {
+      "courses": [],
+      "requiredHours": 2
+     }
+    },
+    "overview": "With continuous advancements in dental technology and the growing demand for supporting professionals in clinics, medical centers, and hospitals, there is an increasing need for highly trained dental assistants. This program is designed to prepare graduates for immediate professional readiness through intensive hands-on training and education based on the latest international standards in infection control, sterilization techniques, clinic management, and dental radiography.The program aims to train specialized professionals to assist dentists in dental clinics and medical centers. It focuses on equipping students with both theoretical knowledge and practical skills in dental sciences, anatomy, dental materials, sterilization techniques, and infection prevention. Additionally, extensive clinical training ensures that graduates are fully prepared to work in healthcare environments.Our goal is to bridge the gap between academic education and the fast-evolving job market by offering a dynamic program that adapts to industry changes and provides graduates with diverse career opportunities in the healthcare sector, both locally and regionally.This two-year diploma program requires the completion of 64 credit hours, combining theoretical lectures, hands-on applications, and field training in dental clinics and specialized hospitals, ensuring students gain real-world experience before entering the workforce.OverviewWith continuous advancements in dental technology and the growing demand for supporting professionals in clinics, medical centers, and hospitals, there is an increasing need for highly trained dental assistants. This program is designed to prepare graduates for immediate professional readiness through intensive hands-on training and education based on the latest international standards in infection control, sterilization techniques, clinic management, and dental radiography.The program aims to train specialized professionals to assist dentists in dental clinics and medical centers. It focuses on equipping students with both theoretical knowledge and practical skills in dental sciences, anatomy, dental materials, sterilization techniques, and infection prevention. Additionally, extensive clinical training ensures that graduates are fully prepared to work in healthcare environments.Our goal is to bridge the gap between academic education and the fast-evolving job market by offering a dynamic program that adapts to industry changes and provides graduates with diverse career opportunities in the healthcare sector, both locally and regionally.This two-year diploma program requires the completion of 64 credit hours, combining theoretical lectures, hands-on applications, and field training in dental clinics and specialized hospitals, ensuring students gain real-world experience before entering the workforce.",
+    "sourceNotes": [
+     {
+      "blockIndex": 72,
+      "text": "3rd :"
+     }
+    ]
    },
    {
     "name": "Diploma in Mobile Application Development",
     "blockIndex": 73,
-    "requirements": {}
+    "requirements": {},
+    "overview": "The Diploma in Mobile Application Development is a specialized program designed to provide students with the knowledge and skills necessary to build mobile applications for a variety of platforms. The program emphasizes the development of mobile apps for Android, iOS, and Windows-based devices. Students learn how to create and deploy mobile applications, use APIs and SDKs, integrate services, and more. The program consists of courses that cover topics such as interface design, database design, mobile application development, Artificial Intelligence, Virtual Reality/Augmented Reality, and mobile security. Upon completion, students are prepared to work in the mobile application development industry in innovative way.OverviewThe Diploma in Mobile Application Development is a specialized program designed to provide students with the knowledge and skills necessary to build mobile applications for a variety of platforms. The program emphasizes the development of mobile apps for Android, iOS, and Windows-based devices. Students learn how to create and deploy mobile applications, use APIs and SDKs, integrate services, and more. The program consists of courses that cover topics such as interface design, database design, mobile application development, Artificial Intelligence, Virtual Reality/Augmented Reality, and mobile security. Upon completion, students are prepared to work in the mobile application development industry in innovative way.",
+    "sourceNotes": [
+     {
+      "blockIndex": 110,
+      "text": "forth :"
+     }
+    ]
    },
    {
     "name": "Diploma in Property Valuation",
     "blockIndex": 111,
-    "requirements": {}
+    "requirements": {},
+    "overview": "The Real Estate sector is one of the vital sectors in Palestine especially because of its role in the economy in raising the individuals’ income and being a main part of the national income, in addition to its role in providing the needed buildings for housing and for economic activities. The official statistics show that the high demand of the apartments has reached to 25 thousand housing unit annually. Also the housing units that need to be rebuilt in Gaza after the last war of 2021 was estimated to reach 140 thousand housing unit. Despite the growing that is happening in the real estate sector in Palestine, the gap between demand and supply is still great, and according to statistics published from Palestinian Central Bureau of Statistics there is a clear increasing on real estate with a rate of 10% annually. This in turn increased the real estate prices not only in the main cities, but also in the lands and areas far away from the overpopulation areas.During COVID pandemic, the real estate sector was affected clearly and the prices was changing during the last year, and this caused trust issues between buyers and sellers because of the many closings that happened and the not so clear economic situation in the world and in Palestine in specific. Thus many owners refused the direct installment and preferred selling through the banks, in addition to the credit facilitates that many banks gave to the different categories of the society during the pandemic.From this came the need for a diploma in Property Valuation in Arab American University in order to meet andfulfill the needs of the real estate market and provide the market with efficient and experienced people in selling, buying, managing and pricing the lands and properties. This program also aims to provide the labor market with experienced and skilled graduates who are able to manage the real estates and organize them and put basics and standards for buying and selling. When the commercial movement, the economic activities and the overpopulation increase, then the demand for shops, apartment buildings and lands will increase as well, and so this program is a main factor in raising investment awareness in the real estate sector in Palestine.OverviewThe Real Estate sector is one of the vital sectors in Palestine especially because of its role in the economy in raising the individuals’ income and being a main part of the national income, in addition to its role in providing the needed buildings for housing and for economic activities. The official statistics show that the high demand of the apartments has reached to 25 thousand housing unit annually. Also the housing units that need to be rebuilt in Gaza after the last war of 2021 was estimated to reach 140 thousand housing unit. Despite the growing that is happening in the real estate sector in Palestine, the gap between demand and supply is still great, and according to statistics published from Palestinian Central Bureau of Statistics there is a clear increasing on real estate with a rate of 10% annually. This in turn increased the real estate prices not only in the main cities, but also in the lands and areas far away from the overpopulation areas.During COVID pandemic, the real estate sector was affected clearly and the prices was changing during the last year, and this caused trust issues between buyers and sellers because of the many closings that happened and the not so clear economic situation in the world and in Palestine in specific. Thus many owners refused the direct installment and preferred selling through the banks, in addition to the credit facilitates that many banks gave to the different categories of the society during the pandemic.From this came the need for a diploma in Property Valuation in Arab American University in order to meet andfulfill the needs of the real estate market and provide the market with efficient and experienced people in selling, buying, managing and pricing the lands and properties. This program also aims to provide the labor market with experienced and skilled graduates who are able to manage the real estates and organize them and put basics and standards for buying and selling. When the commercial movement, the economic activities and the overpopulation increase, then the demand for shops, apartment buildings and lands will increase as well, and so this program is a main factor in raising investment awareness in the real estate sector in Palestine.",
+    "sourceNotes": [
+     {
+      "blockIndex": 140,
+      "text": "this one have 2 academic plans 👍 first one :"
+     },
+     {
+      "blockIndex": 148,
+      "text": "now the second plan:"
+     },
+     {
+      "blockIndex": 156,
+      "text": "fifth plan:"
+     }
+    ]
    },
    {
     "name": "Diploma in Cosmetics and Skincare",
     "blockIndex": 157,
-    "requirements": {}
+    "requirements": {},
+    "overview": "The market and fields of cosmetics and skin care are increasing and expanding day after day, and the need for technicians specializing in cosmetics products and skin care has become an urgent one today. The wide spread of cosmetic stores, community pharmacies (cosmetics section), cosmetic factories, and beauty and skin care centers in Palestine without the presence of assistant technicians for cosmetic doctors and skin care specialists in these fields makes these specialization priorities for education, not only in Palestine but globally too. Therefore, educating cosmetics technicians and training them in cosmetics stores, beauty centers, cosmetic clinics, cosmetics formulating facilities, and skin care centers on the latest techniques and materials used is considered essential and urgent for this rapidly evolving profession. A diploma in cosmetics and skin care indicates that the holder has received specialized training in skin care and education in cosmetic formulations, constituents, uses, and adverse effects, and possesses the skills and knowledge necessary to provide professional services. This can help establish credibility and professionalism in the field of cosmetic products and skin care, which can be important for building a successful career. The Arab American University is taking practical steps to fulfill this need by proposing vocational diplomas in cosmetics and skincare that will serve as a platform for high school graduates to become professional technicians by offering a diploma in these fields.",
+    "sourceNotes": [
+     {
+      "blockIndex": 181,
+      "text": "6th plan:"
+     }
+    ]
    },
    {
     "name": "Diploma in Dental Technology",
@@ -31,12 +85,64 @@
       "courses": [],
       "requiredHours": 2
      }
-    }
+    },
+    "overview": "The Diploma in Dental Technology and Manufacturing is a specialized academic program designed to train skilled professionals in the fabrication and maintenance of fixed and removable dental prostheses, orthodontic appliances, and dental implants. The program combines theoretical knowledge with intensive hands-on training, preparing graduates for careers in dental laboratories, hospitals, private clinics, and dental supply companies.",
+    "sourceNotes": [
+     {
+      "blockIndex": 195,
+      "text": "Students receive comprehensive training in restorative dentistry techniques, dental prosthetics, crown and bridge fabrication, and orthodontic appliance manufacturing, equipping them with the skills needed for a wide range of career opportunities in the healthcare industry. With the rapid advancements in dental technology, there is a growing demand for highly skilled technicians who can work with cutting-edge materials and equipment."
+     },
+     {
+      "blockIndex": 196,
+      "text": "The curriculum consists of 69 credit hours completed over two academic years, including 29 credit hours of theoretical coursework and 40 credit hours of hands-on practical training. Throughout the program, students gain essential knowledge and specialized skills to ensure they are fully prepared for the job market upon graduation. The program is delivered by qualified faculty members in fully equipped dental laboratories at the college."
+     },
+     {
+      "blockIndex": 198,
+      "text": "it have to academic plans:"
+     },
+     {
+      "blockIndex": 199,
+      "text": "first one :"
+     },
+     {
+      "blockIndex": 218,
+      "text": "Students must pass ( 2 ) credit hours from any of the following courses"
+     },
+     {
+      "blockIndex": 254,
+      "text": "now 2nd plan:"
+     },
+     {
+      "blockIndex": 264,
+      "text": "6th plan:"
+     }
+    ]
    },
    {
     "name": "Diploma in Occupational Health and Safety",
     "blockIndex": 265,
-    "requirements": {}
+    "requirements": {},
+    "overview": "The Diploma in Occupational Health and Safety program is an integrated, applied program that aims to prepare qualified professionals to address occupational health and safety requirements in various industrial and service sectors.This program provides students with the theoretical and practical skills necessary to identify, assess, and manage risks and comply with local and international legislations, contributing to the creation of safe and healthy work environments.The Diploma in Occupational Health and Safety program is an integrated, applied program that aims to prepare qualified professionals to address occupational health and safety requirements in various industrial and service sectors.This program provides students with the theoretical and practical skills necessary to identify, assess, and manage risks and comply with local and international legislations, contributing to the creation of safe and healthy work environments.",
+    "sourceNotes": [
+     {
+      "blockIndex": 295,
+      "text": "AND THAT’S ALL FOR Junior College"
+     },
+     {
+      "blockIndex": 304,
+      "text": "next"
+     }
+    ]
+   }
+  ],
+  "facultyNotes": [
+   {
+    "blockIndex": 1,
+    "text": "first :"
+   },
+   {
+    "blockIndex": 16,
+    "text": "About Program"
    }
   ]
  },
@@ -548,6 +654,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "In order to keep up with improving and starting new academic programs Faculty of Supporting Medical Sciences opened the Public and Environment Health department in line with the global trend towards environment and negative impact of the environment on human health fields. Controlling these effects requires focusing on the environmental health sciences and the environment’s risk factors includingchemical and biological disasters and physical and environmental factors. The studies of the environmental distribution sources of such elements, mentioned above, human exposure to these factors, environmental risk assessment and prevention and intervention strategies. The department works for graduates to be able to contribute significantly with the ongoing efforts to protect human health and work efficiently in order to meet the challenges that face our communities’ bothnational and local health system.OverviewIn order to keep up with improving and starting new academic programs Faculty of Supporting Medical Sciences opened the Public and Environment Health department in line with the global trend towards environment and negative impact of the environment on human health fields. Controlling these effects requires focusing on the environmental health sciences and the environment’s risk factors includingchemical and biological disasters and physical and environmental factors. The studies of the environmental distribution sources of such elements, mentioned above, human exposure to these factors, environmental risk assessment and prevention and intervention strategies. The department works for graduates to be able to contribute significantly with the ongoing efforts to protect human health and work efficiently in order to meet the challenges that face our communities’ bothnational and local health system.",
     "degreeHours": 130
    },
    {
@@ -1112,6 +1219,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "This BA degree program in Speech, Language, and Hearing Disorders will contribute in preparing specialists who are able to provide help to people of all ages who suffer from developmental delay, congenital disabilities and intellectual disabilities, weakness in hearing ability, autism, cerebral palsy and acquired disabilities such as brain injuries and strokes. This program in comprehensive and includes all the related scientific courses that are taught in the best US universities. The program will provide scientific experiments and intensive clinical training to provide students with knowledge and scientific skills to be able to work with patients efficiently.Students will learn about Anatomy and Physiology including speech, hearing and sound mechanisms and visualization, how to develop language and communication systems, the sound system components, the neural science of speech, language and hearing and the strategies used to manage and assess speech and language disorders and hearing defects. This program also targets all areas of hearing and balance for both children and adultsAAUP works on establishing a special center equipped with the latest and modern technology and qualified staff to provide services for patients with disorders. After finishing 4 college year of (138 Credit Hours), graduates of this program will have a Bachelor degree in Speech, Language, and Hearing Disorders.This BA degree program in Speech, Language, and Hearing Disorders will contribute in preparing specialists who are able to provide help to people of all ages who suffer from developmental delay, congenital disabilities and intellectual disabilities, weakness in hearing ability, autism, cerebral palsy and acquired disabilities such as brain injuries and strokes. This program in comprehensive and includes all the related scientific courses that are taught in the best US universities. The program will provide scientific experiments and intensive clinical training to provide students with knowledge and scientific skills to be able to work with patients efficiently.Students will learn about Anatomy and Physiology including speech, hearing and sound mechanisms and visualization, how to develop language and communication systems, the sound system components, the neural science of speech, language and hearing and the strategies used to manage and assess speech and language disorders and hearing defects. This program also targets all areas of hearing and balance for both children and adultsAAUP works on establishing a special center equipped with the latest and modern technology and qualified staff to provide services for patients with disorders. After finishing 4 college year of (138 Credit Hours), graduates of this program will have a Bachelor degree in Speech, Language, and Hearing Disorders.",
     "degreeHours": 138
    },
    {
@@ -2242,6 +2350,21 @@
       "requiredHours": 6
      }
     },
+    "overview": "Occupational Therapy is one of the Allied Medical professionals that focuses on improving the health status and life pattern of individuals through specific activities and programs. The main goal for the occupational therapy is to enable people with disabilities to do the basic daily-life functions safely and independently. By doing so, people with disabilities will be more confident and this will help them in merging effectively with the society.",
+    "sourceNotes": [
+     {
+      "blockIndex": 530,
+      "text": "The Department of Occupational Therapy envisions preparing an innovative"
+     },
+     {
+      "blockIndex": 531,
+      "text": "professional therapist, lifelong learners, educators, competent scientist-practitioners and recognized leaders in the field of Occupational Therapy that enhance health and wellbeing of individuals, groups and communities."
+     },
+     {
+      "blockIndex": 532,
+      "text": "The Department of Occupational Therapy is committed to training client centered and occupation based practitioners, researchers and professional leaders in order to provide culturally adjusted habilitation, rehabilitation services that promote health and wellness for clients with disability and non-disability-related needs. Our primary value reflects in the aspiration to maintain our reputation as a leading academic program through a process of continuous self-evaluation, improvements and expansion of the frontiers of our academic field both in teaching, training and research, and to encompass areas beyond the traditional parameters of occupational therapy."
+     }
+    ],
     "degreeHours": 142
    },
    {
@@ -2717,7 +2840,14 @@
    {
     "name": "Bachelor in Hearing and Speech - Specialization in Audiology",
     "blockIndex": 639,
-    "requirements": {}
+    "requirements": {},
+    "overview": "Audiology is the science of studying hearing, balance and related disorders. As healthcare professionals, audiologist specialize in “prevention, identification, diagnoses, and evidence-based treatment of hearing, balance, and other auditory disorders for people of all ages” (ASHA, 2021). Utilizing different assessment techniques, audiologists reach a decision as to whether someone’s sensitivity to sound is within normal physiological levels. In contrast, if it is determined not to be so (i.e., a hearing loss is present), audiologists, through a series of meticulous testing, identify the location of the hearing loss (outer/middle/inner ears, auditory nerve, and/or central nervous system), part of hearing affected (i.e., which frequencies), the degree of the identified hearing loss (i.e., severity), and the appropriate course of action (e.g., audiological rehabilitation, referrals to other professionals, etc.). In addition, audiologists provide help to individuals with other ontological disorders such as balance and vestibular disorders, tinnitus, etc.OverviewAudiology is the science of studying hearing, balance and related disorders. As healthcare professionals, audiologist specialize in “prevention, identification, diagnoses, and evidence-based treatment of hearing, balance, and other auditory disorders for people of all ages” (ASHA, 2021). Utilizing different assessment techniques, audiologists reach a decision as to whether someone’s sensitivity to sound is within normal physiological levels. In contrast, if it is determined not to be so (i.e., a hearing loss is present), audiologists, through a series of meticulous testing, identify the location of the hearing loss (outer/middle/inner ears, auditory nerve, and/or central nervous system), part of hearing affected (i.e., which frequencies), the degree of the identified hearing loss (i.e., severity), and the appropriate course of action (e.g., audiological rehabilitation, referrals to other professionals, etc.). In addition, audiologists provide help to individuals with other ontological disorders such as balance and vestibular disorders, tinnitus, etc.",
+    "sourceNotes": [
+     {
+      "blockIndex": 655,
+      "text": "no academic plan"
+     }
+    ]
    },
    {
     "name": "Bachelor in Management – Specialization in Environmental Management and Recycling",
@@ -3141,6 +3271,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "Environmental management tries to identify the factors that have a stake in the conflicts that may rise between meeting the needs but protecting the environment.Environmental challenges require complex solutions, bringing together scientific, social, political and economic perspectives. This Program will provide students with the interdisciplinary perspective and diverse skillset to help solve environmental problems in a leadership role. Graduates can help the Palestinian community manage environmental concerns responsibly, making a positive impact and supporting the common good.This degree with a specialization in waste management provides students with the skills needed to manage, organize, and respond to issues related to waste production and reduction. By focusing on sustainability and paths forward to address waste produced on a local, national, and international scale, this program provides students with the practical tools and policy-based information necessary to pursue waste management jobs in administrative, scientific, or engineering fields.Environmental management tries to identify the factors that have a stake in the conflicts that may rise between meeting the needs but protecting the environment.Environmental challenges require complex solutions, bringing together scientific, social, political and economic perspectives. This Program will provide students with the interdisciplinary perspective and diverse skillset to help solve environmental problems in a leadership role. Graduates can help the Palestinian community manage environmental concerns responsibly, making a positive impact and supporting the common good.This degree with a specialization in waste management provides students with the skills needed to manage, organize, and respond to issues related to waste production and reduction. By focusing on sustainability and paths forward to address waste produced on a local, national, and international scale, this program provides students with the practical tools and policy-based information necessary to pursue waste management jobs in administrative, scientific, or engineering fields.",
     "degreeHours": 128
    },
    {
@@ -3674,6 +3805,33 @@
       "requiredHours": 6
      }
     },
+    "overview": "Because of the society's urgent need for graduates specialized in medical and laboratory tests. Arab American University established a department for this purpose since its opening in 2000. The department have attracted excellent selection of faculty members who graduated from international universities with high efficiency and long experience in both the academic and scientific fields. The department includes distinct educational laboratories that any other prestigious and high ranked university in the world have, such as:OverviewBecause of the society's urgent need for graduates specialized in medical and laboratory tests. Arab American University established a department for this purpose since its opening in 2000. The department have attracted excellent selection of faculty members who graduated from international universities with high efficiency and long experience in both the academic and scientific fields. The department includes distinct educational laboratories that any other prestigious and high ranked university in the world have, such as:",
+    "sourceNotes": [
+     {
+      "blockIndex": 734,
+      "text": "Clinical and Biochemistry labs"
+     },
+     {
+      "blockIndex": 735,
+      "text": "Tissues and pathological tissues"
+     },
+     {
+      "blockIndex": 736,
+      "text": "Microbiology"
+     },
+     {
+      "blockIndex": 737,
+      "text": "Hematology Lab"
+     },
+     {
+      "blockIndex": 738,
+      "text": "Scientific Research Lab"
+     },
+     {
+      "blockIndex": 739,
+      "text": "The department, with the help of the College of Supporting Health Sciences, during the years from 2000 till today, have organized so many conferences that attracted a number of significant professors and researchers from local and Arab universities, hospitals, health and medical institutions and specialists in the field of medical laboratories from Palestine, the Arab states. All of that in addition to serval scientific days and themed workshops.The department, with the help of the College of Supporting Health Sciences, during the years from 2000 till today, have organized so many conferences that attracted a number of significant professors and researchers from local and Arab universities, hospitals, health and medical institutions and specialists in the field of medical laboratories from Palestine, the Arab states. All of that in addition to serval scientific days and themed workshops."
+     }
+    ],
     "degreeHours": 132
    },
    {
@@ -4284,7 +4442,39 @@
       "requiredHours": 6
      }
     },
-    "degreeHours": 138
+    "degreeHours": 138,
+    "sourceNotes": [
+     {
+      "blockIndex": 844,
+      "text": "NOW TO THE NEXT"
+     },
+     {
+      "blockIndex": 850,
+      "text": "next"
+     },
+     {
+      "blockIndex": 860,
+      "text": "next"
+     },
+     {
+      "blockIndex": 871,
+      "text": "next"
+     },
+     {
+      "blockIndex": 880,
+      "text": "next"
+     },
+     {
+      "blockIndex": 886,
+      "text": "next"
+     }
+    ]
+   }
+  ],
+  "facultyNotes": [
+   {
+    "blockIndex": 307,
+    "text": "pictures gonna take a lot of time, soo. raw data only from now on : first :"
    }
   ]
  },
@@ -5563,6 +5753,37 @@
       "mustPassAll": true
      }
     },
+    "overview": "Interior Architecture is a multi-aspects specialization that aims to study and analyze the interior environment, while taking into consideration the tangible and intangible elements to achieve the goals of the interior design. It focuses on implementing creative, functional and attractive solutions inside architecture to reach an interior environment that meets the needs and goal of users and improve their lives.",
+    "sourceNotes": [
+     {
+      "blockIndex": 1011,
+      "text": "In the Interior Architecture program, our teaching depends on practical project design implementing for the architecture and interior design concepts. Students learn how to order elements that create good designed interior spaces, and learn about shapes, areas, structures, materials, fabrics, furniture, colors and lightings. Designing process follows an organized approach of (researching, analyzing and knowledge blending) in a creative way in order to build interior spaces that achieve the project goals and customers’ needs."
+     },
+     {
+      "blockIndex": 1012,
+      "text": "Interior Architecture is a mix between Interior Design and Architecture Engineering, this is the first Program of its kind in Palestine and the second in the region.The Program is offered as a Collaboration with The Academy of Fine Arts of Verona - Italy."
+     },
+     {
+      "blockIndex": 1013,
+      "text": "The Academy of Fine Arts of Verona is a post-secondary school for studies in the visual arts, founded in 1764. The “Accademia di Belle Arti” is one of the oldest Art Academies in the world and it is listed as one of the Top five” Accademie Storiche d'Italia”."
+     },
+     {
+      "blockIndex": 1014,
+      "text": "The Program was designed by The Academy of Fine Arts of Verona and it meets the International Standards and the Italian Standards. Many of the courses will be taught by the faculty of The Academy of Fine Arts of Verona- Italy."
+     },
+     {
+      "blockIndex": 1087,
+      "text": "NOW TO NEXT NEXT"
+     },
+     {
+      "blockIndex": 1088,
+      "text": "next"
+     },
+     {
+      "blockIndex": 1090,
+      "text": "i think you already have :"
+     }
+    ],
     "degreeHours": 134
    }
   ]
@@ -5570,12 +5791,53 @@
  {
   "faculty": "Faculty of Artificial Intelligence and Data Science",
   "blockIndex": 1093,
-  "programs": []
+  "programs": [],
+  "programNamesListed": [
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Cyber Security",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Digital Media",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Education Technology",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Financial Technology",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Innovation",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Medical Sciences",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Public Relations",
+   "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Robotics",
+   "Bachelor in Data Science - Specialization in Data Science and Machine Learning",
+   "Bachelor in Data Science - Specialization in Finance and Data Science",
+   "Bachelor in Data Science - Specialization in Statistics and Data Science",
+   "Bachelor in Financial Engineering",
+   "Bachelor in Virtual Reality Science"
+  ]
  },
  {
   "faculty": "Faculty of Digital Sciences",
   "blockIndex": 1100,
-  "programs": []
+  "programs": [],
+  "programNamesListed": [
+   "Bachelor in Digital Sciences - Specialization in Digital Economy",
+   "Bachelor in Digital Sciences - Specialization in Digital Health",
+   "Bachelor in Digital Sciences - Specialization in Digital Management of Business",
+   "Bachelor in Digital Sciences - Specialization in Digital Marketing",
+   "Bachelor in Digital Sciences - Specialization in Neuromarketing",
+   "Bachelor in Digital Sciences - Specialization in Political Science and Digital Diplomacy"
+  ],
+  "facultyNotes": [
+   {
+    "blockIndex": 1103,
+    "text": "and already added all of them, if something is missing… tell me now to nEXT"
+   },
+   {
+    "blockIndex": 1104,
+    "text": "NEXT NEXT NEXT"
+   },
+   {
+    "blockIndex": 1105,
+    "text": "next"
+   },
+   {
+    "blockIndex": 1108,
+    "text": "next"
+   }
+  ]
  },
  {
   "faculty": "Faculty of Arts and Education",
@@ -5692,6 +5954,7 @@
       "mustPassAll": true
      }
     },
+    "overview": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
     "degreeHours": 33
    },
    {
@@ -6317,12 +6580,34 @@
       "requiredHours": 6
      }
     },
+    "overview": "The Department of Arabic Language and Media was established in 2008 AD, according to a new vision that combines the Arabic language and media, within the framework of one program, according to which the student is granted a bachelor’s degree that qualifies him to work in two tracks, or in two fields; The field of education, and the field of media in its various fields.",
+    "sourceNotes": [
+     {
+      "blockIndex": 1184,
+      "text": "The department includes seven full-time teachers and several part-time teachers in the fields of language and media, in addition to two technicians who work as media supervisors in the radio and television studio."
+     },
+     {
+      "blockIndex": 1185,
+      "text": "Since its establishment, the department has been keen to contract with distinguished expertise and competencies in the fields of media and the Arabic language, which enhances its mission."
+     },
+     {
+      "blockIndex": 1188,
+      "text": "The number of students in the department ranges from 170 to 200 students, and they are often awarded a bachelor's degree after successfully passing (134) credit hours. The department aspires to develop their linguistic, literary and media capabilities, and qualify them to work in the fields of education and media."
+     }
+    ],
     "degreeHours": 134
    },
    {
     "name": "Bachelor in Educational Administration",
     "blockIndex": 1230,
-    "requirements": {}
+    "requirements": {},
+    "overview": "The objective of the Bachelor of Educational Administration program is to provide students with the knowledge, skills, and abilities necessary to work in the fields of school administration, educational supervision, and leadership of Palestinian and international educational institutions.The vision of the program is to be a distinguished program at the national level, and for its graduates to be able to compete in the Palestinian educational labor market, and to “create distinguished educational leaders who are capable of leading the education sector towards a sustainable future.”The objective of the Bachelor of Educational Administration program is to provide students with the knowledge, skills, and abilities necessary to work in the fields of school administration, educational supervision, and leadership of Palestinian and international educational institutions.The vision of the program is to be a distinguished program at the national level, and for its graduates to be able to compete in the Palestinian educational labor market, and to “create distinguished educational leaders who are capable of leading the education sector towards a sustainable future.”",
+    "sourceNotes": [
+     {
+      "blockIndex": 1241,
+      "text": "no academic plan"
+     }
+    ]
    },
    {
     "name": "Bachelor in Languages",
@@ -6736,6 +7021,57 @@
       "mustPassAll": true
      }
     },
+    "overview": "The advantages of learning foreign languages are increasing as the world becomes increasingly globalized and bilingualism. In fact, it is now perhaps the most useful real-world skill to ever exist.",
+    "sourceNotes": [
+     {
+      "blockIndex": 1253,
+      "text": "Foreign language study is all about learning how to truly communicate and connect with others—an incredibly important life skill that can only be cultivated by interacting with people. When you master a foreign language, you can exercise your new superhuman power of being able to understand what someone is saying, recall the proper vocabulary and grammar, put that vocabulary and grammar into the proper context, and reply back—all on the spot and in a timely manner. You’ve connected."
+     },
+     {
+      "blockIndex": 1255,
+      "text": "Therefore, the Arab American University is keen to provide equal opportunities for its students to learn and gain knowledge that take into account individual differences in personality of the learner and different characteristics to be good citizens for themselves, their families and their community. To achieve this purpose emerged the need to qualify future graduates."
+     },
+     {
+      "blockIndex": 1257,
+      "text": "This program is designed to prepare graduates to be skilled, innovative and challenging."
+     },
+     {
+      "blockIndex": 1259,
+      "text": "The program acquaints students with the basic knowledge and skills necessary to learn the languages they choose."
+     },
+     {
+      "blockIndex": 1261,
+      "text": "The program combines the academic study of language with practical training. It prepares students for a wide range of career opportunities teaching and research in language and acquisition to publishing, media, and different government and nongovernment institutions require language knowledge. The student has to pass at least 124 credit hours to earn the BA Degree in Double Major in Languages."
+     },
+     {
+      "blockIndex": 1263,
+      "text": "Note: In addition to English Language, The student has to choose ONE language form the languages offered below:"
+     },
+     {
+      "blockIndex": 1265,
+      "text": "Turkish Language"
+     },
+     {
+      "blockIndex": 1267,
+      "text": "Spanish Language"
+     },
+     {
+      "blockIndex": 1269,
+      "text": "Hebrew Language"
+     },
+     {
+      "blockIndex": 1271,
+      "text": "French Language"
+     },
+     {
+      "blockIndex": 1273,
+      "text": "Chinese Language"
+     },
+     {
+      "blockIndex": 1275,
+      "text": "German Language"
+     }
+    ],
     "degreeHours": 124
    },
    {
@@ -9091,13 +9427,56 @@
       "mustPassAll": true
      }
     },
+    "overview": "All students receive training in linguistics, literature, and both written and spoken English to enhance their skills and expand their knowledge of the English-speaking world.To earn a Bachelor’s Degree in English, students in the Department of Modern Languages must successfully complete a total of 128 credit hours and fulfill the requirements in the following categories:All students receive training in linguistics, literature, and both written and spoken English to enhance their skills and expand their knowledge of the English-speaking world.To earn a Bachelor’s Degree in English, students in the Department of Modern Languages must successfully complete a total of 128 credit hours and fulfill the requirements in the following categories:",
+    "sourceNotes": [
+     {
+      "blockIndex": 1634,
+      "text": "Department Requirements: Students must complete 90 credit hours, including 45 core (compulsory) credits, 21 departmental electives, and 24 credits according to their selected track (either Translation or Communication)."
+     }
+    ],
     "degreeHours": 127
    },
    {
     "name": "Bachelor in Social Work",
     "blockIndex": 1712,
-    "requirements": {}
+    "requirements": {},
+    "overview": "The B.A. program in Social Work is designed to prepare students for a rewarding career in social services, providing the knowledge and skills needed to empower individuals, families, and communities. This interdisciplinary program integrates theories from psychology, sociology, public health, and law to create a comprehensive understanding of human behavior, social systems, and the challenges faced by vulnerable populations. Students will engage with core social work principles, such as social justice, ethics, and advocacy, while developing",
+    "sourceNotes": [
+     {
+      "blockIndex": 1721,
+      "text": "practical skills in areas like crisis intervention, group facilitation, and community organization."
+     },
+     {
+      "blockIndex": 1722,
+      "text": "The curriculum is built around a combination of classroom learning and hands-on experience. Through field practicums, students will have the opportunity to work with diverse populations in real-world settings, applying theoretical concepts to practice. The program covers a wide range of social work fields, including mental health, child welfare, healthcare, substance abuse, and criminal justice, equipping graduates with the flexibility to work in various sectors."
+     },
+     {
+      "blockIndex": 1723,
+      "text": "Graduates of this program will be well-prepared to pursue professional licensure, further their education with advanced degrees, or enter the workforce in roles such as case managers, counselors, community organizers, or policy advocates. With a focus on promoting social change and supporting marginalized communities, the program aims to develop compassionate, ethical, and effective social work practitioners."
+     },
+     {
+      "blockIndex": 1724,
+      "text": "no academic plan. next"
+     },
+     {
+      "blockIndex": 1725,
+      "text": "NEXT"
+     }
+    ]
    }
+  ],
+  "programNamesListed": [
+   "Diploma in Education for Upper Basic Level - Teaching Arabic",
+   "Diploma in Education for Upper Basic Level - Teaching English",
+   "Diploma in Education for Upper Basic Level - Teaching Mathematics",
+   "Diploma in Education for Upper Basic Level - Teaching Science",
+   "Bachelor in Arabic Language and Media",
+   "Bachelor in Basic Elementary Education",
+   "Bachelor in Educational Administration",
+   "Bachelor in English Language",
+   "Bachelor in Languages",
+   "Bachelor in Social Work",
+   "Bachelor in Teaching English"
   ]
  },
  {
@@ -9541,6 +9920,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "The mission of the Accounting Department is to provide students with knowledge of fundamental principles and theories of accounting, and equip them with the most up-to-date accounting methods. The department aims to teach students how to utilize their theoretical knowledge of accounting and apply it successfully and ethically in the business and corporate worlds. The Accounting Department places emphasis on areas such as auditing, financial statement analysis, accounting information systems, managerial accounting, and taxation.The mission of the Accounting Department is to provide students with knowledge of fundamental principles and theories of accounting, and equip them with the most up-to-date accounting methods. The department aims to teach students how to utilize their theoretical knowledge of accounting and apply it successfully and ethically in the business and corporate worlds. The Accounting Department places emphasis on areas such as auditing, financial statement analysis, accounting information systems, managerial accounting, and taxation.",
     "degreeHours": 127
    },
    {
@@ -10451,7 +10831,14 @@
    {
     "name": "Bachelor in Marketing",
     "blockIndex": 1929,
-    "requirements": {}
+    "requirements": {},
+    "overview": "Our Bachelor Marketing degree develops the students’ skills of flexibility, problem-solving ability, effective communication, social responsibility, commercial awareness and communication, all highly valued by employers.All of the above mentioned and much more will be demonstrated by the following ways, and more; Practical application by analyze and solve business problems,Functional interdependence among business functions and processes, Opportunity recognition by finding ways to turn problems into business or personal opportunities, Creativity to generate innovative solutions, Reflective thinking to develop insight towards future action and quality business presentations approach.OverviewOur Bachelor Marketing degree develops the students’ skills of flexibility, problem-solving ability, effective communication, social responsibility, commercial awareness and communication, all highly valued by employers.All of the above mentioned and much more will be demonstrated by the following ways, and more; Practical application by analyze and solve business problems,Functional interdependence among business functions and processes, Opportunity recognition by finding ways to turn problems into business or personal opportunities, Creativity to generate innovative solutions, Reflective thinking to develop insight towards future action and quality business presentations approach.",
+    "sourceNotes": [
+     {
+      "blockIndex": 1948,
+      "text": "no academic plan"
+     }
+    ]
    },
    {
     "name": "Bachelor in Operations Management - Specialization in Management Information Systems (MIS)",
@@ -10899,7 +11286,25 @@
       "requiredHours": 6
      }
     },
-    "degreeHours": 127
+    "degreeHours": 127,
+    "sourceNotes": [
+     {
+      "blockIndex": 2000,
+      "text": "Course Number"
+     },
+     {
+      "blockIndex": 2001,
+      "text": "Course Name Weekly Hours Cr. Hrs.Prerequisi"
+     },
+     {
+      "blockIndex": 2002,
+      "text": "e"
+     },
+     {
+      "blockIndex": 2004,
+      "text": "heoreticaPractical"
+     }
+    ]
    },
    {
     "name": "Bachelor in Business Administration",
@@ -11391,7 +11796,14 @@
    {
     "name": "Bachelor in Financial and Banking Sciences",
     "blockIndex": 2095,
-    "requirements": {}
+    "requirements": {},
+    "overview": "Our mission in the department of finance and banking is to prepare individuals to function effectively in a dynamic and complex global business and economic environment. The department provides academic and professional education to enable individuals, successfully to pursue their career paths especially in banks and to make effective contribution to their communities and country at large. The department of finance and banking has three purposes: 1. To help student understand the function of business in the development and stability of local, national and international societies. 2. To assist students in their mastery of the knowledge and skills necessary for careers in financial markets and banks. 3. To inspire and development finance graduates with capabilities for quality decision-making and leadership with an ethical sensitivity and sense of justice and social responsibility.Our mission in the department of finance and banking is to prepare individuals to function effectively in a dynamic and complex global business and economic environment. The department provides academic and professional education to enable individuals, successfully to pursue their career paths especially in banks and to make effective contribution to their communities and country at large. The department of finance and banking has three purposes: 1. To help student understand the function of business in the development and stability of local, national and international societies. 2. To assist students in their mastery of the knowledge and skills necessary for careers in financial markets and banks. 3. To inspire and development finance graduates with capabilities for quality decision-making and leadership with an ethical sensitivity and sense of justice and social responsibility.",
+    "sourceNotes": [
+     {
+      "blockIndex": 2103,
+      "text": "no academic plan"
+     }
+    ]
    },
    {
     "name": "Bachelor in Land and Property Management",
@@ -11783,12 +12195,38 @@
       "requiredHours": 6
      }
     },
+    "overview": "The land and real estate sector is one of the vital sectors in Palestine, and there has been a noticeable increase in recent years by investors and businessmen towards buying land and owning real estate as a safe haven from investment risks and exchange rate fluctuations. Investment in this sector includes the land and real estate market, which needs professional management of the sources of financing for this sector, land management and settlement, methods of sorting, conflict resolution and decomposition, property management, and real estate development methods.",
+    "sourceNotes": [
+     {
+      "blockIndex": 2115,
+      "text": "Therefore, this program offers a specialized scientific certificate in the methods of land and property management, given the urgent need of the Palestinian market for qualified cadres in this field capable of bridging the gap in the labor market and having the ability to contribute to the development and organization of this important economic sector in various fields, including real estate companies, the construction sector, engineering offices, Land Settlement and Registration Department, city planning, local government bodies, survey offices and others. This program also provides specialized competencies with professional skills in the field of buying, selling, developing and investing land and real estate locally and globally. The College of Administrative and Financial Sciences has the ability to attract qualified and specialized faculty members to teach quality courses in this program to help provide the student with experience and skills professionally and ethically in the field of land and property management in Palestine."
+     }
+    ],
     "degreeHours": 127
    },
    {
     "name": "Bachelor in Operations Management - Specialization in Hospitals and Health Care Management",
     "blockIndex": 2159,
-    "requirements": {}
+    "requirements": {},
+    "overview": "This program provides the students an introduction of health administration and its similarities and differences with the principles of public administration. It also shows the importance of contemporary health-related methods and management techniques in health administration. And the growing importance of health management to maximize output and minimize the cost by effectively utilizing health resources. In Addition, it helps understanding the input and output of the Palestinian health system and comparing it with other similar health systems. In the end, the program provide students with the skills to work in the administrative health services.This program provides the students an introduction of health administration and its similarities and differences with the principles of public administration. It also shows the importance of contemporary health-related methods and management techniques in health administration. And the growing importance of health management to maximize output and minimize the cost by effectively utilizing health resources. In Addition, it helps understanding the input and output of the Palestinian health system and comparing it with other similar health systems. In the end, the program provide students with the skills to work in the administrative health services.",
+    "sourceNotes": [
+     {
+      "blockIndex": 2168,
+      "text": "no academic plan"
+     },
+     {
+      "blockIndex": 2176,
+      "text": "NEXT"
+     },
+     {
+      "blockIndex": 2178,
+      "text": "next NExt NEXT"
+     },
+     {
+      "blockIndex": 2181,
+      "text": "next 👍"
+     }
+    ]
    }
   ]
  },
@@ -12018,6 +12456,7 @@
       "mustPassAll": true
      }
     },
+    "overview": "It is a three-year specialty program. The program has a theoretical and clinical nature and qualifies the doctor to enter the Palestinian Board Examination in Dental Prosthodontics after completing all theoretical and practical graduation requirementsAAUP has received the program accreditation by Palestine Medical Council (the highest medical authority in Palestine), after providing specialized academic staff and high-quality dental equipment based on the standards and regulations of Palestine Medical Council.This program aims at raising career levels by offering a 3-year consistent and programmed training where physicians complete practical cases of patients restoring missing teeth through using fixed and mental prosthodontics, teeth implants, or mending bone tissue that occur either from genetic reasons or as a result from accidents. This program is the first of its kind in Palestinian universities available to meet the needs of dentists who are looking to acquire a higher specialty in Dentistry.Faculty of Dentistry at AAUP along with its Board of Directors and administration, seeks to meet the requirements and development of the Palestinian Dentists through this program, and improves their work experience through multitude of current and future projects.Upon completing the program’s requirements, graduates are qualified to take the Palestinian Medical Board exam in the specialty of Fixed and Removable Prosthodontics and acquire the title of specialist if they pass the exam.It is a three-year specialty program. The program has a theoretical and clinical nature and qualifies the doctor to enter the Palestinian Board Examination in Dental Prosthodontics after completing all theoretical and practical graduation requirementsAAUP has received the program accreditation by Palestine Medical Council (the highest medical authority in Palestine), after providing specialized academic staff and high-quality dental equipment based on the standards and regulations of Palestine Medical Council.This program aims at raising career levels by offering a 3-year consistent and programmed training where physicians complete practical cases of patients restoring missing teeth through using fixed and mental prosthodontics, teeth implants, or mending bone tissue that occur either from genetic reasons or as a result from accidents. This program is the first of its kind in Palestinian universities available to meet the needs of dentists who are looking to acquire a higher specialty in Dentistry.Faculty of Dentistry at AAUP along with its Board of Directors and administration, seeks to meet the requirements and development of the Palestinian Dentists through this program, and improves their work experience through multitude of current and future projects.Upon completing the program’s requirements, graduates are qualified to take the Palestinian Medical Board exam in the specialty of Fixed and Removable Prosthodontics and acquire the title of specialist if they pass the exam.",
     "degreeHours": 63,
     "advisoryPlan": {
      "terms": [
@@ -12995,7 +13434,13 @@
       "mustPassAll": true
      }
     },
-    "degreeHours": 48
+    "degreeHours": 48,
+    "sourceNotes": [
+     {
+      "blockIndex": 2371,
+      "text": "Colg. Elec."
+     }
+    ]
    },
    {
     "name": "Bachelor in Doctor of Dental Surgery",
@@ -14328,8 +14773,32 @@
       "mustPassAll": true
      }
     },
-    "degreeHours": 211
+    "degreeHours": 211,
+    "sourceNotes": [
+     {
+      "blockIndex": 2549,
+      "text": "NEXT"
+     },
+     {
+      "blockIndex": 2550,
+      "text": "next"
+     },
+     {
+      "blockIndex": 2552,
+      "text": "NXET"
+     },
+     {
+      "blockIndex": 2553,
+      "text": "NXET 👍"
+     }
+    ]
    }
+  ],
+  "programNamesListed": [
+   "Advanced Residency in Prosthodontics",
+   "Residency Program in Orthodontics",
+   "Bachelor in Dental Technology",
+   "Bachelor in Doctor of Dental Surgery"
   ]
  },
  {
@@ -14339,7 +14808,8 @@
    {
     "name": "Bachelor in AI and Robotics Engineering",
     "blockIndex": 2559,
-    "requirements": {}
+    "requirements": {},
+    "overview": "no plan"
    },
    {
     "name": "Bachelor in Civil Engineering",
@@ -16159,6 +16629,13 @@
       "requiredHours": 6
      }
     },
+    "overview": "The Cybersecurity Engineering program at The Arab American University in Palestine is closely related to the Computer Engineering program, integrating fundamental and advanced concepts from both fields to prepare graduates for the evolving challenges in the tech industry. The program aims to prepare graduates for professional participation in multi-disciplinary fields in both industry and academia, focusing on cybersecurity. Graduates are expected to produce innovative and entrepreneurial solutions to meet national and international cybersecurity needs, demonstrate ethical and collaborative leadership, and continually develop their knowledge and expertise through professional opportunities and life-long learning.",
+    "sourceNotes": [
+     {
+      "blockIndex": 2722,
+      "text": "The program equips students with the ability to identify, formulate, and solve complex cybersecurity problems, apply secure engineering design principles, communicate effectively with diverse audiences, and function effectively in team environments. Graduates are trained to handle ethical and professional responsibilities, conduct and analyze experimentation, and continuously acquire new knowledge in the field. The program also emphasizes the importance of understanding theoretical foundations, developing secure software and hardware systems, managing cyber threats and incident responses, and integrating artificial intelligence in cybersecurity practices."
+     }
+    ],
     "degreeHours": 163,
     "advisoryPlan": {
      "terms": [
@@ -17239,7 +17716,13 @@
       "requiredHours": 6
      }
     },
-    "degreeHours": 169
+    "degreeHours": 169,
+    "sourceNotes": [
+     {
+      "blockIndex": 2901,
+      "text": "aculty Requirements"
+     }
+    ]
    },
    {
     "name": "Bachelor in Public Safety Engineering",
@@ -17322,6 +17805,13 @@
       "mustPassAll": true
      }
     },
+    "overview": "The Bachelor of Science in Public Safety Engineering prepares engineers to protect people and communities from industrial, construction, environmental, andhealth-related hazards.The curriculum combines theoretical knowledge and practical applications, covering risk analysis, accident prevention, modern safety systems, and emergency/disaster management, along with related regulations and standards.The Bachelor of Science in Public Safety Engineering prepares engineers to protect people and communities from industrial, construction, environmental, andhealth-related hazards.The curriculum combines theoretical knowledge and practical applications, covering risk analysis, accident prevention, modern safety systems, and emergency/disaster management, along with related regulations and standards.",
+    "sourceNotes": [
+     {
+      "blockIndex": 2957,
+      "text": "NO real plan yet."
+     }
+    ],
     "degreeHours": 14
    },
    {
@@ -21297,7 +21787,14 @@
       "requiredHours": 6
      }
     },
+    "overview": "Medical Equipment Engineering is an interdisciplinary program that combines biology and medical theory with specialized training in electrical, physics, material, and mechanical engineering. It applies engineering principles to develop devices, equipment, computer systems, and software used in healthcare to improve human health and quality of life.The Bachelor’s program provides essential skills and knowledge to drive change in the healthcare system, including advances in imaging, robotics, materials engineering, prosthetics, and computer science.Students will study mechanical, electrical engineering, artificial intelligence (e.g., machine learning, neural networks, fuzzy logic), and modern biomedical systems.Medical Equipment Engineering is an interdisciplinary program that combines biology and medical theory with specialized training in electrical, physics, material, and mechanical engineering. It applies engineering principles to develop devices, equipment, computer systems, and software used in healthcare to improve human health and quality of life.The Bachelor’s program provides essential skills and knowledge to drive change in the healthcare system, including advances in imaging, robotics, materials engineering, prosthetics, and computer science.Students will study mechanical, electrical engineering, artificial intelligence (e.g., machine learning, neural networks, fuzzy logic), and modern biomedical systems.",
     "degreeHours": 167,
+    "sourceNotes": [
+     {
+      "blockIndex": 3604,
+      "text": "."
+     }
+    ],
     "advisoryPlan": {
      "terms": [
       {
@@ -22383,6 +22880,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "This department offers a Bachelor's program in Communication Engineering, focusing on both theoretical and practical studies that enhance students' ability to provide engineering solutions in the fields of networking and communications engineering. Additionally, the department emphasizes strengthening the connection between students and society, encouraging them to improve their productivity and contribute to the advancement of the communications engineering profession, ultimately shaping professional engineers in this field.This department offers a Bachelor's program in Communication Engineering, focusing on both theoretical and practical studies that enhance students' ability to provide engineering solutions in the fields of networking and communications engineering. Additionally, the department emphasizes strengthening the connection between students and society, encouraging them to improve their productivity and contribute to the advancement of the communications engineering profession, ultimately shaping professional engineers in this field.",
     "advisoryPlan": {
      "terms": [
       {
@@ -22767,8 +23265,38 @@
       }
      ],
      "sumOfAllTerms": 147.0
-    }
+    },
+    "sourceNotes": [
+     {
+      "blockIndex": 3895,
+      "text": "NEXT"
+     },
+     {
+      "blockIndex": 3897,
+      "text": "next"
+     },
+     {
+      "blockIndex": 3907,
+      "text": "next next next next"
+     },
+     {
+      "blockIndex": 3915,
+      "text": "next 👍"
+     }
+    ]
    }
+  ],
+  "programNamesListed": [
+   "Bachelor in AI and Robotics Engineering",
+   "Bachelor in Architecture Engineering",
+   "Bachelor in Civil Engineering",
+   "Bachelor in Computer Systems Engineering",
+   "Bachelor in Cybersecurity Engineering",
+   "Bachelor in Electrical Engineering and Renewable Energy",
+   "Bachelor in Mechatronics Engineering",
+   "Bachelor in Medical Equipment Engineering",
+   "Bachelor in Public Safety Engineering",
+   "Bachelor in Telecommunications Engineering"
   ]
  },
  {
@@ -23248,6 +23776,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "Information is one of the main components of any computer system and it is very valuable that needs to be protected in any means and ways. This program provides a BA in Computer Network/ minor in Information Security based on a modern study plan. The program’s plan provides chances in the theoretical and practical aspects in designing, building, maintaining and managing computer networks in a way that protects the security and secrecy of information transfer.Information is one of the main components of any computer system and it is very valuable that needs to be protected in any means and ways. This program provides a BA in Computer Network/ minor in Information Security based on a modern study plan. The program’s plan provides chances in the theoretical and practical aspects in designing, building, maintaining and managing computer networks in a way that protects the security and secrecy of information transfer.",
     "advisoryPlan": {
      "terms": [
       {
@@ -23595,7 +24124,14 @@
    {
     "name": "Bachelor in Computer Science - Minor Computer Information Technology",
     "blockIndex": 4104,
-    "requirements": {}
+    "requirements": {},
+    "overview": "This program provides its students a solid base in information technologies and information systems based on computer system and internet, and connected to the needs of the industry, commercial education and all life aspects. Graduates of this program can work in all fields related to computer programming, data processing and database management, analyzing and building computer systems and developing internet websites. What makes this department distinguish is that it focuses on training students to be equipped with practical skills needed in the labor market, and students are taught to be prepared to the postgraduate studies through a solid base in mathematics, logic, computerized theories and program design and others. Moreover, the curriculum was planned to improve students’ capabilities in solving problems by using the technology standards and modern computers.OverviewThis program provides its students a solid base in information technologies and information systems based on computer system and internet, and connected to the needs of the industry, commercial education and all life aspects. Graduates of this program can work in all fields related to computer programming, data processing and database management, analyzing and building computer systems and developing internet websites. What makes this department distinguish is that it focuses on training students to be equipped with practical skills needed in the labor market, and students are taught to be prepared to the postgraduate studies through a solid base in mathematics, logic, computerized theories and program design and others. Moreover, the curriculum was planned to improve students’ capabilities in solving problems by using the technology standards and modern computers.",
+    "sourceNotes": [
+     {
+      "blockIndex": 4121,
+      "text": "no plan yet"
+     }
+    ]
    },
    {
     "name": "Bachelor in Cyber Security",
@@ -24141,6 +24677,25 @@
       "requiredHours": 6
      }
     },
+    "overview": "he Bachelor of Science in Cyber Security at the Arab American University prepares students for careers in computer security by teaching them to design, implement, and manage security systems. Students will develop skills for roles such as security designers, penetration testers, information security specialists, and digital forensic officers. The program covers various aspects of cyber security, including network security, digital forensics, and secure software development for web, mobile, and cloud applications.Key features of the program include:he Bachelor of Science in Cyber Security at the Arab American University prepares students for careers in computer security by teaching them to design, implement, and manage security systems. Students will develop skills for roles such as security designers, penetration testers, information security specialists, and digital forensic officers. The program covers various aspects of cyber security, including network security, digital forensics, and secure software development for web, mobile, and cloud applications.Key features of the program include:",
+    "sourceNotes": [
+     {
+      "blockIndex": 4132,
+      "text": "A comprehensive curriculum that stays updated with the latest trends in cyber security."
+     },
+     {
+      "blockIndex": 4133,
+      "text": "A strong technical focus, combining lectures with practical laboratory exercises."
+     },
+     {
+      "blockIndex": 4134,
+      "text": "Emphasis on secure software development mechanisms across multiple platforms."
+     },
+     {
+      "blockIndex": 4214,
+      "text": "."
+     }
+    ],
     "degreeHours": 132,
     "advisoryPlan": {
      "terms": [
@@ -25907,6 +26462,7 @@
       "requiredHours": 6
      }
     },
+    "overview": "The Computer Science Department was established when AAUP opened in 2000 in collaboration with California State University from Stanslos. The department is considered as a distinguish scientific department in the Faculty Engineering and Information Technology as it contributed in enriching the university status locally, regionally and internationally as many students graduated from this department and currently working in different positions.The department has qualified professors with rich research and practical experiences and skills to teach students, and this gives students in this department the chance to join graduate programs in Computer Science that will enable them to improve the scientific research in modern ways. This department contributes in developing the information technology in private and governmental sectors in Palestine through graduating qualified students equipped with different required skills. Moreover, the department provides the PhD degree in computer science under collaboration with Palestinian universities.The Computer Science Department was established when AAUP opened in 2000 in collaboration with California State University from Stanslos. The department is considered as a distinguish scientific department in the Faculty Engineering and Information Technology as it contributed in enriching the university status locally, regionally and internationally as many students graduated from this department and currently working in different positions.The department has qualified professors with rich research and practical experiences and skills to teach students, and this gives students in this department the chance to join graduate programs in Computer Science that will enable them to improve the scientific research in modern ways. This department contributes in developing the information technology in private and governmental sectors in Palestine through graduating qualified students equipped with different required skills. Moreover, the department provides the PhD degree in computer science under collaboration with Palestinian universities.",
     "degreeHours": 134,
     "advisoryPlan": {
      "terms": [
@@ -27854,6 +28410,16 @@
      ],
      "sumOfAllTerms": 130.0
     },
+    "sourceNotes": [
+     {
+      "blockIndex": 4941,
+      "text": "NEXT"
+     },
+     {
+      "blockIndex": 4942,
+      "text": "next 👍"
+     }
+    ],
     "sourceIssues": [
      {
       "kind": "advisoryPlanDoesNotReachDegreeHours",
@@ -27864,6 +28430,15 @@
      }
     ]
    }
+  ],
+  "programNamesListed": [
+   "Bachelor in Computer Networks - Minor Information Security",
+   "Bachelor in Computer Science",
+   "Bachelor in Computer Science - Minor Computer Information Technology",
+   "Bachelor in Computer Science - Specialization in Game Design and Development",
+   "Bachelor in Cyber Security",
+   "Bachelor in Geographic Information Systems (GIS)",
+   "Bachelor in Multimedia Technology"
   ]
  },
  {
@@ -31090,8 +31665,27 @@
       }
      ],
      "sumOfAllTerms": 136.0
-    }
+    },
+    "sourceNotes": [
+     {
+      "blockIndex": 5518,
+      "text": "NEXT"
+     },
+     {
+      "blockIndex": 5520,
+      "text": "next"
+     },
+     {
+      "blockIndex": 5527,
+      "text": "nEXT 👍"
+     }
+    ]
    }
+  ],
+  "programNamesListed": [
+   "Bachelor in Fiqh And Law",
+   "Bachelor in Law",
+   "Bachelor in Law - Concentration on Law in English"
   ]
  },
  {
@@ -32693,8 +33287,22 @@
       }
      ],
      "sumOfAllTerms": 257.0
-    }
+    },
+    "sourceNotes": [
+     {
+      "blockIndex": 5861,
+      "text": "NEXT"
+     },
+     {
+      "blockIndex": 5863,
+      "text": "next nEXT 👍"
+     }
+    ]
    }
+  ],
+  "programNamesListed": [
+   "Bachelor in Biomedical Sciences",
+   "Bachelor in Doctor of Medicine"
   ]
  },
  {
@@ -33197,6 +33805,7 @@
       "mustPassAll": true
      }
     },
+    "overview": "The \"Digital Media program\" offered by the Faculty of Modern Media is based on a new curriculum in an ever-renewing technological media field, enabling students to acquire theoretical knowledge and practical skills to become journalists engaged in an ever-renewing digital environment. This is by making the teaching structure based on field work, providing an educational environment enhanced by laboratories dedicated to experimentation and presenting media content, and communicating with a team of academics and specialized experts.This program also focuses on everything that would provide the student with skills that would enable him/her to work independently, capable of creating media content, by enabling them to produce by themselves and create entrepreneurial pioneering projects in a world that is no longer the exclusive to large institutions.This program provides four educational fields that bring the students closer to the labor market in the field they prefer and find themselves in, so that they can choose the field of modern media technologies, digital journalism, digital photography, or digital radio and televisionOverviewThe \"Digital Media program\" offered by the Faculty of Modern Media is based on a new curriculum in an ever-renewing technological media field, enabling students to acquire theoretical knowledge and practical skills to become journalists engaged in an ever-renewing digital environment. This is by making the teaching structure based on field work, providing an educational environment enhanced by laboratories dedicated to experimentation and presenting media content, and communicating with a team of academics and specialized experts.This program also focuses on everything that would provide the student with skills that would enable him/her to work independently, capable of creating media content, by enabling them to produce by themselves and create entrepreneurial pioneering projects in a world that is no longer the exclusive to large institutions.This program provides four educational fields that bring the students closer to the labor market in the field they prefer and find themselves in, so that they can choose the field of modern media technologies, digital journalism, digital photography, or digital radio and television",
     "degreeHours": 133
    },
    {
@@ -34046,8 +34655,24 @@
       "courses": [],
       "requiredHours": 6
      }
-    }
+    },
+    "overview": "The “Digital Media and Communication” Program that Arab American University opened will help in solving a huge problem in Palestine and the Arab World as it will be connected to the usage of 80% of citizens in the Palestinian community. The different types and forms of the social media networks and its audiences control most aspects of our lives without any deep, scientific, and practical corresponding educational programs to raise awareness, knowledge and systematic science. This program in AAUP is considered to be an innovation and renewal, and it is a scientific boldness to enter such a life and media-related field. This program depends on the field-work aspect in teaching and the university provided a scientific environment enhanced with laboratories for experiments in order to provide specialized content. Also AAUP provided an opportunity for students to contact some academics and experts face-to-face through the e-learning system as they cannot enter Palestine.This program will provide and build an interactive and integrated forum on the internet to be a platform for the program, for the faculty (Faculty of Digital Media) and for the university as well. This will be the criteria to distinguish students according to what they produce and practice, not on what they are theoretically tested in. And so students’ production will be a variety of democratic digital content that benefit the Palestinian and the Arab community.The program will provide students with the needed skills to start their own work independently and build aprofessional content, especially in light of the increasing number of unemployment between new graduates. Graduates also will be able to start their own pioneer projects in a world that is no longer exclusive to large institutions. Graduates of this program will be “Communication and Social Media Specialists” and innovators in applying technology and employing it to achieve the organization goals.This program helps to cover the gap in the educational Palestinian institutions which did not recognize the network world that forms most of our world and affects our lives. We started to have second and third virtual lives, as the networks are places where you can express your opinions, market your products, a cultural, artistic, advertising and political place … etc. By providing this program, AAUP provides a program that fits this virtual and real world that affects our lives and our future.The “Digital Media and Communication” Program that Arab American University opened will help in solving a huge problem in Palestine and the Arab World as it will be connected to the usage of 80% of citizens in the Palestinian community. The different types and forms of the social media networks and its audiences control most aspects of our lives without any deep, scientific, and practical corresponding educational programs to raise awareness, knowledge and systematic science. This program in AAUP is considered to be an innovation and renewal, and it is a scientific boldness to enter such a life and media-related field. This program depends on the field-work aspect in teaching and the university provided a scientific environment enhanced with laboratories for experiments in order to provide specialized content. Also AAUP provided an opportunity for students to contact some academics and experts face-to-face through the e-learning system as they cannot enter Palestine.This program will provide and build an interactive and integrated forum on the internet to be a platform for the program, for the faculty (Faculty of Digital Media) and for the university as well. This will be the criteria to distinguish students according to what they produce and practice, not on what they are theoretically tested in. And so students’ production will be a variety of democratic digital content that benefit the Palestinian and the Arab community.The program will provide students with the needed skills to start their own work independently and build aprofessional content, especially in light of the increasing number of unemployment between new graduates. Graduates also will be able to start their own pioneer projects in a world that is no longer exclusive to large institutions. Graduates of this program will be “Communication and Social Media Specialists” and innovators in applying technology and employing it to achieve the organization goals.This program helps to cover the gap in the educational Palestinian institutions which did not recognize the network world that forms most of our world and affects our lives. We started to have second and third virtual lives, as the networks are places where you can express your opinions, market your products, a cultural, artistic, advertising and political place … etc. By providing this program, AAUP provides a program that fits this virtual and real world that affects our lives and our future.",
+    "sourceNotes": [
+     {
+      "blockIndex": 6095,
+      "text": "done for now. there is also this :"
+     },
+     {
+      "blockIndex": 6122,
+      "text": "but i’m tired of doing that so i’ll give you this later."
+     }
+    ]
    }
+  ],
+  "programNamesListed": [
+   "Bachelor in Modern Media - Specialization in Digital Media",
+   "Bachelor in Modern Media - Specialization in Digital Media and Communication",
+   "Bachelor in Public Relations"
   ]
  }
 ]

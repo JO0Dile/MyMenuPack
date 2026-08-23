@@ -146,6 +146,14 @@ def parse_course_row(cells):
     return c
 
 ADVISORY = re.compile(r'^Advisory\s+Plan', re.I)
+OVERVIEW = re.compile(r'^(?:Overview|About\s+Program)', re.I)
+OUT_OF_LINE = re.compile(r'\bfor\s+(univ|spec|free)\.?\s*elec', re.I)
+# Diploma in Ambulance and Emergency has no name line anywhere - the document
+# goes 'first :' -> 'About Program' -> the Overview prose, so the only place the
+# program is named is inside a sentence. Without this the whole program vanishes
+# and Junior College silently reports six diplomas instead of seven.
+NAMED_IN_PROSE = re.compile(
+    r'^(?:Overview|About\s+Program)?\s*The\s+((?:Bachelor|Diploma|Master)\s+in\s+[A-Za-z][A-Za-z &,\-]{3,60}?)\s+is\b', re.I)
 YEAR     = re.compile(r'^(First|Second|Third|Fourth|Fifth|Sixth|Seventh)\s+Year$', re.I)
 SEMESTER = re.compile(r'^(Fall|Spring|Summer|Winter)\s+Semester$', re.I)
 
@@ -182,7 +190,7 @@ def parse_advisory_row(cells):
 
 faculties=[]; cur_fac=None; cur_prog=None; cur_sect=None
 consumed=set(); unconsumed_tables=[]
-in_advisory=False; cur_year=None; cur_term=None
+in_advisory=False; cur_year=None; cur_term=None; in_overview=False
 
 def new_prog(name, i):
     return {'name':name,'blockIndex':i,'requirements':collections.OrderedDict()}
@@ -195,17 +203,48 @@ for b in blocks:
         if FAC.match(t):
             cur_fac={'faculty':t,'blockIndex':i,'programs':[]}
             faculties.append(cur_fac); cur_prog=None; cur_sect=None
-            in_advisory=False; cur_year=None; cur_term=None
+            in_advisory=False; cur_year=None; cur_term=None; in_overview=False
             consumed.add(i); continue
         m=PROG.match(t)
         if m and len(t)<220 and cur_fac is not None and '\t' not in b['text']:
             cur_prog=new_prog(norm(m.group(1)), i)
             cur_fac['programs'].append(cur_prog); cur_sect=None
-            in_advisory=False; cur_year=None; cur_term=None
+            in_advisory=False; cur_year=None; cur_term=None; in_overview=False
+            consumed.add(i); continue
+        if cur_prog is None and cur_fac is not None and '\t' in b['text']:
+            # A faculty index page: every program name on one tab-separated
+            # line. For eleven faculties these duplicate programs parsed in
+            # full below. For Artificial Intelligence and Data Science (13
+            # programs) and Digital Sciences (6) they are the ONLY trace the
+            # document carries - the author wrote "i think you already have :"
+            # and "already added all of them". Recording them is the difference
+            # between "this faculty has no course data" and "this faculty does
+            # not appear to exist".
+            seen=[]
+            for n in b['text'].split('\t'):
+                n=norm(n)
+                if n and PROG.match(n) and n not in seen: seen.append(n)
+            if seen:
+                cur_fac['programNamesListed']=seen
+                consumed.add(i); continue
+        if cur_prog is None and cur_fac is not None:
+            mp=NAMED_IN_PROSE.match(t)
+            if mp:
+                cur_prog=new_prog(norm(mp.group(1)), i)
+                cur_prog['nameFoundOnlyInProse']=True
+                cur_fac['programs'].append(cur_prog); cur_sect=None
+                in_advisory=False; cur_year=None; cur_term=None; in_overview=False
+        if cur_prog is None and cur_fac is not None:
+            # Anything left between programs is the author's own writing - the
+            # navigation ("next", "first :") and, twice, the explanation for why
+            # a whole faculty has no course data: "pictures gonna take a lot of
+            # time, soo. raw data only from now on" and "already added all of
+            # them". Kept so that nothing in the document is dropped.
+            cur_fac.setdefault('facultyNotes',[]).append({'blockIndex':i,'text':t})
             consumed.add(i); continue
         if cur_prog is not None:
             if ADVISORY.match(t):
-                in_advisory=True; cur_sect=None; cur_year=None; cur_term=None
+                in_advisory=True; cur_sect=None; cur_year=None; cur_term=None; in_overview=False
                 cur_prog.setdefault('advisoryPlan',{'terms':[]})
                 consumed.add(i); continue
             if in_advisory:
@@ -224,7 +263,7 @@ for b in blocks:
                 ms=rx.match(t)
                 if ms: hit=key; rest=t[ms.end():].strip(); break
             if hit:
-                in_advisory=False; cur_term=None
+                in_advisory=False; cur_term=None; in_overview=False
                 cur_sect=cur_prog['requirements'].setdefault(hit,{'courses':[]})
                 t=rest                       # the rule may share the label's line
                 consumed.add(i)
@@ -234,6 +273,30 @@ for b in blocks:
                 if mn: cur_sect['requiredHours']=int(mn.group(1)); consumed.add(i); continue
                 if MUST_ALL.search(t): cur_sect['mustPassAll']=True; consumed.add(i); continue
                 if hit: continue
+            # An elective rule can also be written out of line, ahead of its own
+            # heading - Mobile Application Development's univ. elec. arrives as
+            # "for univ. elec. : Students must pass ( 2 ) credit hours ...". The
+            # named section is used, not whichever one happens to be open.
+            mo=OUT_OF_LINE.search(t)
+            if mo:
+                key={'univ':'univElec','spec':'specElec','free':'freeElec'}[mo.group(1).lower()]
+                mn=MUST_N.search(t)
+                if mn:
+                    cur_prog['requirements'].setdefault(key,{'courses':[]})['requiredHours']=int(mn.group(1))
+                    consumed.add(i); continue
+            if OVERVIEW.match(t):
+                rest=OVERVIEW.sub('', t, count=1).strip()
+                if rest: cur_prog['overview']=rest
+                in_overview=True; consumed.add(i); continue
+            if in_overview and 'overview' not in cur_prog:
+                cur_prog['overview']=t; consumed.add(i); continue
+            # Anything still unread is the author's own writing about this
+            # program - "NO real plan yet.", "no academic plan", the note under
+            # Bachelor in Languages listing the four languages a student picks
+            # from. It is information the tables do not carry, so it is kept
+            # verbatim rather than dropped on the floor.
+            cur_prog.setdefault('sourceNotes',[]).append({'blockIndex':i,'text':t})
+            consumed.add(i); continue
     else:
         rows=b['rows']
         if in_advisory:
@@ -272,6 +335,17 @@ nadv=sum(1 for f in faculties for p in f['programs'] if 'advisoryPlan' in p)
 nterm=sum(len(p['advisoryPlan']['terms']) for f in faculties for p in f['programs'] if 'advisoryPlan' in p)
 nadvc=sum(len(t['courses']) for f in faculties for p in f['programs'] if 'advisoryPlan' in p for t in p['advisoryPlan']['terms'])
 print(f'advisory plans       : {nadv} ({nterm} terms, {nadvc} entries)')
+stray=[b for b in blocks if b['kind']=='p' and norm(b['text']) and b['i'] not in consumed]
+nnotes=sum(len(p['sourceNotes']) for f in faculties for p in f['programs'] if 'sourceNotes' in p)
+nover=sum(1 for f in faculties for p in f['programs'] if 'overview' in p)
+print(f'program overviews    : {nover}')
+print(f'author notes kept    : {nnotes}')
+nonly=[(f['faculty'], [n for n in f.get('programNamesListed',[]) if n not in {p['name'] for p in f['programs']}])
+       for f in faculties if f.get('programNamesListed')]
+nonly=[(k,v) for k,v in nonly if v]
+print(f'faculties whose programs exist only as a name list: {len(nonly)}')
+for k,v in nonly: print(f'   {k}: {len(v)} programs, no course data anywhere in the document')
+print(f'paragraphs still unread (outside any program): {len(stray)}')
 print(f'tables w/ courses not attached to a section: {len(unconsumed_tables)}')
 if unconsumed_tables: print('   first few block ids:', unconsumed_tables[:15])
 

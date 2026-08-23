@@ -1,0 +1,67 @@
+{
+ "faculty": "Junior College",
+ "name": "Diploma in Ambulance and Emergency",
+ "source": "images image1.png,image2.jpeg,image3.png,image4.png; text blocks 16-17",
+ "programCode": "30015",
+ "degree": "Intermediate diploma",
+ "department": "Department of Health Professions",
+ "campuses": ["Jenin Campus", "Ramallah Campus"],
+ "durationYears": 2,
+ "creditHourFee": "Start from 300 ILS",
+ "teachingLanguage": ["English"],
+ "semesters": ["First Semester", "Second Semester", "Summer Semester"],
+ "studyStyle": "In-Person",
+ "status": "Admission Available",
+ "degreeHours": 73,
+
+ "incompleteInSource": {
+  "what": "This program's capture stops part-way through. It is the only program in the document that is knowingly partial.",
+  "whyItWasAlmostMissed": "Its name never appears as a heading - the document goes straight from 'first :' to 'About Program' to the Overview prose, so the only place the words 'Diploma in Ambulance and Emergency' occur is inside a sentence. Every other program has a name line. It was recovered by auditing the paragraphs no parser rule had read.",
+  "specReqTruncated": "image3.png ends mid-table after 300151220 MEDICAL EMERGENCY (1). The courses below it are not in the document at all.",
+  "advisoryTruncated": "image4.png shows only First Year / Fall Semester (stated total 17, and the 7 courses under it sum to 17). The remaining terms are not in the document.",
+  "arithmetic": "Colg. Req. sums to 16 and the visible Spec. Req. rows sum to 22, so 38 of the stated 73 credit hours are accounted for. The missing 35 hours are missing from the SOURCE. Nothing has been inferred to close the gap.",
+  "authorNote": "Shortly after this program the document says: 'pictures gonna take a lot of time, soo. raw data only from now on' (block 307). Every later program is captured as text instead."
+ },
+
+ "requirements": {
+  "colgReq": {"mustPassAll": true, "complete": true, "courses": [
+   {"code":"300131150","name":"ARABIC LANGUAGE","theoretical":3,"credits":3},
+   {"code":"300131230","name":"ENGLISH LANGUAGE","theoretical":3,"credits":3},
+   {"code":"300132140","name":"ENTREPRENEURSHIP","theoretical":2,"credits":3},
+   {"code":"300132210","name":"COMBATING CORRUPTION (CHALLENGES AND SOLUTIONS)","theoretical":3,"credits":3},
+   {"code":"300132250","name":"PHYSICAL ACTIVITY","credits":1},
+   {"code":"300132270","name":"DIGITAL SKILLS","theoretical":1,"credits":3}]},
+  "specReq": {"mustPassAll": true, "complete": false,
+   "truncated": "The source image ends here; further courses exist in the program but not in this document.",
+   "courses": [
+   {"code":"000011110","name":"COMMUNITY SERVICE","theoretical":1,"credits":0},
+   {"code":"300151110","name":"MICROBIOLOGY","theoretical":2,"credits":2},
+   {"code":"300151120","name":"ANATOMY AND PHYSIOLOGY 1","theoretical":2,"credits":3},
+   {"code":"300151130","name":"MEDICAL TERMINOLOGY","theoretical":2,"credits":2},
+   {"code":"300151140","name":"INTRODUCTION TO EMERGENCY","theoretical":3,"credits":3},
+   {"code":"300151150","name":"INTRODUCTION TO EMERGENCY (LAB)","practical":1,"credits":1},
+   {"code":"300151160","name":"EMERGENCY TRAUMA (1)","theoretical":3,"credits":3},
+   {"code":"300151170","name":"EMERGENCY TRAUMA (CLINICAL)","credits":2},
+   {"code":"300151200","name":"MEDICAL EMERGENCIES SIMULATION LAB (1)","practical":1,"credits":1},
+   {"code":"300151210","name":"INTRODUCTION TO EMERGENCY (CLINICAL)","credits":2,"prerequisites":["300151140","300151150"]},
+   {"code":"300151220","name":"MEDICAL EMERGENCY (1)","theoretical":3,"credits":3}]}
+ },
+
+ "advisoryPlan": {
+  "source": "image4.png",
+  "complete": false,
+  "truncated": "Only First Year / Fall Semester is in the document.",
+  "terms": [
+   {"year": "First Year", "semester": "Fall Semester", "statedTotal": 17, "courses": [
+    {"code":"300131230","name":"ENGLISH LANGUAGE","credits":3},
+    {"code":"300132270","name":"DIGITAL SKILLS","credits":3},
+    {"code":"300151110","name":"MICROBIOLOGY","credits":2},
+    {"code":"300151120","name":"ANATOMY AND PHYSIOLOGY 1","credits":3},
+    {"code":"300151130","name":"MEDICAL TERMINOLOGY","credits":2},
+    {"code":"300151140","name":"INTRODUCTION TO EMERGENCY","credits":3},
+    {"code":"300151150","name":"INTRODUCTION TO EMERGENCY (LAB)","credits":1}]}
+  ]
+ },
+
+ "overview": "The Diploma in Ambulance and Emergency is an applied professional program that aims to prepare qualified staffs (see block 17 of the source for the full text)."
+}

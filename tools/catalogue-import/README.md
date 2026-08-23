@@ -10,7 +10,10 @@ Turns the university catalogue document into structured data.
 document.
 
 ## What is in catalogue.json
-13 faculties, 67 programs, 3,076 course entries, 1,797 distinct courses.
+13 faculties, 68 programs, 3,076 course entries, 1,797 distinct courses.
+Also 37 program overviews and 99 of the author's own notes about individual
+programs — "NO real plan yet.", "no academic plan", the note under Bachelor in
+Languages listing the four languages a student must pick one of.
 
 Requirement sections per program: `univReq`, `univElec`, `colgReq`, `specReq`,
 `specElec`, `freeElec`, `supportCourses` — each with `mustPassAll` or
@@ -24,10 +27,10 @@ Terms include the elective slots the student fills themselves, kept as
 and not a course.
 
 ## from-images/
-Six Junior College diplomas exist in the document only as screenshots. They were
-read image by image and are stored here in the same shape, with `advisoryPlan`
-where the source has one. Every one reconciles to its stated degree total
-exactly:
+Seven Junior College diplomas exist in the document only as screenshots. They
+were read image by image and are stored here in the same shape, with
+`advisoryPlan` where the source has one. Six reconcile to their stated degree
+total exactly; the seventh is cut off in the source and says so:
 
 | program | stated | computed |
 |---|---|---|
@@ -37,6 +40,16 @@ exactly:
 | Cosmetics and Skincare | 72 | 72 |
 | Dental Technology | 78 | 78 |
 | Occupational Health and Safety | 72 | 72 |
+| Ambulance and Emergency | 73 | 38 — source truncated, see below |
+
+**Diploma in Ambulance and Emergency** was almost lost entirely. It is the only
+program in the document with no name line: the pages run "first :" → "About
+Program" → the Overview prose, so the words "Diploma in Ambulance and Emergency"
+appear nowhere except inside a sentence. It surfaced only by auditing the
+paragraphs no parser rule had read. Its Spec. Req. screenshot stops mid-table
+and its advisory plan shows one term, so 35 of its 73 credit hours are missing
+**from the source**; the gap is recorded in `incompleteInSource` and nothing was
+invented to close it.
 
 `program-metadata.json` holds the eight further programs whose only image is a
 metadata card — no course table exists for them anywhere in the document, in
@@ -51,6 +64,9 @@ text or image. They are marked `coursesInSource: false`.
 - **49 of the 50** programs that state a degree total reconcile to it exactly.
 - **182 of 182** advisory-plan terms that print a total match the courses listed
   under them. (15 further terms print no total; that is a source omission.)
+- **0 paragraphs and 0 tables in the entire document are left unread.** Every
+  block of the source now lands somewhere: a course, a section rule, an
+  overview, a program note, a faculty note, or a faculty index list.
 
 ## Recorded source discrepancies
 Seven programs carry a `sourceIssues` array. Nothing in it is corrected — the
@@ -74,9 +90,15 @@ the other sits under `alternatePlanA`. Dental Technology's prose states a third
 figure again (69 hours), recorded in its `sourceConflict`.
 
 ## Known gaps (in the SOURCE, not the parser)
-- Faculty of AI & Data Science and Faculty of Digital Sciences contain only
-  program NAME lists. The document says so itself: "and already added all of
-  them". Their course data must come from another source.
+- Faculty of Artificial Intelligence and Data Science (13 programs) and Faculty
+  of Digital Sciences (6) contain only program NAME lists — captured on the
+  faculty as `programNamesListed`, so they are 19 known programs with no course
+  data rather than 19 programs that appear not to exist. The document says so
+  itself: "i think you already have :" and "and already added all of them, if
+  something is missing… tell me now".
+- **Bachelor in Public Safety Engineering** states 14 credit hours and lists only
+  the university requirements. That is faithful: the document itself writes
+  "NO real plan yet." above it, kept in the program's `sourceNotes`.
 - Three programs print no degree total at all: Telecommunications Engineering,
   Computer Networks – Minor Information Security, and Modern Media – Digital
   Media and Communication. Their sections are captured; the total is absent, so
