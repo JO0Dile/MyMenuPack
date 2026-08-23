@@ -88,6 +88,10 @@
   }
 
   function validateMove(prefix, slug, targetContainerId){
+    // The elective pool is a real drop target: it is how a student takes back
+    // "I take this one in Year 3" without having to guess a semester. It has
+    // no position in time, so none of the prerequisite ordering below applies.
+    if(/-elective-/.test(targetContainerId || '')) return { ok: true };
     var targetOrder = orderOfContainerId(targetContainerId);
     if(targetOrder === null) return { ok: false, hard: true, reason: { en: 'Not a valid semester slot.', ar: 'ليس فصلاً دراسيًا صالحًا.' } };
 
@@ -176,11 +180,11 @@
       if(window.__redraw && window.__redraw[prefix]){ window.__redraw[prefix](); }
     }
     if(!isUndo && fromContainerId && fromContainerId !== targetContainerId && window.__showActionToast){
-      window.__showActionToast('✅ Moved — saved.', '↩ Undo', function(){
+      window.__showActionToast('Moved — saved.', 'Undo', function(){
         applyMove(prefix, slug, fromContainerId, true);
       });
     } else if(window.__showToast){
-      window.__showToast(isUndo ? '↩ Move undone.' : '✅ Moved — saved automatically.');
+      window.__showToast(isUndo ? 'Move undone.' : 'Moved — saved automatically.');
     }
     return true;
   }

@@ -3710,18 +3710,26 @@
    Sits behind the landing content and is never in the way of a tap. */
 .wiz-campus{
   /* Sunk below the fold so its ground line lands under the note rather than
-     through it, and faded from the top so what does reach the buttons is
-     texture rather than a line drawn across them. */
-  position:absolute; left:50%; bottom:-46px; transform:translateX(-50%);
-  width:min(470px, 106%); height:auto;
-  color:var(--accent); opacity:.13;
+     through it. The fade now only softens the very top of the towers, where
+     they would otherwise run into the buttons — it used to erase the whole
+     upper half, taking the clock with it. */
+  position:absolute; left:50%; bottom:-14px; transform:translateX(-50%);
+  width:min(560px, 120%); height:auto;
+  color:var(--accent); opacity:.4;
   pointer-events:none; z-index:0;
-  -webkit-mask-image:linear-gradient(to top, #000 0%, #000 30%, transparent 76%);
-  mask-image:linear-gradient(to top, #000 0%, #000 30%, transparent 76%);
+  /* Only the last sliver softens now. The first version faded from 76% down,
+     which erased the clock — the one thing anybody was meant to recognise. */
+  -webkit-mask-image:linear-gradient(to top, #000 0%, #000 84%, transparent 100%);
+  mask-image:linear-gradient(to top, #000 0%, #000 84%, transparent 100%);
 }
+/* The accent is darker than the page in the light themes, so the same alpha
+   reads stronger there; pulled back to land at the same weight. */
 :root[data-theme="light"] .wiz-campus,
 :root[data-theme="cranberry"] .wiz-campus,
-:root[data-theme="botanical"] .wiz-campus{opacity:.2;}
+:root[data-theme="botanical"] .wiz-campus{opacity:.26;}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]):not([data-theme="indigo"]):not([data-theme="amber"]):not([data-theme="custom"]) .wiz-campus{opacity:.26;}
+}
 
 /* A small language switch, before a plan exists to switch. */
 .wiz-lang{

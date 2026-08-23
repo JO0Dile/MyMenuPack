@@ -434,35 +434,15 @@
       );
       timelineParts.push('<div class="ro-connector ro-connector-' + st + '"></div>');
     });
-    // Electives live outside the year blocks, so a plan like AI & Medical
-    // Sciences showed Year 4 as 13 CH while 15 CH of specialization electives
-    // belonged to that stage of the degree and appeared nowhere on the track.
-    var electiveRows = categoryModel(prefix, 'electives');
-    var electiveCr = 0, electivePick = null;
-    electiveRows.forEach(function(r){
-      electiveCr += r.hours;
-      if(r.pickOf) electivePick = r.pickOf;
-    });
-    if(electiveCr > 0){
-      timelineParts.push(
-        '<button type="button" class="ro-node-wrap" data-ro-scope="electives"' +
-          ' aria-expanded="false"' +
-          ' aria-label="' + (rtl ? 'تفصيل المواد الاختيارية' : 'Breakdown for the electives you choose') + '">' +
-          '<div class="ro-node ro-node-future"></div>' +
-          '<div class="ro-node-body">' +
-          '<div class="ro-node-label">' + (rtl ? 'اختيارية' : 'Electives') + '</div>' +
-          '<div class="ro-node-sub">' + Math.round(electiveCr) + ' CH' +
-            (electivePick ? ' · ' + (rtl
-              ? ('اختر ' + electivePick.need + ' من ' + electivePick.from)
-              : ('pick ' + electivePick.need + ' of ' + electivePick.from)) : '') +
-          '</div>' +
-          '</div>' +
-          '<span class="ro-node-chevron">' + window.AAUP_ICONS.preview('chevron', 16) + '</span>' +
-        '</button>' +
-        '<div class="ro-inline-panel" data-ro-panel="electives"></div>'
-      );
-      timelineParts.push('<div class="ro-connector ro-connector-future"></div>');
-    }
+    // Electives used to get their own stop on this track, after the last
+    // year. That reads as a STAGE of the degree — something you reach after
+    // Year 4 — and they are not one: they are ordinary courses the plan
+    // declines to schedule, which a student places in edit mode into the
+    // semester they actually take them in. Once placed, each one appears in
+    // its real year here, which is the point.
+    //
+    // Their hours are not lost by dropping the stop: the whole-plan
+    // breakdown below counts every course in the plan, scheduled or not.
     // "Whole plan" is not part of the accordion — the static summary card
     // right after the timeline (see the .ro-breakdown section below) already
     // shows this at all times on phone, so there is nothing here for a press

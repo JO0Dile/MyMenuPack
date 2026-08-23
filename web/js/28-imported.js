@@ -1221,7 +1221,16 @@
   // inline made a semester look heavier than it is and implied a fixed slot
   // that does not exist, so they are lifted out of the year grid and gathered
   // into one pool block under the years (see electivePoolHtml below).
-  function isPoolElective(c){ return c && c.category === 'dept'; }
+  // A specialization elective is in the pool until the student says where
+  // they actually took it. Before that, the term the catalogue happens to
+  // print beside it is meaningless — the plan does not schedule these — so
+  // it is pooled regardless of what yearId/semester the data carries.
+  //
+  // placedByStudent is what edit mode writes when one is dragged into a real
+  // semester. Without it the drag appeared to work and then silently undid
+  // itself: the course's yearId was updated, and the very next render pooled
+  // it again anyway because the category had not changed.
+  function isPoolElective(c){ return !!c && c.category === 'dept' && !c.placedByStudent; }
 
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var pairs = pairContinuations(planId);
@@ -1503,16 +1512,28 @@
   // every interaction. Without this, a drag looked like it worked but
   // reverted the instant anything else re-rendered the view.
   function persistCourseMove(planId, slug, targetContainerId){
-    var m = /-y(\d+)-s(\d+)$/.exec(targetContainerId || '');
-    if(!m) return;
-    var yearId = 'y' + m[1], semester = 's' + m[2];
     var plans = loadImportedPlans();
     var p = plans[planId];
     if(!p) return;
     var course = (p.courses || []).filter(function(c){ return c.id === slug; })[0];
     if(!course) return;
-    course.yearId = yearId;
-    course.semester = semester;
+
+    // Dropped back on the elective pool: forget where it was placed and let
+    // it return to being one of the options.
+    if(/-elective-/.test(targetContainerId || '')){
+      delete course.placedByStudent;
+      saveImportedPlans(plans);
+      render(planId);
+      return;
+    }
+
+    var m = /-y(\d+)-s(\d+)$/.exec(targetContainerId || '');
+    if(!m) return;
+    course.yearId = 'y' + m[1];
+    course.semester = 's' + m[2];
+    // The student has now said when they take this one, so it stops being a
+    // pool option and starts being a course in that semester.
+    if(course.category === 'dept'){ course.placedByStudent = true; }
     saveImportedPlans(plans);
     render(planId);
   }
