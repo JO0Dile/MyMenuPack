@@ -41,22 +41,23 @@
       reasonMany: function(names, extra){
         return 'Unlocks ' + names + (extra ? ' and ' + extra + ' more' : '') + '.';
       },
-      reasonNone: 'Nothing else in this plan waits on it yet, but it still counts toward the degree.',
+      reasonNone: 'Nothing waits on it — but it still counts.',
       more: function(n){ return '+' + n + ' more available'; },
       ifYouTake: 'If you take these',
       barCh: 'Credit hours', barChSub: function(a,b){ return a + ' of ' + b + ' CH currently available'; },
       barDept: 'Department requirement', barDegree: 'Degree completion after', barLab: 'Courses with a lab',
       worth: 'Worth knowing',
       doNext: 'Do this next',
+      // One line. This was two clauses explaining a ranking the card's own
+      // "Opens N" tag already states.
       doNextWhy: function(name, n){
-        return n
-          ? 'Of everything open to you, ' + name + ' unlocks the most of what is left — ' + n + ' course' + (n === 1 ? '' : 's') + '.'
-          : name + ' is the strongest thing you can take right now.';
+        return n ? ('Opens ' + n + ' more course' + (n === 1 ? '' : 's') + ' than anything else.')
+                 : 'The strongest thing open to you right now.';
       },
       doNextAdd: 'Show me why',
       oweDept: function(n){ return 'You still need ' + n + ' more department elective hours.'; },
       oweFree: function(n){ return 'You still owe ' + n + ' free elective hours.'; },
-      deadEnds: function(n){ return n + ' other unlocked course' + (n === 1 ? '' : 's') + ' nothing else depends on — good to fit in whenever it suits you.'; }
+      deadEnds: function(n){ return n + ' unlocked course' + (n === 1 ? '' : 's') + ' nothing depends on — fit in anytime.'; }
     },
     ar: {
       empty: 'لا توجد مساقات جديدة متاحة الآن — أكمل بعض المتطلبات السابقة أولاً.',
@@ -164,8 +165,11 @@
     // n is a course name straight from courseInfo, already HTML-escaped once
     // by the shared sanitizer when the plan was registered — esc()'ing it
     // again turned a real "&" into a literal "&amp;" on screen.
-    var shown = names.slice(0, 2).map(function(n){ return '<strong>' + n + '</strong>'; });
-    var extra = names.length > 2 ? (names.length - 2) : 0;
+    // One name, not two. Two full course names plus "and N more" ran to a
+    // three-line sentence on a phone card that already carries an "Opens N"
+    // tag saying the same count.
+    var shown = names.slice(0, 1).map(function(n){ return '<strong>' + n + '</strong>'; });
+    var extra = names.length > 1 ? (names.length - 1) : 0;
     var joiner = rtl ? '، ' : ', ';
     return t.reasonMany(shown.join(joiner), extra || '');
   }
@@ -226,13 +230,19 @@
       ? bar(t.barDept, Math.min(100, (deptUsed + totals.deptDone) / totals.deptNeeded * 100))
       : '';
 
-    return '<div class="wn-panel wn-sim">' +
-      '<div class="wn-lbl">' + t.ifYouTake + '</div>' +
+    // Closed by default. These two panels are worth a look, not worth
+    // reading every time the dashboard opens — and stacked open under the
+    // course cards they were most of the screen's text. Same tap-to-open
+    // pattern the My Path categories and the Course Library shelves use.
+    return '<div class="wn-panel wn-sim" data-wn-panel>' +
+      '<button type="button" class="wn-lbl" aria-expanded="false">' + t.ifYouTake +
+        '<span class="wn-lbl-chev" aria-hidden="true">\u203a</span></button>' +
+      '<div class="wn-panel-body">' +
       bar(t.barCh, simCh / availableCh * 100, t.barChSub(simCh, availableCh)) +
       deptStat +
       bar(t.barDegree, afterPct, Math.round(beforePct) + '% → ' + Math.round(afterPct) + '%') +
       bar(t.barLab, top.length ? (labCount / top.length * 100) : 0, labCount + ' / ' + top.length) +
-      '</div>';
+      '</div></div>';
   }
 
   // Real, checkable facts rather than the mockup's illustrative ones — an
@@ -252,10 +262,13 @@
     var deadEnds = rest.filter(function(c){ return !c.opens; }).length;
     if(deadEnds) lines.push(t.deadEnds(deadEnds));
     if(!lines.length) return '';
-    return '<div class="wn-panel wn-worth">' +
-      '<div class="wn-lbl">' + t.worth + '</div>' +
+    return '<div class="wn-panel wn-worth" data-wn-panel>' +
+      '<button type="button" class="wn-lbl" aria-expanded="false">' + t.worth +
+        '<span class="wn-lbl-count">' + lines.length + '</span>' +
+        '<span class="wn-lbl-chev" aria-hidden="true">\u203a</span></button>' +
+      '<div class="wn-panel-body">' +
       lines.map(function(l){ return '<p class="wn-worth-line">' + esc(l) + '</p>'; }).join('') +
-      '</div>';
+      '</div></div>';
   }
 
   var TOP_N = 3, TOTAL_CAP = 8;
@@ -321,6 +334,14 @@
     }
 
     body.innerHTML = html;
+
+    body.querySelectorAll('[data-wn-panel] > .wn-lbl').forEach(function(head){
+      head.addEventListener('click', function(){
+        var panel = head.parentElement;
+        var open = panel.classList.toggle('wn-panel-open');
+        head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    });
 
     body.querySelectorAll('[data-wn-id]').forEach(function(btn){
       btn.addEventListener('click', function(){

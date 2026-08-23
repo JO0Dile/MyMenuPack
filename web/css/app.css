@@ -1852,7 +1852,29 @@
   .wn-panel{
     background:var(--search-bg); border:1px solid var(--line); border-radius:10px; padding:11px 13px;
   }
-  .wn-lbl{font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px;}
+  /* A button now: these two panels sat open under the course cards and were
+     most of the dashboard's text. Worth a look, not worth reading on every
+     open — same tap-to-open pattern as the My Path categories and the
+     Course Library shelves. */
+  .wn-lbl{
+    display:flex; align-items:center; gap:8px; width:100%;
+    font-size:10px; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    color:var(--text-dim); margin:0; padding:2px 0;
+    background:none; border:none; font-family:inherit; cursor:pointer; text-align:start;
+  }
+  .wn-lbl-count{
+    font-size:9.5px; font-weight:800; color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 14%, transparent);
+    border-radius:999px; padding:1px 6px;
+  }
+  .wn-lbl-chev{
+    margin-inline-start:auto; font-size:15px; line-height:1; color:var(--accent);
+    transition:transform .18s ease;
+  }
+  .wn-panel-open .wn-lbl-chev{transform:rotate(90deg);}
+  .wn-panel-body{display:none;}
+  .wn-panel-open .wn-panel-body{display:block; margin-top:10px;}
+  @media (prefers-reduced-motion:reduce){ .wn-lbl-chev{transition:none;} }
 
   .wn-bar-row{margin-bottom:9px;}
   .wn-bar-row:last-child{margin-bottom:0;}
