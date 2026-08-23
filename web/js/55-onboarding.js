@@ -54,139 +54,154 @@
   // gate, and the faceted glass faculty building beside it — with the walkway
   // running up to them, which is the "path" the app is named for.
   // ---------------------------------------------------------------------
-  // THE AAUP GATE, DRAWN
+  // THE AAUP CAMPUS, DRAWN
   //
   // Drawn rather than photographed so it takes the colour of whichever of
-  // the six themes is running, and so it stays a few kilobytes.
+  // the six themes is running, and so it costs a couple of kilobytes.
   //
-  // This is the real monument, not a generic clock tower: AAUP's gate stands
-  // on an island in a fountain at the Jenin entrance. Reading it top to
-  // bottom — the stone boat-shaped finial, the slab cap, the square shaft
-  // with a white clock set into it, the wide dark dedication plaque under
-  // that, the cornice, and then the pointed ogee arch between two slender
-  // columns, with a stepped stone mass rising behind. The pool ring and its
-  // jets sit at the base.
+  // Redrawn a second time against a photograph of the real plaza, because
+  // the first two attempts got the subject wrong in the same way: they drew
+  // the clock as a solid stone TOWER with an arch cut into its face. It is
+  // not a tower. It is an open pavilion — four slender columns standing in
+  // a round fountain, two pointed arches between them, and you can see the
+  // building straight through it. On the canopy sits a white block carrying
+  // two clock faces, one square on to you and one turned away on the side,
+  // with the dedication plaque as a dark band underneath.
   //
-  // To its right, the Faculty of Engineering: a triangulated dark-glass
-  // prism cut like a gem, against the white block tower behind it. To the
-  // left, the perimeter wall and the flag.
+  // Behind it is the Faculty of Engineering, which is most of what you
+  // actually see standing there: a white stone tower on the left, punched
+  // with triangular openings and striped with colour, and an enormous
+  // triangulated glass roof sloping away to the right. The pavilion is
+  // small against it, and drawing it small is what makes the scene read as
+  // that place rather than as a generic clock tower.
   //
-  // Line weight carries the depth — 2.4 for what is nearest and 1 for what
-  // is furthest — because a single-colour line drawing has nothing else to
-  // separate foreground from background with.
+  // Line weight carries the depth — 2.2 for the pavilion in front, 1.4 for
+  // the building behind it, 1 or less for glazing and detail — because a
+  // one-colour line drawing has nothing else to separate near from far.
   function campusSvg(){
-    var i, a;
+    var i, a, d;
 
-    // ---- clock face: bezel, twelve markers, hands at ten past ten -------
-    var CX = 200, CY = 90;
-    var face = '';
+    // ---- the big clock, square on: bezel, ticks, hands at ten past ten --
+    var CX = 258, CY = 108, face = '';
     for(i = 0; i < 12; i++){
       a = (i * 30 - 90) * Math.PI / 180;
       var quarter = i % 3 === 0;
-      var r1 = quarter ? 8.8 : 10.1, r2 = 12.3;
+      var r1 = quarter ? 10.4 : 12, r2 = 14.4;
       face += '<path d="M' + (CX + Math.cos(a) * r1).toFixed(1) + ' ' + (CY + Math.sin(a) * r1).toFixed(1) +
         ' L' + (CX + Math.cos(a) * r2).toFixed(1) + ' ' + (CY + Math.sin(a) * r2).toFixed(1) +
-        '" stroke-width="' + (quarter ? 1.7 : 1) + '"/>';
+        '" stroke-width="' + (quarter ? 1.6 : .9) + '"/>';
     }
 
-    // ---- fountain jets around the front of the pool ---------------------
+    // ---- the glass roof's triangulation ---------------------------------
+    // The facade is a field of triangles. Ruling it with two crossing sets
+    // of diagonals gives that at a fraction of the path data of drawing
+    // each pane, and it stays legible when the whole thing is a watermark.
+    var glass = '';
+    for(i = 0; i <= 6; i++){
+      d = 176 + i * 46;
+      glass += '<path d="M' + d + ' 222 L' + (d - 62) + ' ' + (150 + i * 2) + '" stroke-width=".8" opacity=".3"/>';
+      glass += '<path d="M' + (d - 40) + ' 222 L' + (d + 26) + ' ' + (152 + i * 4) + '" stroke-width=".8" opacity=".22"/>';
+    }
+
+    // ---- fountain jets around the pavilion -------------------------------
     var jets = '';
-    [[126, 6], [152, 9], [248, 9], [274, 6]].forEach(function(j){
-      jets += '<path d="M' + j[0] + ' 214 v-' + (j[1] + 8) + '" stroke-width="1" opacity=".5"/>';
+    [[168, 7], [196, 11], [304, 11], [332, 7]].forEach(function(j){
+      jets += '<path d="M' + j[0] + ' 220 v-' + (j[1] + 9) + '" stroke-width=".9" opacity=".45"/>';
     });
 
-    return '<svg class="wiz-campus" viewBox="0 0 460 250" fill="none" ' +
+    return '<svg class="wiz-campus" viewBox="0 0 480 260" fill="none" ' +
       'stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" ' +
       'aria-hidden="true" focusable="false">' +
 
-      // ================= background: the plaza floor ====================
-      '<path d="M0 216 H460" stroke-width="1.2" opacity=".5"/>' +
-      '<path d="M92 232 H368 M60 246 H400" stroke-width="1" opacity=".28"/>' +
+      // ================= the plaza ======================================
+      '<path d="M0 222 H480" stroke-width="1.1" opacity=".45"/>' +
+      '<path d="M40 240 Q240 228 440 240 M0 254 Q240 240 480 254" stroke-width=".9" opacity=".22"/>' +
 
-      // ================= left: perimeter wall, flag, lamp ===============
-      '<path d="M0 178 H104 V216" stroke-width="1.3" opacity=".55"/>' +
-      '<path d="M0 194 H104" stroke-width="1" opacity=".35"/>' +
-      '<path d="M26 216 V198 h13 v18 M60 216 V198 h13 v18" stroke-width="1" opacity=".35"/>' +
-      // flag pole, with the Palestinian flag: a rectangle and its hoist triangle
-      '<path d="M84 216 V96" stroke-width="1.5" opacity=".8"/>' +
-      '<path d="M84 98 h34 v21 h-34" stroke-width="1.4" opacity=".8"/>' +
-      '<path d="M84 98 L103 108.5 L84 119" stroke-width="1.2" opacity=".8"/>' +
-      // street lamp
-      '<path d="M40 216 V140 q0 -11 11 -11 h9" stroke-width="1.2" opacity=".5"/>' +
-      '<path d="M55 129 h11 l-2 6 h-7 z" stroke-width="1.1" opacity=".5"/>' +
+      // ================= behind: the glass roof =========================
+      '<path d="M156 222 V164 L254 100 L462 190 V222" stroke-width="1.5"/>' +
+      glass +
+      // the ridge, redrawn over the glazing so the roofline stays the
+      // strongest edge on that side
+      '<path d="M254 100 L462 190" stroke-width="1.5"/>' +
+      '<path d="M156 164 L254 100" stroke-width="1.5"/>' +
 
-      // ================= right: the faceted faculty building ============
-      // white block tower standing behind the glass
-      '<path d="M300 216 V104 h30 v112" stroke-width="1.3" opacity=".45"/>' +
-      '<path d="M306 124 l9 -12 9 12 z M306 152 l9 -12 9 12 z M306 180 l9 -12 9 12 z" ' +
-        'stroke-width="1" opacity=".4"/>' +
-      // the glass prism, cut like a gem
-      '<path d="M312 216 V158 L366 118 L438 152 V216 Z" stroke-width="2.1"/>' +
-      '<path d="M312 158 L370 190 L438 152" stroke-width="1.4" opacity=".8"/>' +
-      '<path d="M366 118 L370 190" stroke-width="1.4" opacity=".8"/>' +
-      '<path d="M339 138 L339 203 M404 135 L404 203" stroke-width="1" opacity=".45"/>' +
-      '<path d="M312 216 L370 190 L438 216" stroke-width="1" opacity=".45"/>' +
-      // the diagonal glazing that gives the facade its triangles
-      '<path d="M339 138 L370 190 L404 135" stroke-width="1" opacity=".3"/>' +
-      // the red V sculpture at its foot, in outline
-      '<path d="M352 216 L361 192 M380 216 L371 192" stroke-width="1.7" opacity=".65"/>' +
+      // ================= behind: the white stone tower ==================
+      '<path d="M56 222 V38 h96 v184" stroke-width="1.6"/>' +
+      '<path d="M56 60 h96 M56 208 h96" stroke-width="1" opacity=".45"/>' +
+      // the coloured stripes down its face
+      '<path d="M66 86 V150 M72 86 V150 M78 86 V150" stroke-width="1" opacity=".5"/>' +
+      // triangular perforations, the motif the whole facade is built from
+      '<path d="M112 82 l9 -13 9 13 z M112 118 l9 -13 9 13 z M112 154 l9 -13 9 13 z ' +
+             'M132 100 l7 -11 7 11 z M132 136 l7 -11 7 11 z" stroke-width=".9" opacity=".55"/>' +
+      // glazing on the lower storeys
+      '<path d="M84 208 V170 h22 v38 M118 208 V170 h22 v38" stroke-width=".9" opacity=".4"/>' +
 
-      // ================= centre: the gate ===============================
-      // Proportions taken off the photographs rather than invented: the
-      // monument is BROAD. The arch block is wider than it is tall, the
-      // clock shaft on top of it is short, and the whole thing above the
-      // water is about as wide as it is high. Drawn slender it read as a
-      // European church tower, which is not what stands at the Jenin gate.
+      // ================= the flag, to the right =========================
+      '<path d="M404 222 V126" stroke-width="1.3" opacity=".75"/>' +
+      '<path d="M404 128 h32 v20 h-32" stroke-width="1.2" opacity=".75"/>' +
+      '<path d="M404 128 L422 138 L404 148" stroke-width="1" opacity=".75"/>' +
 
-      // stepped stone wings rising behind the gate, low and wide
-      '<path d="M252 216 V158 h20 v16 h18 v20 h12 v22" stroke-width="1.2" opacity=".5"/>' +
-      '<path d="M148 216 V162 h-20 v18 h-16 v36" stroke-width="1.2" opacity=".5"/>' +
+      // ================= in front: the clock pavilion ===================
+      // Deliberately drawn last and heaviest — it is the thing in front.
+      //
+      // Top to bottom, from the photographs: an open BOOK carved in stone
+      // (this is a university, and that is what the sculpture is — earlier
+      // versions of this drawing guessed at it as an abstract curve), on a
+      // stepped plinth; the white clock box, which carries a round face on
+      // each of its four sides; the dark dedication cube under it, text on
+      // every face; a cornice; and then the open arched pavilion standing
+      // on a round stone island in the water.
 
-      // podium standing in the water
-      '<path d="M140 216 V200 h120 v16" stroke-width="1.9"/>' +
-      '<path d="M146 200 h108" stroke-width="1" opacity=".45"/>' +
+      // the open book, and the stepped plinth it rests on
+      // Two page blocks curving up from a shared spine. Drawn as flat
+      // wedges first, it read as a gable roof — which is the shape a
+      // pediment makes, and the opposite of what this is.
+      '<path class="cs-solid" d="M250 48 Q230 40 212 43 V64 Q230 61 250 70 Z" stroke-width="1.6"/>' +
+      '<path class="cs-solid" d="M250 48 Q270 40 288 43 V64 Q270 61 250 70 Z" stroke-width="1.6"/>' +
+      '<path d="M250 48 V70" stroke-width="1.3"/>' +
+      '<path d="M222 49 Q234 48 244 52 M222 56 Q234 55 244 59 ' +
+             'M278 49 Q266 48 256 52 M278 56 Q266 55 256 59" stroke-width=".8" opacity=".45"/>' +
+      '<path class="cs-solid" d="M228 70 h44 v7 h-44 z" stroke-width="1.4"/>' +
+      '<path class="cs-solid" d="M214 77 h72 v7 h-72 z" stroke-width="1.5"/>' +
 
-      // arch block
-      '<path d="M148 200 V142 h104 v58" stroke-width="2.4"/>' +
-      // the pointed ogee arch, with its inner reveal
-      '<path d="M176 200 V170 Q176 150 200 141 Q224 150 224 170 V200" stroke-width="2"/>' +
-      '<path d="M185 200 V172 Q185 157 200 149 Q215 157 215 172 V200" stroke-width="1" opacity=".45"/>' +
-      // slender columns either side, on their own bases and capitals
-      '<path d="M162 194 V158 M238 194 V158" stroke-width="1.4" opacity=".85"/>' +
-      '<path d="M157 158 h10 v-5 h-10 z M233 158 h10 v-5 h-10 z" stroke-width="1.1" opacity=".85"/>' +
-      '<path d="M157 194 h10 v6 h-10 z M233 194 h10 v6 h-10 z" stroke-width="1.1" opacity=".85"/>' +
-
-      // cornice over the arch block
-      '<path d="M142 142 h116 l-6 -8 H148 z" stroke-width="1.7"/>' +
-
-      // dedication plaque — the dark board under the clock
-      '<path d="M146 134 V112 h108 v22 z" stroke-width="1.9"/>' +
-      '<path d="M153 118 h94 M153 124 h94 M153 130 h66" stroke-width="1.1" opacity=".55"/>' +
-
-      // clock shaft: short, and narrower than the block under it
-      '<path d="M178 112 V68 h44 v44" stroke-width="2.2"/>' +
-      '<path d="M174 112 h52" stroke-width="1.2" opacity=".6"/>' +
-
-      // the clock itself
-      '<circle cx="200" cy="90" r="15" stroke-width="2.1"/>' +
-      '<circle cx="200" cy="90" r="12" stroke-width="1" opacity=".55"/>' +
+      // the white clock box
+      '<path class="cs-solid" d="M204 84 h92 v52 h-92 z" stroke-width="2"/>' +
+      // the face square on to you
+      '<circle class="cs-face" cx="258" cy="108" r="15" stroke-width="2"/>' +
+      '<circle cx="258" cy="108" r="12" stroke-width=".9" opacity=".5"/>' +
       face +
-      '<path d="M200 90 L193 83.5" stroke-width="2.1"/>' +
-      '<path d="M200 90 L208.5 84.5" stroke-width="1.6"/>' +
-      '<circle cx="200" cy="90" r="1.6" fill="currentColor" stroke="none"/>' +
+      '<path d="M258 108 L251 101.5" stroke-width="2"/>' +
+      '<path d="M258 108 L266.5 102.5" stroke-width="1.5"/>' +
+      '<circle cx="258" cy="108" r="1.5" fill="currentColor" stroke="none"/>' +
+      // and the one on the face turned away, narrowed by the angle
+      '<ellipse cx="220" cy="110" rx="9" ry="12" stroke-width="1.5" opacity=".8"/>' +
+      '<path d="M220 110 L215 103" stroke-width="1.2" opacity=".8"/>' +
+      '<path d="M220 110 L225 106.5" stroke-width="1" opacity=".8"/>' +
 
-      // The top, in three pieces that touch: a chamfered cornice off the
-      // shaft, the slab sitting on it, and the carved stone resting on the
-      // slab. Shared edges throughout — a finial floating a few pixels clear
-      // of its own cap is what made the first version read as a sketch.
-      '<path d="M172 68 l7 -7 h42 l7 7 z" stroke-width="1.7"/>' +
-      '<path d="M170 61 h60 v-8 h-60 z" stroke-width="1.9"/>' +
-      '<path d="M177 53 Q200 38 223 53 Z" stroke-width="1.7"/>' +
-      '<path d="M184 53 Q200 45 216 53" stroke-width="1" opacity=".5"/>' +
+      // the dark dedication cube, carrying text on each face
+      '<path class="cs-solid" d="M192 136 h116 v34 h-116 z" stroke-width="1.9"/>' +
+      '<path d="M228 136 V170" stroke-width="1" opacity=".45"/>' +
+      '<path d="M234 144 h68 M234 151 h68 M234 158 h68 M234 165 h44" stroke-width=".9" opacity=".5"/>' +
+      '<path d="M198 146 h24 M198 153 h24 M198 160 h24" stroke-width=".9" opacity=".35"/>' +
 
-      // ================= the pool ring, drawn last so it reads in front ==
-      '<ellipse cx="200" cy="216" rx="104" ry="15" stroke-width="1.9"/>' +
-      '<ellipse cx="200" cy="214" rx="90" ry="11" stroke-width="1" opacity=".45"/>' +
+      // cornice under the cube
+      '<path class="cs-solid" d="M186 170 h128 l-7 8 H193 z" stroke-width="1.7"/>' +
+
+      // the open pavilion: pointed arches between stone piers, and you can
+      // see the building straight through it
+      '<path class="cs-solid" d="M200 210 V182 Q200 166 222 158 Q244 166 244 182 V210 h-8 V184 Q236 172 222 165 Q208 172 208 184 V210 Z" stroke-width="2.1"/>' +
+      '<path class="cs-solid" d="M258 210 V182 Q258 166 280 158 Q302 166 302 182 V210 h-8 V184 Q294 172 280 165 Q266 172 266 184 V210 Z" stroke-width="2.1"/>' +
+      // piers, with their capitals and bases
+      '<path d="M195 182 h10 v-6 h-10 z M239 182 h10 v-6 h-10 z ' +
+             'M253 182 h10 v-6 h-10 z M297 182 h10 v-6 h-10 z" stroke-width="1.1"/>' +
+      '<path d="M194 210 h12 v6 h-12 z M238 210 h12 v6 h-12 z ' +
+             'M252 210 h12 v6 h-12 z M296 210 h12 v6 h-12 z" stroke-width="1.1"/>' +
+      // the round stone island the pavilion stands on
+      '<ellipse cx="250" cy="216" rx="76" ry="10" stroke-width="1.4" opacity=".8"/>' +
+
+      // ================= the fountain, in front of everything ============
+      '<ellipse cx="250" cy="222" rx="122" ry="17" stroke-width="1.8"/>' +
+      '<ellipse cx="250" cy="219" rx="106" ry="12" stroke-width=".9" opacity=".4"/>' +
       jets +
       '</svg>';
   }

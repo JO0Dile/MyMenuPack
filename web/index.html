@@ -309,7 +309,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      showUnlockToast) — a screen reader already hears this on every tick
      that opens something new; this is the same news, on screen. -->
 <div class="unlock-toast" id="globalUnlockToast" role="status" aria-live="polite">
-  <span class="ut-icon">✓</span>
+  <span class="ut-icon" data-app-icon="tick" data-app-icon-size="15" aria-hidden="true"></span>
   <span class="ut-body">
     <span class="ut-title" id="globalUnlockToastTitle"></span>
     <span class="ut-sub" id="globalUnlockToastSub"></span>

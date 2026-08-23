@@ -3715,7 +3715,9 @@
      upper half, taking the clock with it. */
   position:absolute; left:50%; bottom:-14px; transform:translateX(-50%);
   width:min(560px, 120%); height:auto;
-  color:var(--accent); opacity:.4;
+  /* Visible, not loud: you should be able to make out the book on top and
+     read the clock, without the drawing competing with the two buttons. */
+  color:var(--accent); opacity:.3;
   pointer-events:none; z-index:0;
   /* Only the last sliver softens now. The first version faded from 76% down,
      which erased the clock — the one thing anybody was meant to recognise. */
@@ -3724,11 +3726,19 @@
 }
 /* The accent is darker than the page in the light themes, so the same alpha
    reads stronger there; pulled back to land at the same weight. */
+/* The pavilion is solid stone: it hides the glass roof behind it. Without a
+   fill, every background line drew straight through the clock box and the
+   plaque, which is what made the drawing read as a wireframe rather than as
+   a building standing in front of another one. The fill is the page's own
+   ground, so it occludes without introducing a second colour. */
+.wiz-campus .cs-solid{fill:var(--surface-bg);}
+.wiz-campus .cs-face{fill:var(--panel);}
+
 :root[data-theme="light"] .wiz-campus,
 :root[data-theme="cranberry"] .wiz-campus,
-:root[data-theme="botanical"] .wiz-campus{opacity:.26;}
+:root[data-theme="botanical"] .wiz-campus{opacity:.22;}
 @media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]):not([data-theme="indigo"]):not([data-theme="amber"]):not([data-theme="custom"]) .wiz-campus{opacity:.26;}
+  :root:not([data-theme="dark"]):not([data-theme="indigo"]):not([data-theme="amber"]):not([data-theme="custom"]) .wiz-campus{opacity:.22;}
 }
 
 /* A small language switch, before a plan exists to switch. */
