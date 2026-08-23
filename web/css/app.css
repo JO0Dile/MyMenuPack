@@ -4964,6 +4964,13 @@
     padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .tut-next:hover{filter:brightness(1.08);}
+  /* A step waiting on the student to actually perform a gesture. Quieter
+     than the solid button, so the invitation to try it reads before the
+     invitation to move past it — this used to be done by relabelling the
+     button "Skip", which put two buttons reading Skip side by side. */
+  .tut-next.tut-next-waiting{
+    background:none; color:var(--accent); border:1px solid var(--accent);
+  }
   @media (prefers-reduced-motion: reduce){
     .tut-spotlight, .tut-tooltip{transition:none;}
   }
