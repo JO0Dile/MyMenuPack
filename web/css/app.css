@@ -3490,11 +3490,17 @@
   }
   .sb-tray-list{display:flex;flex-direction:column;gap:6px;}
   .sb-tray-item{
-    display:flex;align-items:center;gap:8px;padding:7px 9px;
+    display:flex;align-items:flex-start;gap:8px;padding:8px 9px;
     border-radius:8px;background:var(--panel);border:1px solid var(--line);
   }
-  .sb-tray-name{flex:1;min-width:0;font-size:12px;font-weight:700;line-height:1.35;}
-  .sb-tray-cr{font-size:11px;font-weight:800;color:var(--accent);}
+  .sb-tray-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .sb-tray-name{min-width:0;font-size:12px;font-weight:700;line-height:1.35;}
+  /* The argument for the pick, in the terms the recommender actually ranks
+     by. Deliberately quieter than the name: it is there to be checked, not
+     read first. */
+  .sb-tray-why{font-size:10.5px;color:var(--text-dim);line-height:1.4;}
+  .sb-tray-caution{font-size:10.5px;color:var(--text);line-height:1.4;opacity:.85;}
+  .sb-tray-cr{font-size:11px;font-weight:800;color:var(--accent);flex:0 0 auto;padding-top:1px;}
   .sb-tray-x{
     background:none;border:0;color:var(--text-dim);cursor:pointer;
     font-size:13px;line-height:1;padding:3px;font-family:inherit;

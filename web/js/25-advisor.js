@@ -120,6 +120,26 @@
     return meta ? (rtl ? (meta.ar || meta.name) : (meta.name || meta.ar)) : slug;
   }
 
+  // ---- why this course is in the suggestion -------------------------------
+  // Read straight off the two things recommend() actually ranks by: how many
+  // later courses a pass in this one opens, and its credit hours (the tie
+  // break, and what decides whether it still fits under the cap). The tray
+  // listed a name and an hour count and nothing else, so the app's own
+  // suggestion arrived with no argument for itself — a student could see
+  // what it picked but not why, which is the part worth disagreeing with.
+  function reasonFor(c, rtl){
+    if(c.unlocksCount > 0){
+      return rtl
+        ? 'يفتح ' + c.unlocksCount + (c.unlocksCount === 1 ? ' مساق لاحق' : ' مساقات لاحقة')
+        : 'opens ' + c.unlocksCount + (c.unlocksCount === 1 ? ' later course' : ' later courses');
+    }
+    return rtl ? 'يملأ الساعات المتبقية' : 'fills the remaining hours';
+  }
+  function cautionFor(c, rtl){
+    if(!c.likelyHard) return '';
+    return rtl ? 'من فئة قيّمتها صعبة سابقًا' : 'in a category you rated Hard before';
+  }
+
   // ---- the suggestion (also used by the dashboard) ------------------------
   function recommend(prefix){
     var candidates = poolFor(prefix);
@@ -231,8 +251,13 @@
     }
     return chosen.map(function(s){
       var c = t.index[s];
+      var caution = cautionFor(c, rtl);
       return '<div class="sb-tray-item">' +
-        '<span class="sb-tray-name">' + esc(courseName(prefix, s, rtl)) + '</span>' +
+        '<div class="sb-tray-main">' +
+          '<span class="sb-tray-name">' + esc(courseName(prefix, s, rtl)) + '</span>' +
+          '<span class="sb-tray-why">' + esc(reasonFor(c, rtl)) + '</span>' +
+          (caution ? '<span class="sb-tray-caution">⚡ ' + esc(caution) + '</span>' : '') +
+        '</div>' +
         '<span class="sb-tray-cr">' + c.cr + 'H</span>' +
         '<button type="button" class="sb-tray-x" data-sb-remove="' + esc(s) + '" aria-label="' +
           (rtl ? 'إزالة' : 'Remove') + ' ' + esc(courseName(prefix, s, rtl)) + '">✕</button>' +
