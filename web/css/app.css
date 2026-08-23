@@ -928,7 +928,30 @@
 
   .search-hit .sh-ar{font-size:11.5px;color:var(--text-dim);direction:rtl;text-align:left;}
 
-  .search-hit .sh-meta{font-size:10.5px;color:var(--accent);font-weight:700;letter-spacing:.03em;}
+  .search-hit .sh-meta{
+    font-size:10.5px;color:var(--accent);font-weight:700;letter-spacing:.03em;
+    display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:2px;
+  }
+  .search-hit .sh-code{font-variant-numeric:tabular-nums;}
+
+  /* Why this row is here. Only shown when the marked text cannot say so on
+     its own — a code match, an Arabic-name match, or a typo-tolerant one.
+     A plain name match gets no label: the mark in the name is the answer. */
+  .search-hit .sh-why{
+    font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--text-dim);background:rgba(255,255,255,.06);
+    border-radius:999px;padding:1px 7px;
+  }
+  /* A fuzzy hit is the one a student should read before trusting, and
+     "closest match" says so in words. It deliberately gets no colour of its
+     own: the app ships six themes, three of them light, and a chip tinted
+     for one of them is either invisible or shouting on the others. */
+  .search-hit .sh-why-fuzzy{font-style:italic;}
+
+  .search-hit .sh-mark{
+    background:rgba(111,140,255,.22);color:inherit;
+    border-radius:3px;padding:0 1px;font-weight:inherit;
+  }
 
   .search-empty{padding:14px 12px;font-size:12.5px;color:var(--text-dim);text-align:center;}
 
