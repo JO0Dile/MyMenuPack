@@ -2635,6 +2635,42 @@
   .ro-bd-cats{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
   .ro-bd-cat{border:1px solid var(--line); border-radius:12px; padding:12px 14px;}
   .ro-bd-cat-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+
+/* A category card opens to show the courses it is made of. It reported four
+   numbers and nothing else, and the question a student has reading
+   "Colg. Req. — 59 hours, 0 earned" is which courses those are. */
+.ro-bd-cat-expandable{cursor:pointer;}
+.ro-bd-cat-expandable:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.ro-bd-cat-more{
+  display:flex; align-items:center; gap:6px; margin-top:10px;
+  font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--accent);
+}
+.ro-bd-chev{display:inline-block; transition:transform .18s ease; font-size:15px; line-height:1;}
+.ro-bd-cat-open .ro-bd-chev{transform:rotate(90deg);}
+.ro-bd-courses{
+  display:none; list-style:none; margin:10px 0 0; padding:10px 0 0;
+  border-top:1px solid var(--line);
+}
+.ro-bd-cat-open .ro-bd-courses{display:block;}
+.ro-bd-course{
+  display:flex; align-items:baseline; gap:8px; padding:6px 0;
+  font-size:12.5px; line-height:1.4;
+}
+.ro-bd-course + .ro-bd-course{border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent);}
+.ro-bd-course-name{flex:1; min-width:0; overflow-wrap:anywhere;}
+.ro-bd-course-num{
+  font-size:10.5px; color:var(--text-dim); font-variant-numeric:tabular-nums; flex:none;
+}
+.ro-bd-course-cr{
+  font-size:11px; font-weight:800; color:var(--text-dim);
+  font-variant-numeric:tabular-nums; flex:none;
+}
+.ro-bd-course.is-done .ro-bd-course-name{color:var(--unlock);}
+.ro-bd-course.is-done .ro-bd-course-cr{color:var(--unlock);}
+.ro-bd-course.is-open .ro-bd-course-cr{color:var(--accent);}
+@media (prefers-reduced-motion:reduce){ .ro-bd-chev{transition:none;} }
+
   .ro-bd-cat-name{font-size:13.5px; font-weight:800; color:var(--text);}
   .ro-bd-cat-tag{font-size:11px; font-weight:700; color:var(--text-dim);}
   .ro-bd-cat-tag-opt{color:var(--accent);}

@@ -134,6 +134,7 @@
     if(!root) return [];
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var progress = window.__getProgress ? window.__getProgress() : {};
+    var rtlNow = window.__isRtl ? window.__isRtl(prefix) : false;
 
     var blocks;
     if(scopeYearIndex == null){
@@ -151,7 +152,11 @@
     }
 
     var acc = {};
-    BUCKET_ORDER.forEach(function(k){ acc[k] = { hours: 0, earned: 0, courses: 0, done: 0 }; });
+    // items: the courses themselves, not only the totals. The category cards
+    // showed four numbers and nothing else, and the one question a student
+    // has when reading "Colg. Req. — 59 hours, 0 earned" is which courses
+    // those are.
+    BUCKET_ORDER.forEach(function(k){ acc[k] = { hours: 0, earned: 0, courses: 0, done: 0, items: [] }; });
 
     var seen = {};
     blocks.forEach(function(block){
@@ -172,6 +177,13 @@
         var cr = meta ? (parseFloat(meta.cr) || 0) : 0;
         acc[b].hours += cr;
         acc[b].courses += 1;
+        acc[b].items.push({
+          name: meta ? ((rtlNow && meta.ar) ? meta.ar : (meta.name || (parts && parts.slug))) : (parts && parts.slug),
+          num: meta ? (meta.num || '') : '',
+          cr: cr,
+          done: !!progress[el.id],
+          open: el.classList.contains('available')
+        });
         if(progress[el.id]){ acc[b].earned += cr; acc[b].done += 1; }
       });
     });
@@ -228,6 +240,7 @@
         hours: a.hours, earned: a.earned,
         remaining: Math.max(0, a.hours - a.earned),
         courses: a.courses, done: a.done,
+        items: a.items || [],
         pct: a.hours > 0 ? Math.round(a.earned / a.hours * 100) : 0
       };
     });
@@ -288,8 +301,23 @@
         '<div class="ro-bd-total ro-bd-total-left"><b>' + Math.round(remaining) + '</b><span>' + (rtl ? 'ساعة متبقية' : 'Remaining Hours') + '</span></div>' +
       '</div>';
 
-    var cards = rows.map(function(r){
-      return '<div class="ro-bd-cat">' +
+    var cards = rows.map(function(r, i){
+      // Tapping a category opens the courses it is made of. Reported twice
+      // as "I still can't click this to open and see courses" — the card had
+      // no handler at all, only four numbers.
+      var items = r.items || [];
+      var listId = 'roBdList' + i;
+      var list = items.length
+        ? '<ul class="ro-bd-courses" id="' + listId + '">' + items.map(function(c){
+            return '<li class="ro-bd-course' + (c.done ? ' is-done' : (c.open ? ' is-open' : '')) + '">' +
+              '<span class="ro-bd-course-name">' + esc(c.name || '') + '</span>' +
+              (c.num ? '<span class="ro-bd-course-num">' + esc(c.num) + '</span>' : '') +
+              '<span class="ro-bd-course-cr">' + c.cr + 'H</span>' +
+              '</li>';
+          }).join('') + '</ul>'
+        : '';
+      return '<div class="ro-bd-cat' + (items.length ? ' ro-bd-cat-expandable' : '') + '"' +
+        (items.length ? ' data-ro-expand="' + listId + '" role="button" tabindex="0" aria-expanded="false"' : '') + '>' +
         '<div class="ro-bd-cat-head">' +
           '<span class="ro-bd-cat-name">' + esc(rtl ? r.meta.ar : r.meta.en) + '</span>' +
           '<span class="ro-bd-cat-tag' + (r.meta.optional ? ' ro-bd-cat-tag-opt' : '') + '">' +
@@ -308,6 +336,9 @@
           '<div><b>' + Math.round(r.remaining) + '</b><span>' + (rtl ? 'متبقية' : 'Remaining') + '</span></div>' +
           '<div><b>' + r.done + '/' + (r.pickOf ? r.pickOf.need : r.courses) + '</b><span>' + (rtl ? 'مساقات' : 'Courses') + '</span></div>' +
         '</div>' +
+        (items.length ? '<div class="ro-bd-cat-more">' + (rtl ? 'اعرض المساقات' : 'Show courses') +
+          '<span class="ro-bd-chev" aria-hidden="true">\u203a</span></div>' : '') +
+        list +
       '</div>';
     }).join('');
 
@@ -622,10 +653,28 @@
     body.addEventListener('click', function(e){
       var btn = e.target.closest('[data-ro-expand]');
       if(!btn) return;
+      // Two things carry data-ro-expand now: a year's "+N more" button,
+      // which opens the card AROUND it, and a category card, which is the
+      // expandable itself.
+      if(btn.classList.contains('ro-bd-cat')){
+        var openCat = btn.classList.toggle('ro-bd-cat-open');
+        btn.setAttribute('aria-expanded', openCat ? 'true' : 'false');
+        return;
+      }
       var card = btn.closest('.ro-card');
       if(!card) return;
       var open = card.classList.toggle('ro-card-open');
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    // The category cards are role="button" tabindex="0", so they have to
+    // answer the keyboard too — a div that only responds to a mouse is not
+    // a button however it is labelled.
+    body.addEventListener('keydown', function(e){
+      if(e.key !== 'Enter' && e.key !== ' ') return;
+      var cat = e.target.closest && e.target.closest('.ro-bd-cat[data-ro-expand]');
+      if(!cat) return;
+      e.preventDefault();
+      cat.click();
     });
   }
 
