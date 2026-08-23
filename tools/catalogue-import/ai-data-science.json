@@ -1,0 +1,3676 @@
+{
+ "faculty": "Faculty of Artificial Intelligence and Data Science",
+ "source": "AAUP AI & Data Science catalogue PDF (Overview.pdf, 48 pages)",
+ "note": "The 600-page document lists this faculty by program NAME ONLY. This PDF is where its course data comes from.",
+ "programs": [
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Cyber Security",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "100411010",
+       "name": "CALCULUS I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411020",
+       "name": "CALCULUS II",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "100413750",
+       "name": "DISCRETE MATHEMATICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111040",
+       "name": "ELEMENTARY PROBABILITY & STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "250223010",
+       "name": "LINEAR ALGEBRA I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290311110",
+       "name": "INTRODUCTION TO COMPUTER SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290311210",
+       "name": "PROGRAMMING FUNDAMENTALS",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311110"
+       ]
+      },
+      {
+       "code": "290312120",
+       "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312140",
+       "name": "DATA STRUCTURE AND ALGORITHMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312210",
+       "name": "DATA SCIENCE AND ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "290312220",
+       "name": "INTRODUCTION TO OPERATING SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290312230",
+       "name": "MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290313240",
+       "name": "DEEP LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290314110",
+       "name": "ETHICS IN AI",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specReq": {
+     "courses": [
+      {
+       "code": "290312110",
+       "name": "FUNDAMENTALS OF DATABASES",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313130",
+       "name": "FUNDAMENTAL OF AI PROGRAMMING WITH PYTHON",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313250",
+       "name": "INTERNSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290354230",
+       "name": "CAPSTONE PROJECT",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290372210",
+       "name": "INTRODUCTION TO CYBERSECURITY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290372220",
+       "name": "COMPUTER NETWORKS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290373110",
+       "name": "AI IN CYBERSECURITY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290373120",
+       "name": "DIGITAL FORENSICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290372210"
+       ]
+      },
+      {
+       "code": "290373130",
+       "name": "CYBERSECURITY POLICY AND GOVERNANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290372210"
+       ]
+      },
+      {
+       "code": "290373210",
+       "name": "CRYPTOGRAPHY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290372210"
+       ]
+      },
+      {
+       "code": "290373220",
+       "name": "NETWORK SECURITY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290372220"
+       ]
+      },
+      {
+       "code": "290373230",
+       "name": "ETHICAL HACKING AND PENETRATION TESTING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290372210"
+       ]
+      },
+      {
+       "code": "290374110",
+       "name": "SOFTWARE SECURITY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290374120",
+       "name": "BLOCKCHAIN AND SECURITY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290372210"
+       ]
+      },
+      {
+       "code": "290374210",
+       "name": "CYBER-PHYSICAL SYSTEMS SECURITY",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290372210"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "250223040",
+       "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313110",
+       "name": "ROBOTICS FOUNDATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313120",
+       "name": "NATURAL LANGUAGE PROCESSING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313210",
+       "name": "COMPUTER VISION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290373140",
+       "name": "WEB DEVELOPMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290373150",
+       "name": "SPECIAL TOPICS IN CYBERSECURITY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290373160",
+       "name": "ADVANCED ETHICAL HACKING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290373230"
+       ]
+      },
+      {
+       "code": "290373170",
+       "name": "WIRELESS NETWORKS MANAGEMENT AND SECURITY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290372220"
+       ]
+      }
+     ],
+     "requiredHours": 12
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 127
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Education Technology",
+   "requirements": {},
+   "noPlanPublished": "No plan"
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Innovation",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "100411010",
+       "name": "CALCULUS I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411020",
+       "name": "CALCULUS II",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "100413750",
+       "name": "DISCRETE MATHEMATICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111040",
+       "name": "ELEMENTARY PROBABILITY & STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "250223010",
+       "name": "LINEAR ALGEBRA I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290311110",
+       "name": "INTRODUCTION TO COMPUTER SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290311210",
+       "name": "PROGRAMMING FUNDAMENTALS",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311110"
+       ]
+      },
+      {
+       "code": "290312120",
+       "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312130",
+       "name": "COMPUTER ARCHITECTURE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312140",
+       "name": "DATA STRUCTURE AND ALGORITHMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312210",
+       "name": "DATA SCIENCE AND ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "290312220",
+       "name": "INTRODUCTION TO OPERATING SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312130"
+       ]
+      },
+      {
+       "code": "290312230",
+       "name": "MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290312240",
+       "name": "DIFFERENTIAL EQUATIONS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290312250",
+       "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313120",
+       "name": "NATURAL LANGUAGE PROCESSING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313240",
+       "name": "DEEP LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290314110",
+       "name": "ETHICS IN AI",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specReq": {
+     "courses": [
+      {
+       "code": "290312110",
+       "name": "FUNDAMENTALS OF DATABASES",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313100",
+       "name": "ROBOTICS AND AUTOMATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290313110"
+       ]
+      },
+      {
+       "code": "290313110",
+       "name": "ROBOTICS FOUNDATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313130",
+       "name": "FUNDAMENTAL OF AI PROGRAMMING WITH PYTHON",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313250",
+       "name": "INTERNSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290354230",
+       "name": "CAPSTONE PROJECT",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "291123110",
+       "name": "INNOVATION MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "291123210",
+       "name": "TECHNOLOGY ENTREPRENEURSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "291123240",
+       "name": "DIGITAL TRANSFORMATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "291123250",
+       "name": "INNOVATIVE PRODUCT DESIGN",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "291124110",
+       "name": "STRATEGIC MANAGEMENT OF TECHNOLOGY AND INNOVATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "291124210",
+       "name": "ARTIFICIAL INTELLIGENCE THEORIES AND APPLICATIONS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "291124220",
+       "name": "ADVANCED ETHICS IN AI",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290314110"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "290313190",
+       "name": "COGNITIVE SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313210",
+       "name": "COMPUTER VISION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "291123220",
+       "name": "ADVANCED MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "291123230",
+       "name": "AI IN HEALTHCARE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      }
+     ],
+     "requiredHours": 6
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 127
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Public Relations",
+   "requirements": {},
+   "noPlanPublished": "No plan yet"
+  },
+  {
+   "name": "Bachelor in Data Science - Specialization in Data Science and Machine Learning",
+   "requirements": {},
+   "noPlanPublished": "No plan yet"
+  },
+  {
+   "name": "Bachelor in Data Science - Specialization in Statistics and Data Science",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "250111010",
+       "name": "PRINCIPLES AND PRACTICES OF DATA SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "250111020",
+       "name": "MATHEMATICS FOR DATA SCIENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111030",
+       "name": "PROGRAMMING FUNDAMENTALS (JAVA)",
+       "credits": 5.0,
+       "theoretical": 3.0,
+       "practical": 4.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "250112080",
+       "name": "STATISTICAL PROCESS CONTROL",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250111060"
+       ]
+      },
+      {
+       "code": "250112090",
+       "name": "CATEGORICAL EXPERIMENTS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250111060"
+       ]
+      },
+      {
+       "code": "250112100",
+       "name": "APPLIED PROBABILITY & STOCHASTIC PROCESSES",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "250112110",
+       "name": "OPERATIONS RESEARCH I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250112020"
+       ]
+      },
+      {
+       "code": "250112120",
+       "name": "OPERATIONS RESEARCH II",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250112130",
+       "name": "SPECIAL TOPICS IN STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250112140",
+       "name": "NUMERICAL ANALYSIS I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250112020"
+       ]
+      },
+      {
+       "code": "250112150",
+       "name": "DATA MINING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250112030"
+       ]
+      },
+      {
+       "code": "250112160",
+       "name": "APPLIED NON-PARAMETRIC STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250111060"
+       ]
+      },
+      {
+       "code": "250112170",
+       "name": "SURVIVAL ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "250112190",
+       "name": "NEURAL NETWORKS AND DEEP LEARNING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250113060"
+       ]
+      },
+      {
+       "code": "250112200",
+       "name": "BIG DATA",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250113060"
+       ]
+      },
+      {
+       "code": "250112210",
+       "name": "SPECIAL TOPICS IN DATA SCIENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      }
+     ],
+     "requiredHours": 12
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 125,
+   "degreeHoursDiscrepancy": {
+    "statedDegreeHours": 125,
+    "sumOfRequirementHours": 50.0,
+    "difference": -75.0,
+    "reason": "The PDF states this total but does not print enough requirement sections to reach it. Nothing is inferred to close the gap."
+   }
+  },
+  {
+   "name": "Bachelor in Virtual Reality Science",
+   "requirements": {},
+   "noPlanPublished": "No plan"
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Digital Media",
+   "requirements": {},
+   "noPlanPublished": "Noo plan yet"
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Financial Technology",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "100411010",
+       "name": "CALCULUS I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411020",
+       "name": "CALCULUS II",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "100413750",
+       "name": "DISCRETE MATHEMATICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111040",
+       "name": "ELEMENTARY PROBABILITY & STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "250223010",
+       "name": "LINEAR ALGEBRA I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290311110",
+       "name": "INTRODUCTION TO COMPUTER SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290311210",
+       "name": "PROGRAMMING FUNDAMENTALS",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311110"
+       ]
+      },
+      {
+       "code": "290312120",
+       "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312140",
+       "name": "DATA STRUCTURE AND ALGORITHMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290312210",
+       "name": "DATA SCIENCE AND ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "290312230",
+       "name": "MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290312250",
+       "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313210",
+       "name": "COMPUTER VISION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313240",
+       "name": "DEEP LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290314110",
+       "name": "ETHICS IN AI",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specReq": {
+     "courses": [
+      {
+       "code": "290312110",
+       "name": "FUNDAMENTALS OF DATABASES",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290313250",
+       "name": "INTERNSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290332210",
+       "name": "PRINCIPLES OF FINANCE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290332220",
+       "name": "MICROECONOMICS AND MACROECONOMICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290333110",
+       "name": "FINANCIAL MARKETS AND INSTITUTIONS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290333120",
+       "name": "OBJECT-ORIENTED PROGRAMMING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311210"
+       ]
+      },
+      {
+       "code": "290333130",
+       "name": "FINANCIAL ACCOUNTING AND REPORTING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290332210"
+       ]
+      },
+      {
+       "code": "290333210",
+       "name": "BLOCKCHAIN AND CRYPTOCURRENCY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290333220",
+       "name": "ARTIFICIAL INTELLIGENCE IN FINANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290333230",
+       "name": "REGTECH (REGULATORY TECHNOLOGY) AND COMPLIANCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290334110",
+       "name": "DIGITAL PAYMENTS AND REMITTANCES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290334120",
+       "name": "FINANCIAL MODELING AND SIMULATION",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290332210"
+       ]
+      },
+      {
+       "code": "290334210",
+       "name": "ETHICS IN AI AND FINANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290314110"
+       ]
+      },
+      {
+       "code": "290354230",
+       "name": "CAPSTONE PROJECT",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "290333140",
+       "name": "ADVANCED MACHINE LEARNING AND DATA ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290333150",
+       "name": "QUANTITATIVE FINANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290332210"
+       ]
+      },
+      {
+       "code": "290333160",
+       "name": "USER EXPERIENCE DESIGN IN FINTECH",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290332210"
+       ]
+      },
+      {
+       "code": "290333170",
+       "name": "ENTREPRENEURSHIP IN FINTECH",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290332210"
+       ]
+      },
+      {
+       "code": "290333180",
+       "name": "ROBOTIC PROCESS AUTOMATION IN FINANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      }
+     ],
+     "requiredHours": 6
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 121
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Medical Sciences",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "100411010",
+       "name": "CALCULUS I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411020",
+       "name": "CALCULUS II",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "100413750",
+       "name": "DISCRETE MATHEMATICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111040",
+       "name": "ELEMENTARY PROBABILITY & STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "250223010",
+       "name": "LINEAR ALGEBRA I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290311110",
+       "name": "INTRODUCTION TO COMPUTER SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290311120",
+       "name": "PROGRAMMING FUNDAMENTALS",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311110"
+       ]
+      },
+      {
+       "code": "290312120",
+       "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290312130",
+       "name": "COMPUTER ARCHITECTURE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290312140",
+       "name": "DATA STRUCTURE AND ALGORITHMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290312210",
+       "name": "DATA SCIENCE AND ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "290312220",
+       "name": "INTRODUCTION TO OPERATING SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312130"
+       ]
+      },
+      {
+       "code": "290312230",
+       "name": "MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290312240",
+       "name": "DIFFERENTIAL EQUATIONS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290312250",
+       "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290313120",
+       "name": "NATURAL LANGUAGE PROCESSING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313210",
+       "name": "COMPUTER VISION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313240",
+       "name": "DEEP LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290314110",
+       "name": "ETHICS IN AI",
+       "credits": 3.0,
+       "theoretical": 3.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "290313110",
+       "name": "ROBOTICS FOUNDATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290313190",
+       "name": "COGNITIVE SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290323210",
+       "name": "AI FOR CLINICAL DECISION SUPPORT SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323220",
+       "name": "AI IN DIAGNOSTIC AND PREDICTIVE MEDICINE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323230",
+       "name": "ROBOTICS AND ASSISTIVE TECHNOLOGIES IN MEDICINE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323240",
+       "name": "AI APPLICATIONS IN LABORATORY TECHNOLOGY AND DIAGNOSIS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323250",
+       "name": "DIGITAL HEALTH AND INFORMATICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323260",
+       "name": "AI IN GENOMICS AND PERSONALIZED MEDICINE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290323270",
+       "name": "AI ENABLED MEDICAL IMAGING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290323280",
+       "name": "AI IN DIAGNOSTIC AND PREDICTIVE MEDICINE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      }
+     ],
+     "requiredHours": 12
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 129,
+   "degreeHoursDiscrepancy": {
+    "statedDegreeHours": 129,
+    "sumOfRequirementHours": 97.0,
+    "difference": -32.0,
+    "reason": "The PDF states this total but does not print enough requirement sections to reach it. Nothing is inferred to close the gap."
+   }
+  },
+  {
+   "name": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Robotics",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "100411010",
+       "name": "CALCULUS I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411020",
+       "name": "CALCULUS II",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "100413750",
+       "name": "DISCRETE MATHEMATICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111040",
+       "name": "ELEMENTARY PROBABILITY & STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411010"
+       ]
+      },
+      {
+       "code": "250223010",
+       "name": "LINEAR ALGEBRA I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "250223040",
+       "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290311110",
+       "name": "INTRODUCTION TO COMPUTER SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290311120",
+       "name": "PROGRAMMING FUNDAMENTALS",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311110"
+       ]
+      },
+      {
+       "code": "290312120",
+       "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290312130",
+       "name": "COMPUTER ARCHITECTURE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290312140",
+       "name": "DATA STRUCTURE AND ALGORITHMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290312210",
+       "name": "DATA SCIENCE AND ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "250111040"
+       ]
+      },
+      {
+       "code": "290312220",
+       "name": "INTRODUCTION TO OPERATING SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312130"
+       ]
+      },
+      {
+       "code": "290312230",
+       "name": "MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      },
+      {
+       "code": "290312240",
+       "name": "DIFFERENTIAL EQUATIONS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411020"
+       ]
+      },
+      {
+       "code": "290313120",
+       "name": "NATURAL LANGUAGE PROCESSING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313210",
+       "name": "COMPUTER VISION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313240",
+       "name": "DEEP LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290314110",
+       "name": "ETHICS IN AI",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "290312120"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specReq": {
+     "courses": [
+      {
+       "code": "290312110",
+       "name": "FUNDAMENTALS OF DATABASES",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290313110",
+       "name": "ROBOTICS FOUNDATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290313130",
+       "name": "FUNDAMENTAL OF AI PROGRAMMING WITH PYTHON",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290311120"
+       ]
+      },
+      {
+       "code": "290313220",
+       "name": "ROBOTICS MOTION, PLANNING, AND NAVIGATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290313110"
+       ]
+      },
+      {
+       "code": "290313230",
+       "name": "HUMAN ROBOTIC INTERACTION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290313110"
+       ]
+      },
+      {
+       "code": "290313250",
+       "name": "INTERNSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "290314120",
+       "name": "AUTONOMOUS VEHICLE SIMULATION AND MODELING OF AI ROBOTIC SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290314130",
+       "name": "CAPSTONE PROJECT RESEARCH",
+       "credits": 1.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "290314210",
+       "name": "CAPSTONE PROJECT: COGNITIVE ROBOTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290314130"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "290313100",
+       "name": "ROBOTICS AND AUTOMATION",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290313110"
+       ]
+      },
+      {
+       "code": "290313140",
+       "name": "EMBEDDED SYSTEM FOR ROBOTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290313150",
+       "name": "ROBOTICS OPERATING SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290313160",
+       "name": "SWARM ROBOTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290313170",
+       "name": "SENSORS AND PERCEPTION IN ROBOTICS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "290313180",
+       "name": "REINFORCEMENT LEARNING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      },
+      {
+       "code": "290313190",
+       "name": "COGNITIVE SYSTEMS",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0,
+       "prerequisites": [
+        "290312230"
+       ]
+      }
+     ],
+     "requiredHours": 18
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 128
+  },
+  {
+   "name": "Bachelor in Data Science - Specialization in Finance and Data Science",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "010610035"
+       ]
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "univElec": {
+     "courses": [],
+     "requiredHours": 8
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "020111011",
+       "name": "ACCOUNTING PRINCIPLES I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020111021",
+       "name": "ACCOUNTING PRINCIPLES II",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020111011"
+       ]
+      },
+      {
+       "code": "020211010",
+       "name": "INTRODUCTION TO BUSINESS ADMINISTRATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020211020",
+       "name": "PRINCIPLES OF MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020211010"
+       ]
+      },
+      {
+       "code": "020211050",
+       "name": "ENGLISH FOR BUSINESS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020212100",
+       "name": "COMMERCIAL LAW",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020211020"
+       ]
+      },
+      {
+       "code": "020311010",
+       "name": "MACROECONOMICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020311020",
+       "name": "MICROECONOMICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020311010"
+       ]
+      },
+      {
+       "code": "020312100",
+       "name": "FINANCIAL MANAGEMENT I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020111021"
+       ]
+      },
+      {
+       "code": "020411010",
+       "name": "PRINCIPLES OF MARKETING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020732010",
+       "name": "ADVANCED COMPUTER APPLICATIONS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "240111000"
+       ]
+      },
+      {
+       "code": "020732100",
+       "name": "INTRODUCTION TO MIS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "240111000"
+       ]
+      },
+      {
+       "code": "100411050",
+       "name": "BUSINESS MATHEMATICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411810",
+       "name": "BUSINESS STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "100411050"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specReq": {
+     "courses": [
+      {
+       "code": "020114110",
+       "name": "FINANCIAL STATEMENT ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020214110",
+       "name": "DECISION ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020313701",
+       "name": "INTERNATIONAL FINANCIAL MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020314650",
+       "name": "BANKS MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020332210",
+       "name": "PRINCIPLES OF CORPORATE FINANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020332220",
+       "name": "INTRODUCTION TO DATA ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020333110",
+       "name": "CAPITAL MARKETS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020333120",
+       "name": "DATA MINING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020332220"
+       ]
+      },
+      {
+       "code": "020333150",
+       "name": "TRAINING COURSE I IN FINANCE AND DATA SCIENCE",
+       "credits": 0.0
+      },
+      {
+       "code": "020333210",
+       "name": "FINANCIAL TECHNOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020333220",
+       "name": "ESSENTIALS OF INVESTMENTS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020333240",
+       "name": "FINANCIAL ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020333250",
+       "name": "TRAINING COURSE II IN FINANCE AND DATA SCIENCE",
+       "credits": 0.0
+      },
+      {
+       "code": "020334110",
+       "name": "VALUATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020334120",
+       "name": "PROGRAMING LANGUAGES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020334150",
+       "name": "TRAINING COURSE III IN FINANCE AND DATA SCIENCE",
+       "credits": 0.0
+      },
+      {
+       "code": "020334210",
+       "name": "DATA ANALYTICS FOR BUSINESS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020334220",
+       "name": "GRADUATION PROJECT FOR FINANCE AND DATA ANALYTICS",
+       "credits": 3.0
+      },
+      {
+       "code": "020334250",
+       "name": "TRAINING COURSE IV IN FINANCE AND DATA SCIENCE",
+       "credits": 0.0
+      },
+      {
+       "code": "020334261",
+       "name": "INTERNSHIP IN FINANCE AND DATA SCIENCE I",
+       "credits": 3.0
+      },
+      {
+       "code": "020334262",
+       "name": "INTERNSHIP IN FINANCE AND DATA SCIENCE II",
+       "credits": 3.0,
+       "prerequisites": [
+        "020334261"
+       ]
+      }
+     ],
+     "mustPassAll": true
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "020114000",
+       "name": "MANAGERIAL ACCOUNTING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020111021"
+       ]
+      },
+      {
+       "code": "020213110",
+       "name": "BUSINESS ETHICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020212100"
+       ]
+      },
+      {
+       "code": "020213210",
+       "name": "LEADERSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020332230",
+       "name": "REAL ESTATE FINANCE",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "020333130",
+       "name": "FIXED INCOME SECURITIES",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020333220"
+       ]
+      },
+      {
+       "code": "020333140",
+       "name": "DATA ANALYTICS FOR ACCOUNTING",
+       "credits": 3.0,
+       "theoretical": 2.0,
+       "practical": 2.0
+      },
+      {
+       "code": "020333160",
+       "name": "MARKETING ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020334230",
+       "name": "DIGITAL ANALYTICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      }
+     ],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 127
+  },
+  {
+   "name": "Bachelor in Financial Engineering",
+   "requirements": {
+    "univReq": {
+     "courses": [
+      {
+       "code": "000011110",
+       "name": "COMMUNITY SERVICE",
+       "credits": 0.0,
+       "theoretical": 1.0
+      },
+      {
+       "code": "010610014",
+       "name": "BEGINNING ENGLISH",
+       "credits": 0.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610025",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "010610014"
+       ]
+      },
+      {
+       "code": "010610026",
+       "name": "INTERMEDIATE ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true
+      },
+      {
+       "code": "010610035",
+       "name": "ADVANCED ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610036",
+       "name": "ADVANCED ENGLISH LAB",
+       "credits": 1.0,
+       "weeklyHours": 2.0,
+       "weeklyHoursColumnUnknown": true,
+       "prerequisites": [
+        "010610026"
+       ]
+      },
+      {
+       "code": "040111001",
+       "name": "ARABIC LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511011",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040521301",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "240111000",
+       "name": "COMPUTER SKILLS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "colgReq": {
+     "courses": [
+      {
+       "code": "020211010",
+       "name": "INTRODUCTION TO BUSINESS ADMINISTRATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020312100",
+       "name": "FINANCIAL MANAGEMENT I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250111010",
+       "name": "PRINCIPLES AND PRACTICES OF DATA SCIENCE",
+       "credits": 4.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "250111030",
+       "name": "PROGRAMMING FUNDAMENTALS (JAVA)",
+       "credits": 5.0,
+       "theoretical": 3.0,
+       "practical": 4.0
+      },
+      {
+       "code": "250221020",
+       "name": "ECONOMIC PRINCIPLES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250221040",
+       "name": "MATHEMATICS FOR DATA SCIENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250221060",
+       "name": "FINANCIAL ACCOUNTING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "specReq": {
+     "courses": [
+      {
+       "code": "020213110",
+       "name": "BUSINESS ETHICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020211010"
+       ]
+      },
+      {
+       "code": "250222010",
+       "name": "ELEMENTARY PROBABILITY & STATISTICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250221040"
+       ]
+      },
+      {
+       "code": "250222020",
+       "name": "FINANCIAL RISK MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "250222030",
+       "name": "PROGRAMMING IN PYTHON",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250111010"
+       ]
+      },
+      {
+       "code": "250222040",
+       "name": "OPTIONS, FUTURES, AND DERIVATIVES",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "250222050",
+       "name": "FINANCIAL ECONOMICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250222060",
+       "name": "CAPITAL MARKETS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "250222070",
+       "name": "CREDIT RISK ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "250223010",
+       "name": "LINEAR ALGEBRA I",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250221040"
+       ]
+      },
+      {
+       "code": "250223020",
+       "name": "FIXED INCOME SECURITIES",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "250223030",
+       "name": "PRINCIPLES OF FINANCIAL ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222010"
+       ]
+      },
+      {
+       "code": "250223040",
+       "name": "FUNDAMENTALS OF SOFTWARE ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250223050",
+       "name": "ESSENTIALS OF INVESTMENT",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222060"
+       ]
+      },
+      {
+       "code": "250223060",
+       "name": "FINANCIAL STATEMENT ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250223070",
+       "name": "FINANCIAL TECHNOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "020312100"
+       ]
+      },
+      {
+       "code": "250223080",
+       "name": "FUNDAMENTALS OF DATABASES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250223090",
+       "name": "APPLIED REGRESSION ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222010"
+       ]
+      },
+      {
+       "code": "250224010",
+       "name": "DATA VISUALIZATION",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222030"
+       ]
+      },
+      {
+       "code": "250224030",
+       "name": "QUANTITATIVE METHODS IN FINANCIAL ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250223030"
+       ]
+      },
+      {
+       "code": "250224040",
+       "name": "PROBABILITY THEORY",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222010"
+       ]
+      },
+      {
+       "code": "250224050",
+       "name": "DATA ANALYTICS FOR BUSINESS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250224060",
+       "name": "ESSENTIALS OF ECONOMETRICS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222010"
+       ]
+      },
+      {
+       "code": "250224070",
+       "name": "GRADUATION PROJECT FOR FINANCIAL ENGINEERING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      }
+     ],
+     "mustPassAll": true
+    },
+    "freeElec": {
+     "courses": [],
+     "requiredHours": 6
+    },
+    "specElec": {
+     "courses": [
+      {
+       "code": "020214110",
+       "name": "DECISION ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020214150",
+       "name": "STRATEGIC MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020253110",
+       "name": "MANAGING INNOVATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020313701",
+       "name": "INTERNATIONAL FINANCIAL MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020333120",
+       "name": "DATA MINING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020334110",
+       "name": "VALUATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020411010",
+       "name": "PRINCIPLES OF MARKETING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "210312150",
+       "name": "BUSINESS LAW",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "240114320",
+       "name": "ENTREPRENEURSHIP",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250112030",
+       "name": "FUNDAMENTALS OF ARTIFICIAL INTELLIGENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250112200",
+       "name": "BIG DATA",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250112210",
+       "name": "SPECIAL TOPICS IN DATA SCIENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250113010",
+       "name": "DATA MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250113020",
+       "name": "MULTIVARIATE DATA ANALYSIS",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222010"
+       ]
+      },
+      {
+       "code": "250113060",
+       "name": "APPLIED MACHINE LEARNING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "250113090",
+       "name": "TIME SERIES",
+       "credits": 3.0,
+       "theoretical": 3.0,
+       "prerequisites": [
+        "250222010"
+       ]
+      }
+     ],
+     "requiredHours": 12
+    },
+    "univElec": {
+     "courses": [
+      {
+       "code": "040511052",
+       "name": "ISRAELI & ZIONISM STUDIES I",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511053",
+       "name": "JERUSALEM: CIVILIZATION AND HISTORY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511061",
+       "name": "ISRAELI & ZIONISM STUDIES II",
+       "credits": 2.0,
+       "theoretical": 2.0,
+       "prerequisites": [
+        "040511052"
+       ]
+      },
+      {
+       "code": "040511081",
+       "name": "HOME GARDENING",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511091",
+       "name": "FINE ARTS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511101",
+       "name": "CURRENT WORLD ISSUES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511121",
+       "name": "PHYSICAL EDUCATION",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511132",
+       "name": "ELECTION AND POLITICAL PARTICIPATION",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511133",
+       "name": "THE PALESTINIAN PRISONERS MOVEMENT",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511140",
+       "name": "LAW IN OUR LIFE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511150",
+       "name": "ISLAMIC CULTURE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511160",
+       "name": "DEMOCRACY AND HUMAN RIGHTS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511170",
+       "name": "TECHNOLOGY IN OUR LIFE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511180",
+       "name": "INTRODUCTION TO ASTRONOMY SCIENCE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511190",
+       "name": "HISTORY OF CIVILIZATION",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511200",
+       "name": "INTRODUCTION TO ECONOMICS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511211",
+       "name": "ANTHROPOLOGY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511230",
+       "name": "FRENCH LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511240",
+       "name": "GERMAN LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511250",
+       "name": "ENERGY RESOURCES & USE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511260",
+       "name": "INTRODUCTION TO PSYCHOLOGY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511280",
+       "name": "HUMAN & ENVIRONMENT",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511290",
+       "name": "HISTORY OF SCIENCE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511311",
+       "name": "INTERNATIONAL RELATIONS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511321",
+       "name": "SCIENCE,TECHNOLOGY AND SOCIETY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511400",
+       "name": "TURKISH LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511411",
+       "name": "POLITICAL SCIENCES",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511421",
+       "name": "CRITICAL THINKING",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511490",
+       "name": "HUMAN RIGHTS AND GENDER",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511500",
+       "name": "THE PALESTINIAN CINEMA: AN ALTERNATIVE NARRATIVE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511511",
+       "name": "MODERN ARAB THOUGHT",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511521",
+       "name": "ARCHEOLOGY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511611",
+       "name": "HEBREW LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511621",
+       "name": "CIVIL SOCIETY ORGANIZATIONS",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511990",
+       "name": "EFFECTIVE COMMUNICATION",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "280311100",
+       "name": "FINANCIAL LITERACY",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "280311110",
+       "name": "INTRODUCTION TO SIGN LANGUAGE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "280311120",
+       "name": "CHINESE LANGUAGE AND CULTURE",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "010411000",
+       "name": "HISTORY OF CIVILIZATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010411050",
+       "name": "JERUSALEM:CIVILIZATION AND HISTORY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "010610022",
+       "name": "INTERMEDIATE ENGLISH",
+       "credits": 2.0,
+       "theoretical": 3.0,
+       "practical": 2.0
+      },
+      {
+       "code": "011111611",
+       "name": "HEBREW LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "011111611",
+       "name": "HEBREW LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "011111611",
+       "name": "HEBREW LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020211000",
+       "name": "DEVELOPMENT MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "020311000",
+       "name": "INTRODUCTION TO ECONOMICS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "030111100",
+       "name": "ISLAMIC CULTURE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "030111121",
+       "name": "LAW IN OUR LIFE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "030111230",
+       "name": "INTEGRITY,TRANSPARENCY, AND ACCOUNTABILITY IN FIGHTING CORRUPTION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "030121220",
+       "name": "DEMOCRACY AND HUMAN RIGHTS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040111000",
+       "name": "ARABIC LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040211510",
+       "name": "FRENCH LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040211711",
+       "name": "GERMAN LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040213430",
+       "name": "TURKISH LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040411000",
+       "name": "NUTRITION & FOOD SECURITY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040411009",
+       "name": "NUTRITION & FOOD SECURITY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511010",
+       "name": "PALESTINIAN STUDIES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511040",
+       "name": "FINE ARTS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511051",
+       "name": "ISRAELI & ZIONISM STUDIES I",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511060",
+       "name": "ISRAELI & ZIONISM STUDIES II",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511070",
+       "name": "DEVELOPMENT MANAGEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511080",
+       "name": "HOME GARDENING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511090",
+       "name": "FINE ARTS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511100",
+       "name": "CURRENT WORLD ISSUES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511120",
+       "name": "PHYSICAL EDUCATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511130",
+       "name": "ELECTION AND POLITICAL PARTICIPATION",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511131",
+       "name": "THE PALESTINIAN PRISONERS MOVEMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511210",
+       "name": "ANTHROPOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511310",
+       "name": "INTERNATIONAL RELATIONS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511320",
+       "name": "SCIENCE,TECHNOLOGY AND SOCIETY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511410",
+       "name": "POLITICAL SCIENCES",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511420",
+       "name": "CRITICAL THINKING",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511430",
+       "name": "TURKISH LANGUAGE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511510",
+       "name": "MODERN ARAB THOUGHT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511520",
+       "name": "ARCHEOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511610",
+       "name": "HEBREW LANGUAGE ( for Bagrut Students )",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511610",
+       "name": "HEBREW LANGUAGE ( for Bagrut Students )",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511610",
+       "name": "HEBREW LANGUAGE ( for Bagrut Students )",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040511611",
+       "name": "HEBREW LANGUAGE ( for Bagrut Students )",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511611",
+       "name": "HEBREW LANGUAGE ( for Bagrut Students )",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511611",
+       "name": "HEBREW LANGUAGE ( for Bagrut Students )",
+       "credits": 2.0,
+       "theoretical": 2.0
+      },
+      {
+       "code": "040511620",
+       "name": "CIVIL SOCIETY ORGANIZATIONS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "040521300",
+       "name": "FUNDAMENTALS OF RESEARCH METHODS",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "050411000",
+       "name": "ENERGY RESOURCES & USE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "060411100",
+       "name": "INTRODUCTION TO PSYCHOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "060411200",
+       "name": "INTRODUCTION TO SOCIOLOGY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "060511020",
+       "name": "FIRST AID",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100111000",
+       "name": "ASTRONOMY SCIENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100112020",
+       "name": "INTRODUCTION TO ASTRONOMY",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100311000",
+       "name": "HUMAN & ENVIRONMENT",
+       "credits": 3.0,
+       "theoretical": 3.0
+      },
+      {
+       "code": "100411000",
+       "name": "HISTORY OF SCIENCE",
+       "credits": 3.0,
+       "theoretical": 3.0
+      }
+     ],
+     "requiredHours": 6
+    }
+   },
+   "degreeHours": 133,
+   "degreeHoursDiscrepancy": {
+    "statedDegreeHours": 133,
+    "sumOfRequirementHours": 131.0,
+    "difference": -2.0,
+    "reason": "The PDF states this total but does not print enough requirement sections to reach it. Nothing is inferred to close the gap."
+   }
+  }
+ ]
+}

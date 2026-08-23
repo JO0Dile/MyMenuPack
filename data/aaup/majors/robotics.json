@@ -5,7 +5,7 @@
   "nameAr": "الذكاء الاصطناعي والروبوتات",
   "university": "aaup",
   "college": "aaup-ai-ds",
-  "degreeHours": null,
+  "degreeHours": 128,
   "courses": [
     {
       "slug": "arabic-language",
@@ -22,7 +22,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "calc-1",
@@ -39,7 +40,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "computer-skills",
@@ -56,7 +58,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "discrete-math",
@@ -73,7 +76,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "intermediate-english",
@@ -90,7 +94,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "intermediate-english-lab",
@@ -107,7 +112,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "intro-cs",
@@ -124,7 +130,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "intro-cs-lab",
@@ -141,7 +148,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "colgReq"
     },
     {
       "slug": "uni-elective-1",
@@ -158,7 +166,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "advanced-english",
@@ -175,7 +184,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "Intermediate English (010610025) & Intermediate English Lab (010610026)"
+      "prerequisiteText": "Intermediate English (010610025) & Intermediate English Lab (010610026)",
+      "requirement": "univReq"
     },
     {
       "slug": "advanced-english-lab",
@@ -192,7 +202,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": true,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "calc-2",
@@ -209,7 +220,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Calculus I (100411010)"
+      "prerequisiteText": "Calculus I (100411010)",
+      "requirement": "colgReq"
     },
     {
       "slug": "prob-stats",
@@ -226,7 +238,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Calculus I (100411010)"
+      "prerequisiteText": "Calculus I (100411010)",
+      "requirement": "colgReq"
     },
     {
       "slug": "progfund",
@@ -243,7 +256,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Computer Science (290311110)"
+      "prerequisiteText": "Introduction to Computer Science (290311110)",
+      "requirement": "colgReq"
     },
     {
       "slug": "progfund-lab",
@@ -260,7 +274,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Introduction to Computer Science (290311110)"
+      "prerequisiteText": "Introduction to Computer Science (290311110)",
+      "requirement": "colgReq"
     },
     {
       "slug": "uni-elective-2",
@@ -277,7 +292,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "comp-arch",
@@ -294,7 +310,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "colgReq"
     },
     {
       "slug": "dsa",
@@ -311,7 +328,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "colgReq"
     },
     {
       "slug": "fund-ai",
@@ -328,7 +346,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "colgReq"
     },
     {
       "slug": "db-fund",
@@ -345,7 +364,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "specReq"
     },
     {
       "slug": "db-fund-lab",
@@ -362,7 +382,8 @@
       "isPlaceholder": false,
       "pairGroup": true,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "specReq"
     },
     {
       "slug": "linear-algebra",
@@ -379,7 +400,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Calculus II (100411020)"
+      "prerequisiteText": "Calculus II (100411020)",
+      "requirement": "colgReq"
     },
     {
       "slug": "palestinian-studies",
@@ -396,7 +418,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univReq"
     },
     {
       "slug": "robotics-foundation",
@@ -413,7 +436,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "specReq"
     },
     {
       "slug": "data-sci-analytics",
@@ -430,7 +454,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Elementary Probability & Statistics (250111040)"
+      "prerequisiteText": "Elementary Probability & Statistics (250111040)",
+      "requirement": "colgReq"
     },
     {
       "slug": "diff-eq",
@@ -447,7 +472,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Calculus II (100411020)"
+      "prerequisiteText": "Calculus II (100411020)",
+      "requirement": "colgReq"
     },
     {
       "slug": "ai-python",
@@ -464,7 +490,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "specReq"
     },
     {
       "slug": "research-methods",
@@ -481,7 +508,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Advanced English (010610035) &amp; Advanced English Lab (010610036)"
+      "prerequisiteText": "Advanced English (010610035) &amp; Advanced English Lab (010610036)",
+      "requirement": "univReq"
     },
     {
       "slug": "fund-se",
@@ -498,7 +526,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Programming Fundamentals (290311120)"
+      "prerequisiteText": "Programming Fundamentals (290311120)",
+      "requirement": "colgReq"
     },
     {
       "slug": "intro-os",
@@ -515,7 +544,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Computer Architecture (290312130)"
+      "prerequisiteText": "Computer Architecture (290312130)",
+      "requirement": "colgReq"
     },
     {
       "slug": "uni-elective-3",
@@ -532,7 +562,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "univElec"
     },
     {
       "slug": "free-elective-1",
@@ -549,7 +580,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "freeElec"
     },
     {
       "slug": "human-robot-interaction",
@@ -566,7 +598,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Robotics Foundation (290313110)"
+      "prerequisiteText": "Robotics Foundation (290313110)",
+      "requirement": "specReq"
     },
     {
       "slug": "machine-learning",
@@ -583,7 +616,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Fundamentals of Artificial Intelligence (290312120)"
+      "prerequisiteText": "Fundamentals of Artificial Intelligence (290312120)",
+      "requirement": "colgReq"
     },
     {
       "slug": "robotics-motion",
@@ -600,7 +634,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Robotics Foundation (290313110)"
+      "prerequisiteText": "Robotics Foundation (290313110)",
+      "requirement": "specReq"
     },
     {
       "slug": "deep-learning",
@@ -617,7 +652,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Machine Learning (290312230)"
+      "prerequisiteText": "Machine Learning (290312230)",
+      "requirement": "colgReq"
     },
     {
       "slug": "free-elective-2",
@@ -634,7 +670,8 @@
       "isPlaceholder": true,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "freeElec"
     },
     {
       "slug": "nlp",
@@ -651,7 +688,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Machine Learning (290312230)"
+      "prerequisiteText": "Machine Learning (290312230)",
+      "requirement": "colgReq"
     },
     {
       "slug": "av-sim",
@@ -668,7 +706,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Machine Learning (290312230) & Robotics Foundation (290313110)"
+      "prerequisiteText": "Machine Learning (290312230) & Robotics Foundation (290313110)",
+      "requirement": "specReq"
     },
     {
       "slug": "capstone-research",
@@ -685,7 +724,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "-"
+      "prerequisiteText": "-",
+      "requirement": "specReq"
     },
     {
       "slug": "computer-vision",
@@ -702,7 +742,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Machine Learning (290312230)"
+      "prerequisiteText": "Machine Learning (290312230)",
+      "requirement": "colgReq"
     },
     {
       "slug": "ethics-ai",
@@ -719,7 +760,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Fundamentals of Artificial Intelligence (290312120)"
+      "prerequisiteText": "Fundamentals of Artificial Intelligence (290312120)",
+      "requirement": "colgReq"
     },
     {
       "slug": "capstone-cognitive",
@@ -736,7 +778,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Capstone Project Research (290314130)"
+      "prerequisiteText": "Capstone Project Research (290314130)",
+      "requirement": "specReq"
     },
     {
       "slug": "elective-cognitive-systems",
@@ -753,7 +796,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Machine Learning (290312230)"
+      "prerequisiteText": "Machine Learning (290312230)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-embedded-systems",
@@ -770,7 +814,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Computer Architecture (290312130) & Robotics Foundation (290313110)"
+      "prerequisiteText": "Computer Architecture (290312130) & Robotics Foundation (290313110)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-reinforcement-learning",
@@ -787,7 +832,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Machine Learning (290312230)"
+      "prerequisiteText": "Machine Learning (290312230)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-robotics-os",
@@ -804,7 +850,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Data Structure and Algorithms (290312140) & Introduction to Operating Systems (290312220)"
+      "prerequisiteText": "Data Structure and Algorithms (290312140) & Introduction to Operating Systems (290312220)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-robotics-automation",
@@ -821,7 +868,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Robotics Foundation (290313110)"
+      "prerequisiteText": "Robotics Foundation (290313110)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-sensors-perception",
@@ -838,7 +886,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Robotics Foundation (290313110) & Computer Vision (290313210)"
+      "prerequisiteText": "Robotics Foundation (290313110) & Computer Vision (290313210)",
+      "requirement": "specElec"
     },
     {
       "slug": "elective-swarm-robotics",
@@ -855,7 +904,8 @@
       "isPlaceholder": false,
       "pairGroup": false,
       "independentGrades": false,
-      "prerequisiteText": "Data Structure and Algorithms (290312140) & Robotics Foundation (290313110)"
+      "prerequisiteText": "Data Structure and Algorithms (290312140) & Robotics Foundation (290313110)",
+      "requirement": "specElec"
     }
   ],
   "prerequisites": [
@@ -1065,5 +1115,22 @@
   ],
   "iconKey": "robot",
   "icon": "🤖",
-  "imageUrl": null
+  "imageUrl": null,
+  "requirementHours": {
+    "univReq": 14.0,
+    "univElec": 6,
+    "colgReq": 59.0,
+    "specReq": 25.0,
+    "specElec": 18,
+    "freeElec": 6
+  },
+  "requirementSource": {
+    "document": "AAUP AI & Data Science catalogue PDF",
+    "program": "Bachelor in Artificial Intelligence - Specialization in Artificial Intelligence and Robotics",
+    "via": "tools/merge-catalogue-requirements.py"
+  },
+  "requirementHoursDrift": {
+    "colgReq": 8.0,
+    "specElec": 3.0
+  }
 }

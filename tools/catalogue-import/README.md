@@ -6,8 +6,11 @@ Turns the university catalogue document into structured data.
     python3 parse.py     # blocks -> catalogue.json (faculties>programs>sections>courses)
     python3 index.py     # catalogue -> courses-index.json (one entry per course code)
 
-`blocks.jsonl` is committed, so the last two steps run without the 4.6 MB source
-document.
+    # The AI & Data Science faculty comes from its own PDF, not the docx:
+    python3 parse-ai-pdf.py sources/ai-data-science-faculty.pdf
+
+`blocks.jsonl` and the AI faculty PDF are both committed, so every step runs
+without the 4.6 MB source document.
 
 ## What is in catalogue.json
 13 faculties, 68 programs, 3,076 course entries, 1,797 distinct courses.
@@ -88,6 +91,35 @@ own words ("this one have 2 academic plans 👍 first one : … now the second
 plan:"). Both are stored; the one its advisory plan corroborates is primary and
 the other sits under `alternatePlanA`. Dental Technology's prose states a third
 figure again (69 hours), recorded in its `sourceConflict`.
+
+## ai-data-science.json
+The main document lists the Faculty of Artificial Intelligence and Data Science
+by program NAME ONLY. Its course data comes from a separate 48-page faculty PDF
+(`sources/ai-data-science-faculty.pdf`), parsed by `parse-ai-pdf.py` into the
+same program shape.
+
+13 programs, 446 course rows. **Five carry no plan and say so** in the
+document's own words — "No plan", "No plan yet", "Noo plan yet". Of the eight
+that do, five reconcile to their stated degree total exactly:
+
+| program | stated | computed |
+|---|---|---|
+| AI and Cyber Security | 127 | 127 |
+| AI and Innovation | 127 | 127 |
+| AI and Financial Technology | 121 | 121 |
+| **AI and Robotics** | **128** | **128** |
+| Finance and Data Science | 127 | 127 |
+| AI and Medical Sciences | 129 | 97 — no Spec. Req. section in the PDF |
+| Statistics and Data Science | 125 | 50 — Colg. Req. stops after three courses |
+| Financial Engineering | 133 | 131 |
+
+The three shortfalls are gaps in the PDF itself and carry
+`degreeHoursDiscrepancy`. Nothing is inferred to close them.
+
+AI and Robotics is worth calling out because it can be checked against a
+third, independent source: a student's own registrar portal. The PDF gives
+Univ. Req. 14, Colg. Req. 59, Spec. Req. 25 — the portal prints the same three
+numbers.
 
 ## Known gaps (in the SOURCE, not the parser)
 - Faculty of Artificial Intelligence and Data Science (13 programs) and Faculty
