@@ -89,6 +89,13 @@
     document.getElementById('dashboard').style.display = 'none';
     if(isImportedPlan(prefix)){ window.AAUP_IMPORTED.open(prefix); }
     else if(window.showPage){ window.showPage(prefix); }
+    // A built-in plan's cards carry their availability classes from the
+    // static markup, and computeAvailability only ever ran off a progress
+    // change — so until the student ticked something, the plan showed
+    // whatever the HTML was authored with rather than what their own
+    // progress actually unlocks. Recompute on open, which is also when the
+    // plan data these rules read has finished registering.
+    if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
     if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'studyplan'); }
     if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('studyplan'); }
   }

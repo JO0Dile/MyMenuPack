@@ -186,15 +186,47 @@
     var gates = CREDIT_GATES[prefix] || {};
     var doneCredits = null; // computed lazily, only if a gate needs it
     var courses = page.querySelectorAll('.course[id]:not(.course-removed)');
+
+    function meetsOwnPrereqs(slug){
+      var needs = needsMap[slug] || [];
+      return needs.every(function(reqSlug){ return !!progress[prefix + '-c-' + reqSlug]; });
+    }
+
+    // A lecture and its lab are ONE registered course at AAUP — same
+    // catalogue number, same credit value, drawn as two cards only because
+    // they meet at different times. So they have to unlock together, and
+    // they did not: the catalogue lists prerequisites per printed row, and
+    // Programming Fundamentals Lab's row states none while Programming
+    // Fundamentals' row requires Intro to CS. Read literally that made the
+    // lab "open to you" sitting directly under its own lecture reading
+    // "closed to you" — an offer a student cannot actually act on, since
+    // neither half can be registered without the other.
+    //
+    // The prerequisite DATA is left exactly as the catalogue printed it.
+    // What changes is the question asked of it: a paired course is open when
+    // BOTH halves' prerequisites are met.
+    // Looks for the other half as a CARD, not as a courseInfo entry: this
+    // runs on first paint too, and on that pass __registerPlanData has not
+    // necessarily populated courseInfo yet — an empty map made every course
+    // look unpaired, so the very render a student sees first was the one
+    // that still showed the lab open under a closed lecture. The cards are
+    // in the DOM by definition, since this is iterating them.
+    function pairSlugOf(slug){
+      var other = /-lab$/.test(slug) ? slug.replace(/-lab$/, '') : slug + '-lab';
+      return page.querySelector('[id="' + prefix + '-c-' + other + '"]') ? other : null;
+    }
+
     courses.forEach(function(el){
       var isDone = !!progress[el.id];
       var available = false;
       if(!isDone){
         var parts = splitCourseId(el.id);
-        var needs = (parts && needsMap[parts.slug]) || [];
-        available = needs.every(function(reqSlug){
-          return !!progress[prefix + '-c-' + reqSlug];
-        });
+        var slug = parts && parts.slug;
+        available = !!slug && meetsOwnPrereqs(slug);
+        var pair = slug && pairSlugOf(slug);
+        if(available && pair && !progress[prefix + '-c-' + pair]){
+          available = meetsOwnPrereqs(pair);
+        }
         // Credit-hour gate (e.g. Senior Project I needs 90 completed hours):
         // even with every course prerequisite met, stay locked until enough
         // total credit-hours are done.
