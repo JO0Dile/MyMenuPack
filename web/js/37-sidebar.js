@@ -40,23 +40,71 @@
     // Sits with the GPA screen it plays with, not at the bottom of the
     // list: a student opens the audit, sees a number they do not like,
     // and the next thing they want is right there.
-    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', group: 'plan', action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
-    { key: 'achievements', icon: 'trophy', label: 'Achievements', group: 'plan', action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
+    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', group: 'plan', advanced: true, action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
+    { key: 'achievements', icon: 'trophy', label: 'Achievements', group: 'plan', advanced: true, action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
     { key: 'advisor', icon: 'brain', label: 'Plan My Next Semester', group: 'plan', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
-    { key: 'overview', icon: 'printer', label: 'Overview & Print', group: 'plan', action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
+    { key: 'overview', icon: 'printer', label: 'Overview & Print', group: 'plan', advanced: true, action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
     // The one place in the app where students talk to each other rather than
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
-    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', group: 'community', action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
-    { key: 'contacts', icon: 'people', label: 'Contacts', group: 'community', action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
+    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
+    { key: 'contacts', icon: 'people', label: 'Contacts', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
     // Not the same thing as "Switch Plan" at the bottom, which only reopens
     // the picker. This one answers the question first: what happens to my
     // progress if I move?
-    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
+    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', advanced: true, action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } }
   ];
   var GROUP_LABELS = { plan: 'Plan', community: 'Community', account: 'Account' };
 
   var currentPrefix = null;
+
+  // ---------------------------------------------------------------------
+  // ADVANCED
+  //
+  // Thirteen nav rows meant a student had to read past nine screens they
+  // were not looking for to reach the one they were. Only five of them are
+  // the everyday path — the plan, where you are on it, what you have
+  // earned, and what to take next. The other six are real features that a
+  // student reaches for occasionally: a GPA sandbox, badges, a printout,
+  // the message wall, the phone book, and moving majors.
+  //
+  // They are not deleted and they are not buried in Settings, which is
+  // where preferences live, not screens. They sit behind one row named
+  // Advanced, next to Settings, that remembers whether it was left open.
+  var ADV_KEY = 'aaup_sidebar_advanced_open';
+  function advancedOpen(){
+    try{ return localStorage.getItem(ADV_KEY) === '1'; }catch(e){ return false; }
+  }
+  function setAdvancedOpen(v){
+    try{ localStorage.setItem(ADV_KEY, v ? '1' : '0'); }catch(e){}
+  }
+  function isAdvancedKey(key){
+    // 'library' is appended at render time rather than living in ITEMS, so
+    // it is named here too — otherwise opening the Course Library would
+    // collapse the section the row was clicked in.
+    if(key === 'library') return true;
+    var item = ITEMS.filter(function(i){ return i.key === key; })[0];
+    return !!(item && item.advanced);
+  }
+  // A section that hides the screen you are currently on is worse than no
+  // section at all, so an advanced destination forces it open.
+  function advancedExpanded(activeKey){
+    return advancedOpen() || (!!activeKey && isAdvancedKey(activeKey));
+  }
+  // The desktop flat list and the phone More sheet are both in the DOM at
+  // once — CSS shows one per breakpoint — so each gets its own toggle and
+  // panel, and each pair needs its own ids. Sharing one id made the document
+  // invalid and, worse, left the phone toggle unbound: querySelector('#id')
+  // returns the first match, which is always the desktop one.
+  function advancedToggleHtml(expanded, count, variant){
+    return '<button type="button" class="sb-adv-toggle' + (expanded ? ' open' : '') +
+      '" id="sbAdvancedToggle-' + variant + '" aria-expanded="' + (expanded ? 'true' : 'false') +
+      '" aria-controls="sbAdvancedPanel-' + variant + '">' +
+      '<span class="sb-icon">' + window.AAUP_ICONS.preview('menu', 16) + '</span>' +
+      '<span class="sb-adv-label">Advanced</span>' +
+      '<span class="sb-adv-count">' + count + '</span>' +
+      '<span class="sb-adv-chevron" aria-hidden="true">' + (expanded ? '⌃' : '⌄') + '</span></button>';
+  }
 
   // Phone-only markup: the same ITEMS grouped into labeled sections with an
   // icon badge per row instead of one flat list of plain-gray icons. Built
@@ -66,9 +114,17 @@
   // click handler in render() covers whichever markup is actually visible.
   function moreGroupsHtml(prefix, activeKey, hasLibrary){
     var byGroup = { plan: [], community: [], account: [] };
-    ITEMS.forEach(function(item){ if(item.group && byGroup[item.group]) byGroup[item.group].push(item); });
+    var adv = [];
+    // The advanced rows leave their own groups and gather into one list, in
+    // the order they were declared — Plan's extras, then Community, then
+    // Change Major — so the section still reads as a sequence rather than a
+    // pile of unrelated leftovers.
+    ITEMS.forEach(function(item){
+      if(item.advanced){ adv.push(item); return; }
+      if(item.group && byGroup[item.group]) byGroup[item.group].push(item);
+    });
     if(hasLibrary){
-      byGroup.account.push({ key: 'library', icon: 'book', label: 'Course Library' });
+      adv.push({ key: 'library', icon: 'book', label: 'Course Library' });
     }
     byGroup.account.push({ key: 'settings', icon: 'gear', label: 'Settings' });
     byGroup.account.push({ key: 'switch', icon: 'refresh', label: 'Switch Plan' });
@@ -89,8 +145,16 @@
     // for convenience) — a standalone row above the labeled sections rather
     // than forced into one of them.
     var dashItem = ITEMS.filter(function(i){ return i.key === 'dashboard'; })[0];
+    var expanded = advancedExpanded(activeKey);
+    // Advanced sits directly above Account, so Settings stays the last thing
+    // in the sheet and the new row is the one immediately before it.
+    var advHtml = adv.length
+      ? advancedToggleHtml(expanded, adv.length, 'more') +
+        '<div class="sb-group sb-adv-panel" id="sbAdvancedPanel-more"' + (expanded ? '' : ' hidden') + '>' +
+          adv.map(rowHtml).join('') + '</div>'
+      : '';
     return (dashItem ? '<div class="sb-group sb-group-solo">' + rowHtml(dashItem) + '</div>' : '') +
-      groupHtml('plan') + groupHtml('community') + groupHtml('account');
+      groupHtml('plan') + groupHtml('community') + advHtml + groupHtml('account');
   }
 
   function render(prefix, activeKey){
@@ -102,20 +166,50 @@
     var hasLibrary = isImportedPlan(prefix);
 
     var html = '<div class="sb-brand"><span class="sb-mark">' + window.AAUP_ICONS.markup(iconEntity, { size: 20 }) + '</span><span>' + name + '</span></div>';
-    html += '<div class="sb-flat-list">';
-    html += ITEMS.map(function(item){
+    function itemHtml(item){
       return '<button type="button" class="sb-item' + (item.key === activeKey ? ' active' : '') + '" data-sb-key="' + item.key + '">' +
         '<span class="sb-icon">' + window.AAUP_ICONS.preview(item.icon, 16) + '</span><span>' + item.label + '</span></button>';
-    }).join('');
-    if(hasLibrary){
-      html += '<button type="button" class="sb-item" data-sb-key="library"><span class="sb-icon">' + window.AAUP_ICONS.preview('book', 16) + '</span><span>Course Library</span></button>';
     }
+    var advItems = ITEMS.filter(function(i){ return i.advanced; });
+    if(hasLibrary){ advItems = advItems.concat([{ key: 'library', icon: 'book', label: 'Course Library' }]); }
+    var advExpanded = advancedExpanded(activeKey);
+
+    html += '<div class="sb-flat-list">';
+    html += ITEMS.filter(function(i){ return !i.advanced; }).map(itemHtml).join('');
     html += '<div class="sb-spacer"></div>';
-    html += '<div class="sb-switch"><button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>Settings</span></button>' +
+    html += '<div class="sb-switch">';
+    if(advItems.length){
+      html += advancedToggleHtml(advExpanded, advItems.length, 'flat') +
+        '<div class="sb-adv-panel" id="sbAdvancedPanel-flat"' + (advExpanded ? '' : ' hidden') + '>' +
+          advItems.map(itemHtml).join('') + '</div>';
+    }
+    html += '<button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>Settings</span></button>' +
       '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('refresh', 16) + '</span><span>Switch Plan</span></button></div>';
     html += '</div>';
     html += '<div class="sb-groups">' + moreGroupsHtml(prefix, activeKey, hasLibrary) + '</div>';
     sidebar.innerHTML = html;
+
+    // Toggling Advanced re-renders in place rather than re-running render(),
+    // which would rebuild the whole sidebar and lose nothing but cost a
+    // repaint of every row for a section that only has to open.
+    sidebar.querySelectorAll('.sb-adv-toggle').forEach(function(advToggle){
+      advToggle.addEventListener('click', function(){
+        var open = advToggle.getAttribute('aria-expanded') !== 'true';
+        setAdvancedOpen(open);
+        // Both copies move together — the student's choice is one preference,
+        // not one per breakpoint, and a phone that rotates into the desktop
+        // layout should not find the section back in its old state.
+        sidebar.querySelectorAll('.sb-adv-toggle').forEach(function(t){
+          t.setAttribute('aria-expanded', open ? 'true' : 'false');
+          t.classList.toggle('open', open);
+          var chev = t.querySelector('.sb-adv-chevron');
+          if(chev) chev.textContent = open ? '⌃' : '⌄';
+        });
+        sidebar.querySelectorAll('.sb-adv-panel').forEach(function(panel){
+          if(open){ panel.removeAttribute('hidden'); } else { panel.setAttribute('hidden', ''); }
+        });
+      });
+    });
 
     sidebar.querySelectorAll('[data-sb-key]').forEach(function(el){
       el.addEventListener('click', function(){
