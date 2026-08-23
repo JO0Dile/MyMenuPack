@@ -508,6 +508,55 @@
     display:flex;align-items:center;gap:6px;
   }
 
+  /* A faculty tile is one row: the faculty's icon, its name, and how many
+     plans sit behind it. The stacked .plan-card layout above — icon on its
+     own line, then paragraphs, then a CTA — is for tiles that have something
+     to say. A signpost doesn't, so it gets a row and stays short. */
+  .plan-card-faculty{
+    flex-direction:row;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+  }
+
+  .plan-card-faculty .pc-icon{
+    width:44px;height:44px;border-radius:10px;flex:0 0 auto;
+  }
+
+  .plan-card-faculty .pc-icon svg{width:26px;height:26px;}
+
+  .pc-faculty-body{min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .pc-faculty-body h2{font-size:15px;}
+  .pc-faculty-body p{font-size:12px;}
+
+  /* The count is a number, not a sentence — "8 plans" spelled out is exactly
+     the kind of line this tile stopped carrying. The words are on the tile's
+     aria-label for a screen reader and on this badge's title for a hover. */
+  .pc-faculty-count{
+    flex:0 0 auto;margin-inline-start:auto;
+    min-width:30px;padding:3px 9px;border-radius:999px;
+    background:rgba(111,140,255,.12);color:var(--accent);
+    font-size:13px;font-weight:800;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .pc-faculty-count-none{background:rgba(255,255,255,.05);color:var(--text-dim);}
+
+  /* The faculty screen's "Add a plan" tile shares a grid row with the faculty
+     tiles, so its 150px column height would stretch every row beside it back
+     to the size the tiles just stopped being. On this screen only, it becomes
+     the same row shape they are. */
+  #homeCollegeGrid .new-plan-card{
+    flex-direction:row;justify-content:flex-start;gap:14px;
+    min-height:0;padding:16px 18px;
+  }
+
+  #homeCollegeGrid .new-plan-card .npc-plus{
+    width:44px;height:44px;border-radius:10px;border-width:1px;font-size:24px;
+  }
+
+  #homeCollegeGrid .new-plan-card .npc-label{text-align:left;}
+
 
   .home-footer{
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
@@ -536,6 +585,8 @@
     .search-wrap{margin-left:0;margin-right:0;}
     .plan-grid{gap:10px;}
     .plan-card{padding:16px 14px 14px;}
+    .plan-card-faculty,
+    #homeCollegeGrid .new-plan-card{padding:14px;gap:12px;}
   }
 
   /* A resting border only earns its keep on a device with hover to promote

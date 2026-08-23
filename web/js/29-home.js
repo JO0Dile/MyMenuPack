@@ -63,49 +63,6 @@
     return out;
   }
 
-  // Up to a few real majors from inside a college, for the picker tile's
-  // preview rows — every plan (built-in and community) lives in the same
-  // AAUP_IMPORTED store, so this is one lookup, not two. Distinct majors
-  // stay distinct entries here even when several share a college (e.g. AI &
-  // Robotics and Data Science both under "AI and Data Science") — nothing
-  // here collapses two majors into one row.
-  function majorsForCollege(uniId, collegeId){
-    var imported = importedPlans();
-    var keyFn = window.AAUP_IMPORTED && window.AAUP_IMPORTED.collegeKeyForPlan;
-    var nameFn = window.AAUP_IMPORTED && window.AAUP_IMPORTED.nameParts;
-    var out = [];
-    Object.keys(imported).forEach(function(id){
-      var p = imported[id];
-      if(!p || !p.majorName || (p.university || 'aaup') !== uniId) return;
-      if((keyFn ? keyFn(p) : 'custom:' + uniId + ':unspecified') !== collegeId) return;
-      var courses = Array.isArray(p.courses) ? p.courses : [];
-      var cr = courses.length ? window.__planTotalCredits(p) : null;
-      var en = nameFn ? nameFn(p.majorName.en) : { big: p.majorName.en || '', small: '' };
-      var ar = nameFn ? nameFn(p.majorName.ar) : { big: p.majorName.ar || '', small: '' };
-      out.push({
-        en: en.big + (en.small ? ' ' + en.small : ''),
-        ar: (ar.big || en.big) + (ar.small ? ' ' + ar.small : ''),
-        cr: cr,
-        sortOrder: p.sortOrder
-      });
-    });
-    // Majors with a real course list (cr set) come before "coming soon" ones
-    // (cr null, per the same 0-courses check 28-imported.js uses) — otherwise
-    // a coming-soon major that happens to sit earlier in storage can fill the
-    // tile's 3-item preview and bury every actually-available plan behind
-    // "+N more". Within each of those two groups the admin's chosen display
-    // order applies, matching the full plan list one tap deeper.
-    out.sort(function(a, b){
-      var byAvailability = (b.cr != null) - (a.cr != null);
-      if(byAvailability) return byAvailability;
-      return window.AAUP_IMPORTED.compareByDisplayOrder(
-        { sortOrder: a.sortOrder, majorName: { en: { big: a.en } } },
-        { sortOrder: b.sortOrder, majorName: { en: { big: b.en } } }
-      );
-    });
-    return out;
-  }
-
   function collegeDisplayName(college){
     if(college && college.name && (college.name.en || college.name.ar)){
       return { en: college.name.en || college.name.ar, ar: college.name.ar || college.name.en };
@@ -197,40 +154,42 @@
     }).join('');
   }
 
-  var COLLEGE_PREVIEW_N = 3;
-
   function renderColleges(uniId){
     var grid = document.getElementById('homeCollegeGrid');
     if(!grid) return;
     var colleges = collegesForUniversity(uniId);
     var ids = Object.keys(colleges);
     var esc = window.__escapeHtml;
+    // A faculty tile is a signpost, not a summary. It used to carry a badge, an
+    // icon, two names, three major names with their credit hours, "+5 more →"
+    // AND "View plans →" — eight lines each, sixteen of them, all of it
+    // repeating what the very next screen says in full. Icon, name, count.
     var tiles = ids.map(function(cid){
       var c = colleges[cid];
       var name = collegeDisplayName(c);
-      var majors = majorsForCollege(uniId, cid);
-      var shown = majors.slice(0, COLLEGE_PREVIEW_N);
-      var rest = majors.length - shown.length;
-      var previewHTML = shown.map(function(m){
-        return '<div class="pc-major-row"><span class="pc-major-name">' + esc(m.en) + '</span>' +
-          '<span class="pc-major-cr">' + (m.cr != null ? m.cr + 'H' : '') + '</span></div>';
-      }).join('') + (rest > 0 ? '<div class="pc-major-more">+ ' + rest + ' more →</div>' : '');
       // Registered colleges (APP_COLLEGES) carry their own icon; a college
       // that only exists because a student's custom plan named it (no
       // registered entry) falls back to a plain building.
-      return '<div class="plan-card" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0">' +
-        '<span class="home-tile-badge">' + c.count + ' plan' + (c.count === 1 ? '' : 's') + '</span>' +
+      // A registered faculty with nothing behind it yet still gets a tile —
+      // APP_COLLEGES lists it — but its count is dimmed rather than sitting in
+      // the accent colour, so "0" doesn't read as something worth tapping.
+      var plans = c.count === 1 ? '1 plan' : (c.count || 0) + ' plans';
+      return '<div class="plan-card plan-card-faculty" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0"' +
+        ' aria-label="' + esc(name.en) + ', ' + plans + '">' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(c, { size: 26, fallback: '🏫' }) + '</div>' +
-        '<h2 style="font-size:14.5px;">' + name.en + '</h2>' +
-        '<p style="direction:rtl;">' + name.ar + '</p>' +
-        (previewHTML ? '<div class="pc-major-list">' + previewHTML + '</div>' : '') +
-        (c.count ? '<div class="pc-cta">View plans →</div>' : '<div class="pc-cta home-tile-empty">No plans yet</div>') +
+        '<div class="pc-faculty-body">' +
+          '<h2>' + esc(name.en) + '</h2>' +
+          '<p style="direction:rtl;">' + esc(name.ar) + '</p>' +
+        '</div>' +
+        '<span class="pc-faculty-count' + (c.count ? '' : ' pc-faculty-count-none') +
+          '" aria-hidden="true" title="' + plans + '">' +
+          (c.count || 0) + '</span>' +
         '</div>';
     }).join('');
     var uni = window.APP_UNIVERSITIES[uniId];
     tiles += '<div class="new-plan-card" onclick="AAUP_HOME.startNewPlan(\'' + uniId + '\')" role="button" tabindex="0">' +
       '<span class="npc-plus">+</span>' +
-      '<p class="npc-label">Don’t see your college? Add a plan and it’ll get its own tile.</p></div>';
+      '<p class="npc-label">Add a plan</p></div>';
     grid.innerHTML = ids.length
       ? tiles
       : '<p class="home-step-empty-note">No colleges registered for ' + (uni ? uni.name.en : uniId) + ' yet.</p>' + tiles;
