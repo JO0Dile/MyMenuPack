@@ -308,6 +308,74 @@ window.__openCourses = function(prefix){
 // number is seen first (GPA's primaryId resolves a "-lab" slug to its
 // lecture), skip a course superseded by a retake, and never dedupe on the
 // "-" placeholder that generic elective slots share.
+// What a plan is WORTH, from the plan object rather than the rendered page.
+//
+// __dedupeForCredit below does this for DOM elements, but the home grid and the
+// plan sheet count from the data, before anything is rendered — and they were
+// counting raw. Two things make a raw sum wrong, and AAUP's plans hit both:
+//
+//   A lecture and its lab are ONE registered course with ONE catalogue number
+//   and ONE credit value, drawn as two cards on purpose. Summing the cards
+//   counted Programming Fundamentals as 4 hours plus another 4.
+//
+//   An elective pool lists every option a student may pick from, so its cards
+//   add up to far more than the requirement is worth.
+//
+// requirementHours settles both at once where a plan has it: it is what the
+// university requires, per bucket. Without it, fall back to summing each
+// catalogue number once.
+window.__planTotalCredits = function(plan){
+  if(!plan) return 0;
+  var req = plan.requirementHours;
+  if(req){
+    var keys = Object.keys(req);
+    if(keys.length){
+      var sum = 0;
+      keys.forEach(function(k){ var n = Number(req[k]); if(isFinite(n)) sum += n; });
+      return sum;
+    }
+  }
+  var seen = Object.create(null), total = 0, pool = [];
+  (plan.courses || []).forEach(function(c){
+    var num = c && c.courseNumber ? String(c.courseNumber).trim() : '';
+    var key = (num && num !== '-') ? num : (c && c.id);
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    var cr = parseFloat(c.creditHours) || 0;
+    if(c.category === 'dept') pool.push(cr);   // the elective pool, capped below
+    else total += cr;
+  });
+  if(pool.length){
+    // How many of the pool a student actually takes. Same per-plan count the
+    // Degree Audit and My Path use, so all three report one number.
+    var need = (window.__DEPT_REQUIRED || {})[plan.id];
+    if(typeof need !== 'number' || need > pool.length) need = pool.length;
+    var counts = {}, unit = pool[0], best = 0;
+    pool.forEach(function(v){
+      counts[v] = (counts[v] || 0) + 1;
+      if(counts[v] > best){ best = counts[v]; unit = v; }
+    });
+    total += unit * need;
+  }
+  return total;
+};
+
+// The credit hours a student has finished, counted the same way: one entry per
+// registered course, so ticking a lecture does not also bank its lab's hours.
+window.__planEarnedCredits = function(plan, isDone){
+  if(!plan) return 0;
+  var seen = Object.create(null), total = 0;
+  (plan.courses || []).forEach(function(c){
+    if(!c || !isDone(c.id)) return;
+    var num = c.courseNumber ? String(c.courseNumber).trim() : '';
+    var key = (num && num !== '-') ? num : c.id;
+    if(!key || seen[key]) return;
+    seen[key] = true;
+    total += parseFloat(c.creditHours) || 0;
+  });
+  return total;
+};
+
 window.__dedupeForCredit = function(prefix, els){
   var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
   var seen = Object.create(null);

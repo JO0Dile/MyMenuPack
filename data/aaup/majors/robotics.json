@@ -129,8 +129,8 @@
     {
       "slug": "intro-cs-lab",
       "code": "290311110",
-      "name": "Introduction to Computer Science",
-      "nameAr": "مختبر مدخل إلى علم الحاسوب",
+      "name": "Introduction to Computer Science Lab",
+      "nameAr": "مختبر مختبر مدخل إلى علم الحاسوب",
       "credits": "4",
       "theoretical": "3",
       "practical": "2",
@@ -248,8 +248,8 @@
     {
       "slug": "progfund-lab",
       "code": "290311120",
-      "name": "Programming Fundamentals",
-      "nameAr": "مختبر أساسيات البرمجة",
+      "name": "Programming Fundamentals Lab",
+      "nameAr": "مختبر مختبر أساسيات البرمجة",
       "credits": "4",
       "theoretical": "3",
       "practical": "2",
@@ -350,8 +350,8 @@
     {
       "slug": "db-fund-lab",
       "code": "290312110",
-      "name": "Fundamentals of Databases",
-      "nameAr": "مختبر أساسيات قواعد البيانات",
+      "name": "Fundamentals of Databases Lab",
+      "nameAr": "مختبر مختبر أساسيات قواعد البيانات",
       "credits": "3",
       "theoretical": "2",
       "practical": "2",

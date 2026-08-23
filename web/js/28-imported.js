@@ -973,7 +973,28 @@
     });
   }
 
-  function courseCardHtml(planId, c, rtl, yearNum){
+  // A lecture and its lab are ONE registered course at AAUP: one catalogue
+  // number, one credit value, deliberately drawn as two cards. Both cards
+  // printed the full figure, so Programming Fundamentals read as 4H and then
+  // another 4H — eight hours for a four-hour course, which is exactly what
+  // students reported. The totals were already right (they de-duplicate on
+  // the catalogue number); only the cards lied.
+  //
+  // The FIRST card of such a pair keeps the figure. The rest say the hours are
+  // part of it, so no card claims hours a second time.
+  function pairContinuations(planId){
+    var plan = loadImportedPlans()[planId];
+    var firstFor = Object.create(null), out = Object.create(null);
+    ((plan && plan.courses) || []).forEach(function(c){
+      var num = c.courseNumber ? String(c.courseNumber).trim() : '';
+      if(!num || num === '-') return;
+      if(firstFor[num] === undefined){ firstFor[num] = c.id; return; }
+      out[c.id] = true;
+    });
+    return out;
+  }
+
+  function courseCardHtml(planId, c, rtl, yearNum, continuations){
     var done = isDone(planId, c.id);
     var avail = isAvailable(planId, c.id);
     var editing = document.getElementById('page-' + planId) && document.getElementById('page-' + planId).classList.contains('editing');
@@ -1005,13 +1026,17 @@
       : (rtl ? 'مغلق لك' : 'closed to you');
     var yearTx = yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum)
       : (rtl ? 'اختياري' : 'Elective');
-    var meta = window.__escapeHtml(yearTx + ' · ' + statusTx + ' · ' + c.creditHours + 'H');
+    var partOfPair = !!(continuations && continuations[c.id]);
+    var hoursTx = partOfPair
+      ? (rtl ? 'ضمن ' + c.creditHours + ' ساعات' : 'part of ' + c.creditHours + 'H')
+      : c.creditHours + 'H';
+    var meta = window.__escapeHtml(yearTx + ' · ' + statusTx + ' · ' + hoursTx);
     // Focusable so the plan can be worked from a keyboard: the card itself is
     // a button (Enter opens the details) and the tick inside it is its own
     // control (Space toggles completion) — see js/57-card-input.js.
     var a11y = editing ? '' :
       ' tabindex="0" role="button" aria-label="' +
-      window.__escapeHtml(displayName + ' — ' + yearTx + ', ' + statusTx + ', ' + c.creditHours + 'H') + '"';
+      window.__escapeHtml(displayName + ' — ' + yearTx + ', ' + statusTx + ', ' + hoursTx) + '"';
     return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + a11y + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
       checkboxHtml +
       cardButtons +
@@ -1180,12 +1205,13 @@
   function isPoolElective(c){ return c && c.category === 'dept'; }
 
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
+    var pairs = pairContinuations(planId);
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
     var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester && !isPoolElective(c); });
     var addCard = editing ? '<div class="imp-add-course-card" onclick="AAUP_IMPORTED.addCoursePrompt(\'' + planId + '\',\'' + yearId + '\',\'' + semester + '\')">+</div>' : '';
     return '<div class="imp-semester-block"><div class="imp-semester-title">' + (rtl ? SEMESTER_LABEL_AR[semester] : SEMESTER_LABEL[semester]) + '</div>' +
       '<div class="course-row" id="' + containerId + '">' +
-      courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum); }).join('') + addCard +
+      courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs); }).join('') + addCard +
       '</div></div>';
   }
 
@@ -1207,6 +1233,7 @@
   };
 
   function unscheduledHtml(planId, plan, editing, rtl){
+    var pairs = pairContinuations(planId);
     // Two sources feed one pool: courses the plan never scheduled, and every
     // specialization elective regardless of the term the data happens to name.
     var loose = (plan.courses || []).filter(function(c){ return !c.yearId || isPoolElective(c); });
@@ -1239,7 +1266,7 @@
         ' <span class="imp-optional-tag">' + (rtl ? '(اختياري)' : '(Optional)') + '</span>' +
         ' <span class="imp-elective-count">' + groups[k].length + '</span></div>' +
         '<div class="course-row" id="' + planId + '-elective-' + k + '">' +
-        groups[k].map(function(c){ return courseCardHtml(planId, c, rtl); }).join('') +
+        groups[k].map(function(c){ return courseCardHtml(planId, c, rtl, null, pairs); }).join('') +
         '</div></div>';
     });
     return html + '</div>';
@@ -1527,8 +1554,8 @@
       var reqs = needs[cid] || [];
       return reqs.every(function(r){ return isDoneLegacy(r); });
     }
-    var totalCr = p.courses.reduce(function(s, c){ return s + (parseFloat(c.creditHours) || 0); }, 0);
-    var doneCr = p.courses.filter(function(c){ return isDoneLegacy(c.id); }).reduce(function(s, c){ return s + (parseFloat(c.creditHours) || 0); }, 0);
+    var totalCr = window.__planTotalCredits(p);
+    var doneCr = window.__planEarnedCredits(p, isDoneLegacy);
     var pct = totalCr ? Math.round(doneCr / totalCr * 100) : 0;
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
 

@@ -79,7 +79,7 @@
       if(!p || !p.majorName || (p.university || 'aaup') !== uniId) return;
       if((keyFn ? keyFn(p) : 'custom:' + uniId + ':unspecified') !== collegeId) return;
       var courses = Array.isArray(p.courses) ? p.courses : [];
-      var cr = courses.length ? courses.reduce(function(sum, c){ return sum + (parseFloat(c.creditHours) || 0); }, 0) : null;
+      var cr = courses.length ? window.__planTotalCredits(p) : null;
       var en = nameFn ? nameFn(p.majorName.en) : { big: p.majorName.en || '', small: '' };
       var ar = nameFn ? nameFn(p.majorName.ar) : { big: p.majorName.ar || '', small: '' };
       out.push({
