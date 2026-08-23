@@ -15,7 +15,7 @@
 // the CDN, correct and verified, and simply not what the browser ran. The
 // fetch handler below does refresh entries one at a time, so it heals after an
 // extra reload, but "reload twice" is not a fix anyone can be told to rely on.
-var CACHE = 'studyplan-shell-v134';
+var CACHE = 'studyplan-shell-v135';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './contacts.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',
@@ -26,7 +26,14 @@ var CORE = [
   './assets/icons/icon-any-512.png',
   './assets/icons/icon-maskable-192.png', './assets/icons/icon-maskable-384.png',
   './assets/icons/icon-maskable-512.png',
-  './assets/fonts/cairo-arabic.woff2', './assets/fonts/cairo-latin.woff2'
+  './assets/fonts/cairo-arabic.woff2', './assets/fonts/cairo-latin.woff2',
+  // The backdrop on the landing. Precached like the fonts because it is on
+  // the very first screen: a student who installs the app and opens it on
+  // the bus should not meet a blank one.
+  // (No apostrophes in here — check-precache reads this array with a regex
+  // over quoted strings, and one inside a comment opens a string it then
+  // closes at the next real quote.)
+  './assets/img/landing-campus.webp'
 ];
 
 // Precached at install rather than opportunistically on first fetch. The
