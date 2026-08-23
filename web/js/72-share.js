@@ -78,16 +78,29 @@
     return !(p.official && !p.wasEdited);
   }
 
+  function planNameFor(prefix){
+    var imported = window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix];
+    if(imported && imported.majorName){
+      var parts = window.AAUP_IMPORTED.nameParts(imported.majorName.en || '');
+      return parts.big || imported.majorName.en || prefix;
+    }
+    var page = document.getElementById('page-' + prefix);
+    var nameEl = page && page.querySelector('.title-block .en');
+    return nameEl ? nameEl.textContent.trim() : prefix;
+  }
+
   function buildLink(prefix){
     if(!needsFullData(prefix)){
-      return Promise.resolve({ url: baseUrl() + '#plan=' + encodeURIComponent(prefix), isCustom: false });
+      return Promise.resolve({ url: baseUrl() + '#plan=' + encodeURIComponent(prefix),
+                               isCustom: false, planName: planNameFor(prefix) });
     }
     var bundle = window.AAUP_IMPORTED && window.AAUP_IMPORTED.planBundle(prefix);
     if(!bundle) return Promise.reject(new Error('This plan could not be read.'));
     var text = JSON.stringify(bundle);
     return compressText(text).then(function(res){
       var marker = res.compressed ? 'g' : 'r';
-      return { url: baseUrl() + '#import=' + marker + toBase64Url(res.bytes), isCustom: true };
+      return { url: baseUrl() + '#import=' + marker + toBase64Url(res.bytes),
+               isCustom: true, planName: planNameFor(prefix) };
     });
   }
 
@@ -97,7 +110,13 @@
     if(!window.__qrEncode) return false;
     var qr = window.__qrEncode(text, { ecLevel: 'L' });
     if(!qr) return false;
-    var moduleSize = 4, quiet = 4;
+    // Sized so the whole code lands near 280 CSS px however many modules it
+    // needs — a fixed 4px module made a dense link's code physically smaller
+    // than a sparse one's, which is backwards: the denser the code, the more
+    // room each module needs for a camera to resolve it. Clamped so a short
+    // link does not produce an absurdly chunky one.
+    var quiet = 4;
+    var moduleSize = Math.max(3, Math.min(9, Math.round(280 / (qr.size + quiet * 2))));
     var total = qr.size + quiet * 2;
     canvas.width = total * moduleSize;
     canvas.height = total * moduleSize;
@@ -121,7 +140,9 @@
                   ar: 'هاي خطة أنت بنيتها — الرابط شايل كل شي فيها، فمين ما فتحه بياخذ نسخة مطابقة يستوردها، بلا تنزيل ورفع.' },
     copy: { en: 'Copy link', ar: 'انسخ الرابط' },
     copied: { en: 'Copied ✓', ar: 'انتسخ ✓' },
-    scan: { en: 'Or scan this:', ar: 'أو امسحه:' },
+    // Was "Or scan this:" — an alternative to the link above it. The code is
+    // the screen now, so it is an instruction, not an afterthought.
+    scan: { en: 'Point a camera here to open it', ar: 'وجّه الكاميرا هنا لفتحها' },
     tooBig: { en: 'This plan is too large to fit in a QR code — the link above still works, just send it directly.',
               ar: 'هاي الخطة كبيرة كثير على رمز QR — بس الرابط فوق يشتغل تمام، ابعته مباشرة.' },
     building: { en: 'Building your link…', ar: 'عم نجهّز رابطك…' },
@@ -145,15 +166,25 @@
       body.innerHTML =
         (window.__backBarHTML ? window.__backBarHTML('', 'shareOverlay', rtl) : '') +
         '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('link', 20) + t('title', rtl) + '</h2>' +
-        '<p class="form-note" style="margin-top:0;">' + t(res.isCustom ? 'customLead' : 'builtinLead', rtl) + '</p>' +
-        (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + t('shareVia', rtl) + '</button>' : '') +
-        '<div class="share-link-row">' +
-          '<input type="text" id="shareLinkInput" class="share-link-input" readonly dir="ltr" value="' + esc(res.url) + '">' +
+        // The QR is the thing this screen exists for and the one part of it
+        // that works across the room, so it opens the screen at a size a
+        // phone camera can actually read. It used to sit last, under a lead
+        // paragraph, a share button and a read-only URL field — below the
+        // fold on a phone, small, captioned "Or scan this:" as if it were
+        // the afterthought. The link is still here, demoted to where it is
+        // useful: after the two buttons that are what most people want.
+        '<div class="share-qr-wrap" id="shareQrWrap">' +
+          '<div class="share-qr-plate"><canvas id="' + qrCanvasId + '" class="share-qr-canvas"></canvas></div>' +
+          '<p class="share-qr-for">' + esc(res.planName || '') + '</p>' +
+          '<p class="share-qr-label">' + t('scan', rtl) + '</p>' +
+        '</div>' +
+        '<div class="share-actions">' +
+          (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + t('shareVia', rtl) + '</button>' : '') +
           '<button type="button" class="home-btn" id="shareCopyBtn">' + window.AAUP_ICONS.preview('copy', 14) + t('copy', rtl) + '</button>' +
         '</div>' +
-        '<div class="share-qr-wrap" id="shareQrWrap">' +
-          '<p class="share-qr-label">' + t('scan', rtl) + '</p>' +
-          '<canvas id="' + qrCanvasId + '" class="share-qr-canvas"></canvas>' +
+        '<p class="form-note share-lead">' + t(res.isCustom ? 'customLead' : 'builtinLead', rtl) + '</p>' +
+        '<div class="share-link-row">' +
+          '<input type="text" id="shareLinkInput" class="share-link-input" readonly dir="ltr" value="' + esc(res.url) + '">' +
         '</div>';
 
       // The native share sheet, when the platform has one, goes straight
