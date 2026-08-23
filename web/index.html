@@ -242,8 +242,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </div>
 
   <div class="home-footer">
-    <span>👥 An unofficial, open student project — always confirm with your academic advisor</span>
-    <span>🇵🇸 Made by students in Palestine, for students everywhere</span>
+    <button type="button" class="dev-link" onclick="AAUP_ABOUT.open()"><span data-app-icon="people" data-app-icon-size="14" aria-hidden="true"></span> About us</button>
     <button type="button" class="dev-link" onclick="AAUP_SIDEBAR.openSettings()"><span data-app-icon="gear" data-app-icon-size="14" aria-hidden="true"></span> Settings</button>
     <span class="dev-link app-version-badge"></span>
     <button type="button" class="dev-link" onclick="AAUP_DEV.openDialog()">Developer</button>
@@ -329,6 +328,13 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
         <button type="button" class="tut-next" id="tutNext">Next</button>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="aboutOverlay">
+  <div class="modal-card" style="max-width:460px;">
+    <button class="modal-close" id="aboutClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="aboutBody"></div>
   </div>
 </div>
 

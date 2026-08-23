@@ -5980,6 +5980,42 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
 }
 
 /* ============================================================================
+   ABOUT US  (js/75-about.js)
+
+   Replaces three lines of prose that used to sit under every screen of the
+   plan picker. One button, one page.
+   ========================================================================= */
+.ab-lead{font-size:13px; line-height:1.65; color:var(--text-dim); margin:0 0 12px;}
+.ab-flag{
+  display:flex; align-items:center; gap:9px; margin:0 0 18px;
+  font-size:12.5px; color:var(--text-dim); line-height:1.5;
+}
+.ab-flag-mark{font-size:17px; flex:none; line-height:1;}
+.ab-rows{display:flex; flex-direction:column; gap:2px;}
+.ab-row{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 4px; border-top:1px solid var(--line);
+}
+.ab-row-ic{
+  flex:none; width:30px; height:30px; border-radius:9px;
+  background:color-mix(in srgb, var(--accent) 13%, transparent); color:var(--accent);
+  display:flex; align-items:center; justify-content:center;
+}
+.ab-row-body{display:flex; flex-direction:column; gap:3px; min-width:0;}
+.ab-row-label{
+  font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-dim);
+}
+.ab-row-value{font-size:13.5px; line-height:1.5; color:var(--text); overflow-wrap:anywhere;}
+.ab-row-value a{color:var(--accent); text-decoration:none; font-weight:700;}
+.ab-row-value a:hover{text-decoration:underline;}
+.ab-row-value code{
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12.5px;
+  background:var(--search-bg); border-radius:6px; padding:2px 7px;
+}
+.ab-more{margin-top:16px;}
+
+/* ============================================================================
    COURSE DETAIL PANEL  (js/49-course-detail.js)
 
    Written narrow-first. Every rule here is the phone layout; the two-column
