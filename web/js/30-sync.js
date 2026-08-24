@@ -61,6 +61,11 @@
       if(window.__REQUIREMENT_KEYS && window.__REQUIREMENT_KEYS.indexOf(c.requirement) !== -1){
         out.requirement = c.requirement;
       }
+      // Whether this course's TERM came from the published plan or was picked
+      // by the app (see tools/build-catalogue.py). Named here for the same
+      // reason the two above are: this whitelist drops anything it does not
+      // know, and every plan on the home screen arrives through it.
+      if(c.termSuggested){ out.termSuggested = true; }
       return out;
     }) : [];
     var prerequisites = Array.isArray(fp.prerequisites) ? fp.prerequisites.slice(0, 800).map(function(pair){

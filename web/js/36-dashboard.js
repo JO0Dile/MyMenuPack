@@ -218,7 +218,11 @@
       '<div class="dash-quicklinks">' +
 
         '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('clipboard', 22) + '</span><span class="dq-label">' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</span></div>' +
-        '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('trophy', 22) + '</span><span class="dq-label">' + (rtl ? 'الإنجازات' : 'Achievements') + '</span></div>' +
+        // The Achievements tile that used to sit here is gone. It was the
+        // third door to the same screen — a menu row, this tile, and the
+        // toast that fires the moment a badge unlocks. The toast now leads
+        // there (js/24-achievements.js) and the menu row is the way in the
+        // rest of the time; the count above still says how many are earned.
 
         '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('planpin', 22) + '</span><span class="dq-label">' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</span></div>' +
         (window.AAUP_SHARE
@@ -245,7 +249,7 @@
     }
     host.innerHTML = html;
     if(window.AAUP_FOLLOW){ window.AAUP_FOLLOW.bind(prefix); }
-    if(window.AAUP_WHATS_NEXT){ window.AAUP_WHATS_NEXT.render(prefix, prefix + '-dashNextBody'); }
+    if(window.AAUP_WHATS_NEXT){ window.AAUP_WHATS_NEXT.render(prefix, prefix + '-dashNextBody', 'lead'); }
     if(window.AAUP_GRADUATION){ window.AAUP_GRADUATION.render(prefix, prefix + '-dashGradBody'); }
     // Phone only (see .dash-swipe-dots in app.css) — the three stat tiles
     // swipe side by side there instead of stacking; the dots are decorative

@@ -32,7 +32,7 @@
   function send(prefix){
     var feedback = buildFeedback(prefix);
     if(feedback.length === 0){
-      if(window.__showToast) window.__showToast('Rate or add a note to a course first — nothing to share yet.');
+      if(window.__showToast) window.__showToast('Nothing to share yet — rate a course first');
       return;
     }
     var info = window.AAUP_STUDENT ? window.AAUP_STUDENT.get() : null;
@@ -48,7 +48,7 @@
     var body = JSON.stringify(payload, null, 2);
     var mailto = 'mailto:' + FEEDBACK_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     window.location.href = mailto;
-    if(window.__showToast) window.__showToast('📧 Email opened \u2014 just hit send to share your feedback!');
+    if(window.__showToast) window.__showToast('📧 Email opened \u2014 hit send');
   }
 
   window.AAUP_FEEDBACK = { send: send, buildFeedback: buildFeedback };

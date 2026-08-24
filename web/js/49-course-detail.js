@@ -46,6 +46,10 @@
       ch: 'Credit hours', chShort: 'CH', th: 'Theoretical', pr: 'Practical',
       cat: 'Category', ar: 'Arabic name', code: 'Course code',
       term: 'Planned term', unscheduled: 'not scheduled',
+      // The card only has room for two words. This is where they are
+      // explained: the published plan required the course but did not say
+      // when, so the app placed it as early as its own prerequisites allow.
+      termSuggested: 'suggested — the plan requires this course but does not say which term',
       passed: 'Passed', open: 'Unlocked', locked: 'Locked', progress: 'In progress',
       needAll: 'Still needed:', haveAll: 'All prerequisites passed.',
       opensCount: function(n){ return 'Taking this keeps ' + n + ' later course' + (n === 1 ? '' : 's') + ' on schedule.'; },
@@ -63,6 +67,7 @@
       ch: 'الساعات المعتمدة', chShort: 'س.م', th: 'نظري', pr: 'عملي',
       cat: 'التصنيف', ar: 'الاسم بالعربية', code: 'رقم المساق',
       term: 'الفصل المقرر', unscheduled: 'غير مجدول',
+      termSuggested: 'مقترح — الخطة بتطلب المساق بس ما بتحدد فصله',
       passed: 'منجز', open: 'متاح', locked: 'مغلق', progress: 'قيد الدراسة',
       needAll: 'ما زال مطلوباً:', haveAll: 'جميع المتطلبات السابقة منجزة.',
       opensCount: function(n){ return 'أخذه الآن يبقي ' + n + ' مساقاً لاحقاً في موعده.'; },
@@ -227,6 +232,7 @@
           row(t.cat, cats[(course && course.category) || ''] || '') +
           (!rtl && info.ar ? row(t.ar, info.ar) : '') +
           row(t.term, term) +
+          (course && course.termSuggested ? '<p class="cd-note">' + esc(t.termSuggested) + '</p>' : '') +
         '</div>' +
       '</div>' +
       '<div class="cd-actions">' +

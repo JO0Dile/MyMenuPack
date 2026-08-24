@@ -90,6 +90,16 @@ def shape_plan(major, scales_by_college, colleges):
             'yearId': None if c.get('year') is None else f"y{c['year']}",
             'semester': None if c.get('semester') is None else f"s{c['semester']}",
             'courseNumber': c.get('code') or '',
+            # Where this course's TERM came from. Every other course in a plan
+            # sits in the year and semester the published document put it in.
+            # These ones do not: tools/merge-catalogue-requirements.py found
+            # them listed in the program's requirement tables but missing from
+            # its advisory plan, and picked the earliest term their own
+            # prerequisites allow. That is the app's arrangement, not the
+            # department's, and until now the two looked identical on the page.
+            # Only emitted where it is true, so the flag never implies anything
+            # about the courses that do not carry it.
+            **({'termSuggested': True} if c.get('addedFromSource') else {}),
         })
 
     prereqs = [[p['requires'], p['forCourse']] for p in major.get('prerequisites', [])]

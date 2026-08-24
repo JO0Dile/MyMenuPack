@@ -186,7 +186,7 @@
   function removeYear(prefix, yearId){
     var rtl = isRtl(prefix);
     if(semesterHasCourses(prefix, yearId, 1) || semesterHasCourses(prefix, yearId, 2) || semesterHasCourses(prefix, yearId, 3)){
-      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'هذه السنة تحتوي على مساقات — انقلها أولًا.' : 'This year still has courses in it — move them out first.')); }
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'السنة مش فاضية — انقل مساقاتها أولًا' : 'Year not empty — move its courses first')); }
       return;
     }
     var state = forPlan(prefix);
@@ -217,7 +217,7 @@
   function removeSummer(prefix, yearId){
     var rtl = isRtl(prefix);
     if(semesterHasCourses(prefix, yearId, 3)){
-      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'الفصل الصيفي يحتوي على مساقات — انقلها أولًا.' : 'This summer still has courses in it — move them out first.')); }
+      if(window.__showToast){ window.__showToast('🚫 ' + (rtl ? 'الصيفي مش فاضي — انقل مساقاته أولًا' : 'Summer not empty — move its courses first')); }
       return;
     }
     var row = document.getElementById(prefix + '-' + yearId + '-s3');

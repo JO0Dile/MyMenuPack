@@ -411,7 +411,7 @@
   function removeYear(planId, yearId){
     withPlan(planId, function(p, plans){
       if(yearCourseCount(p, yearId) > 0){
-        if(window.__showToast){ window.__showToast('🚫 This year still has courses in it — remove or move them first.'); }
+        if(window.__showToast){ window.__showToast('🚫 Year not empty — move its courses first'); }
         return;
       }
       p.structure.years = p.structure.years.filter(function(y){ return y.id !== yearId; });
@@ -431,7 +431,7 @@
   function removeSummer(planId, yearId){
     withPlan(planId, function(p, plans){
       if(yearCourseCount(p, yearId, 's3') > 0){
-        if(window.__showToast){ window.__showToast('🚫 This summer still has courses in it — remove or move them first.'); }
+        if(window.__showToast){ window.__showToast('🚫 Summer not empty — move its courses first'); }
         return;
       }
       var y = p.structure.years.filter(function(yy){ return yy.id === yearId; })[0];
@@ -1144,9 +1144,18 @@
     var yearTx = yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum)
       : (rtl ? 'اختياري' : 'Elective');
     var partOfPair = !!(continuations && continuations[c.id]);
+    // The grade is entered on this card, stored against this card and counted
+    // in the GPA — and then was not shown on it. It rides with the hours,
+    // which is the other number a finished course still has to say.
+    var gr = '';
+    try{
+      var grades = window.AAUP_GPA ? window.AAUP_GPA.loadGrades() : {};
+      gr = grades[fullId(planId, c.id)] || '';
+    }catch(e){ gr = ''; }
     var hoursTx = partOfPair
       ? (rtl ? 'ضمن ' + c.creditHours + ' ساعات' : 'part of ' + c.creditHours + 'H')
       : c.creditHours + 'H';
+    if(done && gr && !superseded){ hoursTx += ' · ' + gr; }
     // Each part in its own span so the phone layout can drop the year: a
     // card sitting inside a block headed "Year 1" does not need to say
     // "Year 1" as well, and at half width that repetition is what pushes the
@@ -1157,15 +1166,19 @@
     // name and is the part that gets ellipsised on a narrow card, so putting
     // it last is what keeps the hours on screen.
     metaParts.push('<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>');
+    // The plan document listed this course among the requirements but did not
+    // say which term to take it in — the app picked the earliest one its own
+    // prerequisites allow. Every other card on the page is showing the
+    // department's own placement, and without this line these ten looked
+    // exactly the same as those.
+    if(c.termSuggested){
+      metaParts.push('<span class="cm-status cm-suggested">' +
+        window.__escapeHtml(rtl ? 'الفصل مقترح' : 'term suggested') + '</span>');
+    }
     if(!done && !avail){
       metaParts.push('<span class="cm-status cm-locked">' + window.__escapeHtml(lockTx) + '</span>');
     }
     if(superseded || c.isRetake){
-      var gr = '';
-      try{
-        var grades = window.AAUP_GPA ? window.AAUP_GPA.loadGrades() : {};
-        gr = grades[fullId(planId, c.id)] || '';
-      }catch(e){ gr = ''; }
       var attemptTx = superseded
         ? (gr ? gr + ' · ' : '') + (rtl ? 'مستبدَل' : 'replaced')
         : (rtl ? 'المحسوب' : 'counts');
@@ -1425,14 +1438,131 @@
       '</div>';
   }
 
+  // A requirement the plan lists at zero credit hours — Community Service in
+  // almost every AAUP plan, and Beginning English in the ones that publish
+  // it. The plan asks for them and they move no number on this page, so
+  // scheduled among fifteen credit-hour courses they read as the least
+  // important card in the year. They are lifted out of their semester and
+  // pinned above Year 1 instead. Nothing else changes: the card keeps its
+  // id, so its prerequisite arrows, its grade, the audit and the filter all
+  // still find it, and js/12-removed.js still hides it if the student's
+  // English placement took it out of their plan.
+  function isZeroHour(c){
+    return !!c && !isPoolElective(c) && (parseFloat(c.creditHours) || 0) === 0;
+  }
+
+  // Where the plan itself put a course, in words. Used by the pinned block,
+  // whose cards are no longer sitting under a year header that says it.
+  function yearIndexOf(plan, yearId){
+    var idx = -1;
+    (plan.structure && plan.structure.years ? plan.structure.years : []).forEach(function(y, i){
+      if(y.id === yearId) idx = i;
+    });
+    return idx;
+  }
+
+  function whereOf(plan, c, rtl){
+    if(!c.yearId) return rtl ? 'غير مجدولة' : 'Not scheduled';
+    var idx = yearIndexOf(plan, c.yearId);
+    var yearTx = idx >= 0 ? ((rtl ? 'سنة ' : 'Year ') + (idx + 1)) : '';
+    var semTx = c.semester ? (rtl ? SEMESTER_LABEL_AR[c.semester] : SEMESTER_LABEL[c.semester]) : '';
+    return [yearTx, semTx].filter(Boolean).join(' · ');
+  }
+
+  function pinnedHtml(planId, plan, rtl){
+    var zero = (plan.courses || []).filter(isZeroHour);
+    if(!zero.length) return '';
+    var pairs = pairContinuations(planId);
+    return '<div class="imp-year-block imp-pinned-block">' +
+      '<div class="imp-year-header"><h3>' +
+      (rtl ? 'مطلوبة بلا ساعات' : 'Required, worth no hours') + '</h3></div>' +
+      '<p class="imp-elective-note">' +
+      (rtl
+        ? 'الخطة تدرجها بصفر ساعة معتمدة — فهي لا تضيف شيئًا لأي مجموع في هذه الصفحة.'
+        : 'The plan lists these at zero credit hours, so they add nothing to any total on this page.') +
+      '</p><div class="course-row">' +
+      zero.map(function(c){
+        // The year is still passed through, so a card lifted out of Year 1
+        // keeps saying Year 1 on its own meta line instead of losing where
+        // the plan put it.
+        var idx = c.yearId ? yearIndexOf(plan, c.yearId) : -1;
+        return courseCardHtml(planId, c, rtl, idx >= 0 ? idx + 1 : null, pairs, whereOf(plan, c, rtl));
+      }).join('') +
+      '</div></div>';
+  }
+
+  // How heavy a semester is, said in the only terms this app can honestly
+  // use. The university's registration ceiling is a regulation, not
+  // something any plan document publishes, so it is not in plans.json and
+  // is not guessed at here. What IS in the data is every other semester the
+  // same plan schedules — so "heavy" means heavy FOR THIS PLAN, measured
+  // against the median of its own regular semesters, and the label says so
+  // rather than implying a rule from the registrar.
+  //
+  // Summers are left out of the median and never flagged: a summer term is
+  // deliberately light and would drag the typical load down.
+  // A course the student dropped out of their own plan is not part of the
+  // load they will actually register for — an Intermediate English they
+  // placed out of is three hours this term will never contain. Removal is
+  // normally painted onto the cards after render (js/12-removed.js), which
+  // is too late for a number computed while building them, so the same
+  // store is asked directly here.
+  function countsForLoad(planId, c){
+    if(window.AAUP_REMOVED && window.AAUP_REMOVED.isRemoved(planId, c.id)) return false;
+    return true;
+  }
+
+  function typicalLoad(planId, plan){
+    var totals = {};
+    (plan.courses || []).forEach(function(c){
+      if(!c.yearId || c.semester === 's3' || isPoolElective(c)) return;
+      if(!countsForLoad(planId, c)) return;
+      var k = c.yearId + '/' + c.semester;
+      totals[k] = (totals[k] || 0) + (parseFloat(c.creditHours) || 0);
+    });
+    var arr = Object.keys(totals).map(function(k){ return totals[k]; })
+      .filter(function(n){ return n > 0; }).sort(function(a, b){ return a - b; });
+    if(arr.length < 3) return 0;               // too few terms for a median to mean anything
+    // Upper median rather than the average of the middle two: credit hours
+    // are whole numbers and an eight-semester plan would otherwise be
+    // compared against a "14.5H usual" no term in it actually has. Taking
+    // the upper one also errs toward flagging less.
+    return arr[Math.floor(arr.length / 2)];
+  }
+
+  // One course clear of the plan's own median is the line. Anything tighter
+  // flags a seventeen-hour term against a sixteen-hour median, which is not
+  // information.
+  var HEAVY_MARGIN = 3;
+
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var pairs = pairContinuations(planId);
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
-    var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester && !isPoolElective(c); });
+    var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester && !isPoolElective(c) && !isZeroHour(c); });
     var addCard = editing ? '<div class="imp-add-course-card" onclick="AAUP_IMPORTED.addCoursePrompt(\'' + planId + '\',\'' + yearId + '\',\'' + semester + '\')">+</div>' : '';
     var semTx = rtl ? SEMESTER_LABEL_AR[semester] : SEMESTER_LABEL[semester];
     var whereTx = (yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum) + ' · ' : '') + semTx;
-    return '<div class="imp-semester-block"><div class="imp-semester-title">' + semTx + '</div>' +
+
+    // Hours in the term, and — when the plan's own median says this one is a
+    // course heavier than the rest — a line naming the comparison it is
+    // making, so nobody reads it as the university's ceiling.
+    var semHours = courses.reduce(function(a, c){
+      return countsForLoad(planId, c) ? a + (parseFloat(c.creditHours) || 0) : a;
+    }, 0);
+    var usual = semester === 's3' ? 0 : typicalLoad(planId, plan);
+    var heavy = usual > 0 && semHours >= usual + HEAVY_MARGIN;
+    var loadNote = heavy
+      ? '<div class="imp-sem-heavy">' +
+        (rtl
+          ? ('أثقل من المعتاد في هذه الخطة (' + usual + ' ساعة)')
+          : ((semHours - usual) + 'H over this plan\'s usual ' + usual + 'H')) +
+        '</div>'
+      : '';
+
+    return '<div class="imp-semester-block' + (heavy ? ' is-heavy' : '') + '">' +
+      '<div class="imp-semester-title">' + semTx +
+      (semHours > 0 ? '<span class="imp-sem-hours">' + semHours + 'H</span>' : '') +
+      '</div>' + loadNote +
       '<div class="course-row" id="' + containerId + '">' +
       courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs, whereTx); }).join('') + addCard +
       '</div></div>';
@@ -1487,7 +1617,7 @@
     var pairs = pairContinuations(planId);
     // Two sources feed one pool: courses the plan never scheduled, and every
     // specialization elective regardless of the term the data happens to name.
-    var loose = (plan.courses || []).filter(function(c){ return !c.yearId || isPoolElective(c); });
+    var loose = (plan.courses || []).filter(function(c){ return (!c.yearId || isPoolElective(c)) && !isZeroHour(c); });
     if(!loose.length) return '';
 
     // Grouped by category so a plan with both department and free electives
@@ -1584,7 +1714,14 @@
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
       '<div class="imp-body-pad">' +
-      (bioEn ? '<p class="imp-bio-text" style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
+      // Six lines of mission statement sat between the search box and the
+      // meter, on every plan, and it is read once. Folded behind one row —
+      // nothing is lost, and the hours it quotes are on the title above and
+      // in the Degree Audit's own table.
+      (bioEn
+        ? '<details class="imp-about"><summary>' + (rtl ? 'عن هذه الخطة' : 'About this plan') + '</summary>' +
+          '<p>' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p></details>'
+        : '') +
       // "48 / 129H completed (37%)" — the bar underneath is the percentage,
       // and "completed" is what a progress meter means. What is left is the
       // two numbers, plus (from js/64-milestones.js, which appends into this
@@ -1609,13 +1746,18 @@
       '<defs><marker id="' + id + '-prereqArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z"></path></marker>' +
       '<marker id="' + id + '-prereqArrowActive" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z"></path></marker></defs></svg>';
 
+    // Inside .years on purpose: the connector layer above is positioned in
+    // this container's coordinate space, and a card pinned outside it would
+    // have its prerequisite arrows drawn to the wrong place.
+    html += pinnedHtml(id, p, rtl);
+
     // Each year is its own disclosure: a header button that toggles the
     // body under it. The header carries how far through that year the
     // student is, so a folded plan still answers "where am I" without
     // anything having to be opened — see js/05-year-collapse.js for the
     // state, which lives per plan and per year and starts folded.
     p.structure.years.forEach(function(y, i){
-      var yearCourses = (p.courses || []).filter(function(c){ return c.yearId === y.id && !isPoolElective(c); });
+      var yearCourses = (p.courses || []).filter(function(c){ return c.yearId === y.id && !isPoolElective(c) && !isZeroHour(c); });
       var yearDone = yearCourses.filter(function(c){ return isDone(id, c.id); }).length;
       var yearHours = yearCourses.reduce(function(a, c){ return a + (parseFloat(c.creditHours) || 0); }, 0);
       var bodyId = id + '-yearbody-' + i;
@@ -1658,6 +1800,9 @@
     initSearch(id);
 
     if(window.AAUP_PLAN_EDITOR){ window.AAUP_PLAN_EDITOR.bindDraggable(id); }
+    // A course held in hand (js/85-carry.js) has a dimmed source card and a
+    // drop slot in every semester, and this render just replaced both.
+    if(window.AAUP_CARRY){ window.AAUP_CARRY.repaint(id); }
     if(window.AAUP_COMMUNITY){
       window.AAUP_COMMUNITY.refreshAllCommunityBadges();
       if(window.AAUP_COMMUNITY.syncLive) window.AAUP_COMMUNITY.syncLive(id);
@@ -1954,7 +2099,7 @@
       // app's own Fix analyzer flags exactly this for <a target="_blank">, so
       // the same standard applies here.
       window.open(window.APP_SUBMIT_URL, '_blank', 'noopener');
-      if(window.__showToast){ window.__showToast('\ud83d\udce8 Your plan file just downloaded \u2014 attach it in the form that opened.'); }
+      if(window.__showToast){ window.__showToast('\ud83d\udce8 Downloaded \u2014 attach it in the form that opened'); }
       return;
     }
     var overlay = document.getElementById('devModalOverlay');
@@ -2008,7 +2153,7 @@
     a.click();
     a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-    if(window.__showToast){ window.__showToast('📤 Exported — share this file, or paste its contents into Import Study Plan.'); }
+    if(window.__showToast){ window.__showToast('📤 Exported — the file is in your downloads'); }
   }
 
   function confirmDelete(id){

@@ -127,6 +127,12 @@ window.__sanitizeImportedPlan = function(p){
       if(window.__REQUIREMENT_KEYS.indexOf(c.requirement) !== -1){ out.requirement = c.requirement; }
       if(c.num != null){ out.num = clean(c.num).slice(0, 30); }
       if(c.isRetake){ out.isRetake = true; }
+      // A boolean the catalogue sets on the handful of courses whose TERM the
+      // app picked rather than the published document (tools/build-catalogue.py
+      // carries it through from the import). Whitelisted here or the sanitizer
+      // would drop it along with everything else it does not know, and the
+      // card would go back to claiming the department chose that semester.
+      if(c.termSuggested){ out.termSuggested = true; }
       return out;
     }).filter(function(c){ return !!c; });
   }

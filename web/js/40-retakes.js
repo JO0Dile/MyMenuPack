@@ -61,7 +61,7 @@
     if(!currentContainer) return;
     var targetRow = nextRegularContainer(prefix, currentContainer.id);
     if(!targetRow){
-      if(window.__showToast){ window.__showToast('No later semester available to auto-schedule a retake \u2014 you\u2019ll need to plan this one manually.'); }
+      if(window.__showToast){ window.__showToast('No later semester \u2014 place it yourself'); }
       return;
     }
 

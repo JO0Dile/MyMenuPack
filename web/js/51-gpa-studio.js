@@ -36,10 +36,10 @@
 
   var T = {
     en: {
-      title: 'Your grades', hint: 'Change any grade below and the dial updates immediately.',
+      title: 'Your grades', hint: 'Set or change any grade below and the dial updates immediately.',
       term: 'Term', course: 'Course', ch: 'CH', grade: 'Grade', pts: 'Points',
       excluded: 'excluded — retaken', none: 'Not counted',
-      empty: 'No grades yet — they are entered from each course, once it is marked done.',
+      empty: 'Nothing finished yet — mark a course done on your plan and it appears here to grade.',
       goPlan: 'Enter marks from my plan',
       project: 'Reach a target GPA', projectHint: 'Uses your real credit hours and this plan’s required total — not a guess.',
       target: 'Target cumulative GPA', remaining: 'Credit hours remaining',
@@ -52,10 +52,10 @@
       standing: 'Class standing', noGrades: 'No grades yet'
     },
     ar: {
-      title: 'علاماتك', hint: 'غيّر أي علامة أدناه وستتحدث الدائرة فوراً.',
+      title: 'علاماتك', hint: 'أدخل أو غيّر أي علامة أدناه وستتحدث الدائرة فوراً.',
       term: 'الفصل', course: 'المساق', ch: 'س.م', grade: 'العلامة', pts: 'النقاط',
       excluded: 'مستبعدة — أُعيد أخذه', none: 'غير محتسبة',
-      empty: 'لا توجد علامات بعد — تُدخَل من كل مساق بعد إنجازه.',
+      empty: 'ما خلّصت إشي بعد — علّم مساقًا كمنجز في خطتك ليظهر هنا لتضع علامته.',
       goPlan: 'أدخل العلامات من خطتي',
       project: 'الوصول إلى معدل مستهدف', projectHint: 'يعتمد على ساعاتك الفعلية وإجمالي هذه الخطة — وليس تخميناً.',
       target: 'المعدل التراكمي المستهدف', remaining: 'الساعات المتبقية',
@@ -73,6 +73,18 @@
   // pair, retake-aware), but per row instead of summed — grouped by the same
   // .course-row year/semester regex js/18-gpa.js's semesterGpas() uses, so a
   // term label here can never disagree with the one in the panel below it.
+  // The id'd rows give a compact "Y2 · S1"; a pinned card carries the long
+  // "Year 2 · Second Semester" it shows on the plan. Same column, so the
+  // long one is shortened to match rather than sitting next to it in a
+  // different shape.
+  function shortWhere(where){
+    if(!where) return '';
+    return where
+      .replace(/Year\s+(\d+)/i, 'Y$1')
+      .replace(/First Semester/i, 'S1')
+      .replace(/Second Semester/i, 'S2');
+  }
+
   function gradedRows(prefix){
     var page = document.getElementById('page-' + prefix);
     if(!page) return [];
@@ -81,10 +93,16 @@
     var grades = window.AAUP_GPA.loadGrades();
     var rows = [], seenNum = {};
 
-    Array.prototype.slice.call(page.querySelectorAll('.course-row[id]')).forEach(function(row){
-      var m = /-y(\d+)-s(\d+)$/.exec(row.id);
-      var term = m ? ('Y' + m[1] + ' · ' + (m[2] === '3' ? 'Summer' : 'S' + m[2])) : '';
+    // Every course row on the page, not just the ones carrying an id: the
+    // zero-hour requirements are pinned above Year 1 in a row that has none
+    // (js/28-imported.js), and scanning only id'd rows dropped them out of
+    // this table entirely. Their term comes from the card's own data-where,
+    // which is exactly where the plan scheduled them.
+    Array.prototype.slice.call(page.querySelectorAll('.course-row')).forEach(function(row){
+      var m = row.id ? /-y(\d+)-s(\d+)$/.exec(row.id) : null;
+      var rowTerm = m ? ('Y' + m[1] + ' · ' + (m[2] === '3' ? 'Summer' : 'S' + m[2])) : '';
       row.querySelectorAll('.course[id]:not(.course-removed)').forEach(function(el){
+        var term = rowTerm || shortWhere(el.getAttribute('data-where'));
         var parts = window.__splitCourseId(el.id);
         if(!parts) return;
         var meta = info[parts.slug];
@@ -95,8 +113,16 @@
         if(seenNum[dedupeKey]) return;
         seenNum[dedupeKey] = true;
         if(!progress[pid]) return;
+        // A course marked done but never graded used to be dropped here, and
+        // that is what made two screens necessary: the popup was the only
+        // place a FIRST grade could be set, and this table only edited ones
+        // that already existed. A row appears for every finished course now,
+        // with an empty grade cell that is the same control as a filled one —
+        // so either screen sets it and either screen changes it, writing the
+        // same stored value. In-progress courses are still not listed: the
+        // app does not let an unfinished course carry a grade, and this does
+        // not invent an exception to that.
         var g = grades[pid];
-        if(g == null) return; // never graded — not "0 grade", just not entered yet
 
         var excluded = false;
         if(window.__isSupersededByRetake && window.__isSupersededByRetake(prefix, parts.slug)){
@@ -115,6 +141,9 @@
 
   function pointsCell(row, t){
     if(row.excluded) return '<span class="gs-excluded">' + t.excluded + '</span>';
+    // No grade yet is not the same as a grade that earns nothing, and
+    // "Not counted" on an empty row read as a verdict on the course.
+    if(row.grade == null || row.grade === '') return '<span class="gs-excluded">\u2014</span>';
     // `in` here matched inherited names like "constructor", which then
     // multiplied credit hours by a function and printed NaN into the table.
     if(!window.AAUP_GPA.isRealGrade(row.grade)) return '<span class="gs-excluded">' + t.none + '</span>';
@@ -258,7 +287,14 @@
 
   // Whether this plan has any graded course yet — the audit screen asks so it
   // can drop the "how to edit a grade" line when there is none to edit.
-  function hasGrades(prefix){ return gradedRows(prefix).length > 0; }
+  // "Are there grades" and "are there rows" stopped being the same question
+  // once ungraded finished courses joined the table. The dial, the target
+  // calculator and the Degree Audit's own note all mean the first one.
+  function hasGrades(prefix){
+    return gradedRows(prefix).some(function(r){
+      return window.AAUP_GPA.isRealGrade(r.grade);
+    });
+  }
 
   function bindSwipeDots(){
     var layout = document.getElementById('gsLayout');

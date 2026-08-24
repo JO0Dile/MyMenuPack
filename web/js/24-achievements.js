@@ -511,9 +511,22 @@
       try {
         var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
         var gender = studentGender();
+        // Achievements had three doors: a menu row, a dashboard tile, and
+        // this toast. The toast is the one that arrives at the moment a
+        // student cares — so it is the one that leads somewhere, and the
+        // dashboard tile (js/36-dashboard.js) is gone. The menu row stays:
+        // a toast is only a door while it is on screen, and the badges have
+        // to be reachable the rest of the time.
         newly.forEach(function(a){
           var t = resolveTitle(a, gender);
-          if(window.__showToast){ window.__showToast('🏆 ' + (rtl ? 'إنجاز جديد: ' : 'Achievement unlocked: ') + (rtl ? t.ar : t.en)); }
+          var name = rtl ? t.ar : t.en;
+          if(window.__showActionToast){
+            window.__showActionToast((rtl ? 'إنجاز: ' : 'Achievement: ') + name, rtl ? 'شوف الباقي' : 'See the rest', function(){
+              open(prefix);
+            });
+          } else if(window.__showToast){
+            window.__showToast((rtl ? 'إنجاز جديد: ' : 'Achievement unlocked: ') + name);
+          }
         });
         // A real "you earned something" moment deserves a little burst.
         if(window.__confetti){ window.__confetti(); }

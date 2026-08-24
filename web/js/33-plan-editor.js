@@ -361,7 +361,15 @@
     });
 
     window.addEventListener('pointerup', function(e){
-      if(pending && pending.prefix === prefix){ pending = null; }
+      // `pending` still set at pointerup means the press never crossed the
+      // drag threshold — a tap. Edit mode had no use for one, so it is free
+      // for js/85-carry.js to pick the course up with. A real drag clears
+      // `pending` in pointermove above and never reaches here.
+      if(pending && pending.prefix === prefix){
+        var tap = pending;
+        pending = null;
+        if(window.AAUP_CARRY){ window.AAUP_CARRY.tapped(tap.prefix, tap.slug); }
+      }
       if(drag && drag.prefix === prefix){ endDrag(e); }
     });
 
