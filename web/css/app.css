@@ -2466,7 +2466,12 @@
    not from this screen, so with none entered it explained where to go and
    gave no way to go there. */
 .gs-goplan{
-  display:inline-flex; align-items:center; gap:9px; margin-top:14px;
+  /* The button is the whole point of this empty state, and it was tucked
+     against the left edge of the block hugging its own label. Centred in the
+     block, with the icon and the label centred inside it. */
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  width:fit-content; max-width:100%; min-width:min(250px, 100%);
+  margin:14px auto 0; text-align:center;
   padding:13px 22px; border-radius:999px;
   background:var(--accent); color:var(--on-accent);
   border:none; font-family:inherit; font-size:14.5px; font-weight:800;
@@ -5739,6 +5744,33 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
 /* The SVGs are drawn with currentColor, so they take the accent from whatever
    tile they sit in and follow the theme without a second set for dark mode. */
 .app-icon-svg{color:var(--accent);}
+/* ...except inside a control that has filled itself with the accent and set
+   its own ink. The default above is a colour, not inheritance, so it won an
+   accent-on-accent fight and the icon simply disappeared — which is what had
+   happened to the pin on "Enter marks from my plan". */
+.gs-goplan .app-icon-svg,
+.au-mode-on .app-icon-svg,
+.po-mode.is-on .app-icon-svg,
+.status-btn.active .app-icon-svg,
+.pm-btn.active .app-icon-svg,
+.ach-cat-pill.active .app-icon-svg,
+.ct-chip-on .app-icon-svg,
+.settings-tab.active .app-icon-svg,
+.share-native-btn .app-icon-svg,
+.wiz-continue .app-icon-svg,
+.story-continue .app-icon-svg,
+.tut-next .app-icon-svg,
+.update-bar .app-icon-svg,
+.asst-user .asst-bubble .app-icon-svg,
+.asst-act-primary .app-icon-svg,
+.asst-send .app-icon-svg,
+.guide-next .app-icon-svg,
+.fix-btn-primary .app-icon-svg,
+.cd-action-primary .app-icon-svg,
+.cloud-live-avatar .app-icon-svg,
+.pf-chip.pf-on .app-icon-svg,
+.pg-why-locked-btn:hover .app-icon-svg,
+.achievement-badge .ab-share:hover .app-icon-svg{color:inherit;}
 .app-icon-svg svg{width:100%; height:100%; display:block;}
 
 /* Beats the older `.plan-card .pc-icon svg{width:30px}` rule, which sized the
