@@ -261,6 +261,10 @@
         var el = pid && document.getElementById(pid);
         if(el){
           setTimeout(function(){
+            if(window.__revealYearFor){
+              var pfx = (pid || '').split('-c-')[0];
+              window.__revealYearFor(pfx, el);
+            }
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             el.classList.add('cd-highlight');
             setTimeout(function(){ el.classList.remove('cd-highlight'); }, 1600);

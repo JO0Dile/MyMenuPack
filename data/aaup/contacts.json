@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "note": "Names, courses/roles and @aaup.edu emails only. Phone numbers are deliberately not included here — see the private working sheet kept outside the repo.",
   "categories": {
-    "instructor":       { "en": "Instructors",        "ar": "المحاضرون",         "icon": "🎓" },
-    "dean":              { "en": "Dean's Office",       "ar": "عمادة الكلية",       "icon": "🏛️" },
-    "it":                { "en": "IT",                  "ar": "تقنية المعلومات",   "icon": "💻" },
-    "student_affairs":   { "en": "Student Affairs",     "ar": "شؤون الطلبة",       "icon": "🎒" },
-    "finance":           { "en": "Finance",             "ar": "الشؤون المالية",    "icon": "💳" },
-    "registration":      { "en": "Registration",        "ar": "التسجيل",           "icon": "📝" },
-    "language_center":   { "en": "Language Center",     "ar": "مركز اللغات",       "icon": "🗣️" },
-    "administration":    { "en": "Administration",      "ar": "الإدارة",           "icon": "🏢" }
+    "instructor":       { "en": "Instructors",        "ar": "المحاضرون",         "icon": "🎓", "iconKey": "cap" },
+    "dean":              { "en": "Dean's Office",       "ar": "عمادة الكلية",       "icon": "🏛️", "iconKey": "university" },
+    "it":                { "en": "IT",                  "ar": "تقنية المعلومات",   "icon": "💻", "iconKey": "code" },
+    "student_affairs":   { "en": "Student Affairs",     "ar": "شؤون الطلبة",       "icon": "🎒", "iconKey": "people" },
+    "finance":           { "en": "Finance",             "ar": "الشؤون المالية",    "icon": "💳", "iconKey": "finance" },
+    "registration":      { "en": "Registration",        "ar": "التسجيل",           "icon": "📝", "iconKey": "pen" },
+    "language_center":   { "en": "Language Center",     "ar": "مركز اللغات",       "icon": "🗣️", "iconKey": "language" },
+    "administration":    { "en": "Administration",      "ar": "الإدارة",           "icon": "🏢", "iconKey": "building" }
   },
   "contacts": [
     { "name": "Dr. Iyad Suwan", "category": "instructor", "courses": ["Calculus I", "Calculus II", "Discrete Mathematics"], "email": "iyad.suwan@aaup.edu" },

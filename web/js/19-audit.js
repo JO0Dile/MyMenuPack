@@ -300,7 +300,15 @@
     // in a summary table. Once a grade exists, though, js/51-gpa-studio.js
     // gives a second place to correct it, writing the exact same stored
     // value -- so the sentence below only claims what is still actually true.
-    var studioNote = window.AAUP_GPA_STUDIO
+    // Two sentences of instructions about editing grades, above a screen
+    // with no grades on it, was the first thing a new student met here. The
+    // empty state already says where grades come from and gives a button to
+    // get there, so with none entered this line says nothing twice — it is
+    // only shown once there is actually something below to edit.
+    var anyGrades = !window.AAUP_GPA_STUDIO || !window.AAUP_GPA_STUDIO.hasGrades ||
+                    window.AAUP_GPA_STUDIO.hasGrades(prefix);
+    var studioNote = !anyGrades ? ''
+      : window.AAUP_GPA_STUDIO
       ? (rtl
           ? 'حالة التخطيط والعلامة الأولى تُحدَّدان من نافذة كل مساق؛ يمكنك تعديل العلامات المُدخلة من الجدول أدناه مباشرة.'
           : 'Planning status and a course\u2019s first grade are set from that course\u2019s own info popup; grades already entered can be edited directly below.')
@@ -316,9 +324,12 @@
     // summary is the fallback, not a blank space.
     body.innerHTML =
       '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('clipboard', 20) + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
-      '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' +
+      (studioNote ? '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' : '') +
       (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.layout(prefix, rtl) : renderGpaDashboard(prefix, rtl)) +
-      (window.AAUP_GPA_TARGET
+      // "What do I need to reach…" needs a current GPA to answer from. With
+      // none it printed its heading over the words "No grades yet." — a
+      // second empty state stacked on the one right above it.
+      (window.AAUP_GPA_TARGET && anyGrades
         ? '<div class="gt-section"><h3 style="margin-bottom:6px;">' + window.AAUP_GPA_TARGET.title(rtl) + '</h3>' +
           '<div id="auditGpaTargetBody"></div></div>'
         : '') +
@@ -326,7 +337,9 @@
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');
     if(window.AAUP_GPA_STUDIO) window.AAUP_GPA_STUDIO.bind(prefix, rtl);
-    if(window.AAUP_GPA_TARGET) window.AAUP_GPA_TARGET.render(prefix, 'auditGpaTargetBody', rtl);
+    if(window.AAUP_GPA_TARGET && document.getElementById('auditGpaTargetBody')){
+      window.AAUP_GPA_TARGET.render(prefix, 'auditGpaTargetBody', rtl);
+    }
   }
 
   // Mirrors a real transcript's structure: each semester's own GPA (which

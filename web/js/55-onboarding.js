@@ -34,11 +34,14 @@
   }
   var TX = {
     en: { line: 'Every course in your degree, and where you are on it.',
-          signIn: 'Sign in', start: 'Start', notNow: 'Not now',
+          // One button, both doors — the screen underneath offers "create one
+          // instead", so a student with no account was being asked to press
+          // something that read as if it were not for them.
+          signIn: 'Sign in / Sign up', start: 'Start', notNow: 'Not now',
           note: 'Free, offline, and made by a student. Always confirm with your academic advisor.',
           other: 'العربية' },
     ar: { line: 'كل مساق في تخصصك، وأين أنت منه.',
-          signIn: 'تسجيل الدخول', start: 'ابدأ', notNow: 'ليس الآن',
+          signIn: 'تسجيل الدخول / إنشاء حساب', start: 'ابدأ', notNow: 'ليس الآن',
           note: 'مجاني، يعمل بدون إنترنت، ومن صنع طالب. تأكّد دائمًا من مرشدك الأكاديمي.',
           other: 'English' }
   };
@@ -50,29 +53,29 @@
   // own campus a student recognises from the road: the arched clock-tower
   // gate, and the faceted glass faculty building beside it — with the walkway
   // running up to them, which is the "path" the app is named for.
-  function campusSvg(){
-    return '<svg class="wiz-campus" viewBox="0 0 400 220" fill="none" aria-hidden="true" focusable="false">' +
-      // walkway, converging toward the gate
-      '<path d="M96 220 L176 118 M304 220 L224 118" stroke="currentColor" stroke-width="1.4"/>' +
-      '<path d="M140 176 H260 M124 198 H276" stroke="currentColor" stroke-width="1" opacity=".55"/>' +
-      // ground line
-      '<path d="M8 118 H392" stroke="currentColor" stroke-width="1" opacity=".45"/>' +
-      // clock-tower gate: base, pointed arch, clock, cap
-      '<path d="M176 118 V54 h48 v64" stroke="currentColor" stroke-width="1.6"/>' +
-      '<path d="M190 118 V86 q10 -13 20 0 v32" stroke="currentColor" stroke-width="1.3"/>' +
-      '<circle cx="200" cy="64" r="7.5" stroke="currentColor" stroke-width="1.3"/>' +
-      '<path d="M200 60 v4.5 h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>' +
-      '<path d="M170 54 h60 l-8 -9 h-44 z" stroke="currentColor" stroke-width="1.3"/>' +
-      // faceted faculty building, right
-      '<path d="M252 118 V78 l44 -22 v62 z" stroke="currentColor" stroke-width="1.4"/>' +
-      '<path d="M252 96 l44 -14 M266 118 V72 M282 118 V64" stroke="currentColor" stroke-width="1" opacity=".6"/>' +
-      // low block, left
-      '<path d="M104 118 V88 h44 v30" stroke="currentColor" stroke-width="1.4"/>' +
-      '<path d="M116 118 V100 h8 v18 M136 118 V100 h8 v18" stroke="currentColor" stroke-width="1" opacity=".6"/>' +
-      // flag poles
-      '<path d="M320 118 V52 M334 118 V60" stroke="currentColor" stroke-width="1.1" opacity=".7"/>' +
-      '<path d="M320 52 h16 v9 h-16 M334 60 h13 v8 h-13" stroke="currentColor" stroke-width="1" opacity=".7"/>' +
-      '</svg>';
+  // ---------------------------------------------------------------------
+  // THE LANDING BACKDROP
+  //
+  // The blueprint of the walk up to the نافورة, with the faculty either
+  // side. It is a picture rather than the drawn SVG that used to be here.
+  //
+  // Everywhere else in this app artwork is drawn in code, so it takes the
+  // running theme's colour and costs a couple of kilobytes. This one screen
+  // is the exception, deliberately: it is seen once, before a student has
+  // signed in or picked anything, and it is never reachable again — so it
+  // never meets any theme but the one it was drawn against, and there is
+  // nothing for a theme-aware version to buy.
+  //
+  // 66 KB as WebP, from a 903 KB source: the image is line-work on a flat
+  // ground, which is exactly what that format is good at. A browser too old
+  // for WebP simply gets the plain background, which the screen is designed
+  // to be legible on regardless.
+  //
+  // alt="" and aria-hidden: it is scenery, and a screen reader announcing a
+  // description of it before the sign-in choice would be noise.
+  function campusArt(){
+    return '<img class="wiz-campus" src="assets/img/landing-campus.webp" ' +
+           'alt="" aria-hidden="true" decoding="async">';
   }
 
   function buildSteps(){
@@ -126,7 +129,7 @@
       var tx = t();
       b.innerHTML =
         '<div class="wiz-landing" dir="' + (lang() === 'ar' ? 'rtl' : 'ltr') + '">' +
-          campusSvg() +
+          campusArt() +
           '<button type="button" class="wiz-lang" id="wizLangToggle" lang="' +
             (lang() === 'ar' ? 'en' : 'ar') + '">' + tx.other + '</button>' +
           '<div class="wiz-brand">' +

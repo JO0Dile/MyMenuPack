@@ -237,12 +237,28 @@
   // beneath a possibly-long grade table. The dots are decorative sync only;
   // scroll-snap already does the actual paging.
   function layoutHTML(prefix, rtl){
+    // With no grades entered there is nothing to swipe between and nothing
+    // to project from: the dial reads "—", the projection has no cumulative
+    // GPA to work off, and the two swipe dots point at a second panel that
+    // is empty. All of it collapses to one short card that says where
+    // grades come from and offers the way there, and the requirement
+    // breakdown below becomes the first real thing on the screen — which
+    // with nothing entered yet is the thing worth looking at anyway.
+    if(!gradedRows(prefix).length){
+      return '<div class="gs-layout gs-layout-empty" id="gsLayout">' +
+        '<div class="gs-col-main">' + tableHTML(prefix, rtl) + '</div>' +
+        '</div>';
+    }
     return '<div class="gs-swipe-dots" aria-hidden="true"><span class="active"></span><span></span></div>' +
       '<div class="gs-layout" id="gsLayout">' +
       '<div class="gs-col-main">' + tableHTML(prefix, rtl) + '</div>' +
       '<div class="gs-col-side">' + dialCardHTML(prefix, rtl) + projectionHTML(prefix, rtl) + '</div>' +
       '</div>';
   }
+
+  // Whether this plan has any graded course yet — the audit screen asks so it
+  // can drop the "how to edit a grade" line when there is none to edit.
+  function hasGrades(prefix){ return gradedRows(prefix).length > 0; }
 
   function bindSwipeDots(){
     var layout = document.getElementById('gsLayout');
@@ -315,6 +331,7 @@
 
   window.AAUP_GPA_STUDIO = {
     layout: layoutHTML,
+    hasGrades: hasGrades,
     bind: function(prefix, rtl){ bindTable(prefix); bindProjection(rtl); bindSwipeDots(); }
   };
 })();

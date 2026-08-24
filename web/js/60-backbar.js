@@ -1,7 +1,7 @@
 // ==========================
 // BACK BAR — an obvious way out of every dialog, on every screen size.
 //
-// Phones already got this: a dialog opens as a full page with a ← bar across
+// Phones already got this: a dialog opens as a full page with a back bar across
 // the top (see the max-width:720px block in css/app.css). On a desktop the
 // only way out was a small ✕ in the corner, Escape, or clicking the backdrop
 // — three things you have to already know. Students said it plainly: they
@@ -38,7 +38,12 @@
   // ids (the actual ones are onboardingWizardOverlay and storyStackOverlay;
   // the other two never existed), so neither dialog was actually being
   // skipped despite the comment saying they would be.
-  var SKIP = ['onboardingWizardOverlay', 'storyStackOverlay'];
+  //
+  // englishLevelOverlay joins them for a different reason: it is the one
+  // dialog in the app that deliberately has no way out but an answer, and a
+  // "Back" bar injected into it would be exactly the escape hatch it exists
+  // without.
+  var SKIP = ['onboardingWizardOverlay', 'storyStackOverlay', 'englishLevelOverlay'];
 
   function isRtlNow(card){
     if(card && card.getAttribute('dir') === 'rtl') return true;
@@ -53,7 +58,7 @@
     return '<div class="back-bar' + (rtl ? ' back-bar-rtl' : '') + '">' +
       '<button type="button" class="back-bar-btn" data-back-for="' +
         window.__escapeHtml(overlayId || '') + '">' +
-        '<span class="back-bar-arrow" aria-hidden="true">' + (rtl ? '→' : '←') + '</span>' +
+        '<span class="back-bar-arrow" aria-hidden="true">' + window.AAUP_ICONS.preview('back', 16) + '</span>' +
         '<span>' + window.__escapeHtml(label) + '</span>' +
       '</button>' +
       (title ? '<span class="back-bar-title">' + window.__escapeHtml(title) + '</span>' : '') +
@@ -93,7 +98,7 @@
     bar.className = 'back-bar back-bar-auto' + (rtl ? ' back-bar-rtl' : '');
     bar.innerHTML =
       '<button type="button" class="back-bar-btn" data-back-for="' + overlay.id + '">' +
-        '<span class="back-bar-arrow" aria-hidden="true">' + (rtl ? '→' : '←') + '</span>' +
+        '<span class="back-bar-arrow" aria-hidden="true">' + window.AAUP_ICONS.preview('back', 16) + '</span>' +
         '<span>' + (rtl ? LABEL.ar : LABEL.en) + '</span>' +
       '</button>';
     card.insertBefore(bar, card.firstChild);

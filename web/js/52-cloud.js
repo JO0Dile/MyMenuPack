@@ -18,7 +18,11 @@
 // false, the Settings line says so, and nothing else about the app changes.
 // Nobody's data leaves their device until a student actually signs up.
 (function(){
-  var ICON = '🗄️'; // deliberately not a cloud — see the Settings section below
+  // Deliberately a server, not a cloud — see the Settings section below.
+  // A function rather than a constant because icons.js may not have loaded
+  // when this module's top level runs.
+  function ICONMARK(size){ return window.AAUP_ICONS ? window.AAUP_ICONS.preview('server', size || 20) : ''; }
+  function ICONBTN(key){ return window.AAUP_ICONS ? window.AAUP_ICONS.preview(key, 14) : ''; }
   var TOKEN_KEY = 'aaup_cloudToken';
   var EMAIL_KEY = 'aaup_cloudEmail';
   var USERNAME_KEY = 'aaup_cloudUsername';
@@ -216,7 +220,7 @@
     card.style.textAlign = 'center';
     var title = document.createElement('h3');
     title.style.margin = '0 0 8px';
-    title.textContent = rtl ? (ICON + ' يوجد تقدّم محفوظ في الحسابين') : (ICON + ' Both this device and your account have progress');
+    title.textContent = rtl ? 'يوجد تقدّم محفوظ في الحسابين' : 'Both this device and your account have progress';
     var text = document.createElement('p');
     text.style.cssText = 'margin:0 0 18px;color:var(--text-dim);font-size:12.5px;line-height:1.55;';
     text.textContent = rtl
@@ -235,8 +239,8 @@
       });
       return b;
     }
-    actions.appendChild(btn(rtl ? '📱 إبقاء بيانات هذا الجهاز' : '📱 Keep this device’s data', 'local'));
-    actions.appendChild(btn(rtl ? (ICON + ' استخدام البيانات المتزامنة') : (ICON + ' Use the synced data'), 'remote'));
+    actions.appendChild(btn(rtl ? 'إبقاء بيانات هذا الجهاز' : 'Keep this device’s data', 'local'));
+    actions.appendChild(btn(rtl ? 'استخدام البيانات المتزامنة' : 'Use the synced data', 'remote'));
     var skip = btn(rtl ? 'قرّر لاحقًا' : 'Decide later', 'skip');
     skip.className = 'home-btn'; skip.style.cssText = 'width:100%;';
     actions.appendChild(skip);
@@ -262,12 +266,12 @@
   // ---------- Settings: a one-line status + a button that opens the popup ----------
   function sectionHtml(r){
     if(!isConfigured()){
-      return '<h3 style="margin-bottom:6px;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
+      return '<h3 style="margin-bottom:6px;">' + ICONMARK(17) + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>' +
         '<p class="form-note" style="margin-top:0;">' + (r
           ? 'المزامنة السحابية غير مُفعّلة لهذا التطبيق بعد. بياناتك تبقى على هذا الجهاز كما هي.'
           : 'Cloud Sync isn’t set up for this app yet. Your data stays on this device exactly as it always has.') + '</p>';
     }
-    var head = '<h3 style="margin-bottom:6px;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>';
+    var head = '<h3 style="margin-bottom:6px;">' + ICONMARK(17) + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h3>';
 
     // Signed in used to read exactly like signed out: the same heading, a
     // dim grey line of text, the same button. Nothing said the thing a
@@ -290,7 +294,7 @@
           '</span>' +
         '</div>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
-        '<button type="button" class="home-btn" id="cloudOpenBtn">' + ICON + ' ' +
+        '<button type="button" class="home-btn" id="cloudOpenBtn">' + ICONBTN('server') +
           (r ? 'إدارة المزامنة السحابية' : 'Manage Cloud Sync') +
         '</button></div>';
     }
@@ -298,7 +302,7 @@
     return head +
       '<p class="form-note" style="margin-top:0;">' + (r ? 'غير مسجّل الدخول' : 'Not signed in') + '</p>' +
       '<div class="form-actions" style="justify-content:flex-start;">' +
-      '<button type="button" class="home-btn" id="cloudOpenBtn" style="border-color:var(--accent);color:var(--text);">' + ICON + ' ' +
+      '<button type="button" class="home-btn" id="cloudOpenBtn" style="border-color:var(--accent);color:var(--text);">' + ICONBTN('server') +
         (r ? 'تسجيل الدخول / إنشاء حساب' : 'Sign In / Sign Up') +
       '</button></div>';
   }
@@ -313,22 +317,22 @@
   function detailHtml(r){
     if(isSignedIn()){
       var name = window.__escapeHtml(displayName());
-      return '<h2 style="margin-top:0;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h2>' +
+      return '<h2 style="margin-top:0;">' + ICONMARK(20) + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h2>' +
         '<p class="form-note" style="margin-top:0;">' + (r ? 'مسجّل الدخول باسم ' : 'Signed in as ') + '<b>' + name + '</b></p>' +
         '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-        '<button type="button" class="home-btn" id="cloudSyncNowBtn">🔄 ' + (r ? 'مزامنة الآن' : 'Sync now') + '</button>' +
-        '<button type="button" class="home-btn" id="cloudUsernameBtn">👤 ' + (r ? 'اسم المستخدم' : 'Username') + '</button>' +
-        '<button type="button" class="home-btn" id="cloudChangePwBtn">🔑 ' + (r ? 'تغيير كلمة المرور' : 'Change password') + '</button>' +
-        '<button type="button" class="home-btn" id="cloudSignOutBtn">🚪 ' + (r ? 'تسجيل الخروج' : 'Sign out') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudSyncNowBtn">' + ICONBTN('refresh') + (r ? 'مزامنة الآن' : 'Sync now') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudUsernameBtn">' + ICONBTN('person') + (r ? 'اسم المستخدم' : 'Username') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudChangePwBtn">' + ICONBTN('keys') + (r ? 'تغيير كلمة المرور' : 'Change password') + '</button>' +
+        '<button type="button" class="home-btn" id="cloudSignOutBtn">' + ICONBTN('undo') + (r ? 'تسجيل الخروج' : 'Sign out') + '</button>' +
         '</div>' +
         '<p class="form-note" id="cloudSyncStatus" style="margin-top:4px;">' + lastSyncLabel(r) + '</p>' +
         '<div id="cloudUsernameForm" style="display:none;margin-top:8px;"></div>' +
         '<div id="cloudChangePwForm" style="display:none;margin-top:8px;"></div>' +
         '<p class="form-note" style="margin-top:14px;"><button type="button" id="cloudDeleteAcctBtn" style="background:none;border:none;color:var(--danger, #ff6b6b);font-size:11.5px;cursor:pointer;padding:0;">' +
-          (r ? '🗑 حذف الحساب السحابي نهائيًا' : '🗑 Permanently delete cloud account') + '</button></p>' +
+          ICONBTN('trash') + (r ? 'حذف الحساب السحابي نهائيًا' : 'Permanently delete cloud account') + '</button></p>' +
         '<div id="cloudMsg"></div>';
     }
-    return '<h2 style="margin-top:0;">' + ICON + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h2>' +
+    return '<h2 style="margin-top:0;">' + ICONMARK(20) + ' ' + (r ? 'المزامنة السحابية' : 'Cloud Sync') + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' + (r
         ? 'سجّل بإيميل أو اسم مستخدم وكلمة مرور ليتبعك تقدّمك وعلاماتك وخططك إلى أي جهاز جديد.'
         : 'Sign in with an email (or username) and password, and your progress, grades, and plans follow you to a new device.') + '</p>' +
@@ -337,8 +341,8 @@
       '<div class="form-field"><input type="password" id="cloudPassword" placeholder="' + (r ? 'كلمة المرور' : 'Password') + '" autocomplete="current-password"></div>' +
       '</div>' +
       '<div class="form-actions" style="justify-content:flex-start;flex-wrap:wrap;">' +
-      '<button type="button" class="home-btn" id="cloudSignInBtn" style="border-color:var(--accent);color:var(--text);">🔓 ' + (r ? 'تسجيل الدخول' : 'Sign in') + '</button>' +
-      '<button type="button" class="home-btn" id="cloudToggleSignUpBtn">➕ ' + (r ? 'إنشاء حساب' : 'Sign up') + '</button>' +
+      '<button type="button" class="home-btn" id="cloudSignInBtn" style="border-color:var(--accent);color:var(--text);">' + ICONBTN('unlock') + (r ? 'تسجيل الدخول' : 'Sign in') + '</button>' +
+      '<button type="button" class="home-btn" id="cloudToggleSignUpBtn">' + ICONBTN('plus') + (r ? 'إنشاء حساب' : 'Sign up') + '</button>' +
       '</div>' +
       '<div id="cloudSignUpBox" style="display:none;margin-top:10px;">' +
       '<p class="form-note" style="margin-top:0;">' + (r
@@ -346,7 +350,7 @@
         : 'Create an account with the email above — an optional username makes signing in later easier than typing a full email.') + '</p>' +
       '<div class="form-field"><input type="text" id="cloudSignUpUsername" placeholder="' + (r ? 'اسم مستخدم (اختياري)' : 'Username (optional)') + '" autocomplete="username"></div>' +
       '<div class="form-actions" style="justify-content:flex-start;">' +
-      '<button type="button" class="home-btn" id="cloudSignUpBtn" style="border-color:var(--accent);color:var(--text);">➕ ' + (r ? 'إنشاء الحساب' : 'Create account') + '</button>' +
+      '<button type="button" class="home-btn" id="cloudSignUpBtn" style="border-color:var(--accent);color:var(--text);">' + ICONBTN('plus') + (r ? 'إنشاء الحساب' : 'Create account') + '</button>' +
       '</div></div>' +
       '<div id="cloudMsg"></div>';
   }
@@ -475,7 +479,7 @@
             startAutoSync();
             if(res.reload){ location.reload(); return; }
             render();
-            if(window.__showToast){ window.__showToast(rtl ? (ICON + ' تم تسجيل الدخول.') : (ICON + ' Signed in.')); }
+            if(window.__showToast){ window.__showToast(rtl ? 'تم تسجيل الدخول.' : 'Signed in.'); }
           });
         });
       });

@@ -33,6 +33,20 @@
   }
   function nth(list, i){ return list && list[i] ? list[i] : null; }
 
+  // The first match that is actually on screen. Several selectors in this
+  // file hit a legacy element that is still in the DOM but hidden at the
+  // current width — the dashboard keeps its old desktop stat cards behind
+  // the phone hero strip, so "#dashboard .dash-card" finds a display:none
+  // Progress card long before it finds the one a student can see, and the
+  // step was silently dropped for pointing at nothing.
+  function firstVisible(sel, root){
+    var list = (root || document).querySelectorAll(sel);
+    for(var i = 0; i < list.length; i++){
+      if(list[i].offsetParent !== null) return list[i];
+    }
+    return null;
+  }
+
   // The custom/imported plan editor always renders into this one fixed
   // host regardless of which plan is open — unlike visiblePlanRoot()'s
   // built-in majors, there's only ever one candidate, so this just needs
@@ -53,6 +67,35 @@
     return (id && document.getElementById(id)) || root.querySelector('.course[id]');
   }
 
+  // Calls fn once the page has stopped scrolling — measured, not timed.
+  // Reads the target's own position each frame and fires when it has held
+  // still for two consecutive frames, with a cap so a page that never
+  // settles cannot leave a step hanging.
+  function afterScrollSettles(el, fn){
+    var MAX_WAIT = 800, started = Date.now();
+    var lastTop = null, stable = 0;
+    (function tick(){
+      var top = Math.round(el.getBoundingClientRect().top);
+      stable = (top === lastTop) ? stable + 1 : 0;
+      lastTop = top;
+      if(stable >= 2 || Date.now() - started > MAX_WAIT){ fn(); return; }
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  // Opens the plan's first year if it is folded, so a step about a course
+  // has a course on screen to point at. Idempotent — place() calls prepare()
+  // again on every reflow — and it goes through the real toggle rather than
+  // stripping the class, so the state is stored and the connectors redraw
+  // exactly as they would for a tap.
+  function openFirstYear(){
+    var root = visiblePlanRoot();
+    var block = root.querySelector('.imp-year-block');
+    if(!block || !block.classList.contains('year-collapsed')) return;
+    var toggle = block.querySelector('.imp-year-toggle');
+    if(toggle) toggle.click();
+  }
+
   var TOURS = {
     home: [
       { target: '#homeSearchBox',
@@ -68,50 +111,85 @@
         title: 'Settings',
         text: 'Backups, theme, and profiles on this device.' }
     ],
+    // Rebuilt too. Three of its five steps pointed at .dash-card by index —
+    // first, second, fourth — which stopped meaning anything when the
+    // dashboard's panels were reordered and folded: two of the five
+    // resolved to hidden cards and were dropped, so a "5-step" tour
+    // introduced itself as step 1 of 3. Every step here names what it wants
+    // rather than counting to it.
     dashboard: [
-      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 0); },
-        title: 'Progress',
-        text: 'Completed credit hours out of everything required for your degree.' },
-      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 1); },
-        title: 'GPA',
-        text: 'Enter grades for a course from its info popup on the Study Plan page — your GPA updates here automatically.' },
-      { target: function(){ return document.querySelector('#dashboard .dash-quicklink[onclick*="AAUP_ACHIEVEMENTS"]'); },
-        title: 'Achievements',
-        text: 'Small goals that unlock as you go — tap here to see all of them for this major. Go ahead, try it.' },
-      { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-card'), 3); },
-        title: 'What Can I Take Next',
-        text: 'Courses whose prerequisites you’ve already checked off — a quick answer to "what am I actually allowed to register for."' },
+      { target: function(){ return firstVisible('#dashboard .dash-phone-hero') || firstVisible('#dashboard .dash-card'); },
+        title: 'Where you stand',
+        text: 'How much of the degree is behind you, your GPA, and the hours still left — the three numbers, in one line.' },
+      { target: function(){ return firstVisible('#dashboard .grad-card'); },
+        title: 'When do I graduate?',
+        text: 'Worked out from the hours you have left and how many you take a semester. Move the slider and the date moves with it.' },
+      { target: function(){ return firstVisible('#dashboard .dash-card:not(.grad-card)'); },
+        title: 'What can I take next',
+        text: 'Courses whose prerequisites you have already ticked off — the answer to "what am I actually allowed to register for", with the reason attached to each one.' },
+      { target: function(){ return firstVisible('#dashboard .dash-quicklink'); },
+        title: 'Everything else',
+        text: 'Your path through the degree, the audit, achievements, next semester — all one tap from here.' },
       { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-actions .home-btn'), 1); },
         title: 'My Study Plan',
-        text: 'The full four-year course map — prerequisites, electives, and where every course you’ve completed slots in.' }
+        text: 'The whole course map: every year, its prerequisites, and where what you have finished slots in.' }
     ],
+    // Rebuilt against the plan page as it now is.    // Rebuilt against the plan page as it now is. Two of these steps used to
+    // point at things that no longer exist, and three more pointed INTO a
+    // year — which now starts folded, so their targets resolved to hidden
+    // cards and the drop-if-hidden rule silently deleted them. That is why a
+    // student reported a four-step tour introducing itself as "1 / 2".
+    //
+    // The course steps carry a prepare() that opens Year 1 first, so the tour
+    // puts the screen into the state it is about to describe instead of
+    // skipping past whatever is not already showing.
     studyplan: [
+      { target: function(){ return visiblePlanRoot().querySelector('.now-tag') || visiblePlanRoot().querySelector('.imp-year-toggle'); },
+        title: 'You are here',
+        text: 'The plan opens on the semester you are in and marks it. Everything ahead of it is folded away, one bar per year, each saying how far through it you are.' },
+      { target: function(){
+          var blocks = visiblePlanRoot().querySelectorAll('.imp-year-block.year-collapsed .imp-year-toggle');
+          return blocks[0] || visiblePlanRoot().querySelector('.imp-year-toggle');
+        },
+        title: 'Open a year',
+        text: 'Tap a folded year to see inside it. Hold it instead, and everything you cannot take yet fades — what stays lit is what is open to you today.' },
+      { prepare: openFirstYear,
+        target: function(){ return visiblePlanRoot().querySelector('.imp-year-body .course'); },
+        title: 'Courses',
+        text: 'Tap a course for its details and prerequisites, or tick the box once you have passed it — that is what feeds Progress and GPA on your Dashboard.' },
+      { prepare: openFirstYear,
+        target: aConnectedCourse,
+        title: 'What connects to what',
+        text: 'Press and hold a course. What it needs first lights up in one colour, what it opens up in another. Go ahead, try it.',
+        interactive: true },
+      { target: function(){ return visiblePlanRoot().querySelector('.pf-bar'); },
+        title: 'Ask the whole plan',
+        text: 'These filter every year at once — the years with nothing matching drop out entirely. They live in the hours bar, so they are still there when you are four years down the page.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.progress-widget'); },
+        title: 'Where you are',
+        text: 'Hours done out of hours needed, and which requirement is closest to being finished. Scroll down and it comes with you, shrinking out of the way.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-box'); },
+        title: 'Search a course',
+        text: 'Find any course by name or number instead of opening years looking for it — the year it lives in opens itself. Try typing one now.',
+        noDim: true, // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
+        avoidBelow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown.open'); },
+        watchReflow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown'); } },
+      { target: function(){ return document.querySelector('#sbTabBar [data-sb-tab="more"]') || document.querySelector('#sbTabBar .sb-tab:last-child'); },
+        title: 'Everything else is in here',
+        text: 'Your degree audit, achievements, what to take next, the course library — and Edit Mode at the very top, for changing the plan itself.' },
       { target: function(){
           var legend = visiblePlanRoot().querySelector('.legend');
           // Once expanded, spotlight the whole panel (not just the header)
-          // so the newly-revealed color key is actually inside the lit-up
-          // area instead of sitting in the dimmed backdrop underneath it.
+          // so the newly-revealed colour key is inside the lit-up area
+          // instead of sitting in the dimmed backdrop underneath it.
           return (legend && legend.classList.contains('expanded')) ? legend : visiblePlanRoot().querySelector('.legend-toggle');
         },
         title: 'Legend',
-        text: 'Every color on this page means something — university requirement, elective, core course, etc. Tap it to see what’s what.',
+        text: 'Every colour on this page means something — university requirement, elective, specialization course. Tap it to see which is which.',
         interactive: true,
         watchTarget: function(){ return visiblePlanRoot().querySelector('.legend'); },
         interactionClass: 'expanded',
-        reflowDelay: 320 }, // matches .legend-items' own max-height transition, so the panel has finished growing before it's measured
-      { target: function(){ return visiblePlanRoot().querySelector('.course'); },
-        title: 'Courses',
-        text: 'Tap a course to see its details and prerequisites, or check the box once you’ve completed it — that’s what feeds Progress and GPA on your Dashboard.' },
-      { target: aConnectedCourse,
-        title: 'Trace prerequisites',
-        text: 'Press and hold this course (or hover it on a computer) — the lines connecting it to what it needs, and what it unlocks, light up. Go ahead, try it — Next will be waiting whenever you are.',
-        interactive: true },
-      { target: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-box'); },
-        title: 'Search a course',
-        text: 'Find any course on this page by name or course number instead of hunting through every semester. Try typing one now.',
-        noDim: true, // its results dropdown renders below the spotlighted box, in territory a dark backdrop would otherwise hide
-        avoidBelow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown.open'); },
-        watchReflow: function(){ return visiblePlanRoot().querySelector('.course-search-wrap .search-dropdown'); } }
+        reflowDelay: 320 } // matches .legend-items' own max-height transition, so the panel has finished growing before it's measured
     ],
     // Edit Mode on a student's OWN custom/imported plan — no developer
     // password involved, since only its own creator can ever reach it (see
@@ -128,25 +206,38 @@
     planEditor: [
       { target: function(){ return importedEditRoot().querySelector('.imp-exit-edit-btn'); },
         title: 'Edit Mode',
-        text: 'This is YOUR plan — nothing here is shared with anyone until you choose to Export or Contribute it. Add, remove, and rearrange courses freely; everything saves automatically as you go, no separate Save button.' },
-      { target: function(){ return importedEditRoot().querySelector('.imp-add-course-card'); },
+        text: 'This is YOUR plan — nothing here is shared until you choose to Export or Contribute it, both in the menu under Advanced. Add, remove and rearrange freely; everything saves as you go, with no Save button to remember.' },
+      { prepare: openFirstYear,
+        target: function(){ return importedEditRoot().querySelector('.imp-year-body .imp-add-course-card'); },
         title: 'Add a course',
         text: 'Tap + in any semester to add a course by hand — name, credit hours, category, even its prerequisites. Try it now.' },
-      { target: function(){ return importedEditRoot().querySelector('.home-btn[onclick*="openLibrary"]'); },
+      // The Course Library used to be a button in this header. It is a menu
+      // row now, along with everything else that only navigates somewhere,
+      // so the step points at the menu rather than at a button that is gone.
+      { target: function(){ return document.querySelector('#sbTabBar [data-sb-tab="more"]') || document.querySelector('#sbTabBar .sb-tab:last-child'); },
         title: 'Course Library',
-        text: 'Or skip the typing — copy a course straight from an official plan (or someone else’s) instead of entering it by hand. Go ahead, try it.' },
-      { target: function(){ return importedEditRoot().querySelector('.imp-edit-course-btn'); },
+        text: 'Or skip the typing. Advanced → Course Library in the menu copies a course straight out of an official plan, shelf by shelf.' },
+      { prepare: openFirstYear,
+        target: function(){ return importedEditRoot().querySelector('.imp-year-body .imp-edit-course-btn'); },
         title: 'Edit a course',
         text: 'Tap the pencil on any course to fix its name, credit hours, or category later — nothing here is permanent.' },
-      { target: function(){ return importedEditRoot().querySelector('.course[id]'); },
+      { prepare: openFirstYear,
+        target: function(){ return importedEditRoot().querySelector('.imp-year-body .course[id]'); },
         title: 'Move a course',
         text: 'Press and hold a course, then drag it to a different semester — the app checks prerequisites for you and warns if the new order would break something. Give it a try.' },
+      // New here: the elective pool is the one place where dragging is not
+      // optional. The plan does not schedule these, so nothing knows when a
+      // student takes them until they say so.
+      { target: function(){ return importedEditRoot().querySelector('.imp-elective-block .course[id]'); },
+        title: 'Electives you choose',
+        text: 'These have no semester of their own — the plan does not schedule them. Drag one into the semester you actually take it in, and it becomes part of that term. Drag it back here to undo that.' },
       { target: function(){ return importedEditRoot().querySelector('.imp-structure-actions .home-btn'); },
         title: 'Add a Year',
         text: 'Need more than what’s here? Add another year any time — each year can also get a Summer semester from its own header, and both can be removed again just as easily.' },
-      { target: function(){ return importedEditRoot().querySelector('.imp-remove-course-btn'); },
+      { prepare: openFirstYear,
+        target: function(){ return importedEditRoot().querySelector('.imp-year-body .imp-remove-course-btn'); },
         title: 'Remove a course',
-        text: 'The ✕ on a course removes it — you’ll always get an “are you sure” first, and this can’t be undone once confirmed.' },
+        text: 'The ✕ on a course takes it out of your plan — you always get an “are you sure” first.' },
       { target: function(){ return importedEditRoot().querySelector('.imp-exit-edit-btn'); },
         title: 'All done?',
         text: 'Tap here whenever you’re finished editing. There’s nothing left to save — it already has been, the whole time.' }
@@ -225,6 +316,14 @@
   function render(){
     if(!active) return;
     var step = active.steps[active.index];
+    // A step may need the screen put in a state before its target exists on
+    // it — with every year folded by default, the course steps point at
+    // cards inside a closed year, and the drop-if-hidden rule below would
+    // quietly delete half the tour. prepare() opens what the step is about
+    // to talk about. It must be idempotent: place() runs again on reflow.
+    if(step && typeof step.prepare === 'function'){
+      try{ step.prepare(); }catch(e){}
+    }
     var el = step && resolve(step);
     if(!el || el.offsetParent === null){
       // Not on screen. This used to advance() past it, which left the index
@@ -238,11 +337,30 @@
       render();
       return;
     }
+    // The words go up first, before the scroll. Waiting for the scroll to
+    // settle (below) is right for POSITIONING, but writing the text there
+    // too meant the card kept the previous step's title and count for the
+    // whole of the scroll — pressing Next appeared to do nothing.
+    document.getElementById('tutTitle').textContent = step.title;
+    document.getElementById('tutText').textContent = step.text;
+    document.getElementById('tutProgress').textContent = (active.index + 1) + ' / ' + active.steps.length;
+    document.getElementById('tutNext').textContent =
+      (active.index === active.steps.length - 1) ? 'Got it!' : 'Next';
+
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        // Re-check: two frames is enough time for finish() to have run (e.g.
-        // a rapid plan switch) and cleared `active` out from under this
+    // Two animation frames used to be the whole wait. That is fine for a
+    // target already on screen and wrong for one that is not: a smooth
+    // scroll takes a few hundred milliseconds, so the rect was read while
+    // the page was still moving and the spotlight got pinned to where the
+    // target HAD been. On a long plan that put it below the fold with its
+    // tooltip — and its Next button — off the bottom of the screen.
+    //
+    // Waiting for the rect to stop changing covers both cases without
+    // guessing a duration.
+    afterScrollSettles(el, function(){
+      (function(){
+        // Re-check: enough has happened for finish() to have run (e.g. a
+        // rapid plan switch) and cleared `active` out from under this
         // already-scheduled callback — without this guard the stale closure
         // crashes reading .steps/.index off a null `active`.
         if(!active) return;
@@ -255,17 +373,12 @@
         spot.style.height = (r.height + pad * 2) + 'px';
         spot.classList.toggle('no-dim', !!(step.interactive || step.noDim));
 
-        document.getElementById('tutTitle').textContent = step.title;
-        document.getElementById('tutText').textContent = step.text;
-        document.getElementById('tutProgress').textContent = (active.index + 1) + ' / ' + active.steps.length;
         var waitingOnInteraction = !!(step.interactive && !active._interactionDone);
         // Both buttons used to read "Skip" while a step waited on an
         // interaction — one meaning "skip this step", the other "skip the
         // whole tour", with nothing distinguishing them. The primary keeps
         // its normal label: pressing it moves on without doing the gesture,
         // which is what skipping the step already meant.
-        document.getElementById('tutNext').textContent =
-          (active.index === active.steps.length - 1) ? 'Got it!' : 'Next';
         document.getElementById('tutNext').classList.toggle('tut-next-waiting', waitingOnInteraction);
 
         if(step.interactive){
@@ -318,7 +431,7 @@
           top = (bottomLimit - belowEdge) >= r.top ? below : above;
         }
         tip.style.top = Math.max(12, Math.min(top, bottomLimit - tipH)) + 'px';
-      });
+      })();
     });
   }
 

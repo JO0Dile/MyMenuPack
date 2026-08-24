@@ -70,9 +70,10 @@ GROUPS = {
         '23-legend.js', '24-achievements.js', '25-advisor.js', '27-community.js',
         '28-imported.js', '36-dashboard.js', '49-course-detail.js', '50-whats-next.js',
         '51-gpa-studio.js', '53-roadmap.js', '54-prereq-graph.js', '57-card-input.js',
-        '62-change-plan.js', '63-whatif.js', '64-milestones.js', '65-focus-mode.js',
+        '62-change-plan.js', '63-whatif.js', '64-milestones.js',
         '66-graduation.js', '67-gpa-target.js', '69-phone-header.js', '72-share.js',
-        '74-course-gestures.js', '75-about.js', '76-course-pairs.js',
+        '74-course-gestures.js', '75-about.js', '76-course-pairs.js', '77-english-level.js',
+        '78-you-are-here.js', '79-plan-filter.js',
     ],
     'server': [
         '30-sync.js', '31-collect.js', '41-assistant-kb.js', '42-assistant.js',

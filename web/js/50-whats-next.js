@@ -308,7 +308,7 @@
         '<span class="wn-lead-name">' + leadName +
         (lead.cr ? ' <span class="wn-lead-cr">' + esc(lead.cr) + 'H</span>' : '') + '</span>' +
         '<span class="wn-lead-why">' + esc(t.doNextWhy(leadName, lead.opens || 0)) + '</span>' +
-        '<span class="wn-lead-cta">' + esc(t.doNextAdd) + ' →</span>' +
+        '<span class="wn-lead-cta">' + esc(t.doNextAdd) + window.AAUP_ICONS.preview('chevronRight', 13) + '</span>' +
         '</button>';
     }
     html += '<div class="wn-cards">' +

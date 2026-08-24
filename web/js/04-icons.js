@@ -249,8 +249,22 @@
     // (✓ ➕ 🔒 ⚠️ ...) headings and menus used to be prefixed with. ----
     plus: stroke('<path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/>'),
     chevron: stroke('<path d="m5.6 8.4 6.4 7.2 6.4-7.2"/>'),
+    // chevron points down; these three are the same stroke rotated, drawn
+    // rather than CSS-rotated so a caller can place one without also having
+    // to know which way the base glyph happens to face.
+    chevronUp: stroke('<path d="m5.6 15.6 6.4-7.2 6.4 7.2"/>'),
+    chevronRight: stroke('<path d="m9 5.6 7.2 6.4-7.2 6.4"/>'),
+    chevronLeft: stroke('<path d="m15 5.6-7.2 6.4 7.2 6.4"/>'),
+    // Close and Back replace the bare ✖ and ← characters the app was
+    // printing as text. A character inherits the font, not the icon grid,
+    // so it never lined up with the drawn icons beside it.
+    close: stroke('<path d="M6.4 6.4 17.6 17.6"/><path d="M17.6 6.4 6.4 17.6"/>'),
+    back: stroke('<path d="M19.4 12H5"/><path d="m11 6-6 6 6 6"/>'),
     send: stroke('<path d="M4 12h15"/><path d="m13 6 6 6-6 6"/>'),
     check: stroke('<circle cx="12" cy="12" r="8.6"/><path d="m7.6 12.4 3 3 6-6.4"/>'),
+    // The tick on its own, for places that already draw their own circle
+    // around it — the course card's checkbox being the one that matters.
+    tick: stroke('<path d="m5.4 12.6 4.4 4.4 8.8-9.6"/>'),
     undo: stroke('<path d="M8.4 15 4 10.6 8.4 6.2"/><path d="M4 10.6h10.4a5.6 5.6 0 0 1 0 11.2H10"/>'),
     copy: stroke('<rect x="9" y="9" width="11" height="11" rx="2"/>' +
       '<path d="M15 9V6.4A2.4 2.4 0 0 0 12.6 4H6.4A2.4 2.4 0 0 0 4 6.4v6.2A2.4 2.4 0 0 0 6.4 15H9"/>'),

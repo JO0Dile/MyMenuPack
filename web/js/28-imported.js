@@ -862,9 +862,52 @@
     var order = (row && window.AAUP_PLAN_EDITOR) ? window.AAUP_PLAN_EDITOR.orderOfContainerId(row.id) : null;
     return (order === null || order === undefined) ? Infinity : order;
   }
+  // What this course needs, and what it opens up, read from the plan's own
+  // prerequisite data rather than from the lines drawn on screen.
+  //
+  // This used to walk the connector SVG's <path class="edge"> elements and
+  // take data-from/data-to off them. Three things go wrong that way, and a
+  // student reported all three as "some courses light the wrong ones, and
+  // they stay pink":
+  //
+  //   - the app deliberately does not draw every connector (an edge whose
+  //     two ends are too far apart, or would cross the page, is dropped), so
+  //     a course with real prerequisites traced nothing at all;
+  //   - a year that is folded has no laid-out cards, so its edges are stale
+  //     or absent, and the trace pointed at where a card used to be;
+  //   - it returned early when it found no paths, which meant holding a
+  //     course silently did nothing rather than saying what it connects to.
+  //
+  // The relationships are in window.__PLAN_DATA — they are the same data the
+  // lines are generated FROM — so they are always complete and always right.
+  // The lines are still animated when they happen to exist; they are now
+  // decoration on top of the highlight rather than the source of it.
+  function relatedSlugs(planId, slug){
+    var data = (window.__PLAN_DATA || {})[planId] || {};
+    var needs = (data.needsMap && data.needsMap[slug]) || [];
+    var unlocks = (data.unlocksMap && data.unlocksMap[slug]) || [];
+    return { needs: needs, unlocks: unlocks };
+  }
+
   function handleCourseHoverEnter(planId, courseEl){
     clearHoverSequence();
     var id = courseEl.id;
+    var slug = id.slice((planId + '-c-').length);
+    var rel = relatedSlugs(planId, slug);
+
+    // Mark the cards first, so the highlight is correct whether or not a
+    // single line got drawn between them.
+    var marked = [];
+    function mark(s, cls){
+      var el = document.getElementById(planId + '-c-' + s);
+      if(!el) return;
+      el.classList.add('node-active', cls);
+      marked.push(el);
+    }
+    rel.needs.forEach(function(s){ mark(s, 'node-needs'); });
+    rel.unlocks.forEach(function(s){ mark(s, 'node-unlocks'); });
+    courseEl.classList.add('node-active');
+
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
     var paths = Array.prototype.slice.call(svg.querySelectorAll('path.edge'));
@@ -900,13 +943,7 @@
       var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var STEP_MS = reducedMotion ? 0 : 650;
       sequence.forEach(function(p, i){
-        var t = setTimeout(function(){
-          p.style.strokeDashoffset = 0;
-          ['data-from', 'data-to'].forEach(function(attr){
-            var otherEl = document.getElementById(p.getAttribute(attr));
-            if(otherEl){ otherEl.classList.add('node-active'); }
-          });
-        }, i * STEP_MS);
+        var t = setTimeout(function(){ p.style.strokeDashoffset = 0; }, i * STEP_MS);
         hoverSequenceTimers.push(t);
       });
     });
@@ -917,6 +954,12 @@
     // sheet exists to sit on top of.
     if(window.__QA_HOLD) return;
     clearHoverSequence();
+    // Cards first and unconditionally. Clearing used to sit behind an early
+    // return when the connector layer was missing, which is exactly how a
+    // course could be left highlighted with no way to un-highlight it.
+    document.querySelectorAll('#page-' + planId + ' .course[id]').forEach(function(c){
+      c.classList.remove('node-active', 'node-needs', 'node-unlocks');
+    });
     var svg = document.getElementById(planId + '-connectorSvg');
     if(!svg) return;
     svg.querySelectorAll('path.edge').forEach(function(p){
@@ -925,7 +968,6 @@
       p.style.strokeDasharray = '';
       p.style.strokeDashoffset = '';
     });
-    document.querySelectorAll('#page-' + planId + ' .course[id]').forEach(function(c){ c.classList.remove('node-active'); });
   }
   var touchHoldTimer = null;
   var touchHoldEl = null;
@@ -1018,18 +1060,20 @@
     var cardButtons = editing
       ? '<div class="imp-card-btn-row">' +
         '<button type="button" class="imp-edit-course-btn" title="Edit course" onclick="event.stopPropagation(); AAUP_IMPORTED.editCoursePrompt(\'' + planId + '\',\'' + c.id + '\');">' + window.AAUP_ICONS.preview('pen', 13) + '</button>' +
-        '<button type="button" class="imp-remove-course-btn" title="Remove course" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmRemoveCourse(\'' + planId + '\',\'' + c.id + '\');">✕</button>' +
+        '<button type="button" class="imp-remove-course-btn" title="Remove course" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmRemoveCourse(\'' + planId + '\',\'' + c.id + '\');">' + window.AAUP_ICONS.preview('close', 13) + '</button>' +
         '</div>'
       : '';
     var checkboxHtml = editing ? '' :
       '<span class="course-check" role="checkbox" tabindex="0" aria-checked="' + (done ? 'true' : 'false') + '" ' +
       'aria-label="Mark course as completed" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
-      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">✓</span>';
+      'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">' + window.AAUP_ICONS.preview('tick', 11) + '</span>';
     // The line under the name answers the three things a student checks on
     // every card: which year the plan puts it in, whether they can register
-    // for it today, and how many hours it carries. The official course code
-    // sits under them because that — not the name — is what gets typed into
-    // the registration system.
+    // for it today, and how many hours it carries. The course code used to
+    // sit under that as a third line; it is read off the card perhaps once,
+    // when registering, and was costing every card a line of height for it.
+    // It is in the course details popup, a tap away, where the rest of the
+    // registration facts already live.
     var statusTx = done ? (rtl ? 'مُنجز' : 'passed')
       : avail ? (rtl ? 'متاح لك' : 'open to you')
       : (rtl ? 'مغلق لك' : 'closed to you');
@@ -1061,7 +1105,6 @@
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
       '<div class="name">' + displayName + '</div>' +
       '<div class="course-meta">' + meta + '</div>' +
-      '<div class="course-code">' + window.__escapeHtml(String(c.id)) + '</div>' +
       '</div>';
   }
 
@@ -1220,7 +1263,16 @@
   // inline made a semester look heavier than it is and implied a fixed slot
   // that does not exist, so they are lifted out of the year grid and gathered
   // into one pool block under the years (see electivePoolHtml below).
-  function isPoolElective(c){ return c && c.category === 'dept'; }
+  // A specialization elective is in the pool until the student says where
+  // they actually took it. Before that, the term the catalogue happens to
+  // print beside it is meaningless — the plan does not schedule these — so
+  // it is pooled regardless of what yearId/semester the data carries.
+  //
+  // placedByStudent is what edit mode writes when one is dragged into a real
+  // semester. Without it the drag appeared to work and then silently undid
+  // itself: the course's yearId was updated, and the very next render pooled
+  // it again anyway because the category had not changed.
+  function isPoolElective(c){ return !!c && c.category === 'dept' && !c.placedByStudent; }
 
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var pairs = pairContinuations(planId);
@@ -1300,11 +1352,6 @@
 
     registerPlan(id, p);
     var editing = document.getElementById('page-' + id) ? document.getElementById('page-' + id).classList.contains('editing') : false;
-    // Editing a custom plan doesn't need the developer-mode trick — that
-    // exists to prevent ACCIDENTAL edits to the four official majors,
-    // which every student shares. A custom plan only affects its own
-    // creator, so anyone who made one can freely build it out.
-    var canEdit = true;
     var rtl = !!rtlState[id];
 
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
@@ -1340,19 +1387,23 @@
       '<div class="en">' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</div>' +
       '</div></div>' +
       '<div class="ar-block"><div class="ar1">' + ar.big + '</div>' + (ar.small ? '<div class="ar2">' + ar.small + '</div>' : '') + '</div>' +
-      '<div class="header-actions">' +
-        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.close()"><span class="home-ic">' + window.AAUP_ICONS.preview('home', 15) + '</span><span class="home-lbl">Home</span></button>' +
-        (canEdit ? (editing
-          ? '<button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')" style="border-color:var(--prereq);color:#ff9ecb;">✖ Exit Edit Mode</button>'
-          : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">' + window.AAUP_ICONS.preview('pen', 14) + 'Edit Mode</button>') : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.openLibrary(\'' + id + '\')" title="Browse courses from every plan">' + window.AAUP_ICONS.preview('book', 14) + 'Course Library</button>' : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.exportPlan(\'' + id + '\')" title="Download this plan to share with someone else">' + window.AAUP_ICONS.preview('download', 14) + 'Export Plan</button>' : '') +
-        (canEdit ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.submitPlan(\'' + id + '\')" title="Send this plan to the app maintainer so it can be added for everyone">' + window.AAUP_ICONS.preview('mail', 14) + 'Contribute</button>' : '') +
-        (p.contributing && window.AAUP_CONTRIBUTE
-          ? '<button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">' + window.AAUP_ICONS.preview('send', 14) + 'Submit contribution</button>'
-          : '') +
-      '</div></header>' +
-      '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">▶</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
+      // Home, Edit Mode, Course Library, Export Plan and Contribute all used
+      // to sit here as a five-button row above the plan. Every one of them
+      // is a destination, and destinations belong in the menu — which is
+      // where they are now (Edit Mode at the top of it). What is left in the
+      // header is what the header is for: whose plan this is.
+      //
+      // The one exception is an ACTIVE contribution. That is not navigation,
+      // it is an unsent draft: hiding it in a menu is how a student loses
+      // work they thought they had submitted.
+      (p.contributing && window.AAUP_CONTRIBUTE
+        ? '<div class="header-actions"><button type="button" class="home-btn" onclick="AAUP_CONTRIBUTE.submit(\'' + id + '\')" style="border-color:var(--accent);color:var(--text);" title="Send what you have added so far — the maintainer can reply here in the app">' + window.AAUP_ICONS.preview('send', 14) + 'Submit contribution</button></div>'
+        : '') +
+      (editing
+        ? '<div class="header-actions"><button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">' + window.AAUP_ICONS.preview('close', 14) + 'Exit Edit Mode</button></div>'
+        : '') +
+      '</header>' +
+      '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">' + window.AAUP_ICONS.preview('chevronRight', 13) + '</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
       '<div class="legend-items">' +
       CATS.map(function(c){ return '<span class="item"><span class="chip ' + c + '"></span><span>' + CAT_LABELS[c][rtl ? 1 : 0] + '</span></span>'; }).join('') +
       '<span class="arrow-sample"><span class="ln"></span><span>' + (rtl ? 'متطلب سابق (مرر المؤشر فوق المساق لتتبعه)' : 'Prerequisite (hover a course to trace it)') + '</span></span>' +
@@ -1381,41 +1432,49 @@
         '</div>';
     }
 
-    if(canEdit){
-      html += '<div class="panel-action-row">' +
-        '<button type="button" class="pw-reset" onclick="AAUP_AUDIT.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('clipboard', 14) + 'Degree Audit &amp; GPA</button>' +
-        '<button type="button" class="pw-reset" onclick="AAUP_ACHIEVEMENTS.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('trophy', 14) + 'Achievements</button>' +
-        '<button type="button" class="pw-reset" onclick="AAUP_ADVISOR.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('brain', 14) + 'Plan My Next Semester</button>' +
-        '</div>';
-    }
-
     html += '<div class="years"><svg id="' + id + '-connectorSvg" class="connector-layer" xmlns="http://www.w3.org/2000/svg">' +
       '<defs><marker id="' + id + '-prereqArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z"></path></marker>' +
       '<marker id="' + id + '-prereqArrowActive" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 Z"></path></marker></defs></svg>';
 
+    // Each year is its own disclosure: a header button that toggles the
+    // body under it. The header carries how far through that year the
+    // student is, so a folded plan still answers "where am I" without
+    // anything having to be opened — see js/05-year-collapse.js for the
+    // state, which lives per plan and per year and starts folded.
     p.structure.years.forEach(function(y, i){
-      html += '<div class="imp-year-block"><div class="imp-year-header"><h3>' + (rtl ? 'السنة ' + (i + 1) : 'Year ' + (i + 1)) + '</h3>';
+      var yearCourses = (p.courses || []).filter(function(c){ return c.yearId === y.id && !isPoolElective(c); });
+      var yearDone = yearCourses.filter(function(c){ return isDone(id, c.id); }).length;
+      var yearHours = yearCourses.reduce(function(a, c){ return a + (parseFloat(c.creditHours) || 0); }, 0);
+      var bodyId = id + '-yearbody-' + i;
+      html += '<div class="imp-year-block" data-year-index="' + i + '">' +
+        '<div class="imp-year-header">' +
+        '<button type="button" class="imp-year-toggle" aria-expanded="false" aria-controls="' + bodyId + '">' +
+          '<span class="iy-chev" aria-hidden="true">' + window.AAUP_ICONS.preview('chevronRight', 15) + '</span>' +
+          '<h3>' + (rtl ? 'السنة ' + (i + 1) : 'Year ' + (i + 1)) + '</h3>' +
+          '<span class="iy-count"><b>' + yearDone + '</b> / ' + yearCourses.length + '</span>' +
+          '<span class="iy-hours">' + yearHours + 'H</span>' +
+        '</button>';
       if(editing){
         html += '<div class="imp-year-actions">' +
           (y.hasSummer
-            ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.removeSummer(\'' + id + '\',\'' + y.id + '\')">🗑 ' + (rtl ? 'إزالة الصيفي' : 'Remove Summer') + '</button>'
-            : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.addSummer(\'' + id + '\',\'' + y.id + '\')">☀️ ' + (rtl ? 'إضافة صيفي' : 'Add Summer') + '</button>') +
-          '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.removeYear(\'' + id + '\',\'' + y.id + '\')">🗑 ' + (rtl ? 'إزالة السنة' : 'Remove Year') + '</button>' +
+            ? '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.removeSummer(\'' + id + '\',\'' + y.id + '\')">' + window.AAUP_ICONS.preview('trash', 13) + (rtl ? 'إزالة الصيفي' : 'Remove Summer') + '</button>'
+            : '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.addSummer(\'' + id + '\',\'' + y.id + '\')">' + window.AAUP_ICONS.preview('sun', 13) + (rtl ? 'إضافة صيفي' : 'Add Summer') + '</button>') +
+          '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.removeYear(\'' + id + '\',\'' + y.id + '\')">' + window.AAUP_ICONS.preview('trash', 13) + (rtl ? 'إزالة السنة' : 'Remove Year') + '</button>' +
           '</div>';
       }
-      html += '</div>';
+      html += '</div><div class="imp-year-body" id="' + bodyId + '">';
       html += semesterHtml(id, p, y.id, 's1', editing, rtl, i + 1);
       html += semesterHtml(id, p, y.id, 's2', editing, rtl, i + 1);
       if(y.hasSummer){ html += semesterHtml(id, p, y.id, 's3', editing, rtl, i + 1); }
-      html += '</div>';
+      html += '</div></div>';
     });
 
     html += unscheduledHtml(id, p, editing, rtl);
 
     if(editing){
       html += '<div class="imp-structure-actions">' +
-        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.addYear(\'' + id + '\')">➕ ' + (rtl ? 'إضافة سنة' : 'Add Year') + '</button>' +
-        '<button type="button" class="home-btn" onclick="AAUP_LINKS.open(\'' + id + '\')">🔗 ' + (rtl ? 'خطوط المتطلبات' : 'Prerequisite lines') + '</button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_IMPORTED.addYear(\'' + id + '\')">' + window.AAUP_ICONS.preview('plus', 13) + (rtl ? 'إضافة سنة' : 'Add Year') + '</button>' +
+        '<button type="button" class="home-btn" onclick="AAUP_LINKS.open(\'' + id + '\')">' + window.AAUP_ICONS.preview('link', 13) + (rtl ? 'خطوط المتطلبات' : 'Prerequisite lines') + '</button>' +
         '</div>';
     }
     html += '</div>'; // closes .years
@@ -1430,11 +1489,23 @@
       window.AAUP_COMMUNITY.refreshAllCommunityBadges();
       if(window.AAUP_COMMUNITY.syncLive) window.AAUP_COMMUNITY.syncLive(id);
     }
+    // A course the student dropped out of their own plan (js/12-removed.js —
+    // placed out of Intermediate English, and so on) is marked by adding a
+    // class to its card. render() rebuilds every card from scratch, so that
+    // class has to be re-applied here or it survives exactly until the next
+    // tick of a checkbox. It never was, which meant removing a course from
+    // an imported plan appeared to work and silently came back — and every
+    // plan in the app is an imported plan.
+    if(window.__applyRemovedCourses){ window.__applyRemovedCourses(id); }
     if(window.__refreshCollapse){ window.__refreshCollapse(id); }
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }
-    if(window.__refreshFocusMode){ window.__refreshFocusMode(id); }
     if(window.__refreshPhoneHeader){ window.__refreshPhoneHeader(id); }
+    // Both read the freshly-rebuilt cards: which semester is current moves
+    // whenever a box is ticked, and the filter chips live inside the meter,
+    // which render() has just replaced along with everything else.
+    if(window.__refreshPlanFilter){ window.__refreshPlanFilter(id); }
+    if(window.__refreshYouAreHere){ window.__refreshYouAreHere(id); }
     if(window.__refreshTabBarProgress){ window.__refreshTabBarProgress(id); }
     // Runs against the freshly-rebuilt DOM. The first call per plan (on open)
     // silently seeds already-complete semesters; later ones (after a toggle
@@ -1496,16 +1567,28 @@
   // every interaction. Without this, a drag looked like it worked but
   // reverted the instant anything else re-rendered the view.
   function persistCourseMove(planId, slug, targetContainerId){
-    var m = /-y(\d+)-s(\d+)$/.exec(targetContainerId || '');
-    if(!m) return;
-    var yearId = 'y' + m[1], semester = 's' + m[2];
     var plans = loadImportedPlans();
     var p = plans[planId];
     if(!p) return;
     var course = (p.courses || []).filter(function(c){ return c.id === slug; })[0];
     if(!course) return;
-    course.yearId = yearId;
-    course.semester = semester;
+
+    // Dropped back on the elective pool: forget where it was placed and let
+    // it return to being one of the options.
+    if(/-elective-/.test(targetContainerId || '')){
+      delete course.placedByStudent;
+      saveImportedPlans(plans);
+      render(planId);
+      return;
+    }
+
+    var m = /-y(\d+)-s(\d+)$/.exec(targetContainerId || '');
+    if(!m) return;
+    course.yearId = 'y' + m[1];
+    course.semester = 's' + m[2];
+    // The student has now said when they take this one, so it stops being a
+    // pool option and starts being a course in that semester.
+    if(course.category === 'dept'){ course.placedByStudent = true; }
     saveImportedPlans(plans);
     render(planId);
   }
@@ -1704,7 +1787,7 @@
         encodeURIComponent(title) + '&body=' + encodeURIComponent(lines.join('\n'));
     }
     body.innerHTML =
-      '<h2 style="margin-top:0;">\ud83d\udce8 Thank you for contributing!</h2>' +
+      '<h2 style="margin-top:0;">' + window.AAUP_ICONS.preview('mail', 20) + ' Thank you for contributing!</h2>' +
       '<p style="font-size:13px;">Your plan\u2019s file was just downloaded.' +
       (issueUrl
         ? ' Open a submission issue below (the plan JSON is ' + (canPrefillIssue ? 'already filled in' : 'too big to prefill \u2014 attach the downloaded file there') + '), or send the <b>.json</b> file to the app maintainer any other way you reached this app.'
@@ -1890,10 +1973,17 @@
       }
 
       function rowHtml(c){
+        // The registration number, not the internal slug. Half these rows
+        // were printing things like "arabic-language" beside the name — an
+        // id this app made up, which means nothing to a student and nothing
+        // to the registrar either. Courses whose plan carries no number show
+        // just the hours rather than a placeholder dash.
+        var num = c.num && c.num !== '-' ? window.__escapeHtml(String(c.num)) + ' · ' : '';
         return '<div class="lib-row">' +
           '<span class="lib-row-name">' + window.__escapeHtml(c.name) +
-            ' <span class="lib-row-meta">' + c.slug + ' · ' + c.cr + 'H</span></span>' +
-          (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + c.slug + '">➕ Add</button>') +
+            ' <span class="lib-row-meta">' + num + c.cr + 'H</span></span>' +
+          (currentIsSame ? '' : '<button type="button" class="home-btn lib-add-btn" data-slug="' + window.__escapeHtml(c.slug) + '">' +
+            window.AAUP_ICONS.preview('plus', 13) + 'Add</button>') +
           '</div>';
       }
 
@@ -1921,7 +2011,7 @@
           return '<div class="lib-shelf' + (openAll ? ' lib-shelf-open' : '') + '">' +
             '<button type="button" class="lib-shelf-head" data-lib-shelf="' + id + '"' +
               ' aria-expanded="' + (openAll ? 'true' : 'false') + '" aria-controls="' + id + '">' +
-              '<span class="lib-shelf-chev" aria-hidden="true">\u203a</span>' +
+              '<span class="lib-shelf-chev" aria-hidden="true">' + window.AAUP_ICONS.preview('chevronRight', 14) + '</span>' +
               '<span class="lib-shelf-label">' + sh.label + '</span>' +
               '<span class="lib-shelf-count">' + sh.items.length + ' · ' + sh.hours + 'H</span>' +
             '</button>' +

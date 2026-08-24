@@ -29,20 +29,23 @@
     now:     { en: 'Now', ar: 'الآن' },
     ifThis:  { en: 'If this happens', ar: 'لو صار هيك' },
     noGpa:   { en: 'no grades yet', ar: 'ما في علامات بعد' },
-    retake:  { en: '🔁 Retake a course', ar: '🔁 إعادة مساق' },
+    retake:  { en: 'Retake a course', ar: 'إعادة مساق' },
+    retakeIcon: 'refresh',
     retakeLead: { en: 'Your graded courses, worst first. A retake’s grade replaces the original in the cumulative GPA.',
                ar: 'مساقاتك اللي إلها علامات، الأسوأ أولًا. علامة الإعادة بتحلّ محل الأصلية بالمعدل التراكمي.' },
-    next:    { en: '📚 Next semester', ar: '📚 الفصل القادم' },
+    next:    { en: 'Next semester', ar: 'الفصل القادم' },
+    nextIcon: 'book',
     nextLead:{ en: 'The courses in your semester plan. Give each one the grade you are aiming for.',
                ar: 'مساقات خطة فصلك. اعطِ كل واحد العلامة اللي بتستهدفها.' },
     nextEmpty:{ en: 'Nothing picked yet — build a semester in “Plan My Next Semester” and it shows up here.',
                ar: 'ما اخترت إشي — جهّز فصلك من «خطط لفصلي القادم» وبيظهر هون.' },
-    target:  { en: '🎯 Reach a GPA', ar: '🎯 توصل لمعدل' },
+    target:  { en: 'Reach a GPA', ar: 'توصل لمعدل' },
+    targetIcon: 'target',
     targetLead: { en: 'What you would have to average across the courses above to land on this.',
                ar: 'شو لازم يكون متوسطك بالمساقات فوق حتى توصل لهالرقم.' },
     keep:    { en: 'keep', ar: 'خليها' },
     nograde: { en: '— no grade —', ar: '— بلا علامة —' },
-    reset:   { en: '↺ Clear the scenario', ar: '↺ امسح التجربة' },
+    reset:   { en: 'Clear the scenario', ar: 'امسح التجربة' },
     counted: { en: '{n}H counted', ar: '{n} ساعة محسوبة' },
     needAvg: { en: 'You would need about a {g} average across those {n}H.',
                ar: 'بدك متوسط حوالي {g} على هالـ {n} ساعة.' },
@@ -185,7 +188,7 @@
     return '<div class="wi-head' + cls + '">' +
       '<div class="wi-fig"><span>' + t('now', rtl) + '</span><b>' + fmt(f.now.gpa) + '</b>' +
         '<small>' + t('counted', rtl).replace('{n}', f.now.credits) + '</small></div>' +
-      '<div class="wi-arrow" aria-hidden="true">' + (rtl ? '←' : '→') + '</div>' +
+      '<div class="wi-arrow' + (rtl ? ' wi-arrow-rtl' : '') + '" aria-hidden="true">' + window.AAUP_ICONS.preview('chevronRight', 18) + '</div>' +
       '<div class="wi-fig"><span>' + t('ifThis', rtl) + '</span><b>' + fmt(f.next.gpa) + '</b>' +
         '<small>' + (delta == null ? t('noGpa', rtl)
           : (delta >= 0 ? '+' : '') + delta.toFixed(2)) + '</small></div>' +
@@ -215,7 +218,7 @@
       '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('target', 20) + t('title', rtl) + '</h2>' +
       '<p class="form-note" style="margin-top:0;">' + t('lead', rtl) + '</p>' +
       '<div id="wiHead">' + headHtml(prefix, rtl) + '</div>' +
-      '<h3 class="wi-h3">' + t('retake', rtl) + '</h3>' +
+      '<h3 class="wi-h3">' + window.AAUP_ICONS.preview('refresh', 16) + t('retake', rtl) + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + t('retakeLead', rtl) + '</p>' +
       (graded.length
         ? '<div class="wi-list">' +
@@ -228,21 +231,21 @@
               '</button>'
             : '')
         : '<p class="wi-msg">' + t('noGpa', rtl) + '</p>') +
-      '<h3 class="wi-h3">' + t('next', rtl) + '</h3>' +
+      '<h3 class="wi-h3">' + window.AAUP_ICONS.preview('book', 16) + t('next', rtl) + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + t('nextLead', rtl) + '</p>' +
       (pl.length
         ? '<div class="wi-list">' + pl.map(function(c){
             return rowHtml(c, 'planned', planned[c.pid] || '', rtl, t('nograde', rtl));
           }).join('') + '</div>'
         : '<p class="wi-msg">' + t('nextEmpty', rtl) + '</p>') +
-      '<h3 class="wi-h3">' + t('target', rtl) + '</h3>' +
+      '<h3 class="wi-h3">' + window.AAUP_ICONS.preview('target', 16) + t('target', rtl) + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' + t('targetLead', rtl) + '</p>' +
       '<div class="wi-target">' +
         '<input type="number" id="wiTarget" min="0" max="4" step="0.05" value="' + target + '">' +
         '<div id="wiAdvice">' + targetAdvice(prefix, rtl) + '</div>' +
       '</div>' +
       '<div class="wi-actions"><button type="button" class="home-btn" id="wiReset">' +
-        t('reset', rtl) + '</button></div>';
+        window.AAUP_ICONS.preview('undo', 14) + t('reset', rtl) + '</button></div>';
 
     bindBody(prefix, rtl);
   }

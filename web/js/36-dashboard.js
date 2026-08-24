@@ -97,6 +97,16 @@
     // plan data these rules read has finished registering.
     if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
     if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.show(prefix, 'studyplan'); }
+    // Before the tour, and before anything else can be read as an answer:
+    // which English level this student was placed into decides how many
+    // hours their degree actually is (js/77-english-level.js). It asks once
+    // and only on a plan that has English levels in it; after that this is
+    // just re-applying an answer already given.
+    // Opening a plan starts it unfiltered — the filter is momentary by
+    // design, and a plan that opens already showing half its courses is the
+    // problem the old "Available only" switch created.
+    if(window.AAUP_PLAN_FILTER){ window.AAUP_PLAN_FILTER.reset(prefix); }
+    if(window.AAUP_ENGLISH){ window.AAUP_ENGLISH.ensure(prefix); }
     if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('studyplan'); }
   }
 
@@ -180,7 +190,7 @@
 
     var host = document.getElementById('dashboard');
     var html = '<div class="dash-header">' +
-      '<div class="dash-title"><span class="dash-icon">' + info.icon + '</span><div><h1>' + info.name + '</h1><p>' + (rtl ? 'لوحة التحكم' : 'Dashboard') + '</p></div></div>' +
+      '<div class="dash-title"><span class="dash-icon">' + window.AAUP_ICONS.markup(info, { size: 24 }) + '</span><div><h1>' + info.name + '</h1><p>' + (rtl ? 'لوحة التحكم' : 'Dashboard') + '</p></div></div>' +
       '<div class="dash-actions">' +
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.choosePlan()">' + window.AAUP_ICONS.preview('refresh', 14) + '<span>' + (rtl ? 'تبديل التخصص' : 'Switch Plan') + '</span></button>' +
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">' + window.AAUP_ICONS.preview('planpin', 14) + '<span>' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</span></button>' +
