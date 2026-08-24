@@ -129,12 +129,12 @@
         text: 'Courses whose prerequisites you have already ticked off — the answer to "what am I actually allowed to register for", with the reason attached to each one.' },
       { target: function(){ return firstVisible('#dashboard .dash-quicklink'); },
         title: 'Everything else',
-        text: 'Your path through the degree, the audit, achievements, next semester — all one tap from here.' },
+        text: 'The audit, achievements, sharing this plan — all one tap from here.' },
       { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-actions .home-btn'), 1); },
         title: 'My Study Plan',
         text: 'The whole course map: every year, its prerequisites, and where what you have finished slots in.' }
     ],
-    // Rebuilt against the plan page as it now is.    // Rebuilt against the plan page as it now is. Two of these steps used to
+    // Rebuilt against the plan page as it now is. Two of these steps used to
     // point at things that no longer exist, and three more pointed INTO a
     // year — which now starts folded, so their targets resolved to hidden
     // cards and the drop-if-hidden rule silently deleted them. That is why a
@@ -177,19 +177,9 @@
       { target: function(){ return document.querySelector('#sbTabBar [data-sb-tab="more"]') || document.querySelector('#sbTabBar .sb-tab:last-child'); },
         title: 'Everything else is in here',
         text: 'Your degree audit, achievements, what to take next, the course library — and Edit Mode at the very top, for changing the plan itself.' },
-      { target: function(){
-          var legend = visiblePlanRoot().querySelector('.legend');
-          // Once expanded, spotlight the whole panel (not just the header)
-          // so the newly-revealed colour key is inside the lit-up area
-          // instead of sitting in the dimmed backdrop underneath it.
-          return (legend && legend.classList.contains('expanded')) ? legend : visiblePlanRoot().querySelector('.legend-toggle');
-        },
-        title: 'Legend',
-        text: 'Every colour on this page means something — university requirement, elective, specialization course. Tap it to see which is which.',
-        interactive: true,
-        watchTarget: function(){ return visiblePlanRoot().querySelector('.legend'); },
-        interactionClass: 'expanded',
-        reflowDelay: 320 } // matches .legend-items' own max-height transition, so the panel has finished growing before it's measured
+      { target: function(){ return visiblePlanRoot().querySelector('.legend'); },
+        title: 'What the colours mean',
+        text: 'One swatch per requirement this degree counts — university, college, specialization, elective. The cards take their colour from it.' }
     ],
     // Edit Mode on a student's OWN custom/imported plan — no developer
     // password involved, since only its own creator can ever reach it (see

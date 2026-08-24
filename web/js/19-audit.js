@@ -289,10 +289,30 @@
       '</div>';
   }
 
-  function open(prefix){
+  // The audit and What-if are both about one number: where the GPA is, and
+  // where it would be. What-if used to be a menu row of its own; it is now
+  // this screen's other mode, drawn into the same body by AAUP_WHATIF.mount.
+  var mode = 'now';
+
+  function modeBarHtml(rtl){
+    if(!window.AAUP_WHATIF || !window.AAUP_WHATIF.mount) return '';
+    var tabs = [
+      ['now', rtl ? 'وين أنا' : 'Where I am'],
+      ['whatif', rtl ? 'ماذا لو…' : 'What if…']
+    ];
+    return '<div class="au-modes" role="group">' + tabs.map(function(pair){
+      var on = mode === pair[0];
+      return '<button type="button" class="au-mode' + (on ? ' au-mode-on' : '') +
+        '" data-au-mode="' + pair[0] + '" aria-pressed="' + (on ? 'true' : 'false') + '">' +
+        window.__escapeHtml(pair[1]) + '</button>';
+    }).join('') + '</div>';
+  }
+
+  function open(prefix, startMode){
     var body = document.getElementById('auditModalBody');
     var overlay = document.getElementById('auditModalOverlay');
     if(!body || !overlay) return;
+    if(startMode === 'now' || startMode === 'whatif'){ mode = startMode; }
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     // Planning status (in progress / planned) and a course's FIRST grade
     // still only come from that course's own info popup -- marking something
@@ -322,8 +342,18 @@
     // same screen, is not what was approved and reads as unfinished. If
     // that module is missing for any reason, the original three-card
     // summary is the fallback, not a blank space.
-    body.innerHTML =
-      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('clipboard', 20) + (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' +
+    var head = '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('clipboard', 20) +
+      (rtl ? 'التدقيق الأكاديمي والمعدل' : 'Degree Audit &amp; GPA') + '</h2>' + modeBarHtml(rtl);
+
+    if(mode === 'whatif'){
+      body.innerHTML = head + '<div id="auditWhatIfBody"></div>';
+      overlay.classList.add('open');
+      bindModes(prefix);
+      window.AAUP_WHATIF.mount(prefix, 'auditWhatIfBody');
+      return;
+    }
+
+    body.innerHTML = head +
       (studioNote ? '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' : '') +
       (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.layout(prefix, rtl) : renderGpaDashboard(prefix, rtl)) +
       // "What do I need to reach…" needs a current GPA to answer from. With
@@ -336,10 +366,24 @@
       renderSemesterGpas(prefix, rtl) +
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');
+    bindModes(prefix);
     if(window.AAUP_GPA_STUDIO) window.AAUP_GPA_STUDIO.bind(prefix, rtl);
     if(window.AAUP_GPA_TARGET && document.getElementById('auditGpaTargetBody')){
       window.AAUP_GPA_TARGET.render(prefix, 'auditGpaTargetBody', rtl);
     }
+  }
+
+  function bindModes(prefix){
+    var body = document.getElementById('auditModalBody');
+    if(!body) return;
+    body.querySelectorAll('[data-au-mode]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var m = b.getAttribute('data-au-mode');
+        if(m === mode) return;
+        mode = m;
+        open(prefix);
+      });
+    });
   }
 
   // Mirrors a real transcript's structure: each semester's own GPA (which

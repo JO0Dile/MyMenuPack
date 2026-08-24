@@ -50,7 +50,7 @@ OUT = REPO / 'web' / 'bundles'
 # original 00-70 numbering restricted to that group's files.
 GROUPS = {
     'core': [
-        '02-shared-cross.js', '04-icons.js', '10-progress-core.js', '11-module11.js',
+        '02-shared-cross.js', '04-icons.js', '09-language.js', '10-progress-core.js', '11-module11.js',
         '14-storage.js', '60-backbar.js', '70-skeleton.js', '71-qrcode.js',
     ],
     'shell': [
@@ -67,13 +67,13 @@ GROUPS = {
     'plan': [
         '03-search.js', '05-collapse-finished-years.js', '06-per.js',
         '07-plan-overview-print.js', '08-celebrations.js', '18-gpa.js', '19-audit.js',
-        '23-legend.js', '24-achievements.js', '25-advisor.js', '27-community.js',
+        '24-achievements.js', '25-advisor.js', '27-community.js',
         '28-imported.js', '36-dashboard.js', '49-course-detail.js', '50-whats-next.js',
-        '51-gpa-studio.js', '53-roadmap.js', '54-prereq-graph.js', '57-card-input.js',
+        '51-gpa-studio.js', '54-prereq-graph.js', '57-card-input.js',
         '62-change-plan.js', '63-whatif.js', '64-milestones.js',
         '66-graduation.js', '67-gpa-target.js', '69-phone-header.js', '72-share.js',
         '74-course-gestures.js', '75-about.js', '76-course-pairs.js', '77-english-level.js',
-        '78-you-are-here.js', '79-plan-filter.js',
+        '78-you-are-here.js', '79-plan-filter.js', '81-calendar.js', '82-follow.js',
     ],
     'server': [
         '30-sync.js', '31-collect.js', '41-assistant-kb.js', '42-assistant.js',

@@ -284,5 +284,7 @@
     }
   }
 
-  window.AAUP_GRADUATION = { render: render, title: function(rtl){ return t('title', rtl); } };
+  // Change Major measures "how much longer would this take" with the same
+  // load this estimate runs on, rather than picking a second number.
+  window.AAUP_GRADUATION = { render: render, loadFor: loadFor, title: function(rtl){ return t('title', rtl); } };
 })();

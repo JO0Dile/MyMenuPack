@@ -205,8 +205,15 @@
       '</label>';
   }
 
+  // Where this screen draws. Its own overlay when opened on its own, or the
+  // Degree Audit's body when the audit hosts it as a mode — see idea 17:
+  // what-if and the audit are both about one number, so what-if stopped
+  // being a destination of its own and became the audit's other mode.
+  var hostId = 'whatifBody';
+  var hosted = false;
+
   function render(prefix){
-    var body = document.getElementById('whatifBody');
+    var body = document.getElementById(hostId);
     if(!body) return;
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
@@ -214,8 +221,11 @@
     var pl = plannedCourses(prefix);
 
     body.innerHTML =
-      (window.__backBarHTML ? window.__backBarHTML('', 'whatifOverlay', rtl) : '') +
-      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('target', 20) + t('title', rtl) + '</h2>' +
+      // Hosted inside the audit, the back bar and the title belong to the
+      // screen around it; on its own it still carries both.
+      (hosted ? '' :
+        (window.__backBarHTML ? window.__backBarHTML('', 'whatifOverlay', rtl) : '') +
+        '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('target', 20) + t('title', rtl) + '</h2>') +
       '<p class="form-note" style="margin-top:0;">' + t('lead', rtl) + '</p>' +
       '<div id="wiHead">' + headHtml(prefix, rtl) + '</div>' +
       '<h3 class="wi-h3">' + window.AAUP_ICONS.preview('refresh', 16) + t('retake', rtl) + '</h3>' +
@@ -258,7 +268,7 @@
   }
 
   function bindBody(prefix, rtl){
-    var body = document.getElementById('whatifBody');
+    var body = document.getElementById(hostId);
     if(!body) return;
     body.querySelectorAll('.wi-sel').forEach(function(sel){
       sel.addEventListener('change', function(){
@@ -293,9 +303,20 @@
   function open(prefix){
     var overlay = document.getElementById('whatifOverlay');
     if(!overlay) return;
+    hostId = 'whatifBody'; hosted = false;
     if(current !== prefix){ retakes = {}; planned = {}; current = prefix; }
     render(prefix);
     overlay.classList.add('open');
+  }
+
+  // Draw the same screen into somebody else's element. The scenario (which
+  // retakes, which planned grades, the target) is the module's own state, so
+  // it survives switching back and forth between the audit's two modes.
+  function mount(prefix, elId){
+    if(!document.getElementById(elId)) return;
+    hostId = elId; hosted = true;
+    if(current !== prefix){ retakes = {}; planned = {}; current = prefix; }
+    render(prefix);
   }
 
   function bind(){
@@ -314,5 +335,5 @@
   if(document.readyState === 'complete'){ bind(); }
   else { window.addEventListener('load', bind); }
 
-  window.AAUP_WHATIF = { open: open };
+  window.AAUP_WHATIF = { open: open, mount: mount };
 })();

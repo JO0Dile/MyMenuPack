@@ -139,7 +139,41 @@
       ? 'حتى الآن: ' + t.sumScore + '/100 — تبقّى ' + t.remaining + ' للنهائي'
       : 'So far: ' + t.sumScore + '/100 — ' + t.remaining + ' left for the final');
 
-    var needItems = gradeTiersAscending(prefix, pid).map(function(tier){
+    // The question a student actually arrives with is "what do I need on the
+    // final", and the answer is two numbers: the mark that passes, and the
+    // best grade still within reach. Those led the list of every tier before
+    // this, which made the reader do the scanning.
+    var tiers = gradeTiersAscending(prefix, pid);
+    var lowest = tiers[0];
+    var reachable = null;
+    tiers.forEach(function(tier){
+      if(tier.min - t.sumScore <= t.remaining + 1e-9){ reachable = tier; }
+    });
+    var headRows = [];
+    if(lowest){
+      var passNeed = lowest.min - t.sumScore;
+      headRows.push([
+        (rtl ? 'للنجاح (' : 'To pass (') + lowest.min + ')',
+        passNeed <= 0 ? (rtl ? 'مضمون' : 'secured') : round1(passNeed) + '/' + t.remaining,
+        passNeed <= 0 ? 'as-ok' : ''
+      ]);
+    }
+    if(reachable && (!lowest || reachable.grade !== lowest.grade)){
+      var bestNeed = Math.max(0, reachable.min - t.sumScore);
+      headRows.push([
+        (rtl ? 'أفضل ما زال ممكنًا: ' : 'Best still reachable: ') + reachable.grade,
+        bestNeed <= 0 ? (rtl ? 'مضمون' : 'secured') : round1(bestNeed) + '/' + t.remaining,
+        bestNeed <= 0 ? 'as-ok' : ''
+      ]);
+    }
+    var headHtml = headRows.length
+      ? '<div class="as-need">' + headRows.map(function(row){
+          return '<div class="as-need-row"><span>' + esc(row[0]) + '</span>' +
+            '<b class="' + row[2] + '">' + esc(row[1]) + '</b></div>';
+        }).join('') + '</div>'
+      : '';
+
+    var needItems = tiers.map(function(tier){
       var needed = tier.min - t.sumScore;
       var status;
       if(needed <= 0){ status = rtl ? 'مضمونة ✓' : 'secured ✓'; }
@@ -164,11 +198,44 @@
     }
 
     return {
-      html: '<p class="assessment-total">' + esc(soFarText) + '</p>' +
+      html: headHtml +
+        '<p class="assessment-total">' + esc(soFarText) + '</p>' +
         '<ul class="assessment-need-list">' + needItems + '</ul>' +
         reverseHtml,
       letter: null
     };
+  }
+
+  function passMarkToggleHtml(scale, rtl){
+    return '<div class="pass-mark-toggle" id="passMarkToggle">' +
+      '<span class="pm-label">' + (rtl ? 'علامة النجاح' : 'Pass mark') + '</span>' +
+      '<button type="button" class="pm-btn' + (scale === 'engineering' ? ' active' : '') + '" data-scale="engineering">60 (' + (rtl ? 'هندسة' : 'Engineering') + ')</button>' +
+      '<button type="button" class="pm-btn' + (scale === 'ai' ? ' active' : '') + '" data-scale="ai">50 (' + (rtl ? 'ذكاء اصطناعي' : 'AI') + ')</button>' +
+      '</div>';
+  }
+
+  // One markup for the marks breakdown, used both while a course is running
+  // and once it is finished. showApply is the only difference: "use as my
+  // grade" needs a grade dropdown to write into, and there is not one until
+  // the course is done.
+  function assessmentBlockHtml(rows, summary, rtl, showApply){
+    return '<div class="assessment-breakdown" id="assessmentBreakdown">' +
+      '<div class="assessment-rows" id="assessmentRows">' + assessmentRowsHtml(rows, rtl) + '</div>' +
+      '<div class="assessment-quick-add" id="assessmentQuickAdd">' +
+        ASSESSMENT_PRESETS_EN.map(function(p){
+          return '<button type="button" class="aq-btn" data-preset="' + p + '">+ ' + (rtl ? ASSESSMENT_PRESETS_AR[p] : p) + '</button>';
+        }).join('') +
+        '<button type="button" class="aq-btn" data-preset="">+ ' + (rtl ? 'آخر' : 'Other') + '</button>' +
+      '</div>' +
+      '<div class="assessment-summary" id="assessmentSummary">' + summary.html + '</div>' +
+      (showApply
+        ? '<div class="assessment-total-row">' +
+            '<button type="button" class="aq-apply-btn" id="assessmentApplyBtn" style="display:' + (summary.letter ? 'inline-block' : 'none') + ';">' +
+              (rtl ? 'استخدمها كعلامتي ↑' : 'Use as my grade ↑') +
+            '</button>' +
+          '</div>'
+        : '') +
+      '</div>';
   }
 
   function render(prefix, slug){
@@ -269,30 +336,24 @@
       var summary = assessmentSummaryHtml(rows, prefix, pid, rtl, currentGrade || null);
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
         '<select class="grade-select" id="courseGradeSelect">' + opts + '</select>' +
-        '<div class="pass-mark-toggle" id="passMarkToggle">' +
-          '<span class="pm-label">' + (rtl ? 'علامة النجاح' : 'Pass mark') + '</span>' +
-          '<button type="button" class="pm-btn' + (scale === 'engineering' ? ' active' : '') + '" data-scale="engineering">60 (' + (rtl ? 'هندسة' : 'Engineering') + ')</button>' +
-          '<button type="button" class="pm-btn' + (scale === 'ai' ? ' active' : '') + '" data-scale="ai">50 (' + (rtl ? 'ذكاء اصطناعي' : 'AI') + ')</button>' +
-        '</div>' +
-        '<div class="assessment-breakdown" id="assessmentBreakdown">' +
-          '<div class="assessment-rows" id="assessmentRows">' + assessmentRowsHtml(rows, rtl) + '</div>' +
-          '<div class="assessment-quick-add" id="assessmentQuickAdd">' +
-            ASSESSMENT_PRESETS_EN.map(function(p){
-              return '<button type="button" class="aq-btn" data-preset="' + p + '">+ ' + (rtl ? ASSESSMENT_PRESETS_AR[p] : p) + '</button>';
-            }).join('') +
-            '<button type="button" class="aq-btn" data-preset="">+ ' + (rtl ? 'آخر' : 'Other') + '</button>' +
-          '</div>' +
-          '<div class="assessment-summary" id="assessmentSummary">' + summary.html + '</div>' +
-          '<div class="assessment-total-row">' +
-            '<button type="button" class="aq-apply-btn" id="assessmentApplyBtn" style="display:' + (summary.letter ? 'inline-block' : 'none') + ';">' +
-              (rtl ? 'استخدمها كعلامتي ↑' : 'Use as my grade ↑') +
-            '</button>' +
-          '</div>' +
-        '</div>' +
+        passMarkToggleHtml(scale, rtl) +
+        assessmentBlockHtml(rows, summary, rtl, true) +
         '</div>';
     } else {
+      // The marks calculator used to be locked behind "mark this course
+      // complete" — which is after the exam. "What do I need on the final"
+      // is asked in week eleven, so the breakdown is here for a course in
+      // progress too. The grade dropdown still is not: a letter only means
+      // something once the course is actually finished.
+      var scaleOpen = window.AAUP_GPA.numericScaleFor(prefix, pid);
+      var breakdownOpen = window.AAUP_GPA.loadAssessmentBreakdown();
+      var rowsOpen = breakdownOpen[pid] || [];
+      var summaryOpen = assessmentSummaryHtml(rowsOpen, prefix, pid, rtl, null);
       gradeHtml = '<div class="modal-row-block"><span class="k">' + (rtl ? 'العلامة' : 'Grade') + '</span>' +
-        '<p class="ex-note">' + (rtl ? 'أكمل هذا المساق أولًا لإدخال علامة.' : 'Mark this course complete to enter a grade.') + '</p></div>';
+        '<p class="ex-note">' + (rtl ? 'أكمل هذا المساق أولًا لإدخال علامة.' : 'Mark this course complete to enter a grade.') + '</p>' +
+        passMarkToggleHtml(scaleOpen, rtl) +
+        assessmentBlockHtml(rowsOpen, summaryOpen, rtl, false) +
+        '</div>';
     }
 
     var ratings = window.AAUP_PERSONAL.loadRatings();

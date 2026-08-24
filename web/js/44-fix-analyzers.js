@@ -173,7 +173,7 @@
     ['AAUP_DATA', '16-data.js'], ['AAUP_THEME', '17-theme.js'],
     ['AAUP_GPA', '18-gpa.js'], ['AAUP_AUDIT', '19-audit.js'],
     ['AAUP_PERSONAL', '20-personal.js'], ['AAUP_FEEDBACK', '22-feedback.js'],
-    ['AAUP_LEGEND', '23-legend.js'], ['AAUP_ACHIEVEMENTS', '24-achievements.js'],
+    ['AAUP_ACHIEVEMENTS', '24-achievements.js'],
     ['AAUP_ADVISOR', '25-advisor.js'], ['AAUP_DEV', '26-dev.js'],
     ['AAUP_COMMUNITY', '27-community.js'], ['AAUP_IMPORTED', '28-imported.js'],
     ['AAUP_HOME', '29-home.js'], ['AAUP_SYNC', '30-sync.js'],

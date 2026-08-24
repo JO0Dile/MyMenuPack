@@ -67,7 +67,7 @@
     // runs after every toggle, and stale ticks left over from a smaller
     // remaining-hours figure would sit at the wrong percentage.
     track.querySelectorAll(':scope > .pw-gate').forEach(function(el){ el.remove(); });
-    var oldCaption = widget.querySelector(':scope > .pw-gate-caption');
+    var oldCaption = widget.querySelector('.pw-gate-caption');
     if(oldCaption) oldCaption.remove();
 
     if(!data || !data.gates.length) return;   // nothing left to gate on — fully audited
@@ -85,16 +85,18 @@
     var nearest = data.gates[0];
     var label = window.AAUP_AUDIT.labelFor(prefix, nearest.cat);
     var catTxt = label ? (rtl ? label.ar : label.en) : nearest.cat;
-    var courseTxt = nearest.courseCount === 1
-      ? (rtl ? 'مساق واحد تقريبًا' : 'about one course')
-      : (rtl ? (nearest.courseCount + ' مساقات تقريبًا') : (nearest.courseCount + ' courses, roughly'));
+    // This used to be its own sentence under the meter: "6H to close out
+    // University Elective — that is 3 courses, roughly." The hours and the
+    // requirement are the answer; the rest was arithmetic the reader can do,
+    // in a sentence they read once. It now rides on the same line as the
+    // hours, which is where the eye already is.
     var hrs = Math.round(nearest.remaining * 10) / 10;
-    var caption = document.createElement('p');
+    var caption = document.createElement('span');
     caption.className = 'pw-gate-caption';
     caption.textContent = rtl
-      ? (hrs + ' ساعة حتى إغلاق «' + catTxt + '» — ' + courseTxt + '.')
-      : (hrs + 'H to close out ' + catTxt + ' — that is ' + courseTxt + '.');
-    widget.appendChild(caption);
+      ? ('· ' + hrs + ' ساعة حتى ' + catTxt)
+      : ('· ' + hrs + 'H to ' + catTxt);
+    (widget.querySelector('.pw-num') || widget).appendChild(caption);
   }
 
   window.__refreshMilestones = refresh;

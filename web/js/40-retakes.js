@@ -75,6 +75,15 @@
     var retakeAr = baseAr ? (baseAr + ' (إعادة)') : '';
     var m = /-y(\d+)-s(\d+)$/.exec(targetRow.id || '');
 
+    // Recorded BEFORE the plan is re-rendered below: the cards read this map
+    // to mark which attempt was replaced and which one counts, and writing it
+    // afterwards meant the original card only picked that up on some later
+    // re-render.
+    var all = loadRetakes();
+    all[prefix] = all[prefix] || {};
+    all[prefix][slug] = retakeSlug;
+    saveRetakes(all);
+
     var isImported = !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
     if(isImported && m){
       // Imported plans fully re-render their DOM from p.courses[] on every
@@ -130,11 +139,6 @@
       }
       if(window.__injectCheckboxes){ window.__injectCheckboxes(); }
     }
-
-    var all = loadRetakes();
-    all[prefix] = all[prefix] || {};
-    all[prefix][slug] = retakeSlug;
-    saveRetakes(all);
 
     if(window.__showToast){ window.__showToast('\u21bb Auto-scheduled a retake of "' + baseName + '" next semester.'); }
   }

@@ -40,38 +40,38 @@
   // are chosen, at the top of the menu, and the plan page is left showing
   // the plan.
   var ITEMS = [
-    { key: 'edit', icon: 'pen', label: 'Edit Mode', group: null, planOnly: true,
+    { key: 'edit', icon: 'pen', label: 'Edit Mode', ar: 'وضع التعديل', group: null, planOnly: true,
       action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.toggleEdit(prefix); } },
-    { key: 'dashboard', icon: 'home', label: 'Dashboard', group: null, action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
-    { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', group: 'plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'roadmap', icon: 'compass', label: 'My Path', group: 'plan', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
-    { key: 'audit', icon: 'clipboard', label: 'Degree Audit & GPA', group: 'plan', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
-    // Sits with the GPA screen it plays with, not at the bottom of the
-    // list: a student opens the audit, sees a number they do not like,
-    // and the next thing they want is right there.
-    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', group: 'plan', advanced: true, action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
-    { key: 'achievements', icon: 'trophy', label: 'Achievements', group: 'plan', advanced: true, action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
-    { key: 'advisor', icon: 'brain', label: 'Plan My Next Semester', group: 'plan', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
-    { key: 'overview', icon: 'printer', label: 'Overview & Print', group: 'plan', advanced: true, action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
+    { key: 'dashboard', icon: 'home', label: 'Dashboard', ar: 'لوحة التحكم', group: null, action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', ar: 'خطتي الدراسية', group: 'plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    // Four rows left this list, each into the screen that was already
+    // answering the same question:
+    //   My Path            -> requirement chips on the plan's own filter
+    //   What if… (GPA)     -> the Degree Audit's second mode
+    //   Plan My Next Sem.  -> under "You are here" on the plan
+    //   Overview & Print   -> Share this plan, as the third way out
+    { key: 'audit', icon: 'clipboard', label: 'Degree Audit & GPA', ar: 'التدقيق والمعدل', group: 'plan', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
+    { key: 'achievements', icon: 'trophy', label: 'Achievements', ar: 'الإنجازات', group: 'plan', advanced: true, action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
     // The one place in the app where students talk to each other rather than
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
-    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
-    { key: 'contacts', icon: 'people', label: 'Contacts', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
-    // Not the same thing as "Switch Plan" at the bottom, which only reopens
-    // the picker. This one answers the question first: what happens to my
-    // progress if I move?
-    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', advanced: true, action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } },
+    { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', ar: 'أفكار الطلبة', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
+    { key: 'contacts', icon: 'people', label: 'Contacts', ar: 'جهات الاتصال', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
     // These two also came off the plan header. Neither is an everyday
     // action, so they land in Advanced rather than the top list — but they
     // do land somewhere: a control that is removed from one surface and
     // added to no other is just deleted.
-    { key: 'export', icon: 'download', label: 'Export Plan', group: 'account', advanced: true, planOnly: true,
+    { key: 'export', icon: 'download', label: 'Export Plan', ar: 'تصدير الخطة', group: 'account', advanced: true, planOnly: true,
       action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.exportPlan(prefix); } },
-    { key: 'contribute', icon: 'mail', label: 'Contribute This Plan', group: 'account', advanced: true, planOnly: true,
+    { key: 'contribute', icon: 'mail', label: 'Contribute This Plan', ar: 'إرسال هذه الخطة', group: 'account', advanced: true, planOnly: true,
       action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.submitPlan(prefix); } }
   ];
   var GROUP_LABELS = { plan: 'Plan', community: 'Community', account: 'Account' };
+  var GROUP_LABELS_AR = { plan: 'الخطة', community: 'المجتمع', account: 'الحساب' };
+  // Language is one app-wide setting (js/09-language.js). The menu was the
+  // last thing still written only in English while the plan beside it was in
+  // Arabic — which is most of what "one switch, everywhere" was about.
+  function ar(){ return !!(window.AAUP_LANG && window.AAUP_LANG.isAr()); }
 
   // Edit Mode, Export and Contribute all act on an imported plan through
   // AAUP_IMPORTED. A built-in major has none of those, so the rows are not
@@ -87,11 +87,49 @@
   // The one row whose label depends on what the page is currently doing:
   // pressed once it says how to leave again.
   function labelFor(item, prefix){
-    if(item.key === 'edit' && isEditing(prefix)) return 'Exit Edit Mode';
-    return item.label;
+    var arabic = ar();
+    if(item.key === 'edit' && isEditing(prefix)) return arabic ? 'إنهاء التعديل' : 'Exit Edit Mode';
+    return (arabic && item.ar) ? item.ar : item.label;
+  }
+
+  // "Change Major" and "Switch Plan" were two rows that both changed which
+  // plan you are on. They are one row now, and it asks which — moving major
+  // (what carries over, what it costs) or opening one of your own saved
+  // plans — instead of making the student pick the right row for a
+  // difference the labels never explained.
+  function openPlanChooser(prefix){
+    var overlay = document.getElementById('devModalOverlay');
+    var body = document.getElementById('devModalBody');
+    if(!overlay || !body || !window.AAUP_CHANGE_PLAN){
+      window.AAUP_DASHBOARD.choosePlan();
+      return;
+    }
+    var saved = window.AAUP_IMPORTED ? Object.keys(window.AAUP_IMPORTED.loadImportedPlans() || {}).length : 0;
+    var r = ar();
+    body.innerHTML =
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('shuffle', 20) + (r ? 'تغيير الخطة' : 'Change plan') + '</h2>' +
+      '<div class="cp-choice"' + (r ? ' dir="rtl"' : '') + '>' +
+        '<button type="button" class="cp-choice-btn" id="cpMajor">' +
+          '<span class="cp-choice-icon">' + window.AAUP_ICONS.preview('compass', 20) + '</span>' +
+          '<span class="cp-choice-text"><b>' + (r ? 'الانتقال لتخصص ثاني' : 'Move to another major') + '</b>' +
+          '<span>' + (r ? 'شو بينحسب إلك وشو بتخسر' : 'What carries over, what it costs') + '</span></span></button>' +
+        '<button type="button" class="cp-choice-btn" id="cpSwitch">' +
+          '<span class="cp-choice-icon">' + window.AAUP_ICONS.preview('refresh', 20) + '</span>' +
+          '<span class="cp-choice-text"><b>' + (r ? 'افتح خطة ثانية' : 'Open another plan') + '</b>' +
+          '<span>' + (saved ? saved + (r ? ' محفوظة · كل التخصصات' : ' saved · all majors') : (r ? 'كل التخصصات' : 'All majors')) + '</span></span></button>' +
+      '</div>';
+    overlay.classList.add('open');
+    var close = function(){ overlay.classList.remove('open'); };
+    document.getElementById('cpMajor').addEventListener('click', function(){
+      close(); window.AAUP_CHANGE_PLAN.open(prefix);
+    });
+    document.getElementById('cpSwitch').addEventListener('click', function(){
+      close(); window.AAUP_DASHBOARD.choosePlan();
+    });
   }
 
   var currentPrefix = null;
+  var activeKeyNow = null;
 
   // ---------------------------------------------------------------------
   // ADVANCED
@@ -136,7 +174,7 @@
       '" id="sbAdvancedToggle-' + variant + '" aria-expanded="' + (expanded ? 'true' : 'false') +
       '" aria-controls="sbAdvancedPanel-' + variant + '">' +
       '<span class="sb-icon">' + window.AAUP_ICONS.preview('menu', 16) + '</span>' +
-      '<span class="sb-adv-label">Advanced</span>' +
+      '<span class="sb-adv-label">' + (ar() ? 'متقدم' : 'Advanced') + '</span>' +
       '<span class="sb-adv-count">' + count + '</span>' +
       '<span class="sb-adv-chevron" aria-hidden="true">' + window.AAUP_ICONS.preview(expanded ? 'chevronUp' : 'chevron', 15) + '</span></button>';
   }
@@ -161,10 +199,10 @@
       else soloItems.push(item);
     });
     if(hasLibrary){
-      adv.push({ key: 'library', icon: 'book', label: 'Course Library' });
+      adv.push({ key: 'library', icon: 'book', label: 'Course Library', ar: 'مكتبة المساقات' });
     }
-    byGroup.account.push({ key: 'settings', icon: 'gear', label: 'Settings' });
-    byGroup.account.push({ key: 'switch', icon: 'refresh', label: 'Switch Plan' });
+    byGroup.account.push({ key: 'settings', icon: 'gear', label: 'Settings', ar: 'الإعدادات' });
+    byGroup.account.push({ key: 'switch', icon: 'shuffle', label: 'Change plan', ar: 'تغيير الخطة' });
 
     function rowHtml(item){
       return '<button type="button" class="sb-mrow' + (item.key === activeKey ? ' active' : '') +
@@ -176,7 +214,7 @@
     function groupHtml(key){
       var items = byGroup[key];
       if(!items.length) return '';
-      return '<div class="sb-group-label">' + GROUP_LABELS[key] + '</div>' +
+      return '<div class="sb-group-label">' + (ar() ? GROUP_LABELS_AR[key] : GROUP_LABELS[key]) + '</div>' +
         '<div class="sb-group">' + items.map(rowHtml).join('') + '</div>';
     }
     // Dashboard has no group (it is the app's own Home tab, duplicated here
@@ -211,7 +249,7 @@
         '<span class="sb-icon">' + window.AAUP_ICONS.preview(item.icon, 16) + '</span><span>' + labelFor(item, prefix) + '</span></button>';
     }
     var advItems = itemsFor(prefix).filter(function(i){ return i.advanced; });
-    if(hasLibrary){ advItems = advItems.concat([{ key: 'library', icon: 'book', label: 'Course Library' }]); }
+    if(hasLibrary){ advItems = advItems.concat([{ key: 'library', icon: 'book', label: 'Course Library', ar: 'مكتبة المساقات' }]); }
     var advExpanded = advancedExpanded(activeKey);
 
     html += '<div class="sb-flat-list">';
@@ -223,8 +261,8 @@
         '<div class="sb-adv-panel" id="sbAdvancedPanel-flat"' + (advExpanded ? '' : ' hidden') + '>' +
           advItems.map(itemHtml).join('') + '</div>';
     }
-    html += '<button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>Settings</span></button>' +
-      '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('refresh', 16) + '</span><span>Switch Plan</span></button></div>';
+    html += '<button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>' + (ar() ? 'الإعدادات' : 'Settings') + '</span></button>' +
+      '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('shuffle', 16) + '</span><span>' + (ar() ? 'تغيير الخطة' : 'Change plan') + '</span></button></div>';
     html += '</div>';
     html += '<div class="sb-groups">' + moreGroupsHtml(prefix, activeKey, hasLibrary) + '</div>';
     sidebar.innerHTML = html;
@@ -261,7 +299,7 @@
         // tapped. Read before closeMobile() clears .open below.
         var openedFromMoreDrawer = sidebar.classList.contains('open');
         closeMobile();
-        if(key === 'switch'){ window.AAUP_DASHBOARD.choosePlan(); return; }
+        if(key === 'switch'){ openPlanChooser(prefix); return; }
         if(key === 'settings'){ openSettings(); tagOpenedFromMore(openedFromMoreDrawer); return; }
         if(key === 'library'){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.openLibrary(prefix); tagOpenedFromMore(openedFromMoreDrawer); return; }
         var item = itemsFor(prefix).filter(function(i){ return i.key === key; })[0];
@@ -323,6 +361,7 @@
   else { window.addEventListener('load', watchMoreReturn); }
 
   function setActive(key){
+    activeKeyNow = key;
     var sidebar = document.getElementById('appSidebar');
     if(!sidebar) return;
     sidebar.querySelectorAll('.sb-item').forEach(function(el){
@@ -332,6 +371,7 @@
 
   function show(prefix, activeKey){
     currentPrefix = prefix;
+    activeKeyNow = activeKey;
     render(prefix, activeKey);
     document.getElementById('appSidebar').style.display = 'flex';
     document.getElementById('sbToggleBtn').style.display = '';
@@ -458,9 +498,12 @@
   function accountTabHtml(r, current, others){
     return (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
       '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('person', 18) + (r ? 'ملفات هذا الجهاز' : 'Device Profiles') + '</h3>' +
+      // A row that needs a paragraph under it is usually a badly named row.
+      // The distinction worth keeping — these never leave the device — fits
+      // in the line itself.
       '<p class="form-note" style="margin-top:0;">' + (r
-        ? 'مختلف عن المزامنة السحابية أعلاه: كل ملف هنا يبقى على هذا الجهاز فقط ولا يُزامَن — مفيد إذا كان أكثر من شخص يشارك هذا الجهاز، أو أردت ملفًا محليًا ثانيًا.'
-        : 'Different from Cloud Sync above: each profile here stays on this device only and is never synced anywhere — useful if more than one person shares this device, or you want a second local profile of your own.') + '</p>' +
+        ? 'تبقى على هذا الجهاز ولا تُزامَن.'
+        : 'Stay on this device. Never synced.') + '</p>' +
       '<p style="font-size:12.5px;">' + (r ? 'الحساب الحالي: ' : 'Current account: ') + '<b>' + window.__escapeHtml(current) + '</b></p>' +
       (others.length
         ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">' +
@@ -501,10 +544,9 @@
   function sizePickerHtml(r){
     if(!window.AAUP_THEME || !window.AAUP_THEME.sizes) return '';
     var current = window.AAUP_THEME.currentSize();
-    return '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('textsize', 18) + (r ? 'حجم النص' : 'Reading size') + '</h3>' +
-      '<p class="form-note" style="margin-top:0;">' +
-      (r ? 'يكبّر بطاقات المساقات في الخطة الدراسية.' : 'Makes the course cards in the study plan bigger or tighter.') +
-      '</p>' +
+    // Named for what it changes, so it no longer needs a line saying so.
+    return '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('textsize', 18) +
+      (r ? 'حجم بطاقات المساقات' : 'Course card size') + '</h3>' +
       '<div class="size-picker" role="group" aria-label="' + (r ? 'حجم النص' : 'Reading size') + '">' +
       window.AAUP_THEME.sizes().map(function(sz){
         var active = sz.id === current;
@@ -526,8 +568,8 @@
       ? '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('language', 18) +
           (r ? 'مستوى الإنجليزي' : 'English level') + '</h3>' +
         '<p class="form-note" style="margin-top:0;">' + (r
-          ? 'المستويات اللي تحت مستواك بتطلع من خطتك وبتوقف تظهر كمساقات باقية عليك. مجموع ساعات التخصص المنشور ما بتغيّر.'
-          : 'The levels below yours leave your plan and stop showing as courses you still owe. Your degree’s published total is unchanged.') + '</p>' +
+          ? 'المستويات اللي تحت مستواك بتطلع من خطتك. المجموع المنشور ما بيتغيّر.'
+          : 'Levels below yours leave your plan. The published total is unchanged.') + '</p>' +
         '<p style="font-size:12.5px;margin:6px 0 8px;">' + (r ? 'مستواك: ' : 'Placed at: ') +
           '<b>' + window.__escapeHtml(engLabel) + '</b></p>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
@@ -548,7 +590,7 @@
       '</div>' +
       (window.APP_PLANS_FEED_URL ? (
         '<h3 class="mh" style="margin:18px 0 6px;">' + window.AAUP_ICONS.preview('globe', 18) + (r ? 'الخطط عبر الإنترنت' : 'Online Plans') + '</h3>' +
-        '<p class="form-note" style="margin-top:0;">' + (r ? 'يجلب الخطط الرسمية الجديدة والمحدَّثة عندما تكون متصلًا بالإنترنت. لا يُستبدَل أبدًا أي شيء عدّلته بنفسك.' : 'Pulls in new and updated official study plans when you’re online. Anything you’ve personally edited is never overwritten.') + '</p>' +
+        '<p class="form-note" style="margin-top:0;">' + (r ? 'الخطط الرسمية الجديدة والمحدَّثة. تعديلاتك ما بتنمسح.' : 'New and updated official plans. Your own edits are never overwritten.') + '</p>' +
         '<div class="form-actions" style="justify-content:flex-start;">' +
         '<button type="button" class="home-btn" id="setSyncBtn">' + window.AAUP_ICONS.preview('refresh', 14) + (r ? 'التحقق من التحديثات' : 'Check for updates') + '</button>' +
         '</div>' +
@@ -806,7 +848,13 @@
     if(overlay && overlay.classList.contains('open')) overlay.classList.remove('open');
   });
 
-  window.AAUP_SIDEBAR = { show: show, hide: hide, setActive: setActive, toggleMobile: toggleMobile, closeMobile: closeMobile, openSettings: openSettings };
+  // Redraws the menu in place — used when the app-wide language flips
+  // (js/09-language.js), since every row here is written in one of them.
+  function refresh(){
+    if(currentPrefix) render(currentPrefix, activeKeyNow);
+  }
+
+  window.AAUP_SIDEBAR = { show: show, hide: hide, setActive: setActive, toggleMobile: toggleMobile, closeMobile: closeMobile, openSettings: openSettings, refresh: refresh, openPlanChooser: openPlanChooser };
   // Called from js/28-imported.js's own post-render hook chain (same one
   // js/69-phone-header.js's refresh already sits in) so the tab bar's
   // progress badge updates the moment a course gets checked, not only the
