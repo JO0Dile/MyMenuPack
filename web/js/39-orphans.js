@@ -196,8 +196,8 @@
     announced = true;
     var rtl = document.body.classList.contains('rtl-mode');
     var msg = rtl
-      ? ('⚠️ لديك بيانات على ' + n + ' مساق لم تعد موجودة في خطتك المحدّثة — لم نحذف شيئًا.')
-      : ('⚠️ You have saved data on ' + n + ' course' + (n === 1 ? '' : 's') + ' that your updated plan no longer has — nothing was deleted.');
+      ? ('لديك بيانات على ' + n + ' مساق لم تعد موجودة في خطتك المحدّثة — لم نحذف شيئًا.')
+      : ('You have saved data on ' + n + ' course' + (n === 1 ? '' : 's') + ' that your updated plan no longer has — nothing was deleted.');
     var label = rtl ? 'مراجعة' : 'Review';
     var openSettings = function(){
       if(window.AAUP_SIDEBAR && window.AAUP_SIDEBAR.openSettings){ window.AAUP_SIDEBAR.openSettings(); }
