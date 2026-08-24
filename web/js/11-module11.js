@@ -701,7 +701,12 @@
   function showConfirmDialog(message, onConfirm, rtl, onCancel){
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay open';
-    overlay.style.zIndex = '999';
+    // Above every other layer, not below them. At 999 this sat one below
+    // .modal-overlay's own 1000, so a confirm raised from inside a modal —
+    // "Remove" in the leftover-data review, "Remove course" in edit mode,
+    // "Reset all data" in Settings — opened behind the screen that raised it
+    // and could be neither seen nor clicked. The button looked dead.
+    overlay.style.zIndex = '1500';
 
     var card = document.createElement('div');
     card.className = 'modal-card';
