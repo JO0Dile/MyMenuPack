@@ -314,27 +314,16 @@
     if(!body || !overlay) return;
     if(startMode === 'now' || startMode === 'whatif'){ mode = startMode; }
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
-    // Planning status (in progress / planned) and a course's FIRST grade
-    // still only come from that course's own info popup -- marking something
-    // done and picking its assessment marks is a bigger action than belongs
-    // in a summary table. Once a grade exists, though, js/51-gpa-studio.js
-    // gives a second place to correct it, writing the exact same stored
-    // value -- so the sentence below only claims what is still actually true.
-    // Two sentences of instructions about editing grades, above a screen
-    // with no grades on it, was the first thing a new student met here. The
-    // empty state already says where grades come from and gives a button to
-    // get there, so with none entered this line says nothing twice — it is
-    // only shown once there is actually something below to edit.
+    // The sentence that used to sit here explained which screen set a grade
+    // and which screen edited one. It was true, and it only had to exist
+    // because the two screens did different things: the course popup was the
+    // only place a FIRST grade could be entered, and the table below only
+    // edited grades that already existed. They do the same thing now
+    // (js/51-gpa-studio.js lists every finished course, graded or not), so
+    // there is nothing left to explain and the table's own cells are the
+    // answer.
     var anyGrades = !window.AAUP_GPA_STUDIO || !window.AAUP_GPA_STUDIO.hasGrades ||
                     window.AAUP_GPA_STUDIO.hasGrades(prefix);
-    var studioNote = !anyGrades ? ''
-      : window.AAUP_GPA_STUDIO
-      ? (rtl
-          ? 'حالة التخطيط والعلامة الأولى تُحدَّدان من نافذة كل مساق؛ يمكنك تعديل العلامات المُدخلة من الجدول أدناه مباشرة.'
-          : 'Planning status and a course\u2019s first grade are set from that course\u2019s own info popup; grades already entered can be edited directly below.')
-      : (rtl
-          ? 'العلامات وحالة التخطيط (قيد الإنجاز / مخطط له) تُحدَّد من نافذة كل مساق.'
-          : 'Grades and planning status (in progress / planned) are set from each course\u2019s own info popup.');
 
     // The dial-and-table layout (js/51-gpa-studio.js) replaces the old flat
     // row of three cards outright rather than sitting next to it — showing
@@ -354,7 +343,6 @@
     }
 
     body.innerHTML = head +
-      (studioNote ? '<p style="font-size:12px;color:var(--text-dim);margin-top:-8px;">' + studioNote + '</p>' : '') +
       (window.AAUP_GPA_STUDIO ? window.AAUP_GPA_STUDIO.layout(prefix, rtl) : renderGpaDashboard(prefix, rtl)) +
       // "What do I need to reach…" needs a current GPA to answer from. With
       // none it printed its heading over the words "No grades yet." — a
