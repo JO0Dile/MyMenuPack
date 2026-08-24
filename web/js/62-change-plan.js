@@ -30,8 +30,10 @@
     title:    { en: 'Change Major', ar: 'تغيير التخصص' },
     lead:     { en: 'See what happens to your progress before you switch. Nothing changes until you press the button at the end — and your current plan is kept either way, so you can switch back.',
                 ar: 'شوف شو بصير بتقدّمك قبل ما تبدّل. ما بتغيّر إشي إلا لما تضغط الزر بالآخر — وخطتك الحالية بتضل محفوظة، فبتقدر ترجعلها.' },
-    caveat:   { en: 'Courses are matched by catalogue number. What the university actually accepts is the registrar’s decision, not this app’s.',
-                ar: 'المطابقة بتصير حسب رقم المساق. اللي بتقبله الجامعة فعليًا قرار التسجيل، مش قرار هذا التطبيق.' },
+    // Two sentences saying one thing, next to a screen whose own numbers
+    // already frame it as an estimate. Same claim, half the words.
+    caveat:   { en: 'Matched by course number. The registrar decides.',
+                ar: 'المطابقة حسب رقم المساق. القرار للتسجيل.' },
     current:  { en: 'You are on', ar: 'خطتك الحالية' },
     pick:     { en: 'Switch to', ar: 'التبديل إلى' },
     transfers:{ en: 'carries over', ar: 'بينتقل معك' },

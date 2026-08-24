@@ -411,7 +411,7 @@
   function removeYear(planId, yearId){
     withPlan(planId, function(p, plans){
       if(yearCourseCount(p, yearId) > 0){
-        if(window.__showToast){ window.__showToast('🚫 This year still has courses in it — remove or move them first.'); }
+        if(window.__showToast){ window.__showToast('🚫 Year not empty — move its courses first'); }
         return;
       }
       p.structure.years = p.structure.years.filter(function(y){ return y.id !== yearId; });
@@ -431,7 +431,7 @@
   function removeSummer(planId, yearId){
     withPlan(planId, function(p, plans){
       if(yearCourseCount(p, yearId, 's3') > 0){
-        if(window.__showToast){ window.__showToast('🚫 This summer still has courses in it — remove or move them first.'); }
+        if(window.__showToast){ window.__showToast('🚫 Summer not empty — move its courses first'); }
         return;
       }
       var y = p.structure.years.filter(function(yy){ return yy.id === yearId; })[0];
@@ -2087,7 +2087,7 @@
       // app's own Fix analyzer flags exactly this for <a target="_blank">, so
       // the same standard applies here.
       window.open(window.APP_SUBMIT_URL, '_blank', 'noopener');
-      if(window.__showToast){ window.__showToast('\ud83d\udce8 Your plan file just downloaded \u2014 attach it in the form that opened.'); }
+      if(window.__showToast){ window.__showToast('\ud83d\udce8 Downloaded \u2014 attach it in the form that opened'); }
       return;
     }
     var overlay = document.getElementById('devModalOverlay');
@@ -2141,7 +2141,7 @@
     a.click();
     a.remove();
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-    if(window.__showToast){ window.__showToast('📤 Exported — share this file, or paste its contents into Import Study Plan.'); }
+    if(window.__showToast){ window.__showToast('📤 Exported — the file is in your downloads'); }
   }
 
   function confirmDelete(id){

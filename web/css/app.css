@@ -3391,7 +3391,6 @@
   .ct-empty{font-size:12.5px;color:var(--text-dim);margin-top:10px;}
 
   /* ---------- when do I graduate (js/66-graduation.js) ---------- */
-  .grad-explain{margin:0 0 10px;font-size:11.5px;line-height:1.5;color:var(--text-dim);}
   .grad-msg{font-size:12.5px;color:var(--text-dim);margin:0;}
   .grad-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
   .grad-load-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);}
@@ -3413,10 +3412,17 @@
   .grad-dot-mark{width:10px;height:10px;border-radius:50%;background:var(--line);border:2px solid var(--surface-bg);}
   .grad-dot-now .grad-dot-mark{background:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);}
   .grad-dot-end .grad-dot-mark{background:var(--unlock);}
+  /* Only the two ends carry a label; the empty ones in between must not
+     stretch the flex row, so the text can overflow its own dot. */
   .grad-dot-label{font-size:9.5px;color:var(--text-dim);text-align:center;white-space:nowrap;}
+  .grad-dot:first-child .grad-dot-label{text-align:start;}
+  .grad-dot:last-child .grad-dot-label{text-align:end;}
   .grad-dot-now .grad-dot-label{color:var(--accent);font-weight:700;}
-  .grad-finish{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .grad-finish span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);}
+  /* The date the card exists to give, now the first thing in it. */
+  .grad-finish{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  /* Direct child only: the years hint is a span too, nested inside the <b>,
+     and the eyebrow's uppercase was leaking onto it. */
+  .grad-finish > span{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);}
   .grad-finish b{font-size:17px;font-weight:800;color:var(--unlock);}
   .grad-years-hint{font-size:12px;font-weight:700;color:var(--text-dim);}
   .grad-note{margin:10px 0 0;font-size:12px;line-height:1.6;color:var(--text-dim);}

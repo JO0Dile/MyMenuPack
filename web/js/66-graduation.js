@@ -140,8 +140,12 @@
 
   var TX = {
     title: { en: 'When do I graduate?', ar: 'متى أتخرّج؟' },
-    explain: { en: 'Two things decide this date: how many hours you take each term, and how many semesters your remaining prerequisites still need to unlock — whichever takes longer wins.',
-               ar: 'شيئان يحددان هذا التاريخ: كم ساعة تأخذ كل فصل، وكم فصل لسا محتاجه سلسلة المتطلبات المتبقية لتنفتح — الأطول منهما هو اللي يحسم.' },
+    // The paragraph that used to open this card explained that two things
+    // decide the date — your load, and how long the prerequisite chain takes
+    // — and that the longer of the two wins. The slider under the headline
+    // demonstrates exactly that in one drag, and the note under it already
+    // names WHICH of the two is setting this particular date. So the general
+    // statement is gone and the specific one stayed.
     load: { en: 'Load per semester', ar: 'الحمل لكل فصل' },
     finish: { en: 'Projected finish', ar: 'الإنهاء المتوقع' },
     sems: { en: '{n} more semester', ar: '{n} فصل إضافي' },
@@ -149,10 +153,10 @@
     hereNow: { en: 'you are here', ar: 'أنت هنا' },
     caveat: { en: 'An estimate: this app does not know your real enrollment date — it assumes a normal Fall/Spring pace starting today.',
               ar: 'تقدير: التطبيق ما بيعرف تاريخ تسجيلك الحقيقي — بيفترض إيقاع خريف/ربيع عادي ابتداءً من اليوم.' },
-    bound: { en: 'Raising your load will not move this date. {chain} has to happen one course after the other, and that alone takes {n} semesters — {term} is the earliest this can finish.',
-             ar: 'زيادة حملك لن يقرّب هذا التاريخ. {chain} لازم يصير مساق بعد التاني، وهذا وحده بياخذ {n} فصول — {term} هو أقرب موعد ممكن للتخرج.' },
-    pace: { en: 'Your course load is what is setting this date — raise it above {load}H and you could finish sooner.',
-            ar: 'حملك الدراسي هو اللي يحدد هذا التاريخ — زوّده فوق {load} ساعة ورح تخلص أبكر.' },
+    bound: { en: 'Prerequisites, not your load: {chain} takes {n} semesters on its own.',
+             ar: 'المتطلبات، مش حملك: {chain} لحاله بياخذ {n} فصول.' },
+    pace: { en: 'Your load sets this date — above {load}H you finish sooner.',
+            ar: 'حملك هو اللي يحدد التاريخ — فوق {load} ساعة بتخلص أبكر.' },
     done: { en: 'Nothing left to plan for — every course is done.', ar: 'ما بقي إشي تخطط له — كل المساقات منجزة.' },
     years1: { en: '(≈1 year)', ar: '(≈سنة)' },
     yearsN: { en: '(≈{n} years)', ar: '(≈{n} سنوات)' },
@@ -215,10 +219,16 @@
     var DOT_COUNT = Math.min(6, semesters + 1);
     for(var i = 0; i < DOT_COUNT; i++){
       var termAt = i === 0 ? currentTerm() : stepForward(currentTerm(), i);
-      var cls = i === 0 ? ' grad-dot-now' : (i === semesters ? ' grad-dot-end' : '');
+      var isNow = i === 0, isEnd = i === semesters;
+      var cls = isNow ? ' grad-dot-now' : (isEnd ? ' grad-dot-end' : '');
+      // Only the two ends are labelled. Six "Spring 2027 / Fall 2027 /
+      // Spring 2028…" labels across a phone's width ran into one another
+      // and read as a single word; the terms between here and the finish
+      // are the regular Fall/Spring sequence the two ends already imply.
+      var label = isNow ? t('hereNow', rtl) : (isEnd ? termLabel(termAt, rtl) : '');
       dotsHtml += '<span class="grad-dot' + cls + '">' +
         '<span class="grad-dot-mark"></span>' +
-        '<span class="grad-dot-label">' + (i === 0 ? t('hereNow', rtl) : termLabel(termAt, rtl)) + '</span>' +
+        '<span class="grad-dot-label">' + label + '</span>' +
         '</span>';
     }
 
@@ -232,14 +242,9 @@
     if(rtl) chainSlice = chainSlice.slice().reverse();
     var chainNames = chainSlice.join(arrow);
 
+    // The answer first, then the one control that changes it. The old order
+    // put a paragraph and a slider above the date the card exists to give.
     host.innerHTML =
-      '<p class="grad-explain">' + t('explain', rtl) + '</p>' +
-      '<div class="grad-head">' +
-        '<span class="grad-load-label">' + t('load', rtl) + '</span>' +
-        '<span class="grad-load-val" id="' + hostId + 'LoadVal">' + load + 'H</span>' +
-      '</div>' +
-      '<input type="range" id="' + hostId + 'Slider" class="grad-slider" min="9" max="21" step="1" value="' + load + '">' +
-      '<div class="grad-dots">' + dotsHtml + '</div>' +
       '<div class="grad-finish">' +
         '<span>' + t('finish', rtl) + '</span>' +
         '<b>' + termLabel(finish, rtl) + ' · ' +
@@ -247,6 +252,12 @@
           ' <span class="grad-years-hint">' + yearsHint(semesters, rtl) + '</span>' +
         '</b>' +
       '</div>' +
+      '<div class="grad-head">' +
+        '<span class="grad-load-label">' + t('load', rtl) + '</span>' +
+        '<span class="grad-load-val" id="' + hostId + 'LoadVal">' + load + 'H</span>' +
+      '</div>' +
+      '<input type="range" id="' + hostId + 'Slider" class="grad-slider" min="9" max="21" step="1" value="' + load + '">' +
+      '<div class="grad-dots">' + dotsHtml + '</div>' +
       (chainBinding
         ? '<p class="grad-note grad-note-bound">' + t('bound', rtl)
             .replace('{load}', load).replace('{term}', termLabel(finish, rtl))
