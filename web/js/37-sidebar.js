@@ -61,10 +61,14 @@
     // action, so they land in Advanced rather than the top list — but they
     // do land somewhere: a control that is removed from one surface and
     // added to no other is just deleted.
-    { key: 'export', icon: 'download', label: 'Export Plan', ar: 'تصدير الخطة', group: 'account', advanced: true, planOnly: true,
-      action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.exportPlan(prefix); } },
-    { key: 'contribute', icon: 'mail', label: 'Contribute This Plan', ar: 'إرسال هذه الخطة', group: 'account', advanced: true, planOnly: true,
-      action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.submitPlan(prefix); } }
+    // "Export Plan" and "Contribute This Plan" were two rows that both send
+    // this plan somewhere — one to a file on your device, one to the person
+    // who maintains the catalogue. The labels named the mechanism, not the
+    // destination, so picking between them meant already knowing what each
+    // one did. One row now, and it asks where. Same pattern as the plan
+    // chooser above, and for the same reason.
+    { key: 'send', icon: 'download', label: 'Send this plan', ar: 'إرسال هذه الخطة', group: 'account', advanced: true, planOnly: true,
+      action: function(prefix){ openSendChooser(prefix); } }
   ];
   var GROUP_LABELS = { plan: 'Plan', community: 'Community', account: 'Account' };
   var GROUP_LABELS_AR = { plan: 'الخطة', community: 'المجتمع', account: 'الحساب' };
@@ -125,6 +129,37 @@
     });
     document.getElementById('cpSwitch').addEventListener('click', function(){
       close(); window.AAUP_DASHBOARD.choosePlan();
+    });
+  }
+
+  // The two destinations behind the one "Send this plan" row.
+  function openSendChooser(prefix){
+    var overlay = document.getElementById('devModalOverlay');
+    var body = document.getElementById('devModalBody');
+    if(!overlay || !body || !window.AAUP_IMPORTED){
+      if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.exportPlan(prefix);
+      return;
+    }
+    var r = ar();
+    body.innerHTML =
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('download', 20) + (r ? 'إرسال هذه الخطة' : 'Send this plan') + '</h2>' +
+      '<div class="cp-choice"' + (r ? ' dir="rtl"' : '') + '>' +
+        '<button type="button" class="cp-choice-btn" id="spFile">' +
+          '<span class="cp-choice-icon">' + window.AAUP_ICONS.preview('download', 20) + '</span>' +
+          '<span class="cp-choice-text"><b>' + (r ? 'إلى ملف' : 'To a file') + '</b>' +
+          '<span>' + (r ? 'ينزل على جهازك — للنسخ الاحتياطي أو للمشاركة' : 'Downloads to your device — to keep or to pass on') + '</span></span></button>' +
+        '<button type="button" class="cp-choice-btn" id="spMaintainer">' +
+          '<span class="cp-choice-icon">' + window.AAUP_ICONS.preview('mail', 20) + '</span>' +
+          '<span class="cp-choice-text"><b>' + (r ? 'إلى القائم على التطبيق' : 'To the maintainer') + '</b>' +
+          '<span>' + (r ? 'لإضافتها للخطط الجاهزة' : 'To be added to the built-in plans') + '</span></span></button>' +
+      '</div>';
+    overlay.classList.add('open');
+    var close = function(){ overlay.classList.remove('open'); };
+    document.getElementById('spFile').addEventListener('click', function(){
+      close(); window.AAUP_IMPORTED.exportPlan(prefix);
+    });
+    document.getElementById('spMaintainer').addEventListener('click', function(){
+      close(); window.AAUP_IMPORTED.submitPlan(prefix);
     });
   }
 
@@ -487,13 +522,19 @@
   // modal session (every action here re-renders to reflect its own result,
   // e.g. toggling the theme), so acting on something never bounces the
   // student back to the first tab.
+  //
+  // Account and Data were two of those tabs, and they were the same
+  // question asked twice: where does my progress live. Cloud Sync sat on
+  // Account, Export/Import sat on Data, device profiles sat on Account, and
+  // a student looking for either one had to guess which word the app had
+  // filed it under. They are one tab now — My data — with the same sections
+  // in the same order, cloud first and the local copies under it.
   var SETTINGS_TABS = [
-    { key: 'account', iconKey: 'person', en: 'Account', ar: 'الحساب' },
+    { key: 'mydata', iconKey: 'save', en: 'My data', ar: 'بياناتي' },
     { key: 'prefs', iconKey: 'palette', en: 'Preferences', ar: 'التفضيلات' },
-    { key: 'data', iconKey: 'save', en: 'Data', ar: 'البيانات' },
     { key: 'help', iconKey: 'help', en: 'Help', ar: 'مساعدة' }
   ];
-  var activeSettingsTab = 'account';
+  var activeSettingsTab = 'mydata';
 
   function accountTabHtml(r, current, others){
     return (window.AAUP_CLOUD ? window.AAUP_CLOUD.sectionHtml(r) : '') +
@@ -649,9 +690,10 @@
     body.setAttribute('dir', r ? 'rtl' : 'ltr');
 
     var tabContent = activeSettingsTab === 'prefs' ? prefsTabHtml(r, selectedPlan, isRtlNow)
-      : activeSettingsTab === 'data' ? dataTabHtml(r, devUnlocked)
       : activeSettingsTab === 'help' ? helpTabHtml(r, selectedPlan, isImportedSelected, devUnlocked)
-      : accountTabHtml(r, current, others);
+      // Both halves of the old Account and Data tabs, in one scroll: where
+      // your progress lives online, then the copies of it on this device.
+      : (accountTabHtml(r, current, others) + dataTabHtml(r, devUnlocked));
 
     body.innerHTML =
       '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('gear', 20) + (r ? 'الإعدادات' : 'Settings') + '</h2>' +

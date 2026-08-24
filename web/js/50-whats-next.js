@@ -57,7 +57,8 @@
       doNextAdd: 'Show me why',
       oweDept: function(n){ return 'You still need ' + n + ' more department elective hours.'; },
       oweFree: function(n){ return 'You still owe ' + n + ' free elective hours.'; },
-      deadEnds: function(n){ return n + ' unlocked course' + (n === 1 ? '' : 's') + ' nothing depends on — fit in anytime.'; }
+      deadEnds: function(n){ return n + ' unlocked course' + (n === 1 ? '' : 's') + ' nothing depends on — fit in anytime.'; },
+      onPlan: 'See the rest on your plan'
     },
     ar: {
       empty: 'لا توجد مساقات جديدة متاحة الآن — أكمل بعض المتطلبات السابقة أولاً.',
@@ -80,7 +81,8 @@
       doNextAdd: 'اعرض السبب',
       oweDept: function(n){ return 'ما زلت بحاجة إلى ' + n + ' ساعة تخصص اختياري إضافية.'; },
       oweFree: function(n){ return 'ما زلت مديناً بـ ' + n + ' ساعة متطلب حر.'; },
-      deadEnds: function(n){ return n + ' مساقاً آخر متاحاً لا ينتظره أي مساق آخر — مناسب لأخذه في أي وقت يناسبك.'; }
+      deadEnds: function(n){ return n + ' مساقاً آخر متاحاً لا ينتظره أي مساق آخر — مناسب لأخذه في أي وقت يناسبك.'; },
+      onPlan: 'اعرض الباقي على خطتك'
     }
   };
 
@@ -279,7 +281,16 @@
   // choosing a plan — has its OWN "What Can I Take Next" card with a
   // different id, and calls this directly rather than through the sidebar
   // hook below. Same function, same data, two mount points.
-  function render(prefix, containerId){
+  // mode 'lead' renders only the single strongest recommendation, the two
+  // collapsed panels, and a way onto the plan. The full ranked list — three
+  // cards plus the chips — is what the plan already shows under "You are
+  // here" (js/78-you-are-here.js) and what Plan My Next Semester shows in
+  // full, so the Dashboard had it a third time. It does not any more: it
+  // answers the question in one line and points at the screen where the
+  // answer is acted on. The panels stay here because this is the only place
+  // they exist.
+  function render(prefix, containerId, mode){
+    var lead_only = mode === 'lead';
     var body = document.getElementById(containerId || (prefix + '-nextCoursesBody'));
     if(!body) return;
     var rtl = isRtl(prefix);
@@ -311,16 +322,18 @@
         '<span class="wn-lead-cta">' + esc(t.doNextAdd) + window.AAUP_ICONS.preview('chevronRight', 13) + '</span>' +
         '</button>';
     }
-    html += '<div class="wn-cards">' +
-      top.map(function(c, i){ return cardHTML(c, rtl, t, i); }).join('') + '</div>';
+    if(!lead_only){
+      html += '<div class="wn-cards">' +
+        top.map(function(c, i){ return cardHTML(c, rtl, t, i); }).join('') + '</div>';
 
-    if(rest.length){
-      html += '<div class="next-courses-list wn-rest">' +
-        rest.map(function(c){ return chipHTML(c, rtl); }).join('') + '</div>';
-    }
-    var overflow = all.length - list.length;
-    if(overflow > 0){
-      html += '<p class="ncp-empty" style="margin-top:8px;">' + esc(t.more(overflow)) + '</p>';
+      if(rest.length){
+        html += '<div class="next-courses-list wn-rest">' +
+          rest.map(function(c){ return chipHTML(c, rtl); }).join('') + '</div>';
+      }
+      var overflow = all.length - list.length;
+      if(overflow > 0){
+        html += '<p class="ncp-empty" style="margin-top:8px;">' + esc(t.more(overflow)) + '</p>';
+      }
     }
 
     // Both cards only mean something once there is a real total to compare
@@ -333,7 +346,19 @@
         '</div>';
     }
 
+    if(lead_only){
+      html += '<button type="button" class="home-btn wn-on-plan" data-wn-on-plan>' +
+        esc(t.onPlan) + window.AAUP_ICONS.preview('chevronRight', 13) + '</button>';
+    }
+
     body.innerHTML = html;
+
+    var onPlanBtn = body.querySelector('[data-wn-on-plan]');
+    if(onPlanBtn){
+      onPlanBtn.addEventListener('click', function(){
+        if(window.AAUP_DASHBOARD) window.AAUP_DASHBOARD.openStudyPlan(prefix);
+      });
+    }
 
     body.querySelectorAll('[data-wn-panel] > .wn-lbl').forEach(function(head){
       head.addEventListener('click', function(){

@@ -4557,6 +4557,9 @@
   .wn-lead-cr{font-size:12px;font-weight:700;color:var(--accent);}
   .wn-lead-why{display:block;font-size:12.5px;color:var(--text-dim);margin-top:5px;line-height:1.5;}
   .wn-lead-cta{display:inline-block;margin-top:8px;font-size:12px;font-weight:800;color:var(--accent);}
+  /* The way out of the Dashboard's one-line answer and onto the plan, where
+     the full ranked list lives (js/50-whats-next.js, 'lead' mode). */
+  .wn-on-plan{margin-top:12px; width:100%; justify-content:center;}
 
   /* ---------- Back bar (js/60-backbar.js) ----------
      Phones already turn a dialog into a page with a back arrow; this is the
