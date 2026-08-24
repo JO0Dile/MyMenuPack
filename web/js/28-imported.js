@@ -1097,8 +1097,15 @@
     var avail = isAvailable(planId, c.id);
     var editing = document.getElementById('page-' + planId) && document.getElementById('page-' + planId).classList.contains('editing');
     var bucket = bucketOf(c);
+    // A retake replaces the original in the degree totals (js/40-retakes.js),
+    // and the original stays on the plan carrying the grade that no longer
+    // counts. Neither card said which was which, so a student looked at two
+    // cards for one course with no way to tell the live one from the dead
+    // one. Both say so now.
+    var superseded = !!(window.__isSupersededByRetake && window.__isSupersededByRetake(planId, c.id));
     var cls = 'course ' + visualClassFor(c) + (bucket ? ' req-' + bucket : '') +
-      (done ? ' completed' : '') + (avail || done ? ' available' : '') + (c.isRetake ? ' retake-course' : '');
+      (done ? ' completed' : '') + (avail || done ? ' available' : '') +
+      (c.isRetake ? ' retake-course' : '') + (superseded ? ' course-superseded' : '');
     var displayName = (rtl && c.ar) ? c.ar : c.name;
     // The old quick "📊 set grade" shortcut for a done course is retired —
     // it shared the same top-right corner as the new checkbox and would
@@ -1152,6 +1159,18 @@
     metaParts.push('<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>');
     if(!done && !avail){
       metaParts.push('<span class="cm-status cm-locked">' + window.__escapeHtml(lockTx) + '</span>');
+    }
+    if(superseded || c.isRetake){
+      var gr = '';
+      try{
+        var grades = window.AAUP_GPA ? window.AAUP_GPA.loadGrades() : {};
+        gr = grades[fullId(planId, c.id)] || '';
+      }catch(e){ gr = ''; }
+      var attemptTx = superseded
+        ? (gr ? gr + ' · ' : '') + (rtl ? 'مستبدَل' : 'replaced')
+        : (rtl ? 'المحسوب' : 'counts');
+      metaParts.push('<span class="cm-attempt' + (superseded ? ' cm-replaced' : ' cm-counts') + '">' +
+        window.__escapeHtml(attemptTx) + '</span>');
     }
     var meta = metaParts.join('<span class="cm-sep"> · </span>');
     // Focusable so the plan can be worked from a keyboard: the card itself is
