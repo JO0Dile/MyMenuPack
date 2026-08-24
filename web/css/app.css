@@ -1362,6 +1362,60 @@
 
   .misc{background:var(--misc);color:var(--misc-tx);}
 
+  /* The plan's own blurb, folded. Open it and it reads as it always did. */
+  .imp-about{
+    margin:0 0 12px; border:1px solid var(--line); border-radius:10px;
+    background:var(--panel); overflow:hidden;
+  }
+  .imp-about > summary{
+    list-style:none; cursor:pointer; padding:9px 14px;
+    font-size:12.5px; font-weight:700; color:var(--text-dim);
+    display:flex; align-items:center; gap:8px;
+  }
+  .imp-about > summary::-webkit-details-marker{display:none;}
+  .imp-about > summary::after{
+    content:'›'; margin-inline-start:auto; font-size:16px; line-height:1;
+    transition:transform .18s ease;
+  }
+  .imp-about[open] > summary::after{transform:rotate(90deg);}
+  .imp-about > summary:hover{color:var(--text);}
+  .imp-about > p{
+    margin:0; padding:0 14px 12px; font-size:12px; line-height:1.6;
+    color:var(--text-dim);
+  }
+  @media (prefers-reduced-motion:reduce){ .imp-about > summary::after{transition:none;} }
+
+  /* ---------- one card treatment, every width ----------
+     The desktop filled the whole card with the requirement colour while the
+     phone drew a panel with a coloured edge: same plan, two looks, and the
+     filled one is where a long name, a grade and a "needs…" line all have to
+     fight the background for contrast. The phone's card is the one that won.
+     Sizing stays per-breakpoint; only the look is shared. */
+  .course{
+    background:var(--panel); color:var(--text);
+    border:none; border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,.2);
+  }
+  .course.core, .course.skills, .course.math, .course.dept, .course.eng,
+  .course.uni, .course.free, .course.misc, .course.intern, .course.summer,
+  .course.completed{background:var(--panel); color:var(--text);}
+  .course::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+    border-radius:4px 0 0 4px; background:var(--core);
+  }
+  .plan-page.rtl-mode .course::before,
+  .sheet.rtl-mode .course::before{left:auto; right:0; border-radius:0 4px 4px 0;}
+  .course.core::before{background:var(--core);}
+  .course.skills::before{background:var(--skills);}
+  .course.math::before{background:var(--math);}
+  .course.dept::before{background:var(--dept);}
+  .course.eng::before{background:var(--eng);}
+  .course.uni::before{background:var(--uni);}
+  .course.free::before{background:var(--free);}
+  .course.misc::before{background:var(--misc);}
+  .course.intern::before{background:var(--intern);}
+  .course.summer::before{background:var(--summer);}
+
   /* A course the student removed from their own plan (e.g. tested out of
      Intermediate English, or placed straight into Advanced). Hidden from the
      grid and skipped by every count via .course[id]:not(.course-removed). */
@@ -4438,7 +4492,10 @@
   .course-meta{
     font-size:calc(10px * var(--card-scale, 1));
     margin-top:3px;line-height:1.35;font-weight:600;
-    color:rgba(255,255,255,.92);
+    /* Was a hardcoded near-white, from when a card was a block of colour with
+       white ink on it. The card is a panel now, at every width, so the meta
+       line takes the theme's dim ink like every other secondary line. */
+    color:var(--text-dim);
     /* One line, always. The line can now carry a prerequisite's full name on
        a locked card, and left to wrap it made those cards two rows taller
        than the ones beside them. */
@@ -4452,7 +4509,7 @@
   /* The separator's own spaces are trimmed away by flex, so the gap is a
      margin rather than the " · " it is written as. */
   .course-meta .cm-sep{margin:0 4px;}
-  .course.completed .course-meta{color:rgba(255,255,255,.9);}
+  .course.completed .course-meta{color:var(--text-dim);}
 
   /* The card is a real button now, so it needs a real focus ring. */
   .course:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
@@ -6946,40 +7003,13 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 
   .course{
     flex:1 1 calc(50% - 4px); max-width:none; min-width:0; min-height:auto;
-    background:var(--panel); border:none; border-radius:12px;
     padding:8px 11px 8px 11px;
-    box-shadow:0 3px 10px rgba(0,0,0,.2);
   }
   @media (max-width:359px){
     .course{flex:1 1 100%;}
   }
   .plan-page.rtl-mode .course,
   .sheet.rtl-mode .course{padding:8px 11px 8px 11px;}
-  .course::before{
-    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
-    border-radius:4px 0 0 4px; background:var(--core);
-  }
-  .plan-page.rtl-mode .course::before,
-  .sheet.rtl-mode .course::before{left:auto; right:0; border-radius:0 4px 4px 0;}
-  .course.core::before{background:var(--core);}
-  .course.skills::before{background:var(--skills);}
-  .course.math::before{background:var(--math);}
-  .course.dept::before{background:var(--dept);}
-  .course.eng::before{background:var(--eng);}
-  .course.uni::before{background:var(--uni);}
-  .course.free::before{background:var(--free);}
-  .course.misc::before{background:var(--misc);}
-  .course.intern::before{background:var(--intern);}
-  .course.summer::before{background:var(--summer);}
-  /* Undoes the full-colour fill (.core/.skills/etc are also bare classes —
-     see line ~1189 — so a .course carrying one of them matched that rule
-     too; a compound selector here just needs to be more specific, which
-     two classes always is over one, regardless of file position). */
-  .course.core, .course.skills, .course.math, .course.dept, .course.eng,
-  .course.uni, .course.free, .course.misc, .course.intern, .course.summer{
-    background:var(--panel); color:var(--text);
-  }
-  .course.completed{background:var(--panel);}
 
   /* Two-up means half the width, so the name gets two lines rather than
      being cut off at one, and the checkbox moves in to buy them back. */
@@ -7243,6 +7273,13 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 /* Requirement chips carry the colour their cards carry, so the chip and what
    it reveals are recognisably the same thing. */
 .pf-req{display:inline-flex;align-items:center;gap:6px;}
+/* The chip says how many it would show. Dim, and tabular, so a row of chips
+   reads as labels with counts rather than as two competing numbers. */
+.pf-count{
+  margin-inline-start:6px; font-size:10.5px; font-weight:700;
+  color:var(--text-dim); font-variant-numeric:tabular-nums;
+}
+.pf-chip.pf-on .pf-count{color:inherit; opacity:.75;}
 .pf-swatch{width:9px;height:9px;border-radius:2px;flex:none;}
 .pf-div{
   flex:none;width:1px;align-self:stretch;margin:3px 2px;

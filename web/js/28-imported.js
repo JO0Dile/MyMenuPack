@@ -1144,9 +1144,18 @@
     var yearTx = yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum)
       : (rtl ? 'اختياري' : 'Elective');
     var partOfPair = !!(continuations && continuations[c.id]);
+    // The grade is entered on this card, stored against this card and counted
+    // in the GPA — and then was not shown on it. It rides with the hours,
+    // which is the other number a finished course still has to say.
+    var gr = '';
+    try{
+      var grades = window.AAUP_GPA ? window.AAUP_GPA.loadGrades() : {};
+      gr = grades[fullId(planId, c.id)] || '';
+    }catch(e){ gr = ''; }
     var hoursTx = partOfPair
       ? (rtl ? 'ضمن ' + c.creditHours + ' ساعات' : 'part of ' + c.creditHours + 'H')
       : c.creditHours + 'H';
+    if(done && gr && !superseded){ hoursTx += ' · ' + gr; }
     // Each part in its own span so the phone layout can drop the year: a
     // card sitting inside a block headed "Year 1" does not need to say
     // "Year 1" as well, and at half width that repetition is what pushes the
@@ -1161,11 +1170,6 @@
       metaParts.push('<span class="cm-status cm-locked">' + window.__escapeHtml(lockTx) + '</span>');
     }
     if(superseded || c.isRetake){
-      var gr = '';
-      try{
-        var grades = window.AAUP_GPA ? window.AAUP_GPA.loadGrades() : {};
-        gr = grades[fullId(planId, c.id)] || '';
-      }catch(e){ gr = ''; }
       var attemptTx = superseded
         ? (gr ? gr + ' · ' : '') + (rtl ? 'مستبدَل' : 'replaced')
         : (rtl ? 'المحسوب' : 'counts');
@@ -1584,7 +1588,14 @@
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
       '<div class="imp-body-pad">' +
-      (bioEn ? '<p class="imp-bio-text" style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
+      // Six lines of mission statement sat between the search box and the
+      // meter, on every plan, and it is read once. Folded behind one row —
+      // nothing is lost, and the hours it quotes are on the title above and
+      // in the Degree Audit's own table.
+      (bioEn
+        ? '<details class="imp-about"><summary>' + (rtl ? 'عن هذه الخطة' : 'About this plan') + '</summary>' +
+          '<p>' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p></details>'
+        : '') +
       // "48 / 129H completed (37%)" — the bar underneath is the percentage,
       // and "completed" is what a progress meter means. What is left is the
       // two numbers, plus (from js/64-milestones.js, which appends into this

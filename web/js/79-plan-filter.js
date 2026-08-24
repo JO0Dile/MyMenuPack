@@ -135,15 +135,26 @@
     var rtl = rtlFor(prefix);
     var buckets = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.bucketsInPlan)
       ? window.AAUP_IMPORTED.bucketsInPlan(prefix) : [];
+    // How many each chip would show. The count was already being computed —
+    // the empty state uses it — and without it on the chip the only way to
+    // find out whether "Locked" has anything in it is to press it.
+    function countOf(sel){ return page.querySelectorAll(sel).length; }
+    var counts = {
+      all: countOf('.course[id]:not(.course-removed)'),
+      avail: countOf(MATCH.avail), locked: countOf(MATCH.locked), done: countOf(MATCH.done)
+    };
+    function chipLabel(text, n){
+      return window.__escapeHtml(text) + '<span class="pf-count">' + n + '</span>';
+    }
     bar.innerHTML = MODES.map(function(m){
       return '<button type="button" class="pf-chip" data-pf="' + m + '" aria-pressed="false">' +
-        window.__escapeHtml(t[m]) + '</button>';
+        chipLabel(t[m], counts[m]) + '</button>';
     }).join('') +
       (buckets.length ? '<span class="pf-div" aria-hidden="true"></span>' : '') +
       buckets.map(function(b){
         return '<button type="button" class="pf-chip pf-req" data-pf="' + REQ_PREFIX + b.key + '" aria-pressed="false">' +
           '<span class="pf-swatch ' + b.cls + '"></span>' +
-          window.__escapeHtml(rtl ? b.ar : b.en) + '</button>';
+          chipLabel(rtl ? b.ar : b.en, countOf('.course.req-' + b.key + ':not(.course-removed)')) + '</button>';
       }).join('');
     meter.appendChild(bar);
     // Bound to the plan root, not the chip bar: the "show everything" button
