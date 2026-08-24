@@ -102,6 +102,10 @@
     // hours their degree actually is (js/77-english-level.js). It asks once
     // and only on a plan that has English levels in it; after that this is
     // just re-applying an answer already given.
+    // Opening a plan starts it unfiltered — the filter is momentary by
+    // design, and a plan that opens already showing half its courses is the
+    // problem the old "Available only" switch created.
+    if(window.AAUP_PLAN_FILTER){ window.AAUP_PLAN_FILTER.reset(prefix); }
     if(window.AAUP_ENGLISH){ window.AAUP_ENGLISH.ensure(prefix); }
     if(window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('studyplan'); }
   }

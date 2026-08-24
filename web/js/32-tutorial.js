@@ -144,13 +144,15 @@
     // puts the screen into the state it is about to describe instead of
     // skipping past whatever is not already showing.
     studyplan: [
-      { target: function(){ return visiblePlanRoot().querySelector('.imp-year-toggle'); },
-        title: 'Your plan, folded',
-        text: 'Every year starts closed, so the whole degree fits on one screen. Each bar says how far through that year you are. Tap Year 1 to open it — Next is waiting whenever you are.',
-        interactive: true,
-        watchTarget: function(){ return visiblePlanRoot().querySelector('.imp-year-block'); },
-        interactionClass: 'year-peek',
-        reflowDelay: 220 },
+      { target: function(){ return visiblePlanRoot().querySelector('.now-tag') || visiblePlanRoot().querySelector('.imp-year-toggle'); },
+        title: 'You are here',
+        text: 'The plan opens on the semester you are in and marks it. Everything ahead of it is folded away, one bar per year, each saying how far through it you are.' },
+      { target: function(){
+          var blocks = visiblePlanRoot().querySelectorAll('.imp-year-block.year-collapsed .imp-year-toggle');
+          return blocks[0] || visiblePlanRoot().querySelector('.imp-year-toggle');
+        },
+        title: 'Open a year',
+        text: 'Tap a folded year to see inside it. Hold it instead, and everything you cannot take yet fades — what stays lit is what is open to you today.' },
       { prepare: openFirstYear,
         target: function(){ return visiblePlanRoot().querySelector('.imp-year-body .course'); },
         title: 'Courses',
@@ -160,9 +162,9 @@
         title: 'What connects to what',
         text: 'Press and hold a course. What it needs first lights up in one colour, what it opens up in another. Go ahead, try it.',
         interactive: true },
-      { target: function(){ return visiblePlanRoot().querySelector('.imp-year-toggle'); },
-        title: 'What can I take right now?',
-        text: 'Hold the words "Year 1" instead of tapping them, and everything in that year you cannot take yet fades back. What stays lit is what is open to you today.' },
+      { target: function(){ return visiblePlanRoot().querySelector('.pf-bar'); },
+        title: 'Ask the whole plan',
+        text: 'These filter every year at once — the years with nothing matching drop out entirely. They live in the hours bar, so they are still there when you are four years down the page.' },
       { target: function(){ return visiblePlanRoot().querySelector('.progress-widget'); },
         title: 'Where you are',
         text: 'Hours done out of hours needed, and which requirement is closest to being finished. Scroll down and it comes with you, shrinking out of the way.' },

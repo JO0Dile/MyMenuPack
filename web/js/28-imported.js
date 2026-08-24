@@ -1501,6 +1501,11 @@
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }
     if(window.__refreshPhoneHeader){ window.__refreshPhoneHeader(id); }
+    // Both read the freshly-rebuilt cards: which semester is current moves
+    // whenever a box is ticked, and the filter chips live inside the meter,
+    // which render() has just replaced along with everything else.
+    if(window.__refreshPlanFilter){ window.__refreshPlanFilter(id); }
+    if(window.__refreshYouAreHere){ window.__refreshYouAreHere(id); }
     if(window.__refreshTabBarProgress){ window.__refreshTabBarProgress(id); }
     // Runs against the freshly-rebuilt DOM. The first call per plan (on open)
     // silently seeds already-complete semesters; later ones (after a toggle

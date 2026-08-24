@@ -6973,3 +6973,105 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
   .eng-opt{transition:none;}
   .eng-opt:active{transform:none;}
 }
+
+/* ==========================================================================
+   YOU ARE HERE (js/78-you-are-here.js)
+
+   One semester on a five-year map is the one you are in. Marking it is the
+   difference between a plan you read and a plan you have to orient yourself
+   in first. The accent rail runs the height of the semester so it is
+   findable while scrolling past, not just at its heading. */
+.imp-semester-block.sem-now{
+  border-inline-start:3px solid var(--accent);
+  padding-inline-start:13px;
+  margin-inline-start:-16px;
+  border-radius:0 10px 10px 0;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 62%);
+}
+[dir="rtl"] .imp-semester-block.sem-now,
+.rtl-mode .imp-semester-block.sem-now{
+  background:linear-gradient(270deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 62%);
+}
+.now-tag{
+  display:flex; align-items:center; gap:8px;
+  margin:0 0 8px;
+  font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent);
+}
+.now-dot{
+  flex:0 0 auto; width:8px; height:8px; border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* ==========================================================================
+   FILTER, INSIDE THE METER (js/79-plan-filter.js)
+
+   The chips ride in the hours meter because that is the one element on the
+   plan that travels down the page, so the filter is still reachable four
+   years in without a second sticky bar of its own. */
+.pf-bar{
+  display:flex; gap:6px; overflow-x:auto;
+  margin-top:9px; padding-top:9px;
+  border-top:1px solid var(--line);
+  scrollbar-width:none;
+}
+.pf-bar::-webkit-scrollbar{display:none;}
+.pf-chip{
+  flex:0 0 auto; padding:6px 12px; border-radius:999px; cursor:pointer;
+  font-family:inherit; font-size:11px; font-weight:800;
+  background:var(--panel); color:var(--text-dim); border:1px solid var(--line);
+  transition:background .14s ease, color .14s ease, border-color .14s ease;
+}
+.pf-chip:hover{border-color:var(--accent); color:var(--text);}
+.pf-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.pf-chip.pf-on{
+  background:var(--accent); color:var(--on-accent); border-color:var(--accent);
+}
+/* Stuck to the top, the meter drops its caption (see .pw-stuck) but keeps
+   the chips — being reachable while scrolling is the whole reason they are
+   in here rather than in a row of their own. */
+.sheet-plan.pw-stuck .pf-bar{margin-top:7px; padding-top:7px;}
+@media (prefers-reduced-motion:reduce){ .pf-chip{transition:none;} }
+
+/* ---- what each filter hides -------------------------------------------
+   Three rules per mode, and no JavaScript walking the cards: hide what does
+   not match, then :has() folds away any semester and any year left holding
+   nothing. That last part is what makes a filtered plan show only the years
+   that actually contain something.
+
+   None of it touches the stored fold state, so whatever the student had
+   open is still open when the filter comes off. */
+.plan-filtering .imp-year-block.year-collapsed > .imp-year-body{display:block;}
+.plan-filtering .connector-layer{display:none;}
+
+.plan-f-avail  .course:not(.available),
+.plan-f-locked .course.available,
+.plan-f-locked .course.completed,
+.plan-f-done   .course:not(.completed){display:none;}
+
+.plan-f-avail  .imp-semester-block:not(:has(.course.available)),
+.plan-f-done   .imp-semester-block:not(:has(.course.completed)),
+.plan-f-avail  .imp-year-block:not(:has(.course.available)),
+.plan-f-done   .imp-year-block:not(:has(.course.completed)){display:none;}
+.plan-f-locked .imp-semester-block:not(:has(.course:not(.available):not(.completed))),
+.plan-f-locked .imp-year-block:not(:has(.course:not(.available):not(.completed))){display:none;}
+
+/* A pair bracket around a lecture whose lab the filter just hid would be a
+   bracket around one card. */
+.plan-filtering .cp-pair-label{display:none;}
+
+/* A filter that matches nothing: say which nothing it is, and give the way
+   back. Without this the plan simply goes blank, which reads as broken. */
+.pf-empty{
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  margin:18px 0 4px; padding:26px 22px;
+  border:1px dashed var(--line); border-radius:14px;
+  background:var(--panel); text-align:center;
+}
+.pf-empty[hidden]{display:none;}
+.pf-empty p{
+  margin:0; max-width:34ch;
+  font-size:13px; line-height:1.6; color:var(--text-dim);
+}
+
