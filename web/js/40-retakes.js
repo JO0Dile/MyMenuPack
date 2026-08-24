@@ -61,7 +61,7 @@
     if(!currentContainer) return;
     var targetRow = nextRegularContainer(prefix, currentContainer.id);
     if(!targetRow){
-      if(window.__showToast){ window.__showToast('⚠️ No later semester available to auto-schedule a retake \u2014 you\u2019ll need to plan this one manually.'); }
+      if(window.__showToast){ window.__showToast('No later semester available to auto-schedule a retake \u2014 you\u2019ll need to plan this one manually.'); }
       return;
     }
 
@@ -140,7 +140,7 @@
       if(window.__injectCheckboxes){ window.__injectCheckboxes(); }
     }
 
-    if(window.__showToast){ window.__showToast('\u21bb Auto-scheduled a retake of "' + baseName + '" next semester.'); }
+    if(window.__showToast){ window.__showToast('Auto-scheduled a retake of "' + baseName + '" next semester.'); }
   }
 
   function removeRetakeIfUntouched(prefix, slug){

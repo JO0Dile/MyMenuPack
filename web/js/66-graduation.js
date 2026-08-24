@@ -271,7 +271,7 @@
         var nameEl = page && page.querySelector('.title-block .en');
         var planTitle = nameEl ? nameEl.textContent.trim() : prefix;
         window.__downloadCardImage({
-          title: '🎓 ' + t('title', rtl),
+          title: t('title', rtl),
           subtitle: planTitle,
           rows: [
             { label: t('finish', rtl), value: termLabel(finish, rtl), accent: true },

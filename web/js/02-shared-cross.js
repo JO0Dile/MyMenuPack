@@ -409,6 +409,30 @@ window.__livePrereqs = function(prefix, fallback){
 // DOM-to-canvas conversion needs a library this app does not ship, so this
 // redraws just the handful of facts a card is actually FOR — the number,
 // not the pixels — onto a small themed card of its own.
+// The six colours a drawn card needs, read off the running theme rather
+// than baked in. Both canvas cards in this app (this one and the achievement
+// share card in js/08-celebrations.js) used to be indigo whatever theme was
+// on, so a student on Cranberry saved a blue picture of their own screen.
+window.__themeColors = function(){
+  var fallback = {
+    bg: '#0a0e17', panel: '#141a2a', line: '#232b42',
+    text: '#f2f4fa', dim: '#8b93aa', accent: '#6f8cff', onAccent: '#0a0e17'
+  };
+  try{
+    var css = getComputedStyle(document.documentElement);
+    function v(name, f){ return (css.getPropertyValue(name) || '').trim() || f; }
+    return {
+      bg: v('--surface-bg', fallback.bg),
+      panel: v('--panel', fallback.panel),
+      line: v('--line', fallback.line),
+      text: v('--text', fallback.text),
+      dim: v('--text-dim', fallback.dim),
+      accent: v('--accent', fallback.accent),
+      onAccent: v('--on-accent', fallback.onAccent)
+    };
+  }catch(e){ return fallback; }
+};
+
 function __cardRoundRect(ctx, x, y, w, h, r){
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -431,8 +455,9 @@ window.__downloadCardImage = function(spec){
   var ctx = canvas.getContext('2d');
   ctx.scale(scale, scale);
 
-  var bg = spec.bg || '#0b1330', panel = spec.panel || '#141d47', line = spec.line || '#2a3568';
-  var text = spec.text || '#e9ecf7', dim = spec.dim || '#9aa3cf', accent = spec.accent || '#5db8ff';
+  var th = window.__themeColors();
+  var bg = spec.bg || th.bg, panel = spec.panel || th.panel, line = spec.line || th.line;
+  var text = spec.text || th.text, dim = spec.dim || th.dim, accent = spec.accent || th.accent;
   var FONT = '-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
@@ -477,7 +502,7 @@ window.__downloadCardImage = function(spec){
     a.click();
     document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-    if(window.__showToast) window.__showToast('🖼️ Saved.');
+    if(window.__showToast) window.__showToast('Saved.');
   }
   canvas.toBlob(function(blob){
     if(!blob){ if(window.__showToast) window.__showToast('Could not create the image.'); return; }

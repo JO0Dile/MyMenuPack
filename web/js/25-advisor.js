@@ -282,7 +282,9 @@
         : t.hard + ' of these are in categories you rated Hard before — consider swapping one.'));
     }
     if(!out.length) return '';
-    return '<div class="sb-warn">' + out.map(function(w){ return '<p>⚠️ ' + w + '</p>'; }).join('') + '</div>';
+    return '<div class="sb-warn">' + out.map(function(w){
+      return '<p>' + window.AAUP_ICONS.preview('warning', 13) + w + '</p>';
+    }).join('') + '</div>';
   }
 
   function breakdownHtml(t, rtl){
