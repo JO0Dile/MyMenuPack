@@ -1193,7 +1193,17 @@
   }
   .plan-page.rtl-mode .course .name,
   .sheet.rtl-mode .course .name{padding-right:0;padding-left:24px;}
-  .editing .course .name{padding-right:0;padding-left:0;}
+  /* Edit mode puts TWO buttons in the corner (rename, remove) where the plan
+     puts one tick, and this rule was zeroing the padding that keeps the title
+     clear of them — so "Community Service" read with a pen through it. Wider
+     than the plan's 24px, because there are two of them. */
+  .editing .course .name{padding-right:46px;padding-left:0;}
+  /* .editing and .rtl-mode land on the SAME element (the plan sheet), so
+     these are compounded, not nested — and they need one class more than the
+     narrow-width block's own `.sheet.rtl-mode .course .name{padding:0}`,
+     which is later in the file and otherwise wins the tie. */
+  .sheet.rtl-mode.editing .course .name,
+  .plan-page.rtl-mode.editing .course .name{padding-right:0;padding-left:46px;}
   /* ---------- My Progress: completion checkbox on each course ---------- */
 
   /* The circle itself lives on ::before, sized to the content box only —
@@ -1391,35 +1401,38 @@
   @media (prefers-reduced-motion:reduce){ .imp-about > summary::after{transition:none;} }
 
   /* ---------- one card treatment, every width ----------
-     The desktop filled the whole card with the requirement colour while the
-     phone drew a panel with a coloured edge: same plan, two looks, and the
-     filled one is where a long name, a grade and a "needs…" line all have to
-     fight the background for contrast. The phone's card is the one that won.
-     Sizing stays per-breakpoint; only the look is shared. */
+     Same plan, two looks: the wide screen filled the whole card with its
+     requirement colour, the phone drew a pale panel with a coloured edge.
+     One of them had to win everywhere, and the filled one is the one that
+     carries the information — the colour IS the requirement bucket, and at
+     a glance across a semester that is what you are reading. The pale card
+     said the same thing in a 4px line.
+
+     So: filled, at every width, and in edit mode too. Sizing stays
+     per-breakpoint; only the look is shared. */
   .course{
-    background:var(--panel); color:var(--text);
+    background:var(--misc); color:var(--misc-tx);
     border:none; border-radius:12px;
     box-shadow:0 3px 10px rgba(0,0,0,.2);
   }
-  .course.core, .course.skills, .course.math, .course.dept, .course.eng,
-  .course.uni, .course.free, .course.misc, .course.intern, .course.summer,
-  .course.completed{background:var(--panel); color:var(--text);}
-  .course::before{
-    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
-    border-radius:4px 0 0 4px; background:var(--core);
-  }
-  .plan-page.rtl-mode .course::before,
-  .sheet.rtl-mode .course::before{left:auto; right:0; border-radius:0 4px 4px 0;}
-  .course.core::before{background:var(--core);}
-  .course.skills::before{background:var(--skills);}
-  .course.math::before{background:var(--math);}
-  .course.dept::before{background:var(--dept);}
-  .course.eng::before{background:var(--eng);}
-  .course.uni::before{background:var(--uni);}
-  .course.free::before{background:var(--free);}
-  .course.misc::before{background:var(--misc);}
-  .course.intern::before{background:var(--intern);}
-  .course.summer::before{background:var(--summer);}
+  .course.core{background:var(--core); color:var(--core-tx);}
+  .course.skills{background:var(--skills); color:var(--skills-tx);}
+  .course.math{background:var(--math); color:var(--math-tx);}
+  .course.dept{background:var(--dept); color:var(--dept-tx);}
+  .course.eng{background:var(--eng); color:var(--eng-tx);}
+  .course.uni{background:var(--uni); color:var(--uni-tx);}
+  .course.free{background:var(--free); color:var(--free-tx);}
+  .course.misc{background:var(--misc); color:var(--misc-tx);}
+  .course.intern{background:var(--intern); color:var(--intern-tx);}
+  .course.summer{background:var(--summer); color:var(--summer-tx);}
+
+  /* The ten fills above are fixed colours, not theme tokens — they have to
+     be, because they mean "College Requirement" and that cannot change with
+     the theme. Their ink is therefore fixed too: the --*-tx pairs are each
+     chosen against their own fill, so the meta line stays legible on all six
+     themes rather than following --text-dim onto a dark red card. */
+  .course .course-meta,
+  .course.completed .course-meta{color:inherit; opacity:.86;}
 
   /* A course the student removed from their own plan (e.g. tested out of
      Intermediate English, or placed straight into Advanced). Hidden from the
@@ -4517,7 +4530,10 @@
   }
   .imp-add-course-card:hover{border-color:var(--accent);color:var(--accent);}
   .imp-card-btn-row{
-    position:absolute; top:4px; right:4px; z-index:4;
+    /* inset-inline-end, not right: in Arabic these stayed pinned to the
+       right edge while the title's clearance moved to the left, so the pen
+       and the close button sat on top of the course name. */
+    position:absolute; top:4px; inset-inline-end:4px; z-index:4;
     display:flex; gap:3px;
   }
   .imp-card-btn-row button{
@@ -4569,7 +4585,6 @@
   /* The separator's own spaces are trimmed away by flex, so the gap is a
      margin rather than the " · " it is written as. */
   .course-meta .cm-sep{margin:0 4px;}
-  .course.completed .course-meta{color:var(--text-dim);}
 
   /* The card is a real button now, so it needs a real focus ring. */
   .course:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
@@ -4864,18 +4879,13 @@
   }
   .editing .imp-semester-block .course-row .imp-add-course-card{min-height:36px;}
 
-  .editing .course{
-    background:var(--panel);color:var(--text);
-    border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--line);
-  }
-  .editing .course.core{border-left-color:var(--core);}
-  .editing .course.skills{border-left-color:var(--skills);}
-  .editing .course.math{border-left-color:var(--math);}
-  .editing .course.dept{border-left-color:var(--dept);}
-  .editing .course.eng{border-left-color:var(--eng);}
-  .editing .course.uni{border-left-color:var(--uni);}
-  .editing .course.free{border-left-color:var(--free);}
-  .editing .course.misc{border-left-color:var(--misc);}
+  /* Edit mode used to repaint every card as a pale panel with a 4px colour
+     edge, which made the screen you rearrange the plan in the one screen
+     that did not look like the plan. It inherits the filled requirement
+     colours now — same card, same colour, whichever mode you are in. Only
+     the corner radius and the drag affordance are edit-mode's own. */
+  .editing .course{border-radius:10px;}
+
   .editing .course-cr{
     display:inline-block;margin-top:6px;padding:1px 7px;border-radius:999px;
     border:1px solid var(--line);font-weight:700;opacity:1;
@@ -5029,6 +5039,82 @@
   }
 
   .editing .course[id]:active{cursor:grabbing;}
+
+  /* ---- pick up, then put down (js/85-carry.js) ----
+     A tap lifts a course; every semester grows a slot; a tap on one lands
+     it. The drag is untouched — this is the same move by a route that does
+     not need both ends of a four-screen page visible at once. ---- */
+
+  /* The card stays where it is while it is in hand. Removing it from the
+     grid would reflow the page under the finger that just tapped it. */
+  .carry-source{
+    opacity:.42;
+    outline:2px dashed var(--accent); outline-offset:2px;
+  }
+
+  .carry-slot{
+    display:block; width:100%; margin-top:6px;
+    padding:9px 10px; border-radius:9px;
+    font:inherit; font-size:11.5px; font-weight:700; line-height:1.3;
+    text-align:center; cursor:pointer;
+    border:1px dashed var(--unlock);
+    background:color-mix(in srgb, var(--unlock) 12%, transparent);
+    color:var(--unlock);
+    transition:background .12s ease;
+  }
+  .carry-slot:hover{background:color-mix(in srgb, var(--unlock) 22%, transparent);}
+  .carry-slot:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* A semester the prerequisites rule out. Shown rather than hidden, with
+     the reason on it: "you cannot put it there" is an answer, and a slot
+     that silently is not there is not. */
+  .carry-slot-no{
+    border-color:var(--line); background:none; color:var(--text-dim);
+    cursor:not-allowed; font-weight:400; font-style:italic;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  /* The retake case — allowed, but it is a claim about taking two things at
+     once, so it does not look like the ordinary green slot. */
+  .carry-slot-ask{border-color:var(--warn); background:color-mix(in srgb, var(--warn) 12%, transparent); color:var(--warn);}
+  .carry-slot-here{
+    border-style:solid; border-color:var(--accent); background:none;
+    color:var(--accent); cursor:default; font-weight:400;
+  }
+
+  /* What you are holding, and the way to put it down again. Above the phone
+     tab bar, clear of the home indicator. */
+  .carry-bar{
+    position:fixed; z-index:1400;
+    left:12px; right:12px; bottom:calc(78px + env(safe-area-inset-bottom, 0px));
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:12px;
+    background:var(--panel); border:1px solid var(--accent);
+    box-shadow:0 14px 34px -16px rgba(0,0,0,.75);
+    opacity:0; transform:translateY(8px);
+    transition:opacity .18s ease, transform .18s ease;
+  }
+  .carry-bar.open{opacity:1; transform:none;}
+  .carry-bar .cb-lbl{
+    font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--accent); flex:0 0 auto;
+  }
+  .carry-bar .cb-name{
+    font-size:13px; font-weight:700; color:var(--text);
+    flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .carry-bar .cb-x{
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:5px;
+    padding:6px 10px; border-radius:99px; cursor:pointer;
+    background:none; border:1px solid var(--line);
+    font:inherit; font-size:12px; font-weight:700; color:var(--text-dim);
+  }
+  .carry-bar .cb-x:hover{color:var(--text); border-color:var(--text-dim);}
+
+  /* On a wide screen there is no tab bar to clear, and the bar reads better
+     as a pill in the corner than as a full-width strip. */
+  @media (min-width:900px){
+    .carry-bar{left:auto; right:24px; bottom:24px; width:max-content; max-width:min(460px, calc(100vw - 48px));}
+  }
 
   /* ==========================================================================
      16. TOASTS & MISC — the small bottom-of-screen toast notification and the
@@ -7110,13 +7196,12 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
   }
   .plan-page.rtl-mode .course .name,
   .sheet.rtl-mode .course .name{padding:0;}
-  .course-meta{color:var(--text-dim); font-size:10px; line-height:1.3; margin-top:2px;}
+  .course-meta{font-size:10px; line-height:1.3; margin-top:2px;}
   /* The card sits inside a block headed with its year — repeating it here
      is what pushed this line onto a second row at half width. The card's
      aria-label still carries all three parts. */
   .course-meta .cm-year,
   .course-meta .cm-year + .cm-sep{display:none;}
-  .course.completed .course-meta{color:var(--text-dim);}
 
   /* 18px at the top-right rather than 22px centred: two-up, a vertically
      centred circle sat in the middle of a two-line name. The 11px padding

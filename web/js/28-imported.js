@@ -1800,6 +1800,9 @@
     initSearch(id);
 
     if(window.AAUP_PLAN_EDITOR){ window.AAUP_PLAN_EDITOR.bindDraggable(id); }
+    // A course held in hand (js/85-carry.js) has a dimmed source card and a
+    // drop slot in every semester, and this render just replaced both.
+    if(window.AAUP_CARRY){ window.AAUP_CARRY.repaint(id); }
     if(window.AAUP_COMMUNITY){
       window.AAUP_COMMUNITY.refreshAllCommunityBadges();
       if(window.AAUP_COMMUNITY.syncLive) window.AAUP_COMMUNITY.syncLive(id);
