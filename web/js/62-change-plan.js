@@ -55,7 +55,7 @@
     back:     { en: '← All majors', ar: '→ كل التخصصات' },
     none:     { en: 'No other plan on this device has its courses loaded yet.',
                 ar: 'ما في خطة ثانية على الجهاز محمّلة مساقاتها بعد.' },
-    nothingDone: { en: 'You have not marked any course as done yet, so nothing can carry over — this still shows how big each plan is.',
+    nothingDone: { en: 'Nothing marked as done yet, so nothing carries over.',
                 ar: 'ما علّمت أي مساق كمُنجز، فما في إشي ينتقل — بس بتقدر تشوف حجم كل خطة.' },
     switched: { en: 'Switched. {n} course(s) ticked off in your new plan.',
                 ar: 'تم التبديل. {n} مساق معلّم كمُنجز بخطتك الجديدة.' }

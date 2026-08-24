@@ -43,17 +43,17 @@
   var TX = {
     en: { all: 'All', avail: 'Open to me', locked: 'Locked', done: 'Passed',
           none: {
-            avail: 'Nothing is open to you right now — finish something first and this fills up.',
-            locked: 'Nothing is locked. Every course in this plan is open to you or already passed.',
-            done: 'You have not marked anything as passed yet. Tick a course off and it shows up here.'
+            avail: 'Nothing is open to you yet.',
+            locked: 'Nothing is locked.',
+            done: 'Nothing marked as passed yet.'
           },
           noneReq: 'Nothing in this plan counts toward that requirement.',
           clear: 'Show everything' },
     ar: { all: 'الكل', avail: 'متاح لي', locked: 'مغلق', done: 'منجز',
           none: {
-            avail: 'ما في إشي متاح إلك هلأ — خلّص إشي وبتبدا تظهر مساقات هون.',
-            locked: 'ما في إشي مغلق. كل مساقات الخطة إما متاحة إلك أو منجزة.',
-            done: 'لسا ما علّمت إشي كمنجز. علّم مساق وبيظهر هون.'
+            avail: 'ما في إشي متاح إلك بعد.',
+            locked: 'ما في إشي مغلق.',
+            done: 'لسا ما علّمت إشي كمنجز.'
           },
           noneReq: 'ما في إشي بهالخطة بينحسب على هالمتطلب.',
           clear: 'اعرض الكل' }

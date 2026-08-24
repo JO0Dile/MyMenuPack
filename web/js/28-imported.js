@@ -18,7 +18,10 @@
   // checkbox toggle, course add, drag — so anything that would normally
   // live as a DOM class (rtl-mode, legend expanded) has to be tracked here
   // instead, or it silently resets on the very next render.
-  var rtlState = {};
+  // Language is one app-wide setting now (js/09-language.js), not a per-plan
+  // one held in memory: switching to Arabic on one plan used to leave the
+  // next plan, the menu, and everything after a reload in English.
+  function isAr(){ return !!(window.AAUP_LANG && window.AAUP_LANG.isAr()); }
   var currentOpenPlanId = null;
 
   // Every one of the ~55 readers below assumes each value here is a plan
@@ -519,7 +522,7 @@
     var plans = loadImportedPlans();
     var plan = plans[planId];
     if(!plan) return;
-    var rtl = !!rtlState[planId];
+    var rtl = isAr();
 
     var courseOptions = (plan.courses || []).map(function(c){
       return '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:5px;">' +
@@ -639,10 +642,10 @@
     var courseOptions = (plan.courses || []).filter(function(c){ return c.id !== slug; }).map(function(c){
       var checked = currentNeeds.indexOf(c.id) !== -1 ? ' checked' : '';
       return '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:5px;">' +
-        '<input type="checkbox" value="' + c.id + '" class="ecq-prereq-check"' + checked + '> ' + window.__escapeHtml((!!rtlState[planId] && c.ar) ? c.ar : c.name) + '</label>';
-    }).join('') || '<p class="ex-note">' + (!!rtlState[planId] ? 'لا توجد مساقات أخرى لاشتراطها.' : 'No other courses to require.') + '</p>';
+        '<input type="checkbox" value="' + c.id + '" class="ecq-prereq-check"' + checked + '> ' + window.__escapeHtml((isAr() && c.ar) ? c.ar : c.name) + '</label>';
+    }).join('') || '<p class="ex-note">' + (isAr() ? 'لا توجد مساقات أخرى لاشتراطها.' : 'No other courses to require.') + '</p>';
 
-    var rtl = !!rtlState[planId];
+    var rtl = isAr();
     var categories = ['core','math','dept','eng','uni','free','skills'];
     var categoryLabels = rtl
       ? { core:'إجباري', math:'رياضيات', dept:'اختياري تخصصي', eng:'إنجليزي', uni:'اختياري جامعي', free:'اختياري حر', skills:'متطلب جامعي' }
@@ -1182,7 +1185,7 @@
     var opts = '<option value="">\u2014</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
       return '<option value="' + g + '"' + (g === current ? ' selected' : '') + '>' + window.AAUP_GPA.gradeLabel(g) + '</option>';
     }).join('');
-    var rtl = !!rtlState[planId];
+    var rtl = isAr();
     var dispName = rtl && course.ar ? course.ar : course.name;
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML =
@@ -1233,7 +1236,7 @@
     var plan = loadImportedPlans()[planId];
     var course = plan && (plan.courses || []).filter(function(c){ return c.id === slug; })[0];
     if(!course) return;
-    var rtl = !!rtlState[planId];
+    var rtl = isAr();
     var L = IMP_MODAL_LABELS[rtl ? 'ar' : 'en'];
     var displayName = (rtl && course.ar) ? course.ar : course.name;
     var info = ((window.__PLAN_DATA[planId] || {}).courseInfo || {})[slug] || {
@@ -1513,7 +1516,7 @@
 
     registerPlan(id, p);
     var editing = document.getElementById('page-' + id) ? document.getElementById('page-' + id).classList.contains('editing') : false;
-    var rtl = !!rtlState[id];
+    var rtl = isAr();
 
     var en = nameParts(p.majorName.en), ar = nameParts(p.majorName.ar);
     var bioEn = (p.bio && p.bio.en) || '';
@@ -1774,9 +1777,14 @@
     if(enteringEdit && window.AAUP_TUTORIAL){ window.AAUP_TUTORIAL.startWhenClear('planEditor'); }
   }
 
+  // Flips the app, not the plan: every other screen reads the same setting,
+  // and it is remembered.
   function toggleLang(planId){
-    rtlState[planId] = !rtlState[planId];
+    if(window.AAUP_LANG){ window.AAUP_LANG.toggle(); }
     render(planId);
+    // The menu, the tab bar and anything else already on screen were drawn in
+    // the other language.
+    if(window.AAUP_SIDEBAR && window.AAUP_SIDEBAR.refresh){ window.AAUP_SIDEBAR.refresh(); }
   }
 
   // The line under the search box read "Search a course directly, or just

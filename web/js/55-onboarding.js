@@ -19,16 +19,15 @@
   var mode = 'in';        // the sign-in panel: 'in' or 'up'
 
   // ---- language ----------------------------------------------------------
-  // The app's per-plan toggleLang() switches one plan page. The landing
-  // screen is not a plan page and comes BEFORE one is chosen, so it needs a
-  // choice of its own — stored, so the About page (and anything added later)
-  // can read it instead of asking again.
-  var LANG_KEY = 'aaup_lang';
+  // The same one setting the rest of the app runs on (js/09-language.js).
+  // The landing screen is where a student first says which language they
+  // read, before any plan exists — and that answer is now the answer
+  // everywhere, not just on this screen.
   function lang(){
-    try{ return localStorage.getItem(LANG_KEY) === 'ar' ? 'ar' : 'en'; }catch(e){ return 'en'; }
+    return (window.AAUP_LANG && window.AAUP_LANG.get()) || 'en';
   }
   function setLang(v){
-    try{ localStorage.setItem(LANG_KEY, v); }catch(e){}
+    if(window.AAUP_LANG){ window.AAUP_LANG.set(v); }
     document.documentElement.setAttribute('lang', v);
     document.documentElement.setAttribute('dir', v === 'ar' ? 'rtl' : 'ltr');
   }

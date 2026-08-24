@@ -107,9 +107,15 @@
   });
 
   // ---------- badge / availability helpers ----------
+  // The plan's own class while a plan is on screen — render() sets it from
+  // the app-wide setting, so the two always agree — and the setting itself
+  // everywhere else, so a screen opened with no plan behind it (Settings,
+  // the plan picker) is in the language the student chose rather than
+  // defaulting to English.
   function isRtl(prefix){
     var page = document.getElementById('page-' + prefix);
-    return !!(page && page.classList.contains('rtl-mode'));
+    if(page) return page.classList.contains('rtl-mode');
+    return !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
   }
   window.__isRtl = isRtl;
 

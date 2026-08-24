@@ -50,7 +50,7 @@ OUT = REPO / 'web' / 'bundles'
 # original 00-70 numbering restricted to that group's files.
 GROUPS = {
     'core': [
-        '02-shared-cross.js', '04-icons.js', '10-progress-core.js', '11-module11.js',
+        '02-shared-cross.js', '04-icons.js', '09-language.js', '10-progress-core.js', '11-module11.js',
         '14-storage.js', '60-backbar.js', '70-skeleton.js', '71-qrcode.js',
     ],
     'shell': [

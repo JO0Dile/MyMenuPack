@@ -120,7 +120,12 @@
       en.className = 'sh-en';
       en.innerHTML = markMatch(r.en, rawQuery);
       hit.appendChild(en);
-      if(r.ar){
+      // Both names on every row is the same course said twice: the student
+      // reads one of these languages, and the app knows which. The other name
+      // appears only when it is the reason the row is here at all — you
+      // searched in Arabic and this matched — where it is the answer rather
+      // than a duplicate.
+      if(r.ar && r.reason === 'ar'){
         var ar = document.createElement('div');
         ar.className = 'sh-ar';
         ar.innerHTML = markMatch(r.ar, rawQuery);
