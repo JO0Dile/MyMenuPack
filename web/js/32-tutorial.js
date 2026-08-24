@@ -129,12 +129,12 @@
         text: 'Courses whose prerequisites you have already ticked off — the answer to "what am I actually allowed to register for", with the reason attached to each one.' },
       { target: function(){ return firstVisible('#dashboard .dash-quicklink'); },
         title: 'Everything else',
-        text: 'Your path through the degree, the audit, achievements, next semester — all one tap from here.' },
+        text: 'The audit, achievements, sharing this plan — all one tap from here.' },
       { target: function(){ return nth(document.querySelectorAll('#dashboard .dash-actions .home-btn'), 1); },
         title: 'My Study Plan',
         text: 'The whole course map: every year, its prerequisites, and where what you have finished slots in.' }
     ],
-    // Rebuilt against the plan page as it now is.    // Rebuilt against the plan page as it now is. Two of these steps used to
+    // Rebuilt against the plan page as it now is. Two of these steps used to
     // point at things that no longer exist, and three more pointed INTO a
     // year — which now starts folded, so their targets resolved to hidden
     // cards and the drop-if-hidden rule silently deleted them. That is why a

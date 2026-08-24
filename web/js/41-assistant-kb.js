@@ -196,18 +196,18 @@
       ]
     },
     switchPlan: {
-      title: { en: 'Switching to another plan', ar: 'التبديل إلى خطة أخرى' },
+      title: { en: 'Changing plan', ar: 'تغيير الخطة' },
       steps: [
         { target: q('.sb-item[data-sb-key="switch"]'),
-          text: { en: 'Switch Plan takes you back to the university picker without losing anything.',
-                  ar: '«تبديل الخطة» يعيدك إلى اختيار الجامعة دون فقدان أي شيء.' } }
+          text: { en: 'Change plan asks which: move to another major (and see what carries over), or just open another of your plans. Nothing is lost either way.',
+                  ar: '«تغيير الخطة» بيسأل أي واحدة: تنتقل لتخصص ثاني (وتشوف شو بينحسب إلك)، أو تفتح خطة ثانية عندك. ما بضيع إشي بالحالتين.' } }
       ]
     },
     menu: {
       title: { en: 'Opening the menu', ar: 'فتح القائمة' },
       steps: [
         { target: q('#sbToggleBtn'),
-          text: { en: 'On a phone the menu hides behind this button — Dashboard, Study Plan, Audit, Achievements, Settings.',
+          text: { en: 'On a phone the menu hides behind this button — Dashboard, Study Plan, Audit, and Advanced for the rest.',
                   ar: 'على الهاتف تختفي القائمة خلف هذا الزر — لوحة التحكم والخطة والتدقيق والإنجازات والإعدادات.' } }
       ]
     },
@@ -321,12 +321,12 @@
               ar: ['قائمة', 'الشريط الجانبي', 'تنقل'] },
       title: { en: 'The menu', ar: 'القائمة' },
       body: {
-        en: ['Dashboard · My Study Plan · Degree Audit & GPA · Achievements · Plan My Next Semester · Overview & Print.',
-             'At the bottom: Settings and Switch Plan.',
-             'On a phone it is behind the ☰ button in the corner.'],
-        ar: ['لوحة التحكم · خطتي الدراسية · التدقيق والمعدّل · الإنجازات · خطّط لفصلي القادم · عرض وطباعة.',
-             'في الأسفل: الإعدادات وتبديل الخطة.',
-             'على الهاتف تجدها خلف زر ☰ في الزاوية.']
+        en: ['Edit Mode · Dashboard · My Study Plan · Degree Audit & GPA, then Advanced for Achievements, Student Thoughts, Contacts, Course Library, Export and Contribute.',
+             'At the bottom: Settings and Change plan.',
+             'On a phone it is behind the menu button in the corner.'],
+        ar: ['وضع التعديل · لوحة التحكم · خطتي الدراسية · التدقيق والمعدّل، وتحت «متقدم»: الإنجازات وأفكار الطلبة وجهات الاتصال ومكتبة المساقات والتصدير والإرسال.',
+             'في الأسفل: الإعدادات وتغيير الخطة.',
+             'على الهاتف تجدها خلف زر القائمة في الزاوية.']
       },
       guide: 'menu'
     },
@@ -380,7 +380,7 @@
       body: {
         en: ['A course turns Available the moment every prerequisite is checked off.',
              '"What Can I Take Next" on the Dashboard lists them all.',
-             '"Plan My Next Semester" goes further and builds a 15–18 hour load, preferring the courses that unlock the most later ones.'],
+             'The plan itself suggests the next semester under "You are here", ranked by what each course unlocks; "Plan the whole semester" there builds a full 15–18 hour load.'],
         ar: ['يصبح المساق «متاحًا» فور اكتمال كل متطلباته السابقة.',
              '«ما الذي يمكنني أخذه» في لوحة التحكم يعرضها كلها.',
              '«خطّط لفصلي القادم» يذهب أبعد ويبني حملًا من 15–18 ساعة، مفضّلًا المساقات التي تفتح أكبر عدد من المساقات اللاحقة.']
@@ -467,7 +467,7 @@
       title: { en: 'Credit hours', ar: 'الساعات المعتمدة' },
       body: {
         en: ['Every course carries a credit-hour value, shown on its card and used for progress, GPA weighting, and the audit.',
-             'A typical full semester is 15–18 hours — that is the range "Plan My Next Semester" aims for.'],
+             'A typical full semester is 15–18 hours — that is the range the next-semester suggestions aim for.'],
         ar: ['لكل مساق قيمة بالساعات المعتمدة تظهر على بطاقته وتُستخدم في التقدّم ووزن المعدّل والتدقيق.',
              'الفصل الكامل المعتاد 15–18 ساعة — وهو النطاق الذي يستهدفه «خطّط لفصلي القادم».']
       }
