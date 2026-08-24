@@ -225,14 +225,18 @@
     if(!ctx) return null;
 
     // background gradient
+    // Drawn in whatever theme is running (js/02-shared-cross.js
+    // __themeColors), not the indigo this was pinned to.
+    var th = window.__themeColors ? window.__themeColors()
+      : { bg: '#0a1428', panel: '#132540', accent: '#5db8ff', text: '#ffffff', dim: '#9fb4d0' };
     var g = ctx.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0, '#0a1428');
-    g.addColorStop(1, '#132540');
+    g.addColorStop(0, th.bg);
+    g.addColorStop(1, th.panel);
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
 
     // accent frame
-    ctx.strokeStyle = '#5db8ff';
+    ctx.strokeStyle = th.accent;
     ctx.lineWidth = 8;
     ctx.strokeRect(40, 40, W - 80, H - 80);
 
@@ -245,24 +249,24 @@
     ctx.fillText(opts.icon || '⭐', W / 2, 470);
 
     // "Achievement Unlocked"
-    ctx.fillStyle = '#5db8ff';
+    ctx.fillStyle = th.accent;
     ctx.font = 'bold 40px sans-serif';
     ctx.fillText('ACHIEVEMENT UNLOCKED', W / 2, 590);
 
     // title
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = th.text;
     ctx.font = 'bold 72px sans-serif';
     wrapText(ctx, opts.title || '', W / 2, 690, W - 200, 84);
 
     // subtitle (major)
     if(opts.subtitle){
-      ctx.fillStyle = '#9fb4d0';
+      ctx.fillStyle = th.dim;
       ctx.font = '38px sans-serif';
       wrapText(ctx, opts.subtitle, W / 2, 880, W - 240, 48);
     }
 
     // footer
-    ctx.fillStyle = '#5db8ff';
+    ctx.fillStyle = th.accent;
     ctx.font = 'bold 34px sans-serif';
     ctx.fillText(opts.footer || 'Study Plans', W / 2, H - 90);
 

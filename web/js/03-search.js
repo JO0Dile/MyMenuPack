@@ -365,10 +365,13 @@
   /* ---------------- cross-highlighting on the plan page ---------------- */
   var currentHighlightPrefix = null;
 
-  function addBadge(el, symbol){
+  // An icon, not an emoji — same rule the rest of the app follows, and an
+  // emoji here rendered at whatever size and colour the platform felt like.
+  function addBadge(el, iconKey){
     var b = document.createElement('span');
     b.className = 'search-badge';
-    b.textContent = symbol;
+    if(window.AAUP_ICONS){ b.innerHTML = window.AAUP_ICONS.preview(iconKey, 12); }
+    else { b.textContent = iconKey === 'tick' ? '\u2713' : '\u25CB'; }
     el.appendChild(b);
   }
 
@@ -411,11 +414,11 @@
 
     needs.forEach(function(s){
       var e = document.getElementById(prefix + '-c-' + s);
-      if(e){ e.classList.add('search-prereq'); addBadge(e, '✅'); }
+      if(e){ e.classList.add('search-prereq'); addBadge(e, 'tick'); }
     });
     unlocks.forEach(function(s){
       var e = document.getElementById(prefix + '-c-' + s);
-      if(e){ e.classList.add('search-unlock'); addBadge(e, '🔓'); }
+      if(e){ e.classList.add('search-unlock'); addBadge(e, 'unlock'); }
     });
 
     var svg = document.getElementById(prefix + '-connectorSvg');
