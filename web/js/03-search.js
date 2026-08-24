@@ -97,6 +97,11 @@
   }
 
   /* ---------------- generic search-box wiring ---------------- */
+  // Only the two states worth a word in a list of results: a course you have
+  // already passed, and one you cannot register for yet. "Open" is the normal
+  // case and says nothing.
+  var STATE_LABEL = { done: 'passed', locked: 'locked' };
+
   function renderDropdown(dropdownEl, results, opts){
     dropdownEl.innerHTML = '';
     if(!results.length){
@@ -121,7 +126,7 @@
         ar.innerHTML = markMatch(r.ar, rawQuery);
         hit.appendChild(ar);
       }
-      if(r.code || r.reason){
+      if(r.code || r.reason || r.where){
         var meta = document.createElement('div');
         meta.className = 'sh-meta';
         if(r.code){
@@ -129,6 +134,18 @@
           codeEl.className = 'sh-code';
           codeEl.innerHTML = markMatch(r.code, rawQuery);
           meta.appendChild(codeEl);
+        }
+        if(r.where){
+          var whereEl = document.createElement('span');
+          whereEl.className = 'sh-where';
+          whereEl.textContent = r.where;
+          meta.appendChild(whereEl);
+        }
+        if(r.state && STATE_LABEL[r.state]){
+          var stateEl = document.createElement('span');
+          stateEl.className = 'sh-state sh-state-' + r.state;
+          stateEl.textContent = STATE_LABEL[r.state];
+          meta.appendChild(stateEl);
         }
         // 'name' needs no label: the mark in the name above already says it.
         if(REASON_LABEL[r.reason]){
@@ -287,7 +304,14 @@
       // every result's name twice in the dropdown.
       var infoAr = info && info.ar && info.ar !== en ? info.ar : '';
       var ar = nameEl.getAttribute('data-ar') || infoAr || '';
-      idx.push({ slug: slug, id: el.id, en: en, ar: ar, code: info ? info.num : '' });
+      // Where the card sits and how it stands, both read off the card itself
+      // (js/28-imported.js stamps data-where). A result that says only the
+      // name makes you tap it to find out whether it is this year's problem
+      // or a third-year one.
+      var state = el.classList.contains('completed') ? 'done'
+        : el.classList.contains('available') ? 'open' : 'locked';
+      idx.push({ slug: slug, id: el.id, en: en, ar: ar, code: info ? info.num : '',
+                 where: el.getAttribute('data-where') || '', state: state });
     });
     data.index = idx;
   }

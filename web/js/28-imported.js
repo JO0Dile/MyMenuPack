@@ -19,7 +19,6 @@
   // live as a DOM class (rtl-mode, legend expanded) has to be tracked here
   // instead, or it silently resets on the very next render.
   var rtlState = {};
-  var legendOpen = {};
   var currentOpenPlanId = null;
 
   // Every one of the ~55 readers below assumes each value here is a plan
@@ -1045,11 +1044,58 @@
     return out;
   }
 
-  function courseCardHtml(planId, c, rtl, yearNum, continuations){
+  // The registrar counts a degree in buckets — University Req., Spec. Elec.,
+  // Support — and every course in plans.json carries the one it belongs to.
+  // The cards used to take their colour from `category` (core / math / dept /
+  // free), which is an older and coarser split: one "core" card could be a
+  // College Req. here and a Specialization Req. in the next plan, while the
+  // legend beside it named buckets. Same palette, keyed off the thing the
+  // legend actually names.
+  //
+  // A plan imported before the buckets existed carries no `requirement`, and
+  // those cards keep their category colour rather than being assigned to a
+  // bucket nobody published for them.
+  var BUCKET_ORDER = ['univReq', 'univElec', 'colgReq', 'specReq', 'specElec', 'freeElec', 'supportCourses'];
+  var BUCKET_CLASS = {
+    univReq: 'skills', univElec: 'uni', colgReq: 'math', specReq: 'core',
+    specElec: 'dept', freeElec: 'free', supportCourses: 'misc'
+  };
+  var BUCKET_LABEL = {
+    univReq: ['University Req.', 'متطلب جامعي'],
+    univElec: ['University Elec.', 'اختياري جامعي'],
+    colgReq: ['College Req.', 'متطلب كلية'],
+    specReq: ['Specialization Req.', 'متطلب تخصص'],
+    specElec: ['Specialization Elec.', 'اختياري تخصص'],
+    freeElec: ['Free Elec.', 'اختياري حر'],
+    supportCourses: ['Support', 'مساقات مساندة']
+  };
+  function bucketOf(c){ return (c && BUCKET_CLASS[c.requirement]) ? c.requirement : ''; }
+  function visualClassFor(c){
+    var b = bucketOf(c);
+    return b ? BUCKET_CLASS[b] : ((c && c.category) || 'core');
+  }
+
+  // What a locked course is still waiting for, by name. Only the prerequisites
+  // that are not done yet — the ones already passed are not why it is closed.
+  function missingPrereqNames(planId, slug, rtl){
+    var data = window.__PLAN_DATA[planId] || {};
+    var info = data.courseInfo || {};
+    return ((data.needsMap && data.needsMap[slug]) || [])
+      .filter(function(r){ return !isDone(planId, r); })
+      .map(function(r){
+        var i = info[r];
+        if(!i) return r;
+        return (rtl && i.ar && i.ar !== i.name) ? i.ar : (i.name || r);
+      });
+  }
+
+  function courseCardHtml(planId, c, rtl, yearNum, continuations, whereTx){
     var done = isDone(planId, c.id);
     var avail = isAvailable(planId, c.id);
     var editing = document.getElementById('page-' + planId) && document.getElementById('page-' + planId).classList.contains('editing');
-    var cls = 'course ' + (c.category || 'core') + (done ? ' completed' : '') + (avail || done ? ' available' : '') + (c.isRetake ? ' retake-course' : '');
+    var bucket = bucketOf(c);
+    var cls = 'course ' + visualClassFor(c) + (bucket ? ' req-' + bucket : '') +
+      (done ? ' completed' : '') + (avail || done ? ' available' : '') + (c.isRetake ? ' retake-course' : '');
     var displayName = (rtl && c.ar) ? c.ar : c.name;
     // The old quick "📊 set grade" shortcut for a done course is retired —
     // it shared the same top-right corner as the new checkbox and would
@@ -1077,6 +1123,14 @@
     var statusTx = done ? (rtl ? 'مُنجز' : 'passed')
       : avail ? (rtl ? 'متاح لك' : 'open to you')
       : (rtl ? 'مغلق لك' : 'closed to you');
+    // Most cards on a plan are open, so "open to you" was printed on most
+    // cards — and the colour, the empty tick and the connector lines had all
+    // said so already. The state worth a word is the closed one, and the
+    // useful word is not "closed" but what it is still waiting for.
+    var missing = (done || avail) ? [] : missingPrereqNames(planId, c.id, rtl);
+    var lockTx = !missing.length ? statusTx
+      : (rtl ? 'يحتاج ' : 'needs ') + missing[0] +
+        (missing.length > 1 ? ' +' + (missing.length - 1) : '');
     var yearTx = yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum)
       : (rtl ? 'اختياري' : 'Elective');
     var partOfPair = !!(continuations && continuations[c.id]);
@@ -1088,18 +1142,25 @@
     // "Year 1" as well, and at half width that repetition is what pushes the
     // line onto a second row. The aria-label below keeps all three parts
     // whatever the layout hides.
-    var meta = '<span class="cm-year">' + window.__escapeHtml(yearTx) + '</span>' +
-      '<span class="cm-sep"> · </span>' +
-      '<span class="cm-status">' + window.__escapeHtml(statusTx) + '</span>' +
-      '<span class="cm-sep"> · </span>' +
-      '<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>';
+    var metaParts = ['<span class="cm-year">' + window.__escapeHtml(yearTx) + '</span>'];
+    // Hours before the lock line, not after: the lock line carries a course
+    // name and is the part that gets ellipsised on a narrow card, so putting
+    // it last is what keeps the hours on screen.
+    metaParts.push('<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>');
+    if(!done && !avail){
+      metaParts.push('<span class="cm-status cm-locked">' + window.__escapeHtml(lockTx) + '</span>');
+    }
+    var meta = metaParts.join('<span class="cm-sep"> · </span>');
     // Focusable so the plan can be worked from a keyboard: the card itself is
     // a button (Enter opens the details) and the tick inside it is its own
     // control (Space toggles completion) — see js/57-card-input.js.
     var a11y = editing ? '' :
       ' tabindex="0" role="button" aria-label="' +
       window.__escapeHtml(displayName + ' — ' + yearTx + ', ' + statusTx + ', ' + hoursTx) + '"';
-    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + a11y + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
+    // Where this card sits, written once here so a search result can say it
+    // without having to re-derive the plan's shape from the DOM.
+    var whereAttr = whereTx ? ' data-where="' + window.__escapeHtml(whereTx) + '"' : '';
+    return '<div class="' + cls + '" id="' + fullId(planId, c.id) + '"' + whereAttr + a11y + (editing ? '' : ' onclick="AAUP_IMPORTED.openCourseModal(\'' + planId + '\',\'' + c.id + '\')"') + '>' +
       checkboxHtml +
       cardButtons +
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
@@ -1274,14 +1335,68 @@
   // it again anyway because the category had not changed.
   function isPoolElective(c){ return !!c && c.category === 'dept' && !c.placedByStudent; }
 
+  // The legend was a disclosure: a heading, a "tap to expand" hint, seven
+  // colour-and-word pairs, and a sentence explaining that hovering a course
+  // traces its prerequisites. A key is swatches. This one carries only the
+  // buckets the plan in front of you actually uses, so a plan with no Support
+  // courses does not advertise a Support colour.
+  //
+  // .i18n with data-en/data-ar is kept: js/19-audit.js reads its label for a
+  // bucket off this row rather than hardcoding one wording for every plan.
+  // How far through a year you are, as a shape. The fraction it replaces
+  // ("3 / 22") is still there for a screen reader, and the year's hours still
+  // sit beside it, so nothing is only in the picture.
+  function yearRingHtml(done, total, rtl){
+    var C = 50.27;                       // 2πr at r=8
+    var frac = total ? Math.min(1, done / total) : 0;
+    var label = rtl ? (done + ' من ' + total) : (done + ' of ' + total);
+    return '<span class="iy-ring" role="img" aria-label="' + window.__escapeHtml(label) + '">' +
+      '<svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true" focusable="false">' +
+      '<circle class="iy-ring-bg" cx="11" cy="11" r="8"></circle>' +
+      (frac > 0
+        ? '<circle class="iy-ring-fill" cx="11" cy="11" r="8" transform="rotate(-90 11 11)" ' +
+          'stroke-dasharray="' + (frac * C).toFixed(2) + ' ' + C.toFixed(2) + '"></circle>'
+        : '') +
+      '</svg></span>';
+  }
+
+  function legendHtml(id, p, rtl){
+    var seen = {}, keys = [];
+    (p.courses || []).forEach(function(c){
+      var b = bucketOf(c);
+      if(b && !seen[b]){ seen[b] = true; }
+    });
+    BUCKET_ORDER.forEach(function(b){ if(seen[b]) keys.push(b); });
+    // A plan imported before requirement buckets existed: fall back to the
+    // categories it does carry, named the way the audit names them.
+    if(!keys.length){
+      var byCat = {};
+      (p.courses || []).forEach(function(c){ byCat[c.category || 'core'] = true; });
+      BUCKET_ORDER.forEach(function(b){
+        if(byCat[BUCKET_CLASS[b]] && !seen[BUCKET_CLASS[b]]){ seen[BUCKET_CLASS[b]] = true; keys.push(b); }
+      });
+    }
+    if(!keys.length) return '';
+    return '<div class="legend" id="' + id + '-legend">' +
+      keys.map(function(b){
+        var label = BUCKET_LABEL[b];
+        return '<span class="item"><span class="chip ' + BUCKET_CLASS[b] + '"></span>' +
+          '<span class="i18n" data-en="' + window.__escapeHtml(label[0]) + '" data-ar="' + window.__escapeHtml(label[1]) + '">' +
+          window.__escapeHtml(label[rtl ? 1 : 0]) + '</span></span>';
+      }).join('') +
+      '</div>';
+  }
+
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var pairs = pairContinuations(planId);
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
     var courses = (plan.courses || []).filter(function(c){ return c.yearId === yearId && c.semester === semester && !isPoolElective(c); });
     var addCard = editing ? '<div class="imp-add-course-card" onclick="AAUP_IMPORTED.addCoursePrompt(\'' + planId + '\',\'' + yearId + '\',\'' + semester + '\')">+</div>' : '';
-    return '<div class="imp-semester-block"><div class="imp-semester-title">' + (rtl ? SEMESTER_LABEL_AR[semester] : SEMESTER_LABEL[semester]) + '</div>' +
+    var semTx = rtl ? SEMESTER_LABEL_AR[semester] : SEMESTER_LABEL[semester];
+    var whereTx = (yearNum ? (rtl ? 'سنة ' + yearNum : 'Year ' + yearNum) + ' · ' : '') + semTx;
+    return '<div class="imp-semester-block"><div class="imp-semester-title">' + semTx + '</div>' +
       '<div class="course-row" id="' + containerId + '">' +
-      courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs); }).join('') + addCard +
+      courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs, whereTx); }).join('') + addCard +
       '</div></div>';
   }
 
@@ -1295,12 +1410,40 @@
   // one off, its grade, its prerequisite arrows and the degree audit all go
   // through the shared code, which finds courses by id and does not care
   // where on the page they sit.
+  // Which requirement each pool group is drawn from, so the group can be
+  // measured against the hours the plan actually publishes for it.
+  var POOL_BUCKET = { dept: 'specElec', free: 'freeElec', uni: 'univElec' };
+
   var UNSCHEDULED_LABEL = {
     dept: { en: 'Specialization Electives', ar: 'متطلبات التخصص الاختيارية' },
     free: { en: 'Free Electives', ar: 'المتطلبات الحرة' },
     uni:  { en: 'University Electives', ar: 'المتطلبات الجامعية الاختيارية' },
     other:{ en: 'Electives — choose from these', ar: 'مواد اختيارية' }
   };
+
+  // A shelf of thirteen electives said "13" — the size of the shelf, which is
+  // not a thing a student is finishing. What they are finishing is the hours
+  // the plan asks for, so that is what this measures: hours already placed
+  // into a semester against the hours the plan publishes for that
+  // requirement. A plan that publishes no figure for it gets no meter rather
+  // than a made-up one.
+  function poolMeterHtml(planId, plan, groupKey, rtl){
+    var bucket = POOL_BUCKET[groupKey];
+    var need = bucket && plan.requirementHours ? Number(plan.requirementHours[bucket]) : 0;
+    if(!bucket || !need || !isFinite(need)) return '';
+    var placed = (plan.courses || []).reduce(function(a, c){
+      if(c.requirement !== bucket) return a;
+      if(!c.yearId || isPoolElective(c)) return a;      // still on the shelf
+      return a + (parseFloat(c.creditHours) || 0);
+    }, 0);
+    var pct = Math.max(0, Math.min(100, Math.round(placed / need * 100)));
+    var line = rtl
+      ? ('<b>' + placed + ' من ' + need + ' ساعة</b> موضوعة')
+      : ('<b>' + placed + ' of ' + need + 'H</b> placed');
+    return '<div class="imp-pool-meter">' +
+      '<div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
+      '<span class="imp-pool-num">' + line + '</span></div>';
+  }
 
   function unscheduledHtml(planId, plan, editing, rtl){
     var pairs = pairContinuations(planId);
@@ -1324,19 +1467,21 @@
       ' <span class="imp-optional-tag">' + (rtl ? '(اختياري)' : '(Optional)') + '</span></h3></div>' +
       '<p class="imp-elective-note">' +
       (rtl
-        ? 'اختر منها بالعدد الذي تتطلبه خطتك. الخطة لا تحدد لها فصلًا — ضعها في الفصل الذي يناسبك.'
-        : 'Pick as many as your plan requires. The plan does not assign these to a semester, so you choose when to take them.') +
+        ? 'الخطة لا تحدد لها فصلًا — ضعها في الفصل الذي تأخذها فيه.'
+        : 'The plan does not schedule these — put each one where you take it.') +
       '</p>';
 
     order.forEach(function(k){
       if(!groups[k]) return;
       var label = UNSCHEDULED_LABEL[k];
+      var whereTx = rtl ? 'اختياري' : 'Elective';
       html += '<div class="imp-semester-block"><div class="imp-semester-title">' +
         (rtl ? label.ar : label.en) +
         ' <span class="imp-optional-tag">' + (rtl ? '(اختياري)' : '(Optional)') + '</span>' +
         ' <span class="imp-elective-count">' + groups[k].length + '</span></div>' +
+        poolMeterHtml(planId, plan, k, rtl) +
         '<div class="course-row" id="' + planId + '-elective-' + k + '">' +
-        groups[k].map(function(c){ return courseCardHtml(planId, c, rtl, null, pairs); }).join('') +
+        groups[k].map(function(c){ return courseCardHtml(planId, c, rtl, null, pairs, whereTx); }).join('') +
         '</div></div>';
     });
     return html + '</div>';
@@ -1362,14 +1507,6 @@
       window.AAUP_AUDIT.computeAudit(id).forEach(function(r){ totalCr += r.total; doneCr += r.completed; });
     }
     var pct = totalCr ? Math.round(doneCr / totalCr * 100) : 0;
-
-    var CATS = ['skills','core','math','dept','eng','uni','free'];
-    var CAT_LABELS = {
-      skills: ['University Req.','متطلب جامعي'], core: ['Specialization Req.','متطلب تخصص'],
-      math: ['College Req.','متطلب كلية'], dept: ['Specialization Elec.','اختياري تخصص'],
-      eng: ['University Req.','متطلب جامعي'], uni: ['University Elec.','اختياري جامعي'],
-      free: ['Free Elec.','اختياري حر']
-    };
 
     // Same header structure every built-in major uses (brand block, center
     // title with the plan's own icon standing in for the hand-drawn
@@ -1403,21 +1540,19 @@
         ? '<div class="header-actions"><button type="button" class="home-btn imp-exit-edit-btn" onclick="AAUP_IMPORTED.toggleEdit(\'' + id + '\')">' + window.AAUP_ICONS.preview('close', 14) + 'Exit Edit Mode</button></div>'
         : '') +
       '</header>' +
-      '<div class="legend' + (legendOpen[id] ? ' expanded' : '') + '"><button type="button" class="legend-toggle" onclick="AAUP_IMPORTED.toggleLegend(\'' + id + '\')"><span class="lt-arrow">' + window.AAUP_ICONS.preview('chevronRight', 13) + '</span><span>' + (rtl ? 'الدليل' : 'Legend') + '</span><span class="lt-hint">' + (legendOpen[id] ? (rtl ? 'اضغط للطي' : 'Tap to collapse') : (rtl ? 'اضغط للعرض' : 'Tap to expand')) + '</span></button>' +
-      '<div class="legend-items">' +
-      CATS.map(function(c){ return '<span class="item"><span class="chip ' + c + '"></span><span>' + CAT_LABELS[c][rtl ? 1 : 0] + '</span></span>'; }).join('') +
-      '<span class="arrow-sample"><span class="ln"></span><span>' + (rtl ? 'متطلب سابق (مرر المؤشر فوق المساق لتتبعه)' : 'Prerequisite (hover a course to trace it)') + '</span></span>' +
-      '</div></div>' +
-      '<div class="course-search-wrap"><div class="search-box" id="' + id + '-courseSearchBox">' +
+      legendHtml(id, p, rtl) +      '<div class="course-search-wrap"><div class="search-box" id="' + id + '-courseSearchBox">' +
       '<span class="search-ic">' + window.AAUP_ICONS.preview('search', 15) + '</span>' +
       '<input type="text" id="' + id + '-courseSearchInput" class="search-input" placeholder="' + (rtl ? 'ابحث عن مساق بالاسم أو الرقم…' : 'Search a course by name or code…') + '" autocomplete="off">' +
       '<button type="button" class="search-clear" id="' + id + '-courseSearchClear" aria-label="Clear">&times;</button>' +
       '</div><div class="search-dropdown" id="' + id + '-courseSearchDropdown"></div></div>' +
-      searchHintHtml(id, rtl) +
       '<div class="imp-body-pad">' +
       (bioEn ? '<p class="imp-bio-text" style="font-size:12px;color:var(--text-dim);opacity:.85;">' + txt(rtl && p.bio && p.bio.ar ? p.bio.ar : bioEn) + '</p>' : '') +
+      // "48 / 129H completed (37%)" — the bar underneath is the percentage,
+      // and "completed" is what a progress meter means. What is left is the
+      // two numbers, plus (from js/64-milestones.js, which appends into this
+      // same line) the hours to the nearest requirement still open.
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
-      '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
+      '<span class="pw-num"><b>' + doneCr + ' / ' + totalCr + 'H</b></span></div>';
 
     // Edit mode is where a student is actively rearranging their plan and
     // most wants a quick read on where they stand — the normal view already
@@ -1451,7 +1586,7 @@
         '<button type="button" class="imp-year-toggle" aria-expanded="false" aria-controls="' + bodyId + '">' +
           '<span class="iy-chev" aria-hidden="true">' + window.AAUP_ICONS.preview('chevronRight', 15) + '</span>' +
           '<h3>' + (rtl ? 'السنة ' + (i + 1) : 'Year ' + (i + 1)) + '</h3>' +
-          '<span class="iy-count"><b>' + yearDone + '</b> / ' + yearCourses.length + '</span>' +
+          yearRingHtml(yearDone, yearCourses.length, rtl) +
           '<span class="iy-hours">' + yearHours + 'H</span>' +
         '</button>';
       if(editing){
@@ -1497,6 +1632,12 @@
     // an imported plan appeared to work and silently came back — and every
     // plan in the app is an imported plan.
     if(window.__applyRemovedCourses){ window.__applyRemovedCourses(id); }
+    // The hours in the meter come from the Degree Audit, and the audit counts
+    // the cards on the page — which on the first render of a plan do not
+    // exist yet, because render() computes the figure before it writes them.
+    // A plan therefore opened claiming "0 / 3H" until something re-rendered
+    // it. Same numbers, recomputed once the cards are actually there.
+    refreshMeter(id);
     if(window.__refreshCollapse){ window.__refreshCollapse(id); }
     if(window.__refreshWorkloadSummary){ window.__refreshWorkloadSummary(id); }
     if(window.__refreshMilestones){ window.__refreshMilestones(id); }
@@ -1511,6 +1652,21 @@
     // silently seeds already-complete semesters; later ones (after a toggle
     // re-renders) fire confetti for a semester that just became complete.
     if(window.__celebrateCheck){ window.__celebrateCheck(id); }
+  }
+
+  // Re-reads the audit against the rendered cards and writes the two numbers
+  // back into the meter. js/64-milestones.js appends the "…H to <bucket>"
+  // tail onto the same line right after this, so it is rebuilt too.
+  function refreshMeter(planId){
+    var page = document.getElementById('page-' + planId);
+    var num = page && page.querySelector('.pw-num');
+    if(!num || !window.AAUP_AUDIT) return;
+    var totalCr = 0, doneCr = 0;
+    window.AAUP_AUDIT.computeAudit(planId).forEach(function(r){ totalCr += r.total; doneCr += r.completed; });
+    var pct = totalCr ? Math.round(doneCr / totalCr * 100) : 0;
+    num.innerHTML = '<b>' + doneCr + ' / ' + totalCr + 'H</b>';
+    var fill = page.querySelector('.pw-fill');
+    if(fill){ fill.style.width = pct + '%'; }
   }
 
   function toggle(planId, slug){
@@ -1607,23 +1763,12 @@
     render(planId);
   }
 
-  function toggleLegend(planId){
-    legendOpen[planId] = !legendOpen[planId];
-    render(planId);
-  }
-
-  // A one-line tip shown until dismissed once, ever — search feels like the
-  // only way in otherwise, when scrolling the tree works just as well.
-  var SEARCH_HINT_KEY = 'aaup_searchHintSeen';
-  function searchHintHtml(id, rtl){
-    try{ if(localStorage.getItem(SEARCH_HINT_KEY)) return ''; }catch(e){}
-    return '<p class="search-hint" id="' + id + '-searchHint">' + window.AAUP_ICONS.preview('help', 14) + '' +
-      (rtl ? 'ابحث عن مساق مباشرة، أو مرر لأسفل فقط — كل شيء قابل للتصفح أيضًا.'
-           : 'Search a course directly, or just scroll — everything’s browsable too.') +
-      '<button type="button" class="search-hint-x" onclick="AAUP_IMPORTED.dismissSearchHint()" aria-label="Dismiss">&times;</button></p>';
-  }
+  // The line under the search box read "Search a course directly, or just
+  // scroll — everything's browsable too." The box's own placeholder says the
+  // first half and the plan under it says the second, so it was a sentence
+  // explaining a search box to people already using one. dismissSearchHint()
+  // stays exported: an older cached page can still call it.
   function dismissSearchHint(){
-    try{ localStorage.setItem(SEARCH_HINT_KEY, '1'); }catch(e){}
     document.querySelectorAll('.search-hint').forEach(function(el){ el.remove(); });
   }
 
@@ -1665,8 +1810,12 @@
       '<h1>' + txt(en.big) + (en.small ? ' ' + txt(en.small) : '') + ' <em style="opacity:.6;font-size:.6em;">' + txt(ar.big) + (ar.small ? ' ' + txt(ar.small) : '') + '</em></h1></header>' +
       '<div class="imp-body-pad">' +
       '<p style="font-size:12px;color:var(--text-dim);">This is a community-imported plan \u2014 a simplified view without the custom prerequisite-arrow diagram the built-in majors have, but progress tracking and prerequisite locking both work normally.</p>' +
+      // "48 / 129H completed (37%)" — the bar underneath is the percentage,
+      // and "completed" is what a progress meter means. What is left is the
+      // two numbers, plus (from js/64-milestones.js, which appends into this
+      // same line) the hours to the nearest requirement still open.
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
-      '<span style="font-size:12px;color:var(--text-dim);white-space:nowrap;">' + doneCr + ' / ' + totalCr + 'H completed (' + pct + '%)</span></div>';
+      '<span class="pw-num"><b>' + doneCr + ' / ' + totalCr + 'H</b></span></div>';
 
     var community = window.AAUP_COMMUNITY ? window.AAUP_COMMUNITY.loadCommunity() : {};
     Object.keys(bySemester).forEach(function(sem){
@@ -2131,7 +2280,7 @@
     // Exposed for js/74-course-gestures.js, which shows the same trace under
     // its action sheet rather than re-implementing the walk over the edges.
     traceCourse: handleCourseHoverEnter, untraceCourse: handleCourseHoverLeave,
-    toggleLang: toggleLang, toggleLegend: toggleLegend, openLibrary: openLibrary,
+    toggleLang: toggleLang, openLibrary: openLibrary,
     dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
     // Programmatic course creation, for callers that already have every field

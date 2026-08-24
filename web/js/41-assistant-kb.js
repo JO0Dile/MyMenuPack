@@ -182,9 +182,9 @@
     legend: {
       title: { en: 'What the colours mean', ar: 'معاني الألوان' },
       steps: [
-        { target: inPlan('.legend-toggle, .legend'),
-          text: { en: 'The legend explains every colour: core, elective, university requirement, and so on.',
-                  ar: 'مفتاح الألوان يوضّح كل لون: إجباري، اختياري، متطلب جامعة، وغير ذلك.' } }
+        { target: inPlan('.legend'),
+          text: { en: 'One swatch per requirement this degree counts — university, college, specialization, elective. Every card takes its colour from the requirement it satisfies.',
+                  ar: 'مربّع لكل متطلب تحسبه الخطة — جامعة، كلية، تخصص، اختياري. ولون كل بطاقة يتبع المتطلب الذي تحققه.' } }
       ]
     },
     newPlan: {

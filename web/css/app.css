@@ -935,18 +935,6 @@
 
   .search-dropdown.open{display:block;}
 
-  .search-hint{
-    display:flex; align-items:center; gap:8px; margin:8px 0 0; padding:8px 12px;
-    font-size:12.5px; color:var(--text-dim); background:var(--panel); border:1px solid var(--line);
-    border-radius:8px;
-  }
-  .search-hint-x{
-    margin-left:auto; background:none; border:none; color:var(--text-dim); font-size:16px;
-    line-height:1; cursor:pointer; opacity:.7; padding:0 2px;
-  }
-  .search-hint-x:hover{opacity:1;}
-  [dir="rtl"] .search-hint-x{margin-left:0; margin-right:auto;}
-
   .tour-mark{
     display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px;
     border-radius:50%; font-size:10px; line-height:1; color:var(--text-dim); border:1.3px solid var(--line);
@@ -972,6 +960,18 @@
     display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:2px;
   }
   .search-hit .sh-code{font-variant-numeric:tabular-nums;}
+
+  /* Where the course sits in the plan, and — only when it is worth a word —
+     how it stands. Dim rather than accent-coloured: it is context for the
+     name above it, not a second thing to read. */
+  .search-hit .sh-where{color:var(--text-dim);font-weight:600;}
+  .search-hit .sh-state{
+    font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    border-radius:999px;padding:1px 7px;
+    color:var(--text-dim);background:rgba(255,255,255,.06);
+  }
+  .search-hit .sh-state-done{color:var(--unlock);}
+  .search-hit .sh-state-locked{color:var(--prereq);}
 
   /* Why this row is here. Only shown when the marked text cannot say so on
      its own — a code match, an Arabic-name match, or a typo-tolerant one.
@@ -1074,7 +1074,6 @@
      ========================================================================== */
 
   .plan-page.rtl-mode .legend .item,
-  .plan-page.rtl-mode .legend .arrow-sample{flex-direction:row-reverse;}
 
   .plan-page.rtl-mode .legend .chip{margin-right:0;margin-left:7px;}
   /* ---------- legend ---------- */
@@ -1092,17 +1091,13 @@
     font-size:12.5px;
   }
 
-  .legend .chip{width:14px;height:14px;border-radius:3px;display:inline-block;margin-right:7px;vertical-align:-2px;}
+  .legend .chip{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:-1px;}
+  [dir="rtl"] .legend .chip{margin-right:0;margin-left:6px;}
 
   .legend .chip.pair-chip{background:rgba(224,168,63,.18);border:1px dashed var(--connect);}
 
   .legend .item{display:flex;align-items:center;color:var(--text-dim);}
 
-  .legend .arrow-sample{display:flex;align-items:center;gap:6px;color:var(--text-dim);}
-
-  .legend .arrow-sample .ln{width:26px;height:0;border-top:2px solid var(--prereq);position:relative;}
-
-  .legend .arrow-sample .ln::after{content:"";position:absolute;right:-1px;top:-4px;border:4px solid transparent;border-left-color:var(--prereq);}
   /* connector arrows (prerequisites), drawn by JS to stay accurate as boxes wrap/reflow */
 
   .connector-layer{
@@ -1387,43 +1382,17 @@
   .course.jump-highlight{animation:jumpPulse 1s ease-in-out 2;}
   /* ================= COLLAPSIBLE LEGEND (mobile-friendly) ================= */
 
-  .legend{padding:0;overflow:hidden;display:block;}
-
-  /* The only visible cue that this whole bar is a button used to be one
-     small dim ▶ glyph in var(--text-dim) — easy to miss, easier to mistake
-     for a bullet than a control. Bigger, bolder arrow, full-strength label
-     color, and a plain-language hint on the other side of the row that
-     actually says what tapping it does. */
-  .legend-toggle{
-    display:flex;align-items:center;gap:8px;width:100%;
-    background:none;border:none;font-family:inherit;cursor:pointer;
-    padding:12px 20px;color:var(--text);font-size:12.5px;font-weight:700;
-    text-align:left;
+  /* The legend is a key, so it is swatches: no heading, no "tap to expand",
+     no sentence about hovering a course. It carries only the requirement
+     buckets the plan in front of you actually uses (js/28-imported.js
+     legendHtml), which is why it fits on a row in the first place. */
+  .legend{
+    padding:10px 20px; display:flex; flex-wrap:wrap; gap:8px 18px;
+    align-items:center; font-size:12px;
   }
-
-  .legend-toggle:hover{color:var(--accent);}
-  .legend-toggle:hover .lt-arrow{color:var(--accent);}
-
-  .plan-page.rtl-mode .legend-toggle{text-align:right;}
-
-  .legend-toggle .lt-arrow{display:inline-block;transition:transform .2s ease;color:var(--accent);font-size:15px;font-weight:900;}
-
-  .legend.expanded .legend-toggle .lt-arrow{transform:rotate(90deg);}
-
-  .legend-toggle .lt-hint{margin-left:auto;color:var(--text-dim);font-weight:600;font-size:11px;}
-  .plan-page.rtl-mode .legend-toggle .lt-hint,
-  .sheet.rtl-mode .legend-toggle .lt-hint{margin-left:0;margin-right:auto;}
-
-  .legend-items{
-    max-height:0;overflow:hidden;transition:max-height .3s ease;
-    display:flex;flex-wrap:wrap;gap:22px;align-items:center;
-    padding:0 20px;font-size:12.5px;
-  }
-
-  .legend.expanded .legend-items{max-height:400px;padding-bottom:14px;}
 
   @media (max-width:640px){
-    .legend-items{gap:14px;}
+    .legend{margin:12px 14px 4px; gap:7px 13px; padding:9px 12px;}
   }
   /* Border color/width rather than box-shadow, so it never fights with the
      existing hover/available/active glow states (those are box-shadow based). */
@@ -1467,9 +1436,17 @@
     pointer-events:none;
   }
   .pw-gate-next{background:var(--accent);}
+  /* Rides on the numbers line rather than making a sentence of its own —
+     js/64-milestones.js appends it into .pw-num. */
   .pw-gate-caption{
-    margin:6px 2px 0;font-size:11px;color:var(--text-dim);text-align:center;
+    margin-inline-start:6px;font-size:11.5px;font-weight:600;color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
   }
+  .pw-num{
+    font-size:12.5px;color:var(--text-dim);white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .pw-num b{color:var(--text);font-weight:800;font-size:13.5px;}
 
   /* A folded year hides its body outright rather than height-animating it:
      the connector SVG is redrawn against the new layout on every toggle
@@ -4237,18 +4214,52 @@
     width:22px;height:22px;flex:0 0 22px;color:var(--text-dim);
   }
   .imp-year-toggle:hover .iy-chev{color:var(--accent);}
-  /* Counts sit at the far end so a folded plan reads as a column of
-     "how far through this year am I" without opening anything. */
-  .iy-count{
+  /* How far through the year, as a shape, at the far end of the row: a
+     folded plan reads as a column of rings without opening anything. The
+     fraction it replaces is on the ring's aria-label, not lost. */
+  .iy-ring{
     margin-inline-start:auto;flex:0 0 auto;
-    font-size:12px;font-weight:700;color:var(--text-dim);
-    font-variant-numeric:tabular-nums;
+    display:inline-flex;align-items:center;line-height:0;
   }
-  .iy-count b{color:var(--text);font-weight:800;}
+  .iy-ring .iy-ring-bg{
+    fill:none;stroke:var(--line);stroke-width:3;
+  }
+  .iy-ring .iy-ring-fill{
+    fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;
+  }
   .iy-hours{
     flex:0 0 auto;font-size:11px;font-weight:800;color:var(--accent);
     font-variant-numeric:tabular-nums;
   }
+  /* The only status a card still prints is the closed one, and it names the
+     course it is waiting for rather than the word "closed". Dim, because it
+     is the answer to a question you only ask about a card you cannot use. */
+  .course-meta .cm-locked{
+    color:var(--text-dim);font-style:italic;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+
+  /* An elective shelf measures the hours the plan asks for, not the size of
+     the shelf (js/28-imported.js poolMeterHtml). */
+  .imp-pool-meter{
+    display:flex;align-items:center;gap:10px;
+    margin:0 0 9px;
+  }
+  /* .pw-track is only styled inside .progress-widget, so the shelf meter
+     carries its own bar rather than inheriting an invisible one. */
+  .imp-pool-meter .pw-track{
+    flex:1 1 auto;min-width:60px;height:6px;border-radius:99px;
+    background:var(--line);overflow:hidden;
+  }
+  .imp-pool-meter .pw-fill{
+    height:100%;border-radius:99px;background:var(--accent);
+  }
+  .imp-pool-num{
+    flex:0 0 auto;font-size:11.5px;color:var(--text-dim);
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .imp-pool-num b{color:var(--text);font-weight:800;}
+
   /* Held down: the year says so, so the dimming reads as deliberate rather
      than as the page having gone wrong. */
   .imp-year-block.year-peek{box-shadow:0 0 0 2px var(--accent) inset;}
@@ -4296,7 +4307,19 @@
     font-size:calc(10px * var(--card-scale, 1));
     margin-top:3px;line-height:1.35;font-weight:600;
     color:rgba(255,255,255,.92);
+    /* One line, always. The line can now carry a prerequisite's full name on
+       a locked card, and left to wrap it made those cards two rows taller
+       than the ones beside them. */
+    display:flex;align-items:baseline;min-width:0;white-space:nowrap;
+    /* clear of the tick in the corner */
+    padding-inline-end:18px;
   }
+  .course-meta .cm-locked{flex:0 1 auto;min-width:0;}
+  .course-meta .cm-hours,
+  .course-meta .cm-sep{flex:0 0 auto;}
+  /* The separator's own spaces are trimmed away by flex, so the gap is a
+     margin rather than the " · " it is written as. */
+  .course-meta .cm-sep{margin:0 4px;}
   .course.completed .course-meta{color:rgba(255,255,255,.9);}
 
   /* The card is a real button now, so it needs a real focus ring. */
