@@ -1166,6 +1166,15 @@
     // name and is the part that gets ellipsised on a narrow card, so putting
     // it last is what keeps the hours on screen.
     metaParts.push('<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>');
+    // The plan document listed this course among the requirements but did not
+    // say which term to take it in — the app picked the earliest one its own
+    // prerequisites allow. Every other card on the page is showing the
+    // department's own placement, and without this line these ten looked
+    // exactly the same as those.
+    if(c.termSuggested){
+      metaParts.push('<span class="cm-status cm-suggested">' +
+        window.__escapeHtml(rtl ? 'الفصل مقترح' : 'term suggested') + '</span>');
+    }
     if(!done && !avail){
       metaParts.push('<span class="cm-status cm-locked">' + window.__escapeHtml(lockTx) + '</span>');
     }

@@ -53,8 +53,11 @@
     carries:  { en: 'Carries over', ar: 'بينتقل' },
     doesnt:   { en: 'Does not carry', ar: 'ما بينتقل' },
     notThere: { en: 'not in that plan', ar: 'مش موجود بهذه الخطة' },
-    noNumber: { en: 'elective slot — no catalogue number to match on',
-                ar: 'خانة اختياري — ما إلها رقم مساق للمطابقة' },
+    // Not "does not carry" — the app never got far enough to know. It is a
+    // question for the registrar, and that is what the group is called.
+    askReg:   { en: 'Ask the registrar', ar: 'اسأل التسجيل' },
+    noNumber: { en: 'no course number to match on',
+                ar: 'ما إله رقم مساق للمطابقة' },
     carryBox: { en: 'Tick these courses off in the new plan (and bring their grades)',
                 ar: 'علّم هالمساقات كمُنجزة بالخطة الجديدة (مع علاماتها)' },
     go:       { en: 'Switch to this plan', ar: 'بدّل لهذه الخطة' },
@@ -153,9 +156,17 @@
       if(n && !index[n]) index[n] = c;
     });
     var done = doneIn(fromId);
-    var keeps = [], loses = [];
+    // Three outcomes, not two. A course with a catalogue number that the
+    // target plan does not list genuinely does not carry — that is a match
+    // that was attempted and failed. An elective SLOT has no catalogue
+    // number to attempt a match with ("Free Elective (1)" means something
+    // different in every plan), so filing it under "Does not carry" claimed
+    // a result the app never obtained. Those go in their own group, and out
+    // of the hours counted as lost.
+    var keeps = [], loses = [], unmatchable = [];
     done.forEach(function(d){
-      var match = d.num ? index[d.num] : null;
+      if(!d.num){ unmatchable.push(d); return; }
+      var match = index[d.num];
       if(match) keeps.push({ from: d, to: match });
       else loses.push(d);
     });
@@ -183,8 +194,10 @@
     // already here under "Does not carry"; the figure a student is actually
     // weighing was not.
     var lostCr = loses.reduce(function(sum, d){ return sum + (d.cr || 0); }, 0);
+    var unknownCr = unmatchable.reduce(function(sum, d){ return sum + (d.cr || 0); }, 0);
     return {
-      keeps: keeps, loses: loses,
+      keeps: keeps, loses: loses, unmatchable: unmatchable,
+      unknownCr: Math.round(unknownCr * 10) / 10,
       keptCr: keptCr, doneCr: doneCr, total: total, lostCr: Math.round(lostCr * 10) / 10,
       pct: total ? Math.round((keptCr / total) * 100) : 0,
       stillCount: stillCount, stillCr: stillCr,
@@ -295,8 +308,11 @@
         }).join('') + '</ul></details>' : '') +
       (c.loses.length ? '<details class="cp-det"><summary>' + window.AAUP_ICONS.preview('close', 14) + t('doesnt', rtl) + ' (' + c.loses.length + ')</summary>' +
         '<ul class="cp-ul cp-ul-lose">' + c.loses.map(function(d){
-          return courseLine(rtl ? (d.ar || d.name) : d.name, d.cr,
-            d.num ? t('notThere', rtl) : t('noNumber', rtl), rtl);
+          return courseLine(rtl ? (d.ar || d.name) : d.name, d.cr, t('notThere', rtl), rtl);
+        }).join('') + '</ul></details>' : '') +
+      (c.unmatchable.length ? '<details class="cp-det cp-det-ask"><summary>' + window.AAUP_ICONS.preview('help', 14) + t('askReg', rtl) + ' (' + c.unmatchable.length + ')</summary>' +
+        '<ul class="cp-ul cp-ul-ask">' + c.unmatchable.map(function(d){
+          return courseLine(rtl ? (d.ar || d.name) : d.name, d.cr, t('noNumber', rtl), rtl);
         }).join('') + '</ul></details>' : '') +
       '<label class="cp-carry"><input type="checkbox" id="cpCarry" checked> ' +
         t('carryBox', rtl) + '</label>' +

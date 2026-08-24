@@ -3572,6 +3572,10 @@
   .cp-li-cr{font-size:11px;font-weight:800;color:var(--accent);}
   .cp-li-note{font-size:10.5px;color:var(--text-dim);}
   .cp-ul-lose li{color:var(--text-dim);}
+  /* Courses the app could not attempt a match on at all — a question for
+     the registrar, not a loss (js/62-change-plan.js). */
+  .cp-ul-ask li{color:var(--text-dim);}
+  .cp-det-ask > summary{color:var(--warn);}
   .cp-carry{
     display:flex;align-items:flex-start;gap:8px;margin:12px 0 4px;
     font-size:12px;font-weight:700;color:var(--text);line-height:1.5;cursor:pointer;
@@ -4329,6 +4333,12 @@
   .course-meta .cm-locked{
     color:var(--text-dim);font-style:italic;
     overflow:hidden;text-overflow:ellipsis;
+  }
+  /* "term suggested" — the app put this course in this semester, not the
+     published plan (js/28-imported.js). Warn-coloured, like the heavy-term
+     note: something to know, not something wrong. */
+  .course-meta .cm-suggested{
+    color:var(--warn);font-style:italic;flex:0 0 auto;
   }
 
   /* Following a friend's snapshot (js/82-follow.js). Two bars, same scale,
@@ -6436,6 +6446,9 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   color:var(--text-dim); margin-bottom:9px;
 }
 .cd-note{font-size:12.5px; color:var(--text); line-height:1.65; margin:0 0 10px;}
+/* Inside the Details column it is a footnote on the row above it, not a
+   paragraph of its own weight. */
+.cd-side .cd-note{font-size:11px; color:var(--warn); margin:4px 0 0; line-height:1.5;}
 .cd-note strong{font-weight:700;}
 
 /* Each prerequisite carries its own state, so "why is this locked" is answered
