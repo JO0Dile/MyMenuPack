@@ -50,6 +50,11 @@
 
     --prereq:#e0538c;
     --connect:#e0a83f;
+
+    /* Notice, not error. Used by the heavy-semester note (js/28-imported.js).
+       Kept theme-neutral on purpose: this amber sits legibly on all six
+       grounds, light and dark, so it is defined once rather than per theme. */
+    --warn:#c9821c;
   }
 
   *{box-sizing:border-box;}
@@ -6202,6 +6207,26 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
 .imp-optional-tag{
   font-size:11.5px; font-weight:700; color:var(--text-dim); opacity:.9;
 }
+
+/* Hours in a semester, and the note when this plan's own median says the term
+   is a course heavier than the rest of it (js/28-imported.js). Warn-coloured,
+   not error-coloured: a heavy term is a thing to notice, not a thing that is
+   wrong. */
+.imp-semester-title{display:flex; align-items:baseline; gap:8px;}
+.imp-sem-hours{
+  margin-inline-start:auto; font-variant-numeric:tabular-nums;
+  font-weight:800; color:var(--text-dim); letter-spacing:0;
+}
+.imp-semester-block.is-heavy .imp-sem-hours{color:var(--warn);}
+.imp-sem-heavy{
+  margin:-4px 0 10px; font-size:11px; font-weight:700; line-height:1.45;
+  color:var(--warn); text-transform:none; letter-spacing:0;
+}
+
+/* The zero-hour requirements, pinned above Year 1. Same block shell as a year
+   so it reads as part of the plan rather than an annotation on it. */
+.imp-pinned-block{border-style:dashed;}
+.imp-pinned-block .imp-year-header{margin-bottom:2px;}
 
 /* The Worker-address escape hatch on the admin sign-in screen. Collapsed until
    something fails, because it is a repair tool, not a normal step. */
