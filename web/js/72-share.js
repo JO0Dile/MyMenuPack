@@ -147,7 +147,8 @@
               ar: 'هاي الخطة كبيرة كثير على رمز QR — بس الرابط فوق يشتغل تمام، ابعته مباشرة.' },
     building: { en: 'Building your link…', ar: 'عم نجهّز رابطك…' },
     error: { en: 'Could not build a share link for this plan.', ar: 'ما قدرنا نجهّز رابط مشاركة لهاي الخطة.' },
-    shareVia: { en: '📤 Share via…', ar: '📤 شارك عبر…' }
+    shareVia: { en: 'Share via…', ar: 'شارك عبر…' },
+    print:    { en: 'Print', ar: 'طباعة' }
   };
   function t(k, r){ return r ? TX[k].ar : TX[k].en; }
 
@@ -178,9 +179,14 @@
           '<p class="share-qr-for">' + esc(res.planName || '') + '</p>' +
           '<p class="share-qr-label">' + t('scan', rtl) + '</p>' +
         '</div>' +
+        // Overview & Print used to be its own menu row. It answers the same
+        // question this screen answers — get this plan out of the app — one
+        // as a link, one on paper, so it is a third way out from here rather
+        // than a fourteenth destination in the menu.
         '<div class="share-actions">' +
-          (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + t('shareVia', rtl) + '</button>' : '') +
+          (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + window.AAUP_ICONS.preview('send', 14) + t('shareVia', rtl) + '</button>' : '') +
           '<button type="button" class="home-btn" id="shareCopyBtn">' + window.AAUP_ICONS.preview('copy', 14) + t('copy', rtl) + '</button>' +
+          (window.AAUP_OVERVIEW ? '<button type="button" class="home-btn" id="sharePrintBtn">' + window.AAUP_ICONS.preview('printer', 14) + t('print', rtl) + '</button>' : '') +
         '</div>' +
         '<p class="form-note share-lead">' + t(res.isCustom ? 'customLead' : 'builtinLead', rtl) + '</p>' +
         '<div class="share-link-row">' +
@@ -198,6 +204,11 @@
         nativeBtn.addEventListener('click', function(){
           navigator.share({ title: t('title', rtl), url: res.url }).catch(function(){});
         });
+      }
+
+      var printBtn = document.getElementById('sharePrintBtn');
+      if(printBtn){
+        printBtn.addEventListener('click', function(){ window.AAUP_OVERVIEW.open(prefix); });
       }
 
       var input = document.getElementById('shareLinkInput');

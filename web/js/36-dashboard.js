@@ -73,8 +73,6 @@
       // A one-time orientation screen — the whole degree laid out year by
       // year — the first time this plan's Dashboard is ever opened. Never
       // shown again after that; always reachable afterward from the
-      // sidebar's "My Path".
-      if(window.AAUP_ROADMAP){ window.AAUP_ROADMAP.openIfFirstVisit(prefix); }
     } catch(e){
       // A malformed/half-loaded plan must NEVER strand the student on a blank
       // screen (Home was already hidden). Fall back to the picker. This is the
@@ -214,10 +212,10 @@
             : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>')) +
       '</div>' +
       '<div class="dash-quicklinks">' +
-        (window.AAUP_ROADMAP ? '<div class="dash-quicklink" onclick="AAUP_ROADMAP.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('compass', 22) + '</span><span class="dq-label">' + (rtl ? 'مساري الدراسي' : 'My Path') + '</span></div>' : '') +
+
         '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('clipboard', 22) + '</span><span class="dq-label">' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</span></div>' +
         '<div class="dash-quicklink" onclick="AAUP_ACHIEVEMENTS.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('trophy', 22) + '</span><span class="dq-label">' + (rtl ? 'الإنجازات' : 'Achievements') + '</span></div>' +
-        '<div class="dash-quicklink" onclick="AAUP_ADVISOR.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('brain', 22) + '</span><span class="dq-label">' + (rtl ? 'خطط لفصلي القادم' : 'Plan My Next Semester') + '</span></div>' +
+
         '<div class="dash-quicklink" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('planpin', 22) + '</span><span class="dq-label">' + (rtl ? 'خطتي الدراسية الكاملة' : 'My Full Study Plan') + '</span></div>' +
         (window.AAUP_SHARE
           ? '<div class="dash-quicklink" onclick="AAUP_SHARE.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('link', 22) + '</span><span class="dq-label">' + (rtl ? 'شارك هذه الخطة' : 'Share this plan') + '</span></div>'

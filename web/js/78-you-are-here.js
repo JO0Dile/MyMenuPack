@@ -28,6 +28,17 @@
     en: 'You are here',
     ar: 'أنت هنا'
   };
+  // Plan My Next Semester was a screen you went to. The semester it plans is
+  // the one after the marked one, so its suggestions belong here, under the
+  // marker — with the full screen still one tap away for actually building
+  // and keeping a semester.
+  var NX = {
+    en: { head: 'Next semester — suggested', more: 'Plan the whole semester',
+          empty: 'Nothing new is open yet — finish something in this semester first.' },
+    ar: { head: 'الفصل القادم — مقترح', more: 'خطط الفصل كامل',
+          empty: 'ما في إشي جديد متاح — خلّص إشي من هالفصل الأول.' }
+  };
+  var SHOWN = 4;
 
   function root(prefix){ return document.getElementById('page-' + prefix); }
 
@@ -73,6 +84,56 @@
     return sem;
   }
 
+  // The suggestion block under the marked semester. Everything in it comes
+  // from AAUP_ADVISOR.recommend — the same ranking the full screen uses, so
+  // the two can never suggest different things.
+  function suggestions(prefix, sem){
+    var page = root(prefix);
+    if(!page) return;
+    page.querySelectorAll('.ynx').forEach(function(el){ el.remove(); });
+    if(!sem || !window.AAUP_ADVISOR || !window.AAUP_ADVISOR.recommend) return;
+    // Edit mode is for rearranging the plan, not for taking advice on it.
+    if(page.classList.contains('editing')) return;
+
+    var rtl = rtlFor(prefix);
+    var t = rtl ? NX.ar : NX.en;
+    var rec = window.AAUP_ADVISOR.recommend(prefix) || { chosen: [] };
+    var esc = window.__escapeHtml;
+    // Anything already ticked off in the marked semester is not a suggestion
+    // for the next one, and neither is a course sitting in this semester.
+    var here = {};
+    sem.querySelectorAll('.course[id]').forEach(function(el){ here[el.id] = true; });
+    var picks = (rec.chosen || []).filter(function(c){ return !here[c.id]; }).slice(0, SHOWN);
+
+    var box = document.createElement('div');
+    box.className = 'ynx';
+    var hours = picks.reduce(function(a, c){ return a + (c.cr || 0); }, 0);
+    box.innerHTML =
+      '<div class="ynx-head"><span class="ynx-label">' + esc(t.head) + '</span>' +
+      (picks.length ? '<span class="ynx-hours">' + hours + 'H</span>' : '') + '</div>' +
+      (picks.length
+        ? '<div class="ynx-list">' + picks.map(function(c){
+            var why = window.AAUP_ADVISOR.reason ? window.AAUP_ADVISOR.reason(c, rtl) : '';
+            var nm = window.AAUP_ADVISOR.name ? window.AAUP_ADVISOR.name(prefix, c.slug, rtl) : c.slug;
+            return '<button type="button" class="ynx-card" data-ynx-slug="' + esc(c.slug) + '">' +
+              '<span class="ynx-name">' + esc(nm) + '</span>' +
+              '<span class="ynx-meta">' + esc(c.cr + 'H' + (why ? ' · ' + why : '')) + '</span>' +
+              '</button>';
+          }).join('') + '</div>'
+        : '<p class="ynx-empty">' + esc(t.empty) + '</p>') +
+      '<button type="button" class="ynx-more">' + esc(t.more) + '</button>';
+
+    sem.parentNode.insertBefore(box, sem.nextSibling);
+
+    box.querySelectorAll('[data-ynx-slug]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(window.AAUP_IMPORTED){ window.AAUP_IMPORTED.openCourseModal(prefix, b.getAttribute('data-ynx-slug')); }
+      });
+    });
+    var more = box.querySelector('.ynx-more');
+    if(more){ more.addEventListener('click', function(){ if(window.AAUP_ADVISOR) window.AAUP_ADVISOR.open(prefix); }); }
+  }
+
   // Has the student opened or closed any year of this plan themselves? If
   // so, nothing here touches the fold state.
   function studentHasFolded(prefix){
@@ -84,6 +145,7 @@
 
   function refresh(prefix){
     var sem = mark(prefix);
+    suggestions(prefix, sem);
     if(!sem || SCROLLED[prefix]) return;
     SCROLLED[prefix] = true;
     if(studentHasFolded(prefix)) return;

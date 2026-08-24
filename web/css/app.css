@@ -1436,6 +1436,22 @@
     pointer-events:none;
   }
   .pw-gate-next{background:var(--accent);}
+
+  /* Degree Audit's two modes — where the GPA is, and where it would be.
+     What-if used to be a menu row; it draws into this screen now. */
+  .au-modes{
+    display:inline-flex;gap:2px;padding:3px;margin:0 0 14px;
+    background:rgba(255,255,255,.04);
+    border:1px solid var(--line);border-radius:10px;
+  }
+  .au-mode{
+    font-family:inherit;font-size:12.5px;font-weight:700;
+    padding:7px 15px;border-radius:8px;border:0;cursor:pointer;
+    background:none;color:var(--text-dim);
+  }
+  .au-mode:hover{color:var(--text);}
+  .au-mode-on{background:var(--accent);color:var(--bg);}
+  .au-mode:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   /* Rides on the numbers line rather than making a sentence of its own —
      js/64-milestones.js appends it into .pw-num. */
   .pw-gate-caption{
@@ -4260,6 +4276,59 @@
   }
   .imp-pool-num b{color:var(--text);font-weight:800;}
 
+  /* Next semester, suggested, under the marked one (js/78-you-are-here.js).
+     Plan My Next Semester used to be a trip; this is the same ranking,
+     where the question is asked. */
+  .ynx{
+    margin:0 0 18px;padding:12px 14px;
+    border:1px dashed var(--line);border-radius:10px;
+    background:rgba(255,255,255,.02);
+  }
+  .ynx-head{display:flex;align-items:baseline;gap:10px;margin-bottom:9px;}
+  .ynx-label{
+    font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .ynx-hours{
+    margin-inline-start:auto;font-size:11.5px;font-weight:800;color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  .ynx-list{display:flex;flex-wrap:wrap;gap:7px;}
+  .ynx-card{
+    flex:1 1 190px;min-width:0;text-align:start;cursor:pointer;
+    display:flex;flex-direction:column;gap:2px;
+    padding:8px 10px;border:1px solid var(--line);border-radius:8px;
+    background:var(--panel);font-family:inherit;color:var(--text);
+  }
+  .ynx-card:hover{border-color:var(--accent);}
+  .ynx-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .ynx-name{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ynx-meta{font-size:10.5px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ynx-empty{margin:0;font-size:12px;color:var(--text-dim);}
+  .ynx-more{
+    margin-top:9px;background:none;border:0;padding:0;cursor:pointer;
+    font-family:inherit;font-size:12px;font-weight:700;color:var(--accent);
+  }
+  .ynx-more:hover{text-decoration:underline;}
+
+  /* One row asks which kind of change (js/37-sidebar.js openPlanChooser). */
+  .cp-choice{display:grid;gap:9px;margin-top:6px;}
+  .cp-choice-btn{
+    display:flex;align-items:center;gap:12px;text-align:start;cursor:pointer;
+    padding:13px 14px;border:1px solid var(--line);border-radius:11px;
+    background:var(--panel);font-family:inherit;color:var(--text);
+  }
+  .cp-choice-btn:hover{border-color:var(--accent);}
+  .cp-choice-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .cp-choice-icon{
+    flex:none;display:inline-flex;align-items:center;justify-content:center;
+    width:38px;height:38px;border-radius:10px;color:var(--accent);
+    background:color-mix(in srgb, var(--accent) 14%, transparent);
+  }
+  .cp-choice-text{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .cp-choice-text b{font-size:13.5px;font-weight:700;}
+  .cp-choice-text span{font-size:11.5px;color:var(--text-dim);}
+
   /* Held down: the year says so, so the dimming reads as deliberate rather
      than as the page having gone wrong. */
   .imp-year-block.year-peek{box-shadow:0 0 0 2px var(--accent) inset;}
@@ -7061,6 +7130,14 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 }
 .pf-chip:hover{border-color:var(--accent); color:var(--text);}
 .pf-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+/* Requirement chips carry the colour their cards carry, so the chip and what
+   it reveals are recognisably the same thing. */
+.pf-req{display:inline-flex;align-items:center;gap:6px;}
+.pf-swatch{width:9px;height:9px;border-radius:2px;flex:none;}
+.pf-div{
+  flex:none;width:1px;align-self:stretch;margin:3px 2px;
+  background:var(--line);
+}
 .pf-chip.pf-on{
   background:var(--accent); color:var(--on-accent); border-color:var(--accent);
 }
@@ -7092,6 +7169,13 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
 .plan-f-done   .imp-year-block:not(:has(.course.completed)){display:none;}
 .plan-f-locked .imp-semester-block:not(:has(.course:not(.available):not(.completed))),
 .plan-f-locked .imp-year-block:not(:has(.course:not(.available):not(.completed))){display:none;}
+
+/* Filtering by requirement bucket (the chips that replaced My Path). The
+   matching cards are marked .pf-hit in JS, so one rule covers all seven
+   buckets instead of seven near-identical ones. */
+.plan-f-req .course:not(.pf-hit){display:none;}
+.plan-f-req .imp-semester-block:not(:has(.course.pf-hit)),
+.plan-f-req .imp-year-block:not(:has(.course.pf-hit)){display:none;}
 
 /* A pair bracket around a lecture whose lab the filter just hid would be a
    bracket around one card. */

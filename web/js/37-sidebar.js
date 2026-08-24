@@ -44,24 +44,19 @@
       action: function(prefix){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.toggleEdit(prefix); } },
     { key: 'dashboard', icon: 'home', label: 'Dashboard', group: null, action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
     { key: 'studyplan', icon: 'planpin', label: 'My Study Plan', group: 'plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'roadmap', icon: 'compass', label: 'My Path', group: 'plan', action: function(prefix){ if(window.AAUP_ROADMAP) window.AAUP_ROADMAP.open(prefix); } },
+    // Four rows left this list, each into the screen that was already
+    // answering the same question:
+    //   My Path            -> requirement chips on the plan's own filter
+    //   What if… (GPA)     -> the Degree Audit's second mode
+    //   Plan My Next Sem.  -> under "You are here" on the plan
+    //   Overview & Print   -> Share this plan, as the third way out
     { key: 'audit', icon: 'clipboard', label: 'Degree Audit & GPA', group: 'plan', action: function(prefix){ window.AAUP_AUDIT.open(prefix); } },
-    // Sits with the GPA screen it plays with, not at the bottom of the
-    // list: a student opens the audit, sees a number they do not like,
-    // and the next thing they want is right there.
-    { key: 'whatif', icon: 'target', label: 'What if… (GPA)', group: 'plan', advanced: true, action: function(prefix){ if(window.AAUP_WHATIF) window.AAUP_WHATIF.open(prefix); } },
     { key: 'achievements', icon: 'trophy', label: 'Achievements', group: 'plan', advanced: true, action: function(prefix){ window.AAUP_ACHIEVEMENTS.open(prefix); } },
-    { key: 'advisor', icon: 'brain', label: 'Plan My Next Semester', group: 'plan', action: function(prefix){ window.AAUP_ADVISOR.open(prefix); } },
-    { key: 'overview', icon: 'printer', label: 'Overview & Print', group: 'plan', advanced: true, action: function(prefix){ if(window.AAUP_OVERVIEW) window.AAUP_OVERVIEW.open(prefix); } },
     // The one place in the app where students talk to each other rather than
     // to their own data — so it sits with the rest of the plan's screens, not
     // hidden behind a floating button nobody presses.
     { key: 'thoughts', icon: 'speech', label: 'Student Thoughts', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_THOUGHTS) window.AAUP_THOUGHTS.open(prefix); } },
     { key: 'contacts', icon: 'people', label: 'Contacts', group: 'community', advanced: true, action: function(prefix){ if(window.AAUP_CONTACTS) window.AAUP_CONTACTS.open(prefix); } },
-    // Not the same thing as "Switch Plan" at the bottom, which only reopens
-    // the picker. This one answers the question first: what happens to my
-    // progress if I move?
-    { key: 'changeplan', icon: 'shuffle', label: 'Change Major', group: 'account', advanced: true, action: function(prefix){ if(window.AAUP_CHANGE_PLAN) window.AAUP_CHANGE_PLAN.open(prefix); } },
     // These two also came off the plan header. Neither is an everyday
     // action, so they land in Advanced rather than the top list — but they
     // do land somewhere: a control that is removed from one surface and
@@ -89,6 +84,41 @@
   function labelFor(item, prefix){
     if(item.key === 'edit' && isEditing(prefix)) return 'Exit Edit Mode';
     return item.label;
+  }
+
+  // "Change Major" and "Switch Plan" were two rows that both changed which
+  // plan you are on. They are one row now, and it asks which — moving major
+  // (what carries over, what it costs) or opening one of your own saved
+  // plans — instead of making the student pick the right row for a
+  // difference the labels never explained.
+  function openPlanChooser(prefix){
+    var overlay = document.getElementById('devModalOverlay');
+    var body = document.getElementById('devModalBody');
+    if(!overlay || !body || !window.AAUP_CHANGE_PLAN){
+      window.AAUP_DASHBOARD.choosePlan();
+      return;
+    }
+    var saved = window.AAUP_IMPORTED ? Object.keys(window.AAUP_IMPORTED.loadImportedPlans() || {}).length : 0;
+    body.innerHTML =
+      '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('shuffle', 20) + 'Change plan</h2>' +
+      '<div class="cp-choice">' +
+        '<button type="button" class="cp-choice-btn" id="cpMajor">' +
+          '<span class="cp-choice-icon">' + window.AAUP_ICONS.preview('compass', 20) + '</span>' +
+          '<span class="cp-choice-text"><b>Move to another major</b>' +
+          '<span>What carries over, what it costs</span></span></button>' +
+        '<button type="button" class="cp-choice-btn" id="cpSwitch">' +
+          '<span class="cp-choice-icon">' + window.AAUP_ICONS.preview('refresh', 20) + '</span>' +
+          '<span class="cp-choice-text"><b>Open another plan</b>' +
+          '<span>' + (saved ? saved + ' saved · all majors' : 'All majors') + '</span></span></button>' +
+      '</div>';
+    overlay.classList.add('open');
+    var close = function(){ overlay.classList.remove('open'); };
+    document.getElementById('cpMajor').addEventListener('click', function(){
+      close(); window.AAUP_CHANGE_PLAN.open(prefix);
+    });
+    document.getElementById('cpSwitch').addEventListener('click', function(){
+      close(); window.AAUP_DASHBOARD.choosePlan();
+    });
   }
 
   var currentPrefix = null;
@@ -164,7 +194,7 @@
       adv.push({ key: 'library', icon: 'book', label: 'Course Library' });
     }
     byGroup.account.push({ key: 'settings', icon: 'gear', label: 'Settings' });
-    byGroup.account.push({ key: 'switch', icon: 'refresh', label: 'Switch Plan' });
+    byGroup.account.push({ key: 'switch', icon: 'shuffle', label: 'Change plan' });
 
     function rowHtml(item){
       return '<button type="button" class="sb-mrow' + (item.key === activeKey ? ' active' : '') +
@@ -224,7 +254,7 @@
           advItems.map(itemHtml).join('') + '</div>';
     }
     html += '<button type="button" class="sb-item" data-sb-key="settings"><span class="sb-icon">' + window.AAUP_ICONS.preview('gear', 16) + '</span><span>Settings</span></button>' +
-      '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('refresh', 16) + '</span><span>Switch Plan</span></button></div>';
+      '<button type="button" class="sb-item" data-sb-key="switch"><span class="sb-icon">' + window.AAUP_ICONS.preview('shuffle', 16) + '</span><span>Change plan</span></button></div>';
     html += '</div>';
     html += '<div class="sb-groups">' + moreGroupsHtml(prefix, activeKey, hasLibrary) + '</div>';
     sidebar.innerHTML = html;
@@ -261,7 +291,7 @@
         // tapped. Read before closeMobile() clears .open below.
         var openedFromMoreDrawer = sidebar.classList.contains('open');
         closeMobile();
-        if(key === 'switch'){ window.AAUP_DASHBOARD.choosePlan(); return; }
+        if(key === 'switch'){ openPlanChooser(prefix); return; }
         if(key === 'settings'){ openSettings(); tagOpenedFromMore(openedFromMoreDrawer); return; }
         if(key === 'library'){ if(window.AAUP_IMPORTED) window.AAUP_IMPORTED.openLibrary(prefix); tagOpenedFromMore(openedFromMoreDrawer); return; }
         var item = itemsFor(prefix).filter(function(i){ return i.key === key; })[0];

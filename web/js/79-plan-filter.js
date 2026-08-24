@@ -26,6 +26,11 @@
   'use strict';
 
   var MODES = ['all', 'avail', 'locked', 'done'];
+  // Requirement modes are 'req:<bucket>'. They are why My Path stopped being
+  // a screen: it was the plan grouped by requirement, which is this — a view
+  // of the plan you are already looking at, not a trip to another one. The
+  // hours each bucket owes are in the Degree Audit, where they always were.
+  var REQ_PREFIX = 'req:';
   var CLS = { avail: 'plan-f-avail', locked: 'plan-f-locked', done: 'plan-f-done' };
   // What each mode counts as a match — the same three states the CSS keys
   // off, written once so the empty state can never disagree with what is
@@ -42,6 +47,7 @@
             locked: 'Nothing is locked. Every course in this plan is open to you or already passed.',
             done: 'You have not marked anything as passed yet. Tick a course off and it shows up here.'
           },
+          noneReq: 'Nothing in this plan counts toward that requirement.',
           clear: 'Show everything' },
     ar: { all: 'الكل', avail: 'متاح لي', locked: 'مغلق', done: 'منجز',
           none: {
@@ -49,6 +55,7 @@
             locked: 'ما في إشي مغلق. كل مساقات الخطة إما متاحة إلك أو منجزة.',
             done: 'لسا ما علّمت إشي كمنجز. علّم مساق وبيظهر هون.'
           },
+          noneReq: 'ما في إشي بهالخطة بينحسب على هالمتطلب.',
           clear: 'اعرض الكل' }
   };
 
@@ -65,7 +72,15 @@
     var page = root(prefix);
     if(!page) return;
     var mode = state[prefix] || 'all';
+    var bucket = mode.indexOf(REQ_PREFIX) === 0 ? mode.slice(REQ_PREFIX.length) : '';
     Object.keys(CLS).forEach(function(k){ page.classList.toggle(CLS[k], k === mode); });
+    // One class and one marker rather than seven more CSS blocks: the cards
+    // that match get .pf-hit, and the stylesheet hides everything else.
+    page.classList.toggle('plan-f-req', !!bucket);
+    page.querySelectorAll('.course.pf-hit').forEach(function(el){ el.classList.remove('pf-hit'); });
+    if(bucket){
+      page.querySelectorAll('.course.req-' + bucket).forEach(function(el){ el.classList.add('pf-hit'); });
+    }
     page.classList.toggle('plan-filtering', mode !== 'all');
     var bar = page.querySelector('.pf-bar');
     if(bar){
@@ -80,7 +95,9 @@
     // honest answer. Say which it is, and offer the way out.
     var years = page.querySelector('.years');
     var empty = page.querySelector('.pf-empty');
-    var matches = mode === 'all' ? 1 : page.querySelectorAll(MATCH[mode]).length;
+    var matches = mode === 'all' ? 1
+      : bucket ? page.querySelectorAll('.course.pf-hit').length
+      : page.querySelectorAll(MATCH[mode]).length;
     if(mode !== 'all' && !matches && years){
       if(!empty){
         empty = document.createElement('div');
@@ -88,7 +105,8 @@
         years.parentNode.insertBefore(empty, years);
       }
       var t2 = TX[rtlFor(prefix) ? 'ar' : 'en'];
-      empty.innerHTML = '<p>' + window.__escapeHtml(t2.none[mode]) + '</p>' +
+      var msg = bucket ? t2.noneReq : t2.none[mode];
+      empty.innerHTML = '<p>' + window.__escapeHtml(msg) + '</p>' +
         '<button type="button" class="home-btn" data-pf="all">' + window.__escapeHtml(t2.clear) + '</button>';
       empty.hidden = false;
     } else if(empty){
@@ -114,10 +132,19 @@
     bar.className = 'pf-bar';
     bar.setAttribute('role', 'group');
     bar.setAttribute('aria-label', rtlFor(prefix) ? 'تصفية الخطة' : 'Filter the plan');
+    var rtl = rtlFor(prefix);
+    var buckets = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.bucketsInPlan)
+      ? window.AAUP_IMPORTED.bucketsInPlan(prefix) : [];
     bar.innerHTML = MODES.map(function(m){
       return '<button type="button" class="pf-chip" data-pf="' + m + '" aria-pressed="false">' +
         window.__escapeHtml(t[m]) + '</button>';
-    }).join('');
+    }).join('') +
+      (buckets.length ? '<span class="pf-div" aria-hidden="true"></span>' : '') +
+      buckets.map(function(b){
+        return '<button type="button" class="pf-chip pf-req" data-pf="' + REQ_PREFIX + b.key + '" aria-pressed="false">' +
+          '<span class="pf-swatch ' + b.cls + '"></span>' +
+          window.__escapeHtml(rtl ? b.ar : b.en) + '</button>';
+      }).join('');
     meter.appendChild(bar);
     // Bound to the plan root, not the chip bar: the "show everything" button
     // in the empty state uses the same data-pf attribute, and it lives

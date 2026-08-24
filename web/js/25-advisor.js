@@ -507,6 +507,10 @@
 
   window.AAUP_ADVISOR = {
     open: open, recommend: recommend,
+    // The suggestions also render inline under "You are here" on the plan
+    // (js/78-you-are-here.js), which needs the same one-line argument the
+    // tray puts under each row rather than inventing a second wording.
+    reason: reasonFor, caution: cautionFor, name: courseName,
     // For the dashboard and anything else that wants what the student
     // actually picked rather than what the app suggested.
     picked: function(prefix){ return pickedFor(prefix, poolFor(prefix)); },

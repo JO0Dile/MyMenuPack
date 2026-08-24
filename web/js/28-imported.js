@@ -1360,6 +1360,22 @@
       '</svg></span>';
   }
 
+  // Which requirement buckets this plan actually draws on, in the order the
+  // audit lists them. Read by the legend below and by the plan filter
+  // (js/79-plan-filter.js), which offers one chip per bucket.
+  function bucketsInPlan(planId){
+    var p = loadImportedPlans()[planId];
+    if(!p) return [];
+    var seen = {};
+    (p.courses || []).forEach(function(c){
+      var b = bucketOf(c);
+      if(b) seen[b] = true;
+    });
+    return BUCKET_ORDER.filter(function(b){ return seen[b]; }).map(function(b){
+      return { key: b, cls: BUCKET_CLASS[b], en: BUCKET_LABEL[b][0], ar: BUCKET_LABEL[b][1] };
+    });
+  }
+
   function legendHtml(id, p, rtl){
     var seen = {}, keys = [];
     (p.courses || []).forEach(function(c){
@@ -2280,7 +2296,7 @@
     // Exposed for js/74-course-gestures.js, which shows the same trace under
     // its action sheet rather than re-implementing the walk over the edges.
     traceCourse: handleCourseHoverEnter, untraceCourse: handleCourseHoverLeave,
-    toggleLang: toggleLang, openLibrary: openLibrary,
+    toggleLang: toggleLang, openLibrary: openLibrary, bucketsInPlan: bucketsInPlan,
     dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
     // Programmatic course creation, for callers that already have every field
