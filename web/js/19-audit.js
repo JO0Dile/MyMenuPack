@@ -377,21 +377,54 @@
   // Mirrors a real transcript's structure: each semester's own GPA (which
   // keeps every attempt made that semester, including F's later retaken),
   // alongside the cumulative above (which excludes replaced attempts).
+  // A transcript is the shape this information already has: one row a term,
+  // hours and GPA, with the cumulative underneath. It was a list of two-part
+  // rows before, which is the same numbers arranged so they could not be
+  // read down a column.
+  //
+  // The numbers are this app's, computed from what the student ticked and
+  // the grades they entered — not a record from the registrar, and the
+  // table says so rather than looking like one.
   function renderSemesterGpas(prefix, rtl){
     if(!window.AAUP_GPA.semesterGpas) return '';
     var sems = window.AAUP_GPA.semesterGpas(prefix);
     if(!sems.length) return '';
+    var cum = window.AAUP_GPA.gpaFor(prefix) || {};
+    var totalCr = sems.reduce(function(a, s){ return a + s.credits; }, 0);
     var rows = sems.map(function(s){
-      return '<div class="dash-next-item"><span>' + (rtl ? s.ar : s.label) + '</span>' +
-        '<span><b>' + s.gpa.toFixed(2) + '</b> <span style="opacity:.6;">(' + s.credits + 'H)</span></span></div>';
+      return '<tr><td>' + window.__escapeHtml(rtl ? s.ar : s.label) + '</td>' +
+        '<td class="tr-num">' + s.credits + '</td>' +
+        '<td class="tr-num">' + s.gpa.toFixed(2) + '</td></tr>';
     }).join('');
-    return '<h3 style="margin-bottom:6px;">' + (rtl ? 'معدل كل فصل' : 'GPA by Semester') + '</h3>' +
+    return '<h3 style="margin-bottom:6px;">' + (rtl ? 'كشف العلامات' : 'Your record') + '</h3>' +
       '<p class="form-note" style="margin-top:0;">' +
       (rtl
-        ? 'معدل الفصل يشمل كل المحاولات في ذلك الفصل (تبقى علامة F في فصلها). المعدل التراكمي أعلاه يستبدل علامة المساق المعاد بعلامة الإعادة.'
-        : 'A semester\u2019s GPA keeps every attempt made that semester (an F stays in its semester). The cumulative above replaces a repeated course\u2019s old grade with the retake\u2019s grade \u2014 that\u2019s why a cumulative can be higher than every individual semester.') +
+        ? 'أرقامك أنت — محسوبة مما أدخلته، مش كشف من دائرة التسجيل.'
+        : 'Your numbers, computed from what you entered — not the registrar\u2019s record.') +
       '</p>' +
-      '<div class="dash-next-list" style="margin-bottom:16px;">' + rows + '</div>';
+      '<div class="tr-wrap"><table class="tr-table">' +
+      '<thead><tr>' +
+        '<th>' + (rtl ? 'الفصل' : 'Term') + '</th>' +
+        '<th class="tr-num">' + (rtl ? 'ساعات' : 'Hours') + '</th>' +
+        '<th class="tr-num">' + (rtl ? 'المعدل' : 'GPA') + '</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+      '<tfoot><tr>' +
+        '<td>' + (rtl ? 'التراكمي' : 'Cumulative') + '</td>' +
+        '<td class="tr-num">' + totalCr + '</td>' +
+        '<td class="tr-num">' + (cum.gpa != null ? cum.gpa.toFixed(2) : '\u2014') + '</td>' +
+      '</tr></tfoot>' +
+      '</table></div>' +
+      // Why the last row can be higher than every row above it. Kept, because
+      // it is the one thing about these numbers that looks like a mistake —
+      // but folded, because it is read once.
+      '<details class="tr-why"><summary>' +
+      (rtl ? 'ليش التراكمي أعلى من كل فصل؟' : 'Why is the cumulative higher than every term?') +
+      '</summary><p>' +
+      (rtl
+        ? 'معدل الفصل بيشمل كل المحاولات في ذاك الفصل (علامة F بتضل بفصلها). التراكمي فوق بيستبدل علامة المساق المعاد بعلامة الإعادة.'
+        : 'A term\u2019s GPA keeps every attempt made that term \u2014 an F stays in its term. The cumulative replaces a repeated course\u2019s old grade with the retake\u2019s.') +
+      '</p></details>';
   }
 
   function bind(){

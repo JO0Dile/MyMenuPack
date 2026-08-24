@@ -693,7 +693,8 @@
       : activeSettingsTab === 'help' ? helpTabHtml(r, selectedPlan, isImportedSelected, devUnlocked)
       // Both halves of the old Account and Data tabs, in one scroll: where
       // your progress lives online, then the copies of it on this device.
-      : (accountTabHtml(r, current, others) + dataTabHtml(r, devUnlocked));
+      : (accountTabHtml(r, current, others) + dataTabHtml(r, devUnlocked) +
+         (window.AAUP_AUTOBACKUP ? window.AAUP_AUTOBACKUP.sectionHtml(r) : ''));
 
     body.innerHTML =
       '<h2 class="mh" style="margin-top:0;">' + window.AAUP_ICONS.preview('gear', 20) + (r ? 'الإعدادات' : 'Settings') + '</h2>' +
@@ -714,6 +715,7 @@
         renderSettingsBody(body);
       });
     });
+    if(window.AAUP_AUTOBACKUP){ window.AAUP_AUTOBACKUP.bind(body); }
     if(window.AAUP_ORPHANS){
       window.AAUP_ORPHANS.bindSection(body, function(){ renderSettingsBody(body); });
     }

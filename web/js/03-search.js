@@ -257,6 +257,81 @@
   }
 
   /* ---------------- homepage major search ---------------- */
+  // ---- every course in every plan, not just the one you are standing in.
+  //
+  // Seventy-seven plans ship with the app and all of their courses are
+  // already on the device. "Who teaches Cryptography, and in which year?"
+  // was answerable offline the whole time and there was nowhere to ask it:
+  // the home search matched major names only, so typing a course name
+  // returned "No matching major found".
+  //
+  // Built once and cached, because it is roughly four thousand entries and
+  // the search runs on every keystroke. The cache key carries each plan's
+  // version and course count, so editing a plan rebuilds it and nothing
+  // else does.
+  var courseIdxCache = null, courseIdxKey = '';
+
+  function allPlanCourses(){
+    var plans = window.AAUP_IMPORTED ? (window.AAUP_IMPORTED.loadImportedPlans() || {}) : {};
+    var ids = Object.keys(plans);
+    var key = ids.map(function(id){
+      var p = plans[id] || {};
+      return id + ':' + (p.version || 0) + ':' + ((p.courses || []).length);
+    }).join('|');
+    if(courseIdxCache && courseIdxKey === key) return courseIdxCache;
+
+    var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+    // The plan the student is actually on goes first, so its courses win the
+    // ten result slots ahead of the same course in someone else's major.
+    var selected = window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.getSelected
+      ? window.AAUP_DASHBOARD.getSelected() : null;
+    ids.sort(function(a, b){
+      if(a === selected) return -1;
+      if(b === selected) return 1;
+      return 0;
+    });
+
+    var out = [];
+    ids.forEach(function(id){
+      var p = plans[id] || {};
+      var mn = p.majorName || {};
+      var planName = ((rtl ? (mn.ar && mn.ar.big) : (mn.en && mn.en.big)) ||
+                      (mn.en && mn.en.big) || id);
+      (p.courses || []).forEach(function(c){
+        if(!c || !c.id) return;
+        var where = [
+          planName,
+          c.yearId ? String(c.yearId).toUpperCase() : '',
+          c.semester ? String(c.semester).toUpperCase() : ''
+        ].filter(Boolean).join(' \u00b7 ');
+        out.push({
+          page: id, slug: c.id, imported: true, isCourse: true,
+          en: c.name || c.id, ar: c.ar || '',
+          code: c.courseNumber || '',
+          where: where
+        });
+      });
+    });
+    courseIdxCache = out;
+    courseIdxKey = key;
+    return out;
+  }
+
+  // Open the plan, then land on the course inside it. The plan renders
+  // asynchronously, so the card is waited for rather than assumed — and
+  // given up on after a second rather than polling forever.
+  function openCourseInPlan(planId, slug){
+    if(!(window.AAUP_DASHBOARD && window.AAUP_DASHBOARD.selectAndOpen)) return;
+    window.AAUP_DASHBOARD.selectAndOpen(planId);
+    var tries = 0;
+    (function land(){
+      var el = document.getElementById(planId + '-c-' + slug);
+      if(el && window.__selectCourse){ window.__selectCourse(planId, slug); return; }
+      if(tries++ > 20) return;
+      setTimeout(land, 50);
+    })();
+  }
+
   function initHomeSearch(){
     var input = document.getElementById('homeSearchInput');
     var box = document.getElementById('homeSearchBox');
@@ -268,18 +343,22 @@
     // re-rendered into the DOM whenever a plan is created/edited/deleted,
     // well after this module's own load-time init runs.
     function buildIndex(){
-      return Array.prototype.map.call(document.querySelectorAll('.plan-card[data-page]'), function(el){
+      var majors = Array.prototype.map.call(document.querySelectorAll('.plan-card[data-page]'), function(el){
         return { page: el.dataset.page, imported: el.dataset.imported === '1', en: el.dataset.searchEn || '', ar: el.dataset.searchAr || '', el: el };
       });
+      // Majors first: a student typing "cyber" wants the major, not the
+      // fourteen courses across four plans with the word in their name.
+      return majors.concat(allPlanCourses());
     }
     attachSearch({
       input: input, box: box, clear: clear, dropdown: dropdown,
       getIndex: buildIndex,
-      emptyText: 'No matching major found / لا يوجد تخصص مطابق',
+      emptyText: 'No matching major or course / لا يوجد تخصص أو مساق مطابق',
       onSelect: function(r){
         input.value = '';
         box.classList.remove('has-value');
-        if(r.imported && window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.selectAndOpen(r.page); }
+        if(r.isCourse){ openCourseInPlan(r.page, r.slug); }
+        else if(r.imported && window.AAUP_DASHBOARD){ window.AAUP_DASHBOARD.selectAndOpen(r.page); }
         else { showPage(r.page); }
       }
     });
