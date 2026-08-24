@@ -4255,6 +4255,33 @@
     overflow:hidden;text-overflow:ellipsis;
   }
 
+  /* Following a friend's snapshot (js/82-follow.js). Two bars, same scale,
+     and what each of you has that the other does not. */
+  .fl-row{margin:0 0 10px;}
+  .fl-line{display:flex;align-items:baseline;gap:10px;font-size:12.5px;}
+  .fl-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fl-num{
+    margin-inline-start:auto;color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
+  .fl-track{
+    height:7px;margin-top:5px;border-radius:99px;
+    background:var(--line);overflow:hidden;
+  }
+  .fl-track i{display:block;height:100%;border-radius:99px;background:var(--text-dim);}
+  .fl-me .fl-track i{background:var(--accent);}
+  .fl-me .fl-name{color:var(--accent);}
+  .fl-note{
+    margin:-4px 0 12px;font-size:11.5px;color:var(--text-dim);
+    overflow:hidden;text-overflow:ellipsis;
+  }
+  .fl-x{
+    background:none;border:0;padding:0 2px;cursor:pointer;
+    font-family:inherit;font-size:11.5px;color:var(--text-dim);
+    text-decoration:underline;
+  }
+  .fl-x:hover{color:var(--prereq);}
+
   /* "What do I need on the final", answered before the list of every grade
      tier rather than inside it (js/21-course-modal-extras.js). */
   .as-need{

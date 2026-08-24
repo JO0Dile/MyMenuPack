@@ -190,7 +190,10 @@
     var html = '<div class="dash-header">' +
       '<div class="dash-title"><span class="dash-icon">' + window.AAUP_ICONS.markup(info, { size: 24 }) + '</span><div><h1>' + info.name + '</h1><p>' + (rtl ? 'لوحة التحكم' : 'Dashboard') + '</p></div></div>' +
       '<div class="dash-actions">' +
-        '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.choosePlan()">' + window.AAUP_ICONS.preview('refresh', 14) + '<span>' + (rtl ? 'تبديل التخصص' : 'Switch Plan') + '</span></button>' +
+        // Same one row as the menu's (js/37-sidebar.js): it asks which kind
+        // of change rather than being one of two buttons whose labels never
+        // explained the difference.
+        '<button type="button" class="home-btn" onclick="AAUP_SIDEBAR.openPlanChooser(\'' + prefix + '\')">' + window.AAUP_ICONS.preview('shuffle', 14) + '<span>' + (rtl ? 'تغيير الخطة' : 'Change plan') + '</span></button>' +
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">' + window.AAUP_ICONS.preview('planpin', 14) + '<span>' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</span></button>' +
       '</div></div>' +
       phoneHeroHtml +
@@ -211,6 +214,7 @@
             ? '<div class="dash-next-list">' + nextCourses.map(function(c){ return '<div class="dash-next-item"><span>' + nameFor(c.slug) + '</span><span>' + c.cr + 'H</span></div>'; }).join('') + '</div>'
             : '<p class="ex-note">' + (rtl ? 'لا توجد توصيات متاحة الآن.' : 'No recommendations available right now.') + '</p>')) +
       '</div>' +
+      (window.AAUP_FOLLOW ? window.AAUP_FOLLOW.sectionHtml(prefix, rtl) : '') +
       '<div class="dash-quicklinks">' +
 
         '<div class="dash-quicklink" onclick="AAUP_AUDIT.open(\'' + prefix + '\')"><span class="dq-icon">' + window.AAUP_ICONS.preview('clipboard', 22) + '</span><span class="dq-label">' + (rtl ? 'التدقيق الأكاديمي وGPA' : 'Degree Audit & GPA') + '</span></div>' +
@@ -240,6 +244,7 @@
                'Tip: export a backup of your progress from Settings \u2014 browser data can be wiped.') + '</p>';
     }
     host.innerHTML = html;
+    if(window.AAUP_FOLLOW){ window.AAUP_FOLLOW.bind(prefix); }
     if(window.AAUP_WHATS_NEXT){ window.AAUP_WHATS_NEXT.render(prefix, prefix + '-dashNextBody'); }
     if(window.AAUP_GRADUATION){ window.AAUP_GRADUATION.render(prefix, prefix + '-dashGradBody'); }
     // Phone only (see .dash-swipe-dots in app.css) — the three stat tiles

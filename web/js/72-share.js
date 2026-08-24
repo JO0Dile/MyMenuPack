@@ -104,6 +104,15 @@
     });
   }
 
+  // Any JSON payload as an offline #hash link, gzipped when the browser can.
+  // Used by the plan link above and by js/82-follow.js for a progress
+  // snapshot, so both go through one encoder and one marker convention.
+  function encodePayload(kind, obj){
+    return compressText(JSON.stringify(obj)).then(function(res){
+      return baseUrl() + '#' + kind + '=' + (res.compressed ? 'g' : 'r') + toBase64Url(res.bytes);
+    });
+  }
+
   // ---- drawing the QR (js/71-qrcode.js) ----------------------------------
 
   function drawQr(canvas, text){
@@ -148,7 +157,9 @@
     building: { en: 'Building your link…', ar: 'عم نجهّز رابطك…' },
     error: { en: 'Could not build a share link for this plan.', ar: 'ما قدرنا نجهّز رابط مشاركة لهاي الخطة.' },
     shareVia: { en: 'Share via…', ar: 'شارك عبر…' },
-    print:    { en: 'Print', ar: 'طباعة' }
+    print:    { en: 'Print', ar: 'طباعة' },
+    calendar: { en: 'Calendar', ar: 'التقويم' },
+    progress: { en: 'My progress', ar: 'تقدّمي' }
   };
   function t(k, r){ return r ? TX[k].ar : TX[k].en; }
 
@@ -187,6 +198,10 @@
           (navigator.share ? '<button type="button" class="home-btn share-native-btn" id="shareNativeBtn">' + window.AAUP_ICONS.preview('send', 14) + t('shareVia', rtl) + '</button>' : '') +
           '<button type="button" class="home-btn" id="shareCopyBtn">' + window.AAUP_ICONS.preview('copy', 14) + t('copy', rtl) + '</button>' +
           (window.AAUP_OVERVIEW ? '<button type="button" class="home-btn" id="sharePrintBtn">' + window.AAUP_ICONS.preview('printer', 14) + t('print', rtl) + '</button>' : '') +
+          (window.AAUP_CALENDAR ? '<button type="button" class="home-btn" id="shareIcsBtn">' + window.AAUP_ICONS.preview('calendar', 14) + t('calendar', rtl) + '</button>' : '') +
+          // A link to the PLAN says what the degree is; this one says where
+          // the sender has got to on it (js/82-follow.js).
+          (window.AAUP_FOLLOW ? '<button type="button" class="home-btn" id="shareProgressBtn">' + window.AAUP_ICONS.preview('people', 14) + t('progress', rtl) + '</button>' : '') +
         '</div>' +
         '<p class="form-note share-lead">' + t(res.isCustom ? 'customLead' : 'builtinLead', rtl) + '</p>' +
         '<div class="share-link-row">' +
@@ -204,6 +219,16 @@
         nativeBtn.addEventListener('click', function(){
           navigator.share({ title: t('title', rtl), url: res.url }).catch(function(){});
         });
+      }
+
+      var progressBtn = document.getElementById('shareProgressBtn');
+      if(progressBtn){
+        progressBtn.addEventListener('click', function(){ window.AAUP_FOLLOW.open(prefix); });
+      }
+
+      var icsBtn = document.getElementById('shareIcsBtn');
+      if(icsBtn){
+        icsBtn.addEventListener('click', function(){ window.AAUP_CALENDAR.open(prefix); });
       }
 
       var printBtn = document.getElementById('sharePrintBtn');
@@ -298,6 +323,22 @@
       if(prefix && window.AAUP_DASHBOARD) window.AAUP_DASHBOARD.selectAndOpen(prefix);
       return;
     }
+    if(hash.indexOf('#follow=') === 0){
+      var fpayload = hash.slice(8);
+      var fmarker = fpayload.charAt(0);
+      var fdata = fpayload.slice(1);
+      history.replaceState(null, '', location.pathname + location.search);
+      if(!fdata) return;
+      var fbytes;
+      try{ fbytes = fromBase64Url(fdata); }catch(e){ return; }
+      decompressBytes(fbytes, fmarker === 'g').then(function(jsonText){
+        var snap = JSON.parse(jsonText);
+        if(window.AAUP_FOLLOW) window.AAUP_FOLLOW.accept(snap);
+      }).catch(function(){
+        if(window.__showToast) window.__showToast('Could not open that link.');
+      });
+      return;
+    }
     if(hash.indexOf('#import=') === 0){
       var payload = hash.slice(8);
       var marker = payload.charAt(0);
@@ -315,7 +356,7 @@
         var doImport = function(){
           var result = window.AAUP_DEV && window.AAUP_DEV.importPlan(jsonText);
           if(result && result.ok){
-            if(window.__showToast) window.__showToast('📥 Imported — opening it now.');
+            if(window.__showToast) window.__showToast('Imported — opening it now.');
             if(window.AAUP_DASHBOARD) window.AAUP_DASHBOARD.selectAndOpen(result.id);
           } else if(window.__showToast){
             window.__showToast('Could not import that plan: ' + ((result && result.errors) || ['unknown error']).join(' '));
@@ -331,5 +372,5 @@
   if(document.readyState === 'complete'){ handleIncomingShare(); }
   else { window.addEventListener('load', handleIncomingShare); }
 
-  window.AAUP_SHARE = { open: open, close: function(){ var o = document.getElementById('shareOverlay'); if(o) o.classList.remove('open'); } };
+  window.AAUP_SHARE = { open: open, encodePayload: encodePayload, close: function(){ var o = document.getElementById('shareOverlay'); if(o) o.classList.remove('open'); } };
 })();

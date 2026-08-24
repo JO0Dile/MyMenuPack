@@ -41,6 +41,10 @@
     doneOf:   { en: 'done', ar: 'مُنجز' },
     nowAt:    { en: 'now {n}%', ar: 'حاليًا {n}٪' },
     left:     { en: 'still to take', ar: 'باقي عليك' },
+    lost:     { en: 'you would lose', ar: 'رح تخسرها' },
+    semester: { en: 'semester', ar: 'فصل' },
+    semesters:{ en: 'semesters', ar: 'فصول' },
+    atLoad:   { en: 'at {n}H a term', ar: 'على {n} ساعة بالفصل' },
     notDone:  { en: 'courses there you have not done', ar: 'مساق هناك ما أنجزته' },
     gap:      { en: 'That plan is published as {official}H, but the course list recorded here adds up to {sum}H — most of the difference is an elective pool you only take part of. Hours left are counted off the published total.',
                 ar: 'هذه الخطة منشورة بـ {official} ساعة، بينما مجموع المساقات المسجّلة هنا {sum} ساعة — أغلب الفرق مجموعة اختيارية بتاخد منها جزء فقط. الساعات المتبقية محسوبة من المجموع المنشور.' },
@@ -173,13 +177,32 @@
     // against a published 129H degree — so adding up every unmatched course
     // would tell a student they owe 24 hours nobody has to take.
     var stillCr = Math.max(0, Math.round((total - keptCr) * 10) / 10);
+    // Hours you have passed that this plan has no course for. The list was
+    // already here under "Does not carry"; the figure a student is actually
+    // weighing was not.
+    var lostCr = loses.reduce(function(sum, d){ return sum + (d.cr || 0); }, 0);
     return {
       keeps: keeps, loses: loses,
-      keptCr: keptCr, doneCr: doneCr, total: total,
+      keptCr: keptCr, doneCr: doneCr, total: total, lostCr: Math.round(lostCr * 10) / 10,
       pct: total ? Math.round((keptCr / total) * 100) : 0,
       stillCount: stillCount, stillCr: stillCr,
       official: !!(parseFloat(to.degreeHours) > 0), listSum: courseSum(to)
     };
+  }
+
+  // What moving costs in time, at the same course load the graduation
+  // estimate on the dashboard is already using — not a new assumption, and
+  // the same arithmetic both plans are measured with. Whole semesters,
+  // because that is the unit a university registers in.
+  function extraSemesters(fromId, toStillCr){
+    var load = (window.AAUP_GRADUATION && window.AAUP_GRADUATION.loadFor)
+      ? window.AAUP_GRADUATION.loadFor(fromId) : 15;
+    if(!(load > 0)) return null;
+    var from = plans()[fromId] || {};
+    var fromTotal = planHours(from);
+    var fromDone = doneIn(fromId).reduce(function(sum, d){ return sum + d.cr; }, 0);
+    var fromLeft = Math.max(0, fromTotal - fromDone);
+    return Math.ceil(toStillCr / load) - Math.ceil(fromLeft / load);
   }
 
   function currentPct(fromId){
@@ -234,6 +257,9 @@
     var to = all[toId];
     var c = compare(fromId, toId);
     var nowPct = currentPct(fromId);
+    var extra = extraSemesters(fromId, c.stillCr);
+    var load = (window.AAUP_GRADUATION && window.AAUP_GRADUATION.loadFor)
+      ? window.AAUP_GRADUATION.loadFor(fromId) : 15;
 
     return '<button type="button" class="cp-back" id="cpBack">' + t('back', rtl) + '</button>' +
       '<div class="cp-head">' +
@@ -244,10 +270,15 @@
       '<div class="cp-nums">' +
         '<div class="cp-num"><b>' + c.keptCr + 'H</b><span>' + t('transfers', rtl) + ' · ' +
           t('ofYours', rtl).replace('{n}', c.doneCr) + '</span></div>' +
+        '<div class="cp-num"><b>' + c.lostCr + 'H</b><span>' + t('lost', rtl) + '</span></div>' +
         '<div class="cp-num"><b>' + c.pct + '%</b><span>' + t('wouldBe', rtl) + ' ' + t('doneOf', rtl) +
           ' · ' + t('nowAt', rtl).replace('{n}', nowPct) + '</span></div>' +
         '<div class="cp-num"><b>' + c.stillCr + 'H</b><span>' + t('left', rtl) + ' · ' +
           c.stillCount + ' ' + t('notDone', rtl) + '</span></div>' +
+        (extra === null ? '' :
+          '<div class="cp-num"><b>' + (extra > 0 ? '+' : '') + extra + '</b><span>' +
+            (extra === 1 || extra === -1 ? t('semester', rtl) : t('semesters', rtl)) + ' · ' +
+            t('atLoad', rtl).replace('{n}', load) + '</span></div>') +
       '</div>' +
       // Same honesty the roadmap already applies: when our course list does
       // not add up to the published degree, say so instead of quietly
@@ -256,11 +287,11 @@
         ? '<p class="form-note">' + t('gap', rtl)
             .replace('{official}', c.total).replace('{sum}', Math.round(c.listSum)) + '</p>'
         : '') +
-      (c.keeps.length ? '<details class="cp-det" open><summary>✅ ' + t('carries', rtl) + ' (' + c.keeps.length + ')</summary>' +
+      (c.keeps.length ? '<details class="cp-det" open><summary>' + window.AAUP_ICONS.preview('check', 14) + t('carries', rtl) + ' (' + c.keeps.length + ')</summary>' +
         '<ul class="cp-ul">' + c.keeps.map(function(k){
           return courseLine(rtl ? (k.to.ar || k.to.name) : (k.to.name || k.to.ar), creditsOf(k.to), '', rtl);
         }).join('') + '</ul></details>' : '') +
-      (c.loses.length ? '<details class="cp-det"><summary>✖️ ' + t('doesnt', rtl) + ' (' + c.loses.length + ')</summary>' +
+      (c.loses.length ? '<details class="cp-det"><summary>' + window.AAUP_ICONS.preview('close', 14) + t('doesnt', rtl) + ' (' + c.loses.length + ')</summary>' +
         '<ul class="cp-ul cp-ul-lose">' + c.loses.map(function(d){
           return courseLine(rtl ? (d.ar || d.name) : d.name, d.cr,
             d.num ? t('notThere', rtl) : t('noNumber', rtl), rtl);
@@ -269,7 +300,7 @@
         t('carryBox', rtl) + '</label>' +
       '<p class="form-note">' + t('caveat', rtl) + '</p>' +
       '<div class="cp-actions">' +
-        '<button type="button" class="home-btn cp-go" id="cpGo" data-cp-target="' + esc(toId) + '">🔀 ' +
+        '<button type="button" class="home-btn cp-go" id="cpGo" data-cp-target="' + esc(toId) + '">' + window.AAUP_ICONS.preview('shuffle', 14) +
           t('go', rtl) + '</button>' +
       '</div>';
   }

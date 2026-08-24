@@ -854,7 +854,7 @@
     if(currentPrefix) render(currentPrefix, activeKeyNow);
   }
 
-  window.AAUP_SIDEBAR = { show: show, hide: hide, setActive: setActive, toggleMobile: toggleMobile, closeMobile: closeMobile, openSettings: openSettings, refresh: refresh };
+  window.AAUP_SIDEBAR = { show: show, hide: hide, setActive: setActive, toggleMobile: toggleMobile, closeMobile: closeMobile, openSettings: openSettings, refresh: refresh, openPlanChooser: openPlanChooser };
   // Called from js/28-imported.js's own post-render hook chain (same one
   // js/69-phone-header.js's refresh already sits in) so the tab bar's
   // progress badge updates the moment a course gets checked, not only the
