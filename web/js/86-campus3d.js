@@ -38,6 +38,12 @@
 // hard, down to a floor of eight per cent. That is what keeps the ridge
 // reading as depth rather than as one flat tangle of line-work.
 //
+// AND THEN IT IS THEIRS. When the flight lands the student takes the
+// camera: drag anywhere on the campus and it swings round the fountain,
+// which never moves — the whole hill wheels behind it instead. A flick
+// carries on and eases out. Until the first drag it turns very slowly by
+// itself, which is how anyone finds out they can turn it.
+//
 // WHAT IT REFUSES TO DO. It never blocks the screen. If WebGL is missing,
 // the context is lost, the device asks for reduced motion, or anything at
 // all throws, the original picture is still in the DOM underneath and simply
@@ -757,10 +763,23 @@
     ridgeLine(b, -118.0, 16.0, 7.0, 3, 14, 0.34);
     ridgeLine(b, -152.0, 24.0, 9.0, 11, 10, 0.28);
     ridgeLine(b, -196.0, 30.0, 11.0, 23, 6, 0.22);
+    // and the far side of the valley, behind the camera — the student can
+    // turn all the way round now, so there is no back of the set
+    ridgeLine(b,   96.0, 14.0, 6.0, 31,  9, 0.30);
+    ridgeLine(b,  138.0, 22.0, 8.0, 43,  6, 0.24);
+    // the shoulder the campus is cut into, falling away south of the road
+    var prevA = null, prevB = null;
+    for(var eg = -110; eg <= 110; eg += 7.5){
+      var ez = 30 + Math.abs(eg) * 0.18 + Math.sin(eg * 0.05) * 3.0;
+      var pa = [eg, 0, ez], pb = [eg, -3.2, ez + 7.0];
+      if(prevA){ b.line(prevA, pa, 0.24); b.line(prevB, pb, 0.14); }
+      if((eg / 7.5) % 2 === 0) b.line(pa, pb, 0.1);
+      prevA = pa; prevB = pb;
+    }
     scrub(b, 5, 130, 0.09);
     // the ground plane, kept to a whisper
-    for(var gx = -110; gx <= 110; gx += 8.0){ b.line([gx, 0, 34], [gx, 0, -100], 0.04); }
-    for(var gz = 34; gz > -100; gz -= 8.0){ b.line([-110, 0, gz], [110, 0, gz], 0.04); }
+    for(var gx = -110; gx <= 110; gx += 8.0){ b.line([gx, 0, 48], [gx, 0, -100], 0.04); }
+    for(var gz = 48; gz > -100; gz -= 8.0){ b.line([-110, 0, gz], [110, 0, gz], 0.04); }
 
     // ---- everything at the size a person is ----
     for(var L = 0; L < 10; L++){
@@ -914,6 +933,7 @@
     var scene = {
       gl: gl, canvas: canvas, raf: 0, t0: 0,
       tiltX: 0, tiltY: 0, wantX: 0, wantY: 0,
+      orbit: null, dragging: false, lastX: 0, lastY: 0,
       dead: false
     };
 
@@ -966,6 +986,9 @@
         { t: 0.42, eye: [-13, 20,  40], at: [10,  8, -20] }, // coming down over the road
         { t: 1.0,  eye: [ -3, 4.2, 21.5], at: [0, 5.6,  0] } // the tower, with the campus behind it
       ];
+      // What the camera turns around: the tower's own axis, at the height
+      // the flight was already aiming at.
+      var PIVOT = [0, 5.6, 0];
       var raw = reduced ? 1 : Math.min(1, t / 7.0);
       var eye, at;
       if(raw >= 1){
@@ -982,17 +1005,62 @@
         }
       }
 
-      // The breath, and the lean. Both are added on top of wherever the
-      // journey has got to, so they are alive from the first frame rather
-      // than switching on at the end.
-      if(!reduced){
-        eye[2] += Math.sin(t * 0.31) * 0.30;
-        eye[1] += Math.sin(t * 0.23) * 0.10;
+      // THE TURN. Once the flight has landed the student owns the camera.
+      // The fountain does not move: the camera swings round it on a sphere
+      // centred on the tower's own axis, so wherever you drag to, the
+      // landmark stays exactly where it is and the campus wheels behind it.
+      //
+      // It starts from the flight's last frame — same radius, same angle —
+      // so there is no jump at the handover. Until the first drag it turns
+      // very slowly on its own, which is how the student finds out they can
+      // turn it at all; the first touch ends the drift for good.
+      if(raw >= 1){
+        if(!scene.orbit){
+          var dx0 = KEYS[2].eye[0] - PIVOT[0],
+              dy0 = KEYS[2].eye[1] - PIVOT[1],
+              dz0 = KEYS[2].eye[2] - PIVOT[2];
+          var r0 = Math.hypot(dx0, dy0, dz0);
+          scene.orbit = {
+            r: r0,
+            yaw: Math.atan2(dx0, dz0),
+            elev: Math.asin(dy0 / r0),
+            v: 0, touched: false, landed: t
+          };
+          canvas.classList.add('can-turn');
+        }
+        var o = scene.orbit;
+        if(!scene.dragging){
+          o.yaw += o.v;
+          o.v *= 0.93;                                 // the flick, easing out
+          if(!o.touched && !reduced && t - o.landed > 2.0) o.yaw += 0.00065;
+        }
+        // The hover parallax and the breath ride the orbit rather than world
+        // space. A shove along world X means one thing from the south and the
+        // opposite from the north; a nudge along the orbit means the same
+        // thing from every bearing.
+        var oy = o.yaw  - (scene.dragging ? 0 : scene.tiltX * 0.055);
+        var oe = o.elev - (scene.dragging ? 0 : scene.tiltY * 0.05);
+        var orad = o.r * (reduced ? 1 : 1 + Math.sin(t * 0.31) * 0.014);
+        eye = [PIVOT[0] + Math.cos(oe) * Math.sin(oy) * orad,
+               PIVOT[1] + Math.sin(oe) * orad + (reduced ? 0 : Math.sin(t * 0.23) * 0.10),
+               PIVOT[2] + Math.cos(oe) * Math.cos(oy) * orad];
+        // The target never moves. That is the whole point: whatever the
+        // student does, the fountain stays exactly in the middle of the
+        // screen and the hill wheels round behind it.
+        at = PIVOT.slice();
+      } else {
+        // The breath, and the lean, while the flight still owns the camera.
+        // Both are added on top of wherever the journey has got to, so they
+        // are alive from the first frame rather than switching on at the end.
+        if(!reduced){
+          eye[2] += Math.sin(t * 0.31) * 0.30;
+          eye[1] += Math.sin(t * 0.23) * 0.10;
+        }
+        eye[0] += scene.tiltX * 1.7;
+        eye[1] -= scene.tiltY * 0.5;
+        at[0]  += scene.tiltX * 0.5;
+        at[1]  -= scene.tiltY * 1.2;
       }
-      eye[0] += scene.tiltX * 1.7;
-      eye[1] -= scene.tiltY * 0.5;
-      at[0]  += scene.tiltX * 0.5;
-      at[1]  -= scene.tiltY * 1.2;
 
       var aspect = canvas.width / canvas.height;
       perspective(proj, 62 * Math.PI / 180, aspect, 0.1, 460);
@@ -1018,8 +1086,38 @@
 
     function onPointer(e){
       var r = canvas.getBoundingClientRect();
+      if(scene.dragging && scene.orbit){
+        // Drag distance is measured as a fraction of the canvas, so the same
+        // swipe turns the same amount on a phone as on a desktop.
+        var dx = (e.clientX - scene.lastX) / Math.max(1, r.width);
+        var dy = (e.clientY - scene.lastY) / Math.max(1, r.height);
+        scene.lastX = e.clientX; scene.lastY = e.clientY;
+        var step = -dx * 3.4;
+        scene.orbit.yaw += step;
+        scene.orbit.v = step * 0.55;                   // what carries on after
+        scene.orbit.elev = Math.max(-0.17, Math.min(0.62, scene.orbit.elev + dy * 1.1));
+        if(e.cancelable) e.preventDefault();
+        return;
+      }
       scene.wantX = ((e.clientX - r.left) / r.width * 2 - 1) * 1.1;
       scene.wantY = ((e.clientY - r.top) / r.height * 2 - 1) * 0.6;
+    }
+    function onDown(e){
+      if(!scene.orbit) return;                         // the flight still owns it
+      scene.dragging = true;
+      scene.lastX = e.clientX; scene.lastY = e.clientY;
+      scene.orbit.touched = true;                      // and the drift is over
+      scene.orbit.v = 0;
+      canvas.classList.add('is-turning');
+      try { if(canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId); }
+      catch(err){ /* older engines: the window listener below still catches it */ }
+    }
+    function onUp(e){
+      if(!scene.dragging) return;
+      scene.dragging = false;
+      canvas.classList.remove('is-turning');
+      try { if(canvas.releasePointerCapture && e.pointerId != null) canvas.releasePointerCapture(e.pointerId); }
+      catch(err){ /* nothing to release */ }
     }
     function onLeave(){ scene.wantX = 0; scene.wantY = 0; }
     function onOrient(e){
@@ -1034,6 +1132,10 @@
     function onLost(e){ e.preventDefault(); stop(); }
 
     canvas.addEventListener('pointermove', onPointer);
+    canvas.addEventListener('pointerdown', onDown);
+    canvas.addEventListener('pointerup', onUp);
+    canvas.addEventListener('pointercancel', onUp);
+    window.addEventListener('pointerup', onUp);
     canvas.addEventListener('pointerleave', onLeave);
     window.addEventListener('deviceorientation', onOrient);
     document.addEventListener('visibilitychange', onVisible);
@@ -1041,6 +1143,10 @@
 
     scene.cleanup = function(){
       canvas.removeEventListener('pointermove', onPointer);
+      canvas.removeEventListener('pointerdown', onDown);
+      canvas.removeEventListener('pointerup', onUp);
+      canvas.removeEventListener('pointercancel', onUp);
+      window.removeEventListener('pointerup', onUp);
       canvas.removeEventListener('pointerleave', onLeave);
       window.removeEventListener('deviceorientation', onOrient);
       document.removeEventListener('visibilitychange', onVisible);

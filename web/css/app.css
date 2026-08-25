@@ -3902,6 +3902,11 @@
      move — but never a tap: the buttons above it are the whole screen. */
   pointer-events:auto;
 }
+/* Once the flight has landed the scene turns: drag anywhere on the campus
+   and the camera swings round the fountain. touch-action has to go off or
+   the browser claims the swipe as a scroll before we see it. */
+.wiz-campus-3d.can-turn{cursor:grab; touch-action:none;}
+.wiz-campus-3d.is-turning{cursor:grabbing;}
 /* Once the live scene is up the still drawing would show through the gaps in
    the line-work as a doubled campus, so it stands down. */
 .wiz-campus-3d.is-live ~ .wiz-campus,
