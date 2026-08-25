@@ -188,78 +188,125 @@
     }
   }
 
+  // A line tree: a trunk that forks, twice. Cheap, and from a distance it
+  // reads as planting rather than as a stick.
+  function tree(b, x, z, h, bright){
+    b.line([x, 0, z], [x, h * 0.55, z], bright);
+    var forks = [[-1, 0.4], [1, -0.3], [0.3, 1]];
+    forks.forEach(function(d, i){
+      var bx = x + d[0] * h * 0.26, bz = z + d[1] * h * 0.26, by = h * (0.8 + i * 0.06);
+      b.line([x, h * 0.55, z], [bx, by, bz], bright * 0.8);
+      b.line([bx, by, bz], [bx + d[0] * h * 0.14, by + h * 0.16, bz + d[1] * h * 0.14], bright * 0.55);
+      b.line([bx, by, bz], [bx - d[1] * h * 0.14, by + h * 0.13, bz + d[0] * h * 0.14], bright * 0.55);
+    });
+  }
+
+  function bench(b, x, z, bright){
+    b.box(x, 0.42, z, 1.5, 0.12, 0.5, bright);
+    [-0.6, 0.6].forEach(function(o){
+      b.line([x + o, 0, z - 0.2], [x + o, 0.42, z - 0.2], bright * 0.7);
+      b.line([x + o, 0, z + 0.2], [x + o, 0.42, z + 0.2], bright * 0.7);
+    });
+    b.line([x - 0.75, 0.54, z + 0.25], [x + 0.75, 0.54, z + 0.25], bright * 0.7);
+    b.line([x - 0.75, 0.95, z + 0.3], [x + 0.75, 0.95, z + 0.3], bright * 0.7);
+  }
+
+  // The flag mast on the approach — the one vertical that breaks the
+  // symmetry of the walk.
+  function mast(b, x, z, bright){
+    b.line([x, 0, z], [x, 7.2, z], bright);
+    b.ring(x, 0.1, z, 0.5, 10, bright * 0.6);
+    b.path([[x, 7.2, z], [x + 1.9, 6.7, z], [x + 1.75, 5.9, z], [x, 6.1, z]], bright * 0.85);
+    b.line([x + 0.9, 7.0, z], [x + 0.85, 6.0, z], bright * 0.4);
+  }
+
+  // Steps up to the gate, so the walk arrives somewhere rather than simply
+  // stopping.
+  function steps(b, z, n, bright){
+    for(var i = 0; i < n; i++){
+      var y = i * 0.22, zz = z + i * 0.55, halfW = 5.2 - i * 0.15;
+      b.line([-halfW, y, zz], [halfW, y, zz], bright);
+      b.line([-halfW, y, zz], [-halfW, y + 0.22, zz], bright * 0.5);
+      b.line([ halfW, y, zz], [ halfW, y + 0.22, zz], bright * 0.5);
+    }
+  }
+
   function build(){
     var b = new Builder();
-    var GATE_Z = -21, FOUNTAIN_Z = -12.5;
+    var GATE_Z = -30, FOUNTAIN_Z = -15, STEP_Z = -25.5;
 
-    // ---- the walk itself, the thing the app is named for ----
-    // Two bright rails and a ladder of rungs whose spacing tightens with
-    // distance, which is what actually sells a perspective floor.
-    b.path([[-3.4, 0, 12], [-3.4, 0, GATE_Z]], 0.85);
-    b.path([[ 3.4, 0, 12], [ 3.4, 0, GATE_Z]], 0.85);
-    b.path([[-1.1, 0, 12], [-1.1, 0, GATE_Z]], 0.3);
-    b.path([[ 1.1, 0, 12], [ 1.1, 0, GATE_Z]], 0.3);
-    for(var z = 12; z > GATE_Z; z -= 1.5){
-      b.line([-3.4, 0, z], [3.4, 0, z], 0.34);
+    // ---- the walk ----
+    b.path([[-4.2, 0, 16], [-4.2, 0, STEP_Z]], 0.9);
+    b.path([[ 4.2, 0, 16], [ 4.2, 0, STEP_Z]], 0.9);
+    b.path([[-1.3, 0, 16], [-1.3, 0, STEP_Z]], 0.3);
+    b.path([[ 1.3, 0, 16], [ 1.3, 0, STEP_Z]], 0.3);
+    for(var z = 16; z > STEP_Z; z -= 1.4){
+      b.line([-4.2, 0, z], [4.2, 0, z], 0.32);
     }
-    // a kerb either side, lifted just off the ground
-    [-3.4, 3.4].forEach(function(x){
-      b.path([[x, 0.12, 12], [x, 0.12, GATE_Z]], 0.4);
+    [-4.2, 4.2].forEach(function(x){
+      b.path([[x, 0.14, 16], [x, 0.14, STEP_Z]], 0.45);
+      b.path([[x * 1.06, 0, 16], [x * 1.06, 0, STEP_Z]], 0.3);
     });
+    steps(b, STEP_Z, 7, 0.75);
 
-    // ---- the ground either side ----
-    for(var gx = -34; gx <= 34; gx += 3.4){
-      if(Math.abs(gx) < 3.6) continue;
-      b.line([gx, 0, 14], [gx, 0, GATE_Z - 10], 0.13);
+    // ---- ground ----
+    for(var gx = -46; gx <= 46; gx += 3.6){
+      if(Math.abs(gx) < 4.6) continue;
+      b.line([gx, 0, 18], [gx, 0, GATE_Z - 16], 0.12);
     }
-    for(var gz = 14; gz > GATE_Z - 10; gz -= 3.4){
-      b.line([-34, 0, gz], [-3.6, 0, gz], 0.13);
-      b.line([ 3.6, 0, gz], [ 34, 0, gz], 0.13);
+    for(var gz = 18; gz > GATE_Z - 16; gz -= 3.6){
+      b.line([-46, 0, gz], [-4.6, 0, gz], 0.12);
+      b.line([ 4.6, 0, gz], [ 46, 0, gz], 0.12);
     }
+    b.line([-52, 0, GATE_Z - 16], [52, 0, GATE_Z - 16], 0.24);
 
-    // ---- the faculties, in three receding pairs ----
-    // Pushed well out and back: the first version stood them either side of
-    // the camera, which framed the shot as two boxes with a gap rather than
-    // as a campus with a gate at the end of it.
+    // ---- the faculties: four pairs, plus two set well back ----
     var rows = [
-      { z:  -6, x: 8.6, w: 6.4, h: 7.5, d: 7, br: 0.58 },
-      { z: -15, x: 9.4, w: 6.0, h: 9.5, d: 7, br: 0.44 },
-      { z: -25, x: 10.5, w: 5.6, h: 6.5, d: 6, br: 0.28 }
+      { z:   2, x: 10.5, w: 7.0, h:  6.0, d: 7, br: 0.60 },
+      { z:  -9, x: 11.0, w: 6.8, h: 10.5, d: 8, br: 0.55 },
+      { z: -20, x: 12.0, w: 6.4, h:  7.5, d: 7, br: 0.42 },
+      { z: -31, x: 13.5, w: 6.0, h: 12.0, d: 7, br: 0.30 },
+      { z: -42, x: 15.5, w: 7.5, h:  6.0, d: 7, br: 0.20 }
     ];
     rows.forEach(function(r){
       faculty(b, -r.x, r.z, r.w, r.h, r.d, r.br);
       faculty(b,  r.x, r.z, r.w, r.h, r.d, r.br);
     });
+    // two towers further out, to give the skyline a silhouette
+    faculty(b, -22, -26, 5.0, 16.0, 5, 0.22);
+    faculty(b,  22, -26, 5.0, 16.0, 5, 0.22);
 
-    fountain(b, FOUNTAIN_Z, 0.85);
-    gate(b, GATE_Z, 1.0, 1.55);
+    fountain(b, FOUNTAIN_Z, 0.9);
+    gate(b, GATE_Z, 1.0, 2.1);
+    mast(b, -7.4, -3, 0.55);
 
-    // ---- lamps down both sides, tightening toward the gate ----
-    for(var lz = 6; lz > GATE_Z + 4; lz -= 4.2){
-      [-4.6, 4.6].forEach(function(lx){
-        b.line([lx, 0, lz], [lx, 2.6, lz], 0.42);
-        b.line([lx - 0.3, 2.6, lz], [lx + 0.3, 2.6, lz], 0.42);
-        b.ring(lx, 2.85, lz, 0.26, 8, 0.6);
-        b.line([lx, 2.6, lz], [lx, 2.85, lz], 0.3);
+    // ---- lamps, benches and planting down the approach ----
+    for(var lz = 13; lz > STEP_Z + 2; lz -= 4.0){
+      [-5.4, 5.4].forEach(function(lx){
+        b.line([lx, 0, lz], [lx, 3.0, lz], 0.45);
+        b.line([lx - 0.32, 3.0, lz], [lx + 0.32, 3.0, lz], 0.45);
+        b.ring(lx, 3.28, lz, 0.28, 8, 0.65);
+        b.line([lx, 3.0, lz], [lx, 3.28, lz], 0.3);
       });
     }
-
-    // ---- a horizon, so the ground ends somewhere ----
-    b.line([-40, 0, GATE_Z - 10], [40, 0, GATE_Z - 10], 0.22);
+    for(var tz = 11; tz > -24; tz -= 5.5){
+      tree(b, -7.0, tz, 3.4 + ((tz % 3) + 3) * 0.22, 0.34);
+      tree(b,  7.0, tz + 2.6, 3.4 + ((tz % 4) + 4) * 0.18, 0.34);
+    }
+    [-6.0, 6.0].forEach(function(bx){
+      [6, -2, -10, -18].forEach(function(bz){ bench(b, bx, bz, 0.3); });
+    });
 
     // ---- sky ----
-    // Not stars: the same faint constellation of construction marks the rest
-    // of the drawing uses, scattered high and far so the top of the frame is
-    // not simply empty above the gate.
     var seed = 7;
     function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
-    for(var i = 0; i < 34; i++){
-      var sx = (rnd() * 2 - 1) * 30;
-      var sy = 9 + rnd() * 13;
-      var sz = GATE_Z - 4 - rnd() * 22;
-      var r = 0.12 + rnd() * 0.16;
-      b.line([sx - r, sy, sz], [sx + r, sy, sz], 0.5);
-      b.line([sx, sy - r, sz], [sx, sy + r, sz], 0.5);
+    for(var i = 0; i < 60; i++){
+      var sx = (rnd() * 2 - 1) * 44;
+      var sy = 12 + rnd() * 22;
+      var sz = GATE_Z - 6 - rnd() * 34;
+      var r = 0.14 + rnd() * 0.2;
+      b.line([sx - r, sy, sz], [sx + r, sy, sz], 0.55);
+      b.line([sx, sy - r, sz], [sx, sy + r, sz], 0.55);
     }
     return new Float32Array(b.v);
   }
@@ -393,31 +440,50 @@
       scene.tiltX += (scene.wantX - scene.tiltX) * 0.06;
       scene.tiltY += (scene.wantY - scene.tiltY) * 0.06;
 
-      // The dolly: in from the near end of the walk, slowing as it lands,
-      // then a breath of drift so it never looks frozen.
-      var settle = reduced ? 1 : Math.min(1, t / 4.2);
-      var ease = 1 - Math.pow(1 - settle, 3);
-      var z = 12 - ease * 6.0 + (reduced ? 0 : Math.sin(t * 0.32) * 0.26);
-      var y = 1.75 + (1 - ease) * 0.8 + (reduced ? 0 : Math.sin(t * 0.24) * 0.06);
+      // THE JOURNEY. Not a dolly any more — a shot. It opens high and wide
+      // over the whole campus, drops toward the ground while swinging onto
+      // the axis of the walk, runs down it toward the gate, and lands at
+      // standing height with the arch filling the frame. Seven seconds, then
+      // it breathes and never stops entirely.
+      //
+      // Three keyframes, eased between with a smoothstep so there is no
+      // corner at the joins. Reduced motion skips straight to the last one.
+      var KEYS = [
+        { t: 0.0,  eye: [ 30, 34,  34], at: [0,  5, -14] },   // wide, above
+        { t: 0.45, eye: [ 11, 13,  18], at: [0,  7, -24] },   // dropping in
+        { t: 1.0,  eye: [  0, 2.4,  5], at: [0,  8.2, -30] }  // facing the arch
+      ];
+      var raw = reduced ? 1 : Math.min(1, t / 7.0);
+      var eye, at;
+      if(raw >= 1){
+        eye = KEYS[2].eye.slice(); at = KEYS[2].at.slice();
+      } else {
+        var seg = raw < KEYS[1].t ? 0 : 1;
+        var a = KEYS[seg], bK = KEYS[seg + 1];
+        var u = (raw - a.t) / (bK.t - a.t);
+        u = u * u * (3 - 2 * u);                       // smoothstep
+        eye = [0,0,0]; at = [0,0,0];
+        for(var i2 = 0; i2 < 3; i2++){
+          eye[i2] = a.eye[i2] + (bK.eye[i2] - a.eye[i2]) * u;
+          at[i2]  = a.at[i2]  + (bK.at[i2]  - a.at[i2])  * u;
+        }
+      }
 
-      // A fixed VERTICAL field of view throws the buildings off the sides of
-      // a phone, because a tall viewport turns a 55-degree vertical angle
-      // into a narrow horizontal one. The horizontal angle is what frames a
-      // campus, so that is the one held constant and the vertical is derived
-      // from it — portrait gets a taller cone, landscape a shorter one.
-      // A fixed VERTICAL angle. Deriving it from a fixed horizontal one
-      // looked right on paper and was wrong on a phone: a 0.49 aspect turned
-      // 74 degrees across into 113 degrees up, which flattened the whole
-      // campus into a band around the horizon. Portrait crops the sides
-      // instead, which is what standing between two faculties looks like.
+      // The breath, and the lean. Both are added on top of wherever the
+      // journey has got to, so they are alive from the first frame rather
+      // than switching on at the end.
+      if(!reduced){
+        eye[2] += Math.sin(t * 0.31) * 0.30;
+        eye[1] += Math.sin(t * 0.23) * 0.10;
+      }
+      eye[0] += scene.tiltX * 1.7;
+      eye[1] -= scene.tiltY * 0.5;
+      at[0]  += scene.tiltX * 0.5;
+      at[1]  -= scene.tiltY * 1.2;
+
       var aspect = canvas.width / canvas.height;
-      perspective(proj, 62 * Math.PI / 180, aspect, 0.1, 140);
-      // Eye low and near the ground so the walkway runs out under the
-      // reader, looking slightly UP at the gate rather than down on it.
-      lookAt(view,
-        [scene.tiltX * 1.5, y - scene.tiltY * 0.4, z],
-        [scene.tiltX * 0.4, 4.4 - scene.tiltY * 1.1, -21],
-        [0, 1, 0]);
+      perspective(proj, 62 * Math.PI / 180, aspect, 0.1, 200);
+      lookAt(view, eye, at, [0, 1, 0]);
       multiply(mvp, proj, view);
 
       gl.clearColor(0, 0, 0, 0);
