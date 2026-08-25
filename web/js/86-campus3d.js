@@ -1,11 +1,11 @@
 // ==========================
 // THE CAMPUS, IN THREE DIMENSIONS
 //
-// The sign-in screen used to be a 66 KB drawing of the walk up to the
-// fountain — a good picture that never moved. This is the same walk, built
-// as real geometry and rendered by the GPU: the arched clock gate, the two
-// faceted faculty blocks either side, the fountain, the walkway running out
-// to the bottom of the screen, the lamps along it, and a sky above.
+// The sign-in screen used to be a 66 KB drawing of the campus — a good
+// picture that never moved. This is the same campus, built as real geometry
+// and rendered by the GPU: the clock-tower fountain in the middle of its
+// roundabout, the faculty blocks set back around it, the lamps and the trees
+// on the circle, and a sky above.
 //
 // WHY NOT three.js. This app's whole promise is that it works offline, on a
 // cheap phone, on campus wifi, and the entire bundle is around 400 KB. A 3D
@@ -14,10 +14,17 @@
 // WebGL 1 written directly: the same scene, a few kilobytes, no dependency,
 // and it runs from the service-worker cache with no network at all.
 //
-// WHAT IT DOES. A slow dolly down the walkway toward the gate, a gentle sway
-// from the gyroscope (or the pointer on a desktop), depth fog so the far
-// geometry falls away, and the whole thing drawn as blueprint line-work so
-// it belongs to the same drawing the app has always used.
+// WHAT IT DOES. A slow flight in: it opens high and off to one side, swings
+// down and round the landmark, and settles across the pool with the whole
+// tower in frame. A gentle sway from the gyroscope (or the pointer on a
+// desktop) rides on top, depth fog drops the far geometry away, and the
+// whole thing is drawn as blueprint line-work so it belongs to the same
+// drawing the app has always used.
+//
+// ONE LANDMARK, NOT TWO. At AAUP the clock tower stands in the middle of the
+// fountain — they are a single piece of design, and monument() builds them
+// as a single object: pool, island, arcaded piers, inscription block, clock
+// stage, book.
 //
 // WHAT IT REFUSES TO DO. It never blocks the screen. If WebGL is missing,
 // the context is lost, the device asks for reduced motion, or anything at
