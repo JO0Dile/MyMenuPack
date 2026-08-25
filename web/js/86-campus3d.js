@@ -2,14 +2,18 @@
 // THE CAMPUS, IN THREE DIMENSIONS
 //
 // The sign-in screen used to be a 66 KB drawing of the campus — a good
-// picture that never moved. This is the same campus, built as real geometry
-// and rendered by the GPU, and built from the photographs rather than from
-// imagination: the clock-tower fountain on its roundabout, the white block
-// with the triangular perforations and the crane still standing on it, the
-// faceted glass sloping away beside it, the concentric paving, the shelter
-// and the flags and the planting, the road with its cars, and beyond all of
-// it the hillside, the scatter of houses on it and the wheel across the
-// valley.
+// picture that never moved. This is the campus itself, built as real
+// geometry from the photographs of the Ramallah hill, and rendered by the
+// GPU. West to east, which is the order you meet it walking in: the
+// clock-tower fountain on its roundabout; the glass gem, a crystal of
+// facets with its arris coming down to the doors; the white block cut with
+// triangles above it; the glazed stair tower; the dark block that carries
+// the university's name; the long white building with the perforated
+// screen and the diagonal stair across its face; the high-rise standing
+// behind everything with its crane beside it. In front of all of it the
+// road, the line of parked cars and the retaining wall; behind it the
+// hillside falling into the valley, and the houses scattered along the
+// far ridges.
 //
 // WHY NOT three.js. This app's whole promise is that it works offline, on a
 // cheap phone, on campus wifi, and the entire bundle is around 400 KB. A 3D
@@ -29,6 +33,10 @@
 // fountain — they are a single piece of design, and monument() builds them
 // as a single object: pool, island, arcaded piers, inscription block, clock
 // stage, book.
+//
+// LIGHT. Near geometry carries its own brightness; distance takes it away
+// hard, down to a floor of eight per cent. That is what keeps the ridge
+// reading as depth rather than as one flat tangle of line-work.
 //
 // WHAT IT REFUSES TO DO. It never blocks the screen. If WebGL is missing,
 // the context is lost, the device asks for reduced motion, or anything at
@@ -129,159 +137,302 @@
     }
     this.loop(pts, w);
     return pts;
-  };
-  // ============================================================
-  // THE BUILDINGS ROUND THE CIRCLE
+  };  // ============================================================
+  // THE CAMPUS
   //
-  // The two that matter are the pair the landmark stands in front of: the
-  // white stone block with the triangular perforations on the left, and the
-  // faceted glass volume that slopes away to the right. They are drawn as
-  // what they are rather than as generic boxes, because they are the half of
-  // the view a student actually recognises.
+  // Everything below is modelled from the photographs of the Ramallah
+  // campus rather than invented. Read west to east along the ridge, which
+  // is the order you meet it walking in:
+  //
+  //   the clock-tower fountain on its roundabout
+  //   the faceted glass gem, all triangulated dark panels
+  //   the white block above it, cut with irregular triangles
+  //   the slim glass stair tower joining the two
+  //   the dark signed block that carries the university's name
+  //   the long white building with the perforated screen and the
+  //     diagonal stair running across its face
+  //   the high-rise standing behind everything, and the crane beside it
+  //
+  // and in front of all of it the road, the line of parked cars, the
+  // retaining wall, and then the hillside falling away to the valley.
   // ============================================================
 
-  // The white block. Stepped volumes, and a facade of triangular openings
-  // that alternate point-up and point-down the way the real one does.
-  function stoneBlock(b, cx, cz, w, d, h, bright){
-    b.box(cx, 0, cz, w, h, d, bright);
-    // The perforations cost three lines each, so the blocks that are only
-    // there to close the horizon get a coarse grid and nobody can tell.
-    var near = bright > 0.32;
-    var face = cz + d / 2, rows = near ? 10 : 4, cols = near ? 6 : 3;
-    for(var r = 0; r < rows; r++){
-      var y0 = h * (r / rows) + 0.5, y1 = h * ((r + 1) / rows) - 0.2;
-      for(var c = 0; c < cols; c++){
-        var x0 = cx - w / 2 + w * ((c + 0.22) / cols);
-        var x1 = cx - w / 2 + w * ((c + 0.78) / cols);
-        var up = (r + c) % 2 === 0;
-        if(up){
-          b.loop([[x0, y0, face], [x1, y0, face], [(x0 + x1) / 2, y1, face]], bright * 0.55);
-        } else {
-          b.loop([[x0, y1, face], [x1, y1, face], [(x0 + x1) / 2, y0, face]], bright * 0.55);
-        }
-      }
-      b.line([cx - w / 2, h * (r / rows), face], [cx + w / 2, h * (r / rows), face], bright * 0.22);
+  // A triangular facet, subdivided into a lattice. Every glazed surface on
+  // this campus is panelled in triangles, so this does most of the work.
+  // The barycentric walk emits each small edge exactly once.
+  function facet(b, p0, p1, p2, n, bright, seedv){
+    var seed = seedv || 17;
+    function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    function at(i, j){
+      var u = i / n, v = j / n;
+      return [p0[0] + (p1[0] - p0[0]) * u + (p2[0] - p0[0]) * v,
+              p0[1] + (p1[1] - p0[1]) * u + (p2[1] - p0[1]) * v,
+              p0[2] + (p1[2] - p0[2]) * u + (p2[2] - p0[2]) * v];
     }
-    // the set-back wing at the foot, and the parapet
-    b.box(cx - w * 0.16, 0, cz + d * 0.62, w * 0.72, h * 0.42, d * 0.5, bright * 0.8);
-    b.box(cx, h, cz, w + 0.5, 0.4, d + 0.5, bright * 0.9);
+    for(var i = 0; i < n; i++){
+      for(var j = 0; i + j < n; j++){
+        // A fifth of the panels on the real building are opaque stone, not
+        // glass. Picking them out is what stops the surface reading as mesh.
+        var w = rnd() > 0.80 ? bright * 2.4 : bright;
+        b.line(at(i, j), at(i + 1, j), w);
+        b.line(at(i, j), at(i, j + 1), w);
+        b.line(at(i + 1, j), at(i, j + 1), w);
+      }
+    }
   }
 
-  // The faceted glass. A single great sloping plane from a high ridge down
-  // to the ground, latticed in diamonds — which is the whole impression of
-  // it from the roundabout.
-  function glassPrism(b, ax, az, ah, bx, bz, bh, depth, bright){
-    var cols = 11, rows = 6;
-    function top(u){ return [ax + (bx - ax) * u, ah + (bh - ah) * u, az + (bz - az) * u]; }
-    function foot(u){ var t = top(u); return [t[0], 0, t[2] + depth]; }
-    function at(u, v){
-      var t = top(u), f = foot(u);
-      return [t[0] + (f[0] - t[0]) * v, t[1] + (f[1] - t[1]) * v, t[2] + (f[2] - t[2]) * v];
+  // The gem. Not a box with a pattern on it and not a tent: a crystal of
+  // flat facets at odds with each other, which is what the photographs show.
+  // The nose comes down almost to the paving over the entrance, the ridge
+  // runs back and to the west, and every plane is panelled in triangles.
+  function gem(b, cx, cz, s, bright){
+    function V(x, y, z){ return [cx + x * s, y * s, cz + z * s]; }
+    // The shape is a shard, not a roof: one tall arris runs from the apex
+    // straight down to the doors, and the two great planes either side of it
+    // fall away at different angles onto feet that are nowhere near
+    // symmetrical. That asymmetry is the whole character of the building.
+    var N  = V( -2,  0.4,  18),   // the foot of the arris, over the doors
+        A  = V(  0, 15.0,   1),   // the head of the arris
+        R  = V( -6, 17.0,  -7),   // the apex, behind and west
+        S  = V( 11, 11.0,  -8),   // the eastern shoulder, much lower
+        W1 = V(-17,  0.4,   7), W2 = V(-19, 6.0, -10),
+        E1 = V( 16,  0.4,   3), E2 = V( 18, 4.0, -11);
+    [[N, W1, A, 4, 3], [N, A, E1, 4, 11],        // the two great planes
+     [W1, W2, A, 3, 29], [W2, R, A, 2, 41],
+     [A, R, S, 3, 53], [A, S, E1, 3, 67],
+     [E1, S, E2, 2, 71], [W2, S, R, 2, 83], [W2, E2, S, 2, 97]
+    ].forEach(function(f){ facet(b, f[0], f[1], f[2], f[3], bright * 0.40, f[4]); });
+    // the arrises, carried hard, because a crystal is its edges
+    [[N,A],[N,W1],[N,E1],[W1,A],[E1,A],[W1,W2],[E1,E2],[W2,E2],
+     [W2,R],[E2,S],[R,A],[A,S],[R,S],[W2,S]].forEach(function(e){
+      b.line(e[0], e[1], bright * 1.35);
+    });
+    // the red struts under the nose, and the glazed doors behind them
+    b.line(V(-4.4, 0.4, 16.6), V(-2, 5.6, 15.0), bright * 1.6);
+    b.line(V( 0.4, 0.4, 16.6), V(-2, 5.6, 15.0), bright * 1.6);
+    b.loop([V(-5.8, 0.4, 15.2), V(1.8, 0.4, 15.2),
+            V(1.8, 3.8, 15.2), V(-5.8, 3.8, 15.2)], bright * 0.8);
+  }
+
+  // The white block behind the gem. A stepped mass with a lower wing, cut
+  // with triangular openings in loose columns, and the coloured fins down
+  // its western bay.
+  function cutBlock(b, cx, cz, w, d, h, seedv, bright){
+    var seed = seedv;
+    function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    b.box(cx, 0, cz, w, h, d, bright);
+    b.box(cx - w * 0.14, h, cz - d * 0.10, w * 0.62, h * 0.26, d * 0.72, bright);
+    b.box(cx + w * 0.34, 0, cz + d * 0.30, w * 0.46, h * 0.52, d * 0.62, bright * 0.85);
+    var face = cz + d / 2, cols = 4, rows = 6;
+    for(var c = 0; c < cols; c++){
+      for(var r = 0; r < rows; r++){
+        if(rnd() > 0.74) continue;                     // not every bay is cut
+        var bw = w / cols;
+        var sz = bw * (0.34 + rnd() * 0.4);
+        var px = cx - w / 2 + bw * c + (bw - sz) * (0.2 + rnd() * 0.6);
+        var py = 1.4 + (h - 3.4) * (r / rows) + rnd() * 0.6;
+        if(rnd() > 0.42) b.loop([[px, py, face], [px + sz, py, face], [px + sz / 2, py + sz, face]], bright * 0.95);
+        else             b.loop([[px, py + sz, face], [px + sz, py + sz, face], [px + sz / 2, py, face]], bright * 0.95);
+      }
     }
-    // the ridge and the ground line
-    b.line(top(0), top(1), bright);
-    b.line(foot(0), foot(1), bright * 0.7);
-    b.line(top(0), foot(0), bright);
-    b.line(top(1), foot(1), bright);
-    // the diamond lattice on the slope
+    for(var fl = 1; fl < 6; fl++){
+      b.line([cx - w / 2, h * fl / 6, face], [cx + w / 2, h * fl / 6, face], bright * 0.28);
+    }
+    // the coloured fins on the western bay
+    for(var g = 0; g < 5; g++){
+      var gx = cx - w / 2 + 0.6 + g * 0.5;
+      b.line([gx, h * 0.16, face], [gx, h * 0.80, face], bright * 1.25);
+    }
+    // the long deep-set window band on the east
+    for(var wq = 0; wq < 4; wq++){
+      var wy = h * (0.22 + wq * 0.16);
+      b.loop([[cx + w / 2 - 4.0, wy, face], [cx + w / 2 - 0.8, wy, face],
+              [cx + w / 2 - 0.8, wy + 1.1, face], [cx + w / 2 - 4.0, wy + 1.1, face]], bright * 0.55);
+    }
+  }
+
+  // The long white building on the eastern end: a fine perforated screen
+  // over most of it, and the diagonal stair cutting across the facade.
+  function screenBlock(b, cx, cz, w, d, h, bright){
+    b.box(cx, 0, cz, w, h, d, bright);
+    b.box(cx, h, cz, w + 0.5, 0.5, d + 0.5, bright * 0.85);
+    var face = cz + d / 2, floors = 6;
+    for(var r = 1; r < floors; r++){
+      b.line([cx - w / 2, h * r / floors, face], [cx + w / 2, h * r / floors, face], bright * 0.4);
+    }
+    // the screen: a diamond mesh, dense and quiet
+    var cols = 16, rows = 10;
     for(var i = 0; i < cols; i++){
       for(var j = 0; j < rows; j++){
-        var u0 = i / cols, u1 = (i + 1) / cols, v0 = j / rows, v1 = (j + 1) / rows;
-        b.line(at(u0, v0), at(u1, v1), bright * 0.42);
-        b.line(at(u0, v1), at(u1, v0), bright * 0.42);
+        var x0 = cx - w / 2 + w * (i / cols), x1 = cx - w / 2 + w * ((i + 1) / cols);
+        var y0 = h * (j / rows) + 0.4, y1 = h * ((j + 1) / rows) + 0.4;
+        if((i + j) % 2) b.line([x0, y0, face], [x1, y1, face], bright * 0.26);
+        else            b.line([x0, y1, face], [x1, y0, face], bright * 0.26);
       }
     }
-    for(var k = 1; k < rows; k++){ b.line(at(0, k / rows), at(1, k / rows), bright * 0.2); }
-    // the back wall, so it has a body rather than being a sheet
-    b.line([top(0)[0], 0, top(0)[2]], top(0), bright * 0.3);
-    b.line([top(1)[0], 0, top(1)[2]], top(1), bright * 0.3);
-    b.line([top(0)[0], 0, top(0)[2]], [top(1)[0], 0, top(1)[2]], bright * 0.25);
+    // the diagonal stair, the one thing you recognise it by
+    var sx0 = cx - w * 0.34, sx1 = cx + w * 0.16;
+    b.line([sx0, 0.6, face + 0.5], [sx1, h * 0.82, face + 0.5], bright * 1.2);
+    b.line([sx0, 2.0, face + 0.5], [sx1, h * 0.82 + 1.4, face + 0.5], bright * 1.2);
+    for(var q = 0; q <= 9; q++){
+      var f2 = q / 9;
+      b.line([sx0 + (sx1 - sx0) * f2, 0.6 + (h * 0.82 - 0.6) * f2, face + 0.5],
+             [sx0 + (sx1 - sx0) * f2, 2.0 + (h * 0.82 - 0.6) * f2, face + 0.5], bright * 0.5);
+    }
+    // the entrance canopy
+    b.box(cx - w * 0.30, 0, cz + d / 2 + 1.6, 6.0, 3.2, 3.2, bright * 0.6);
   }
 
-  // The tower crane. It is in two of the three photographs, so it belongs.
+  // The dark block that carries the name, and the sign band across it.
+  function signBlock(b, cx, cz, w, d, h, bright){
+    b.box(cx, 0, cz, w, h, d, bright);
+    b.box(cx, h, cz, w + 0.4, 0.4, d + 0.4, bright * 0.9);
+    var face = cz + d / 2;
+    for(var r = 1; r < 6; r++){
+      var y = h * r / 6;
+      b.line([cx - w / 2, y, face], [cx + w / 2, y, face], bright * 0.55);
+      b.line([cx - w / 2, y + 0.9, face], [cx + w / 2, y + 0.9, face], bright * 0.3);
+    }
+    for(var c = 1; c < 5; c++){
+      var x = cx - w / 2 + w * c / 5;
+      b.line([x, 0, face], [x, h, face], bright * 0.3);
+    }
+    // the sign, and the roundel beside it
+    b.loop([[cx - w * 0.42, h * 0.86, face + 0.2], [cx + w * 0.10, h * 0.86, face + 0.2],
+            [cx + w * 0.10, h * 0.94, face + 0.2], [cx - w * 0.42, h * 0.94, face + 0.2]], bright * 1.2);
+    b.ring(cx + w * 0.28, h * 0.90, face + 0.2, 1.5, 12, bright * 1.2);
+    b.ring(cx + w * 0.28, h * 0.90, face + 0.2, 1.0, 10, bright * 0.7);
+  }
+
+  // The high-rise standing behind the whole complex.
+  function highRise(b, cx, cz, w, d, h, bright){
+    b.box(cx, 0, cz, w, h, d, bright);
+    b.box(cx, h, cz, w * 0.7, 1.6, d * 0.7, bright * 0.8);
+    var face = cz + d / 2, floors = 17;
+    for(var r = 1; r < floors; r++){
+      b.line([cx - w / 2, h * r / floors, face], [cx + w / 2, h * r / floors, face], bright * 0.5);
+    }
+    for(var c = 1; c < 5; c++){
+      var x = cx - w / 2 + w * c / 5;
+      b.line([x, 0, face], [x, h, face], bright * 0.35);
+    }
+    // the core still under construction, a shade brighter than the glass
+    b.line([cx - w / 2, 0, cz - d / 2], [cx - w / 2, h + 3.0, cz - d / 2], bright * 0.8);
+    b.line([cx + w / 2, 0, cz - d / 2], [cx + w / 2, h + 3.0, cz - d / 2], bright * 0.8);
+  }
+
+  // The slim glazed stair tower that joins the gem to the block above it.
+  function liftTower(b, cx, cz, r, h, bright){
+    b.ring(cx, 0, cz, r, 10, bright * 0.7);
+    b.ring(cx, h, cz, r, 10, bright);
+    for(var i = 0; i < 10; i++){
+      var a = i / 10 * Math.PI * 2;
+      b.line([cx + Math.cos(a) * r, 0, cz + Math.sin(a) * r],
+             [cx + Math.cos(a) * r, h, cz + Math.sin(a) * r], bright * 0.6);
+    }
+    for(var y = 3; y < h; y += 3){ b.ring(cx, y, cz, r, 10, bright * 0.32); }
+  }
+
+  // The tower crane. It is in the photographs, so it belongs.
   function crane(b, x, z, h, bright){
-    var s = 0.55;
+    var s = 0.6;
     [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(c){
       b.line([x + c[0]*s, 0, z + c[1]*s], [x + c[0]*s, h, z + c[1]*s], bright);
     });
-    for(var y = 3.2; y < h; y += 3.2){
+    for(var y = 3.4; y < h; y += 3.4){
       b.loop([[x-s,y,z-s],[x+s,y,z-s],[x+s,y,z+s],[x-s,y,z+s]], bright * 0.5);
-      b.line([x-s, y, z-s], [x+s, y + 3.2, z-s], bright * 0.3);
-      b.line([x+s, y, z+s], [x-s, y + 3.2, z+s], bright * 0.3);
+      b.line([x-s, y, z-s], [x+s, y + 3.4, z-s], bright * 0.3);
     }
-    var jib = 17, back = 6, jy = h + 1.4;
-    b.box(x, h, z, 1.6, 1.4, 1.6, bright);
+    var jib = 20, back = 7, jy = h + 1.5;
+    b.box(x, h, z, 1.7, 1.5, 1.7, bright);
     b.line([x - back, jy, z], [x + jib, jy, z], bright);
-    b.line([x - back, jy + 0.5, z], [x + jib, jy + 0.5, z], bright * 0.7);
-    for(var q = -back; q < jib; q += 2.0){
-      b.line([x + q, jy, z], [x + q + 2.0, jy + 0.5, z], bright * 0.3);
+    b.line([x - back, jy + 0.6, z], [x + jib, jy + 0.6, z], bright * 0.65);
+    for(var q = -back; q < jib; q += 2.6){
+      b.line([x + q, jy, z], [x + q + 2.6, jy + 0.6, z], bright * 0.3);
     }
-    b.line([x, jy + 3.4, z], [x + jib, jy + 0.5, z], bright * 0.5);
-    b.line([x, jy + 3.4, z], [x - back, jy + 0.5, z], bright * 0.5);
-    b.line([x, jy + 0.5, z], [x, jy + 3.4, z], bright * 0.6);
-    b.line([x + jib * 0.62, jy, z], [x + jib * 0.62, jy - 3.2, z], bright * 0.35);
+    b.line([x, jy + 3.6, z], [x + jib, jy + 0.6, z], bright * 0.5);
+    b.line([x, jy + 3.6, z], [x - back, jy + 0.6, z], bright * 0.5);
+    b.line([x, jy + 0.6, z], [x, jy + 3.6, z], bright * 0.6);
+    b.line([x + jib * 0.6, jy, z], [x + jib * 0.6, jy - 4.0, z], bright * 0.3);
   }
 
-  // The wheel on the far side of the valley.
-  function ferris(b, x, z, r, bright){
-    var pts = b.ring(x, r + 1.6, z, r, 22, bright * 0.8);
-    b.ring(x, r + 1.6, z, r * 0.18, 10, bright * 0.6);
-    for(var i = 0; i < 22; i += 1){
-      if(i % 2 === 0){ b.line([x, r + 1.6, z], pts[i], bright * 0.35); }
-      var p = pts[i];
-      b.line([p[0] - 0.28, p[1], p[2]], [p[0] + 0.28, p[1], p[2]], bright * 0.5);
-    }
-    b.line([x - r * 0.6, 0, z], [x, r + 1.6, z], bright * 0.6);
-    b.line([x + r * 0.6, 0, z], [x, r + 1.6, z], bright * 0.6);
+  // Vehicles. No wheels — nothing is ever near enough to miss them.
+  function car(b, x, z, ang, bright){
+    var ca = Math.cos(ang), sa = Math.sin(ang);
+    function P(u, y, v){ return [x + u * ca - v * sa, y, z + u * sa + v * ca]; }
+    var L = 2.1, W = 0.86;
+    b.loop([P(-L, 0.26, -W), P(L, 0.26, -W), P(L, 0.26, W), P(-L, 0.26, W)], bright);
+    b.loop([P(-L, 0.80, -W), P(L, 0.80, -W), P(L, 0.80, W), P(-L, 0.80, W)], bright * 0.75);
+    [[-L,-W],[L,-W],[L,W],[-L,W]].forEach(function(c){
+      b.line(P(c[0], 0.26, c[1]), P(c[0], 0.80, c[1]), bright * 0.55);
+    });
+    b.loop([P(-0.9, 1.34, -W * 0.78), P(0.7, 1.34, -W * 0.78),
+            P(0.7, 1.34, W * 0.78), P(-0.9, 1.34, W * 0.78)], bright * 0.6);
+    b.line(P(-L * 0.7, 0.80, -W), P(-0.9, 1.34, -W * 0.78), bright * 0.45);
+    b.line(P( L * 0.7, 0.80, -W), P( 0.7, 1.34, -W * 0.78), bright * 0.45);
   }
 
-  // The hills. A ridge line, and a scatter of houses sitting on it.
+  function bus(b, x, z, ang, bright){
+    var ca = Math.cos(ang), sa = Math.sin(ang);
+    function P(u, y, v){ return [x + u * ca - v * sa, y, z + u * sa + v * ca]; }
+    var L = 5.4, W = 1.3, H = 3.0;
+    b.loop([P(-L, 0.4, -W), P(L, 0.4, -W), P(L, 0.4, W), P(-L, 0.4, W)], bright);
+    b.loop([P(-L, H, -W), P(L, H, -W), P(L, H, W), P(-L, H, W)], bright * 0.8);
+    [[-L,-W],[L,-W],[L,W],[-L,W]].forEach(function(c){
+      b.line(P(c[0], 0.4, c[1]), P(c[0], H, c[1]), bright * 0.6);
+    });
+    for(var w = -2; w <= 2; w++){
+      b.line(P(w * 1.7, 1.5, -W), P(w * 1.7, 2.5, -W), bright * 0.4);
+    }
+    b.line(P(-L, 1.5, -W), P(L, 1.5, -W), bright * 0.4);
+    b.line(P(-L, 2.5, -W), P(L, 2.5, -W), bright * 0.4);
+  }
+
+  // The hillside. A ridge, and the white houses scattered along it.
   function ridgeLine(b, z, base, amp, seedv, houses, bright){
     var seed = seedv;
     function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
     var prev = null, tops = [];
-    for(var x = -150; x <= 150; x += 7.5){
-      var y = base + Math.sin(x * 0.031 + seedv) * amp + Math.sin(x * 0.077) * amp * 0.45 + rnd() * amp * 0.25;
+    for(var x = -230; x <= 230; x += 11){
+      var y = base + Math.sin(x * 0.021 + seedv) * amp + Math.sin(x * 0.058) * amp * 0.5 + rnd() * amp * 0.3;
       var pt = [x, Math.max(1, y), z];
       if(prev) b.line(prev, pt, bright);
       prev = pt; tops.push(pt);
     }
     for(var k = 0; k < houses; k++){
       var t = tops[2 + Math.floor(rnd() * (tops.length - 4))];
-      var hw = 1.6 + rnd() * 1.6, hh = 1.2 + rnd() * 1.4;
-      var hx = t[0] + (rnd() * 2 - 1) * 3, hy = t[1] - 0.6, hz = t[2] + 1.5;
+      var hw = 2.4 + rnd() * 2.6, hh = 1.8 + rnd() * 2.2;
+      var hx = t[0] + (rnd() * 2 - 1) * 5, hy = t[1] - 0.9, hz = t[2] + 2.5;
       b.path([[hx - hw / 2, hy, hz], [hx - hw / 2, hy + hh, hz],
-              [hx + hw / 2, hy + hh, hz], [hx + hw / 2, hy, hz]], bright * 1.4);
+              [hx + hw / 2, hy + hh, hz], [hx + hw / 2, hy, hz]], bright * 1.5);
     }
   }
 
-  function car(b, x, z, ang, bright){
-    var ca = Math.cos(ang), sa = Math.sin(ang);
-    function P(u, y, v){ return [x + u * ca - v * sa, y, z + u * sa + v * ca]; }
-    var L = 2.1, W = 0.85;
-    b.loop([P(-L, 0.28, -W), P(L, 0.28, -W), P(L, 0.28, W), P(-L, 0.28, W)], bright);
-    b.loop([P(-L, 0.78, -W), P(L, 0.78, -W), P(L, 0.78, W), P(-L, 0.78, W)], bright * 0.8);
-    [[-L,-W],[L,-W],[L,W],[-L,W]].forEach(function(c){
-      b.line(P(c[0], 0.28, c[1]), P(c[0], 0.78, c[1]), bright * 0.6);
-    });
-    b.loop([P(-0.9, 1.32, -W * 0.8), P(0.7, 1.32, -W * 0.8),
-            P(0.7, 1.32, W * 0.8), P(-0.9, 1.32, W * 0.8)], bright * 0.7);
-    b.line(P(-L * 0.7, 0.78, -W), P(-0.9, 1.32, -W * 0.8), bright * 0.5);
-    b.line(P( L * 0.7, 0.78, -W), P( 0.7, 1.32, -W * 0.8), bright * 0.5);
+  // The ground the campus is cut into: bare rock and scrub, drawn as
+  // scratches so the ridge does not read as a lawn.
+  function scrub(b, seedv, n, bright){
+    var seed = seedv;
+    function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    for(var i = 0; i < n; i++){
+      var a = rnd() * Math.PI * 2, r = 34 + rnd() * 74;
+      var x = Math.cos(a) * r, z = Math.sin(a) * r * 0.8 - 12;
+      var s = 0.5 + rnd() * 1.5;
+      b.line([x - s, 0, z], [x + s * 0.4, 0, z + s * 0.7], bright);
+      if(rnd() > 0.6) b.line([x, 0, z + s * 0.2], [x + s * 0.6, 0.35 + rnd() * 0.5, z - s * 0.4], bright * 0.8);
+    }
   }
 
   function palm(b, x, z, h, bright){
     var pts = [];
-    for(var i = 0; i <= 5; i++){
-      var f = i / 5;
+    for(var i = 0; i <= 4; i++){
+      var f = i / 4;
       pts.push([x + f * f * 0.5, h * f, z + f * f * 0.2]);
     }
     b.path(pts, bright);
-    var top = pts[5];
-    for(var k = 0; k < 8; k++){
-      var a = k / 8 * Math.PI * 2;
-      var mx = top[0] + Math.cos(a) * 1.0, mz = top[2] + Math.sin(a) * 1.0;
-      b.path([top, [mx, top[1] + 0.45, mz],
+    var top = pts[4];
+    for(var k = 0; k < 7; k++){
+      var a = k / 7 * Math.PI * 2;
+      b.path([top, [top[0] + Math.cos(a) * 1.0, top[1] + 0.45, top[2] + Math.sin(a) * 1.0],
               [top[0] + Math.cos(a) * 1.9, top[1] - 0.35, top[2] + Math.sin(a) * 1.9]], bright * 0.7);
     }
   }
@@ -290,41 +441,22 @@
     b.ring(x, 0.40, z, 0.36, 8, bright);
     for(var i = 0; i < 8; i++){
       var a = i / 8 * Math.PI * 2;
-      if(i % 2 === 0){
-        b.line([x + Math.cos(a) * 0.28, 0.02, z + Math.sin(a) * 0.28],
-               [x + Math.cos(a) * 0.36, 0.40, z + Math.sin(a) * 0.36], bright * 0.45);
-      }
       b.line([x, 0.40, z], [x + Math.cos(a) * 0.42, 0.95 + (i % 3) * 0.14, z + Math.sin(a) * 0.42], bright * 0.45);
     }
   }
 
-  // The shelter beside the circle, patterned panel and all.
   function shelter(b, x, z, bright){
     var w = 4.6, d = 2.0, h = 2.6;
     b.box(x, h, z, w, 0.22, d, bright);
     [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(c){
       b.line([x + c[0]*w/2, 0, z + c[1]*d/2], [x + c[0]*w/2, h, z + c[1]*d/2], bright * 0.8);
     });
-    for(var i = 0; i < 7; i++){
-      var px = x - w / 2 + w * ((i + 0.5) / 7);
-      b.loop([[px - 0.22, 0.5, z - d/2], [px + 0.22, 0.5, z - d/2],
-              [px + 0.22, h - 0.2, z - d/2], [px - 0.22, h - 0.2, z - d/2]], bright * 0.45);
-      b.line([px, 0.5, z - d/2], [px, h - 0.2, z - d/2], bright * 0.25);
+    for(var i = 0; i < 6; i++){
+      var px = x - w / 2 + w * ((i + 0.5) / 6);
+      b.line([px, 0.5, z - d/2], [px, h - 0.2, z - d/2], bright * 0.35);
     }
     b.box(x, 0.45, z + 0.3, w * 0.8, 0.1, 0.4, bright * 0.7);
   }
-
-  // A person, at the size a person is. Six of them do more for the sense of
-  // scale than any amount of extra geometry on the tower.
-  function person(b, x, z, bright){
-    b.ring(x, 1.60, z, 0.09, 6, bright);
-    b.line([x, 0.86, z], [x, 1.51, z], bright);
-    b.line([x, 0.86, z], [x - 0.11, 0, z], bright * 0.7);
-    b.line([x, 0.86, z], [x + 0.11, 0, z], bright * 0.7);
-    b.line([x, 1.40, z], [x - 0.17, 0.92, z], bright * 0.45);
-    b.line([x, 1.40, z], [x + 0.17, 0.92, z], bright * 0.45);
-  }
-
   function archProfile(halfW, y0, seg){
     var d = halfW * 0.55, R = halfW + d;
     var pts = [];
@@ -546,118 +678,128 @@
     b.path([[x, 7.2, z], [x + 1.9, 6.7, z], [x + 1.75, 5.9, z], [x, 6.1, z]], bright * 0.85);
     b.line([x + 0.9, 7.0, z], [x + 0.85, 6.0, z], bright * 0.4);
   }
-
   function build(){
     var b = new Builder();
 
     // ---- the landmark, in the middle of its circle ----
-    monument(b, 1.0);
+    monument(b, 0.88);
 
     // ---- the roundabout ----
-    // From the photograph taken out of the glass: concentric bands of
-    // paving, the road round the outside, the whole thing sitting on a
-    // shelf cut into the hillside.
     var POOL = 9.0;
     var PLAZA = 15.5, ROAD_IN = 17.5, ROAD_OUT = 23.5;
-    b.ring(0, 0.02, 0, PLAZA, 60, 0.5);
-    b.ring(0, 0.02, 0, ROAD_IN, 64, 0.42);
-    b.ring(0, 0.02, 0, ROAD_OUT, 68, 0.42);
-    b.ring(0, 0.02, 0, ROAD_OUT + 0.5, 68, 0.2);
-    for(var i = 0; i < 44; i++){
-      var a = i / 44 * Math.PI * 2;
+    b.ring(0, 0.02, 0, PLAZA, 56, 0.34);
+    b.ring(0, 0.02, 0, ROAD_IN, 60, 0.28);
+    b.ring(0, 0.02, 0, ROAD_OUT, 64, 0.28);
+    for(var i = 0; i < 40; i++){
+      var a = i / 40 * Math.PI * 2;
       b.line([Math.cos(a) * (POOL + 1.4), 0.02, Math.sin(a) * (POOL + 1.4)],
-             [Math.cos(a) * PLAZA, 0.02, Math.sin(a) * PLAZA], 0.12);
+             [Math.cos(a) * PLAZA, 0.02, Math.sin(a) * PLAZA], 0.08);
       b.line([Math.cos(a) * ROAD_IN, 0.02, Math.sin(a) * ROAD_IN],
-             [Math.cos(a) * ROAD_OUT, 0.02, Math.sin(a) * ROAD_OUT], 0.09);
+             [Math.cos(a) * ROAD_OUT, 0.02, Math.sin(a) * ROAD_OUT], 0.08);
     }
-    for(var r2 = POOL + 2.2; r2 < PLAZA; r2 += 1.8){ b.ring(0, 0.02, 0, r2, 48, 0.1); }
-    // the dashed lane line on the road
-    for(var dm = 0; dm < 48; dm++){
-      if(dm % 2) continue;
-      var a0 = dm / 48 * Math.PI * 2, a1 = (dm + 1) / 48 * Math.PI * 2, rm = (ROAD_IN + ROAD_OUT) / 2;
-      b.line([Math.cos(a0) * rm, 0.03, Math.sin(a0) * rm],
-             [Math.cos(a1) * rm, 0.03, Math.sin(a1) * rm], 0.3);
+    for(var r2 = POOL + 2.2; r2 < PLAZA; r2 += 1.8){ b.ring(0, 0.02, 0, r2, 44, 0.07); }
+
+    // ---- the complex, west to east along the ridge ----
+    // Distances and heights are read off the drone photographs: the gem
+    // sits low and wide right beside the fountain, the cut block rises
+    // behind it, and the long buildings run away eastward.
+    gem(b, 16.0, -38.0, 1.25, 0.95);
+    cutBlock(b, -9.0, -48.0, 16.0, 15.0, 21.0, 3, 0.80);
+    liftTower(b, 30.0, -50.0, 2.4, 21.0, 0.62);
+    signBlock(b, 50.0, -52.0, 20.0, 15.0, 20.0, 0.62);
+    screenBlock(b, 66.0, -30.0, 30.0, 17.0, 19.0, 0.58);
+    highRise(b, 30.0, -84.0, 14.0, 13.0, 44.0, 0.66);
+    crane(b, 13.0, -90.0, 46.0, 0.52);
+    // the low buildings that close the eastern end
+    b.box(88.0, 0, -14.0, 9.0, 5.0, 7.0, 0.34);
+    b.box(82.0, 0, -4.0, 5.0, 3.4, 4.5, 0.3);
+
+    // ---- the road along the front, and the wall holding the ridge up ----
+    // One long arc that passes through the roundabout and swings away at
+    // both ends, exactly as it does on the hill.
+    var RCX = 30.0, RCZ = -74.0, RR = 80.0;
+    function onArc(deg, rr){
+      var t = deg * Math.PI / 180;
+      return [RCX + Math.cos(t) * rr, 0.02, RCZ + Math.sin(t) * rr];
+    }
+    var A0 = 46, A1 = 152;
+    var prevIn = null, prevOut = null, prevWall = null;
+    for(var d = A0; d <= A1; d += 2){
+      var pin = onArc(d, RR - 4.0), pout = onArc(d, RR + 4.0), pw = onArc(d, RR + 11.0);
+      if(prevIn){
+        b.line(prevIn, pin, 0.26);
+        b.line(prevOut, pout, 0.26);
+        if((d / 2) % 2 === 0) b.line(onArc(d - 2, RR), onArc(d, RR), 0.22);
+        b.line(prevWall, pw, 0.34);
+        b.line([prevWall[0], 2.2, prevWall[2]], [pw[0], 2.2, pw[2]], 0.4);
+      }
+      if((d - A0) % 8 === 0){
+        b.line(pw, [pw[0], 2.2, pw[2]], 0.22);        // the wall's ribs
+        b.line(pout, pw, 0.1);
+      }
+      prevIn = pin; prevOut = pout; prevWall = pw;
+    }
+    // the line of parked cars on the inner kerb, which is what the ridge
+    // actually looks like on a weekday
+    for(var pc = 0; pc < 22; pc++){
+      var dg = 52 + pc * 2.6;
+      if(dg > 104 && dg < 122) continue;              // the roundabout mouth
+      var t2 = dg * Math.PI / 180;
+      var px = RCX + Math.cos(t2) * (RR - 7.4), pz = RCZ + Math.sin(t2) * (RR - 7.4);
+      car(b, px, pz, t2 + Math.PI / 2, 0.2);
+    }
+    // the buses drawn up at the western end
+    for(var bs = 0; bs < 4; bs++){
+      bus(b, -46.0 - bs * 1.0, -6.0 + bs * 13.0, 1.35, 0.17);
     }
 
-    // ---- the complex the landmark stands in front of ----
-    // White perforated block on the left, faceted glass sloping away to the
-    // right, exactly as they sit behind the fountain from the road.
-    stoneBlock(b, -14.0, -38.0, 15.0, 13.0, 25.0, 0.40);
-    stoneBlock(b, -26.0, -34.0,  9.0,  9.0, 12.0, 0.24);
-    crane(b, -10.0, -43.0, 33.0, 0.26);
-    glassPrism(b, 1.0, -37.0, 19.0, 26.0, -47.0, 4.0, 10.0, 0.34);
-    // the angular canopy where the two meet, over the entrance
-    b.path([[-6.0, 11.5, -28.5], [1.5, 9.0, -25.0], [7.5, 10.5, -28.5]], 0.5);
-    b.line([-6.0, 11.5, -28.5], [-6.0, 8.0, -30.5], 0.35);
-    b.line([ 7.5, 10.5, -28.5], [ 7.5, 8.0, -30.5], 0.35);
-    // and something low and far on the other side, so the circle is enclosed
-    stoneBlock(b, 34.0, -20.0, 11.0, 9.0, 8.0, 0.24);
-    stoneBlock(b, -46.0, -48.0, 12.0, 10.0, 9.0, 0.16);
-
-    // ---- the hillside beyond, and the wheel across the valley ----
-    ridgeLine(b, -78.0, 7.0, 4.5, 3, 9, 0.30);
-    ridgeLine(b, -104.0, 12.0, 6.0, 11, 6, 0.18);
-    ferris(b, -60.0, -72.0, 7.0, 0.3);
-    // the road that runs along the foot of the hill
-    b.line([-120, 0.02, -62], [120, 0.02, -62], 0.16);
-    b.line([-120, 0.02, -67], [120, 0.02, -67], 0.12);
-    for(var pc = 0; pc < 7; pc++){
-      car(b, -48 + pc * 16.0, -64.5, 0.0, 0.22);
-    }
-
-    // ---- ground ----
-    for(var gx = -70; gx <= 70; gx += 5.0){ b.line([gx, 0, 30], [gx, 0, -60], 0.055); }
-    for(var gz = 30; gz > -60; gz -= 5.0){ b.line([-70, 0, gz], [70, 0, gz], 0.055); }
+    // ---- the hillside, and the valley beyond ----
+    ridgeLine(b, -118.0, 16.0, 7.0, 3, 14, 0.34);
+    ridgeLine(b, -152.0, 24.0, 9.0, 11, 10, 0.28);
+    ridgeLine(b, -196.0, 30.0, 11.0, 23, 6, 0.22);
+    scrub(b, 5, 130, 0.09);
+    // the ground plane, kept to a whisper
+    for(var gx = -110; gx <= 110; gx += 8.0){ b.line([gx, 0, 34], [gx, 0, -100], 0.04); }
+    for(var gz = 34; gz > -100; gz -= 8.0){ b.line([-110, 0, gz], [110, 0, gz], 0.04); }
 
     // ---- everything at the size a person is ----
     for(var L = 0; L < 10; L++){
       var al = L / 10 * Math.PI * 2 + 0.4;
       var lx = Math.cos(al) * 19.5, lz = Math.sin(al) * 19.5;
-      b.line([lx, 0, lz], [lx, 3.4, lz], 0.4);
-      b.line([lx - 0.34, 3.4, lz], [lx + 0.34, 3.4, lz], 0.4);
-      b.ring(lx, 3.7, lz, 0.3, 8, 0.6);
-      b.line([lx, 3.4, lz], [lx, 3.7, lz], 0.3);
+      b.line([lx, 0, lz], [lx, 3.4, lz], 0.34);
+      b.line([lx - 0.34, 3.4, lz], [lx + 0.34, 3.4, lz], 0.34);
+      b.ring(lx, 3.7, lz, 0.3, 8, 0.5);
+      b.line([lx, 3.4, lz], [lx, 3.7, lz], 0.26);
     }
-    for(var T = 0; T < 9; T++){
-      var at = T / 9 * Math.PI * 2 + 0.15;
-      tree(b, Math.cos(at) * 26.5, Math.sin(at) * 26.5, 3.6 + (T % 3) * 0.4, 0.3);
+    for(var T = 0; T < 8; T++){
+      var at2 = T / 8 * Math.PI * 2 + 0.15;
+      tree(b, Math.cos(at2) * 27.0, Math.sin(at2) * 27.0, 3.6 + (T % 3) * 0.4, 0.24);
     }
-    [2.1, 2.75, 3.5, 4.15].forEach(function(ap){
-      palm(b, Math.cos(ap) * 29.0, Math.sin(ap) * 29.0, 5.4, 0.3);
+    [[34, -14], [40, -12], [46, -10], [52, -8]].forEach(function(pp){
+      palm(b, pp[0], pp[1], 5.4, 0.2);
     });
     for(var P = 0; P < 10; P++){
       var apn = P / 10 * Math.PI * 2 + 0.26;
-      planter(b, Math.cos(apn) * 14.6, Math.sin(apn) * 14.6, 0.22);
+      planter(b, Math.cos(apn) * 14.6, Math.sin(apn) * 14.6, 0.18);
     }
     [0.9, 2.4, 3.9, 5.4].forEach(function(ab){
-      bench(b, Math.cos(ab) * 12.6, Math.sin(ab) * 12.6, 0.26);
+      bench(b, Math.cos(ab) * 12.6, Math.sin(ab) * 12.6, 0.22);
     });
-    shelter(b, 15.5, -14.0, 0.42);
-    mast(b, 20.0, -22.0, 0.45);
-    mast(b, 22.6, -23.4, 0.34);
-    mast(b, 25.2, -24.8, 0.34);
-    // Beyond the pool, so they give the tower its scale instead of standing
-    // in the lens.
-    [[-7.4, -11.6], [-5.9, -11.9], [4.8, -12.4], [8.6, -11.0],
-     [13.2, -13.4], [14.6, -13.0], [-12.4, -7.0], [10.4, -15.2],
-     [-2.2, -13.8]].forEach(function(pp){
-      person(b, pp[0], pp[1], 0.34);
-    });
-    for(var rc = 0; rc < 3; rc++){
-      var arc = 2.0 + rc * 0.55;
-      car(b, Math.cos(arc) * 20.5, Math.sin(arc) * 20.5, arc + Math.PI / 2, 0.34);
-    }
+    shelter(b, -15.0, 13.0, 0.3);
+    mast(b, 30.0, -18.0, 0.34);
+    mast(b, 33.0, -19.4, 0.26);
+    mast(b, 36.0, -20.8, 0.26);
 
     // ---- sky ----
     var seed = 7;
     function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
-    for(var k = 0; k < 80; k++){
-      var sx = (rnd() * 2 - 1) * 62;
-      var sy = 18 + rnd() * 30;
-      var sz = -24 - rnd() * 52;
-      var rr = 0.15 + rnd() * 0.22;
-      b.line([sx - rr, sy, sz], [sx + rr, sy, sz], 0.55);
-      b.line([sx, sy - rr, sz], [sx, sy + rr, sz], 0.55);
+    for(var k = 0; k < 70; k++){
+      var sx = (rnd() * 2 - 1) * 90;
+      var sy = 30 + rnd() * 40;
+      var sz = -40 - rnd() * 90;
+      var rr = 0.2 + rnd() * 0.3;
+      b.line([sx - rr, sy, sz], [sx + rr, sy, sz], 0.42);
+      b.line([sx, sy - rr, sz], [sx, sy + rr, sz], 0.42);
     }
     return new Float32Array(b.v);
   }
@@ -685,7 +827,7 @@
     // whole range — a tighter curve had the gate arriving at an alpha of
     // 5/255 and the whole campus was invisible on a dark ground. The floor
     // keeps the far geometry present rather than gone.
-    '  vFog = clamp(1.0 - (gl_Position.w - 12.0) / 150.0, 0.28, 1.0);',
+    '  vFog = clamp(1.0 - (gl_Position.w - 14.0) / 135.0, 0.08, 1.0);',
     '}'
   ].join('\n');
 
@@ -699,10 +841,10 @@
     // Measured, not guessed: at the previous multiplier the composited
     // screen came back with a mean luminance of 24/255 and 13% of pixels
     // lit, which is what "too dark to see" is in numbers.
-    '  float a = clamp(vBright * vFog * uAlpha * 5.4, 0.0, 1.0);',
+    '  float a = clamp(vBright * vFog * uAlpha * 3.1, 0.0, 1.0);',
     // A bright line goes toward white and a faint one stays blue, so the
     // gate reads as lit rather than merely as more of the same colour.
-    '  vec3 c = mix(uColour, vec3(1.0), clamp(vBright * 0.30, 0.0, 0.34));',
+    '  vec3 c = mix(uColour, vec3(1.0), clamp(vBright * 0.26, 0.0, 0.30));',
     '  gl_FragColor = vec4(c, a);',
     '}'
   ].join('\n');
@@ -820,9 +962,9 @@
       // Three keyframes, eased between with a smoothstep so there is no
       // corner at the joins. Reduced motion skips straight to the last one.
       var KEYS = [
-        { t: 0.0,  eye: [ 54, 40,  54], at: [0, 10,  0] },   // high and wide: the whole area
-        { t: 0.45, eye: [ 26, 17,  29], at: [0,  8,  0] },   // swinging down and round
-        { t: 1.0,  eye: [3.5,  4.0, 22], at: [0, 5.6,  0] }  // across the pool, whole tower in frame
+        { t: 0.0,  eye: [-20, 40,  64], at: [22,  9, -34] }, // the whole ridge, from the air
+        { t: 0.42, eye: [-13, 20,  40], at: [10,  8, -20] }, // coming down over the road
+        { t: 1.0,  eye: [ -3, 4.2, 21.5], at: [0, 5.6,  0] } // the tower, with the campus behind it
       ];
       var raw = reduced ? 1 : Math.min(1, t / 7.0);
       var eye, at;
@@ -853,7 +995,7 @@
       at[1]  -= scene.tiltY * 1.2;
 
       var aspect = canvas.width / canvas.height;
-      perspective(proj, 62 * Math.PI / 180, aspect, 0.1, 320);
+      perspective(proj, 62 * Math.PI / 180, aspect, 0.1, 460);
       lookAt(view, eye, at, [0, 1, 0]);
       multiply(mvp, proj, view);
 
