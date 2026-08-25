@@ -62,7 +62,7 @@ const FRAG = /* glsl */`
     float a = (1.0 - smoothstep(0.02, 0.25, r)) * vFade;
     // a little variation in warmth, so they are not all the same speck
     vec3 col = uColour * (0.82 + fract(vSeed * 13.0) * 0.36);
-    gl_FragColor = vec4(col, a * 0.5);
+    gl_FragColor = vec4(col, a * 0.26);
   }
 `;
 

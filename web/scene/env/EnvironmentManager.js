@@ -36,6 +36,7 @@ const FRAG = /* glsl */`
   uniform vec3 uSunColour;
   uniform float uSunSize;
   uniform float uHaze;
+  uniform float uLevel;
 
   void main() {
     vec3 d = normalize(vDir);
@@ -64,28 +65,28 @@ const FRAG = /* glsl */`
     float band = exp(-abs(h) * 9.0);
     sky = mix(sky, mix(uHorizon, uSunColour, 0.28), band * uHaze);
 
-    gl_FragColor = vec4(sky, 1.0);
+    gl_FragColor = vec4(sky * uLevel, 1.0);
   }
 `;
 
 const PRESET = {
   // The one the scene ships with: late afternoon, sun low in the west.
   afternoon: {
-    zenith: 0x2f5f9e, horizon: 0xc9c2b4, ground: 0x6e5f4c,
+    zenith: 0x5f95d8, horizon: 0xe2dccd, ground: 0x8a7860,
     sun: 0xffd7a3, sunAltitude: 17, sunAzimuth: -104,
-    sunSize: 0.018, haze: 0.55, intensity: 1.0
+    sunSize: 0.018, haze: 0.55, intensity: 1.0, level: 1.45
   },
   // Kept because the app has dark themes and a bright sky behind a dark UI
   // is a fight nobody wins.
   blueHour: {
     zenith: 0x16294d, horizon: 0x9d7d78, ground: 0x2b2620,
     sun: 0xff9d5c, sunAltitude: 3.5, sunAzimuth: -110,
-    sunSize: 0.02, haze: 0.72, intensity: 0.55
+    sunSize: 0.02, haze: 0.72, intensity: 0.55, level: 0.9
   },
   night: {
     zenith: 0x070c18, horizon: 0x1d2637, ground: 0x0a0c11,
     sun: 0x4a6ea8, sunAltitude: -6, sunAzimuth: -110,
-    sunSize: 0.012, haze: 0.4, intensity: 0.16
+    sunSize: 0.012, haze: 0.4, intensity: 0.16, level: 0.5
   }
 };
 
@@ -102,7 +103,8 @@ export class EnvironmentManager {
       uSunDir: { value: new Vector3() },
       uSunColour: { value: new Color().setHex(this.preset.sun, SRGBColorSpace) },
       uSunSize: { value: this.preset.sunSize },
-      uHaze: { value: this.preset.haze }
+      uHaze: { value: this.preset.haze },
+      uLevel: { value: this.preset.level }
     };
     this.uniforms = uniforms;
     this.sunDirection = new Vector3();

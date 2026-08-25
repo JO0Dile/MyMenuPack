@@ -96,7 +96,7 @@ export class Plaza {
     const jetMat = new MeshStandardMaterial({
       color: new Color().setHex(0xdff0ff, SRGBColorSpace),
       emissive: new Color().setHex(0x8fc4e8, SRGBColorSpace),
-      emissiveIntensity: 0.42,
+      emissiveIntensity: 0.14,
       roughness: 0.25, metalness: 0, transparent: true, opacity: 0.5,
       depthWrite: false, side: DoubleSide
     });
@@ -179,7 +179,7 @@ export class Plaza {
   // The jets and the lamp glass come up together with the accent lighting.
   setAccent(k) {
     this.jets.visible = k > 0.02;
-    this.jetMaterial.opacity = 0.5 * k;
-    this.jetMaterial.emissiveIntensity = 0.42 * k;
+    this.jetMaterial.opacity = 0.34 * k;
+    this.jetMaterial.emissiveIntensity = 0.14 * k;
   }
 }

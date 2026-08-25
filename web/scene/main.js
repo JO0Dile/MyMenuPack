@@ -70,7 +70,7 @@ class LandingScene {
     // ACES is the single most important line in this file for how the image
     // reads: without it a low sun and a shaded soffit cannot both be right.
     this.renderer.toneMapping = ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.toneMappingExposure = 0.82;
     this.renderer.outputColorSpace = SRGBColorSpace;
     if (this.quality.get('shadows')) {
       this.renderer.shadowMap.enabled = true;
@@ -155,7 +155,9 @@ class LandingScene {
     const dt = Math.min(this.clock.getDelta(), 0.1);
     const t = this.clock.elapsedTime;
 
-    this.timeline.advance(dt);
+    // Absolute time, so the choreography and the camera can never disagree
+    // about what second it is however slow the frames are.
+    this.timeline.setTime(t);
     if (this.governor.sample(dt)) this._applyDemotion();
 
     this.camera.update(t, dt);
@@ -169,7 +171,7 @@ class LandingScene {
     this.terrain.object.visible = g > 0.01;
     this.landmark.object.visible = a > 0.01;
     this.plaza.object.visible = g > 0.01;
-    this.renderer.toneMappingExposure = 0.35 + 0.7 * this.timeline.at('sky');
+    this.renderer.toneMappingExposure = 0.30 + 0.52 * this.timeline.at('sky');
 
     const w = this.timeline.at('water');
     this.water.object.visible = w > 0.01;

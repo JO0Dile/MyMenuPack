@@ -31,9 +31,16 @@ export class Timeline {
     return this.cues.reduce((m, c) => Math.max(m, c.at + c.dur), 0);
   }
 
-  advance(dt) {
+  // Driven from the render clock's elapsed time rather than by accumulating
+  // per-frame deltas. Those deltas have to be clamped — a tab left in the
+  // background otherwise returns a delta of minutes and teleports everything
+  // — and on a device slow enough that every frame hits the clamp, an
+  // accumulator falls behind real time and the whole choreography runs in
+  // slow motion. Measured: twelve seconds of wall clock advanced this
+  // timeline by 1.1. Absolute time cannot drift.
+  setTime(t) {
     if (!this.running) return;
-    this.t += dt;
+    this.t = t;
     for (const c of this.cues) {
       if (!c.fired && this.t >= c.at) {
         c.fired = true;
@@ -42,6 +49,9 @@ export class Timeline {
     }
     if (this.t > this.duration + 0.5) this.running = false;
   }
+
+  // Kept for callers that only have a delta to hand.
+  advance(dt) { this.setTime(this.t + dt); }
 
   // How far through a named cue we are, 0..1, eased.
   at(name) {

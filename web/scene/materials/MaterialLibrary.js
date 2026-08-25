@@ -141,7 +141,7 @@ export class MaterialLibrary {
     this._add('glass-ui-edge', new MeshPhysicalMaterial({
       color: c(0xbcd4ee), roughness: 0.12, metalness: 0.35,
       clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 2.0,
-      emissive: c(0x2c4d78), emissiveIntensity: 0.35
+      emissive: c(0x2c4d78), emissiveIntensity: 0.06
     }));
 
     // ---- metal ---------------------------------------------------------

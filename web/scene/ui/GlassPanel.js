@@ -104,7 +104,7 @@ export class GlassPanel {
     // that must never be lost, so it composites last and unconditionally.
     const m = new Mesh(new PlaneGeometry(W - 0.44, H - 0.44), new MeshBasicMaterial({
       map: tex, transparent: true, depthWrite: false, depthTest: false,
-      side: DoubleSide, toneMapped: false
+      side: DoubleSide
     }));
     m.position.z = T / 2 + 0.014;
     m.renderOrder = 30;
@@ -184,7 +184,7 @@ export class GlassPanel {
     this.group.scale.setScalar(0.94 + 0.06 * e);
     this._baseY = 7.6;
     this.glass.material.opacity = 1;
-    this.edge.material.emissiveIntensity = 0.35 * e;
+    this.edge.material.emissiveIntensity = 0.06 * e;
     this.face.material.opacity = Math.max(0, (k - 0.25) / 0.75);
   }
 

@@ -141,10 +141,10 @@ export class LightingRig {
   // rather than as the scene simply being bright.
   setAccent(t) {
     const k = Math.max(0, Math.min(1, t));
-    this.accents[0].intensity = 44 * k;
-    this.accents[1].intensity = 44 * k;
-    this.accents[2].intensity = 26 * k;
-    this.lampLights.forEach(l => { l.intensity = 5.5 * k; });
+    this.accents[0].intensity = 16 * k;
+    this.accents[1].intensity = 16 * k;
+    this.accents[2].intensity = 10 * k;
+    this.lampLights.forEach(l => { l.intensity = 2.4 * k; });
   }
 
   // The whole rig dims together when the sign-in panel takes focus, so the
