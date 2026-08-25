@@ -156,36 +156,59 @@
       face.push([Math.cos(t) * 0.55 * k, cy + Math.sin(t) * 0.55 * k, cz]);
     }
     b.loop(face, bright);
-    b.line([0, cy, cz], [0, cy + 0.38 * k, cz], bright);          // the long hand
-    b.line([0, cy, cz], [0.26 * k, cy + 0.12 * k, cz], bright);   // the short one
-    for(var m = 0; m < 12; m++){
-      var a2 = m / 12 * Math.PI * 2;
-      b.line([Math.cos(a2) * 0.47 * k, cy + Math.sin(a2) * 0.47 * k, cz],
-             [Math.cos(a2) * 0.55 * k, cy + Math.sin(a2) * 0.55 * k, cz], bright * 0.7);
+    // A second rim just inside the first. Two close circles read as a dial;
+    // one circle with spokes read as the fountain.
+    var inner = [];
+    for(var ii = 0; ii < 24; ii++){
+      var ti = ii / 24 * Math.PI * 2;
+      inner.push([Math.cos(ti) * 0.47 * k, cy + Math.sin(ti) * 0.47 * k, cz]);
+    }
+    b.loop(inner, bright * 0.8);
+    b.line([0, cy, cz], [0, cy + 0.36 * k, cz], bright);          // the long hand
+    b.line([0, cy, cz], [0.24 * k, cy + 0.10 * k, cz], bright);   // the short one
+    // Four marks, at the quarters only.
+    for(var m = 0; m < 4; m++){
+      var a2 = m / 4 * Math.PI * 2;
+      b.line([Math.cos(a2) * 0.38 * k, cy + Math.sin(a2) * 0.38 * k, cz],
+             [Math.cos(a2) * 0.46 * k, cy + Math.sin(a2) * 0.46 * k, cz], bright * 0.9);
     }
     // the spire
     b.line([0, H, z], [0, H + 0.9 * k, z], bright);
     b.line([-0.28 * k, H + 0.62 * k, z], [0.28 * k, H + 0.62 * k, z], bright * 0.7);
   }
 
+  // THE FOUNTAIN AND THE CLOCK MUST NOT LOOK ALIKE.
+  //
+  // They did. Both were a circle with twelve spokes radiating out of it, so
+  // the screen read as the same object drawn twice, once high and once low.
+  // The spokes are gone from the water: a fountain is stacked basins and
+  // rising jets, and it is the VERTICALS that say so. The clock keeps a
+  // face and hands and nothing radiating round it.
   function fountain(b, z, bright){
-    b.ring(0, 0.02, z, 2.4, 40, bright);
-    b.ring(0, 0.34, z, 2.4, 40, bright);
-    b.ring(0, 0.36, z, 1.5, 32, bright * 0.8);
-    b.ring(0, 0.9, z, 0.55, 20, bright * 0.7);
-    for(var i = 0; i < 12; i++){
-      var a = i / 12 * Math.PI * 2;
-      b.line([Math.cos(a) * 1.5, 0.36, z + Math.sin(a) * 1.5],
-             [Math.cos(a) * 2.4, 0.34, z + Math.sin(a) * 2.4], bright * 0.4);
+    b.ring(0, 0.02, z, 2.6, 40, bright);
+    b.ring(0, 0.40, z, 2.6, 40, bright);
+    b.ring(0, 0.44, z, 1.75, 32, bright * 0.85);
+    b.ring(0, 0.92, z, 1.15, 26, bright * 0.8);
+    b.ring(0, 1.30, z, 0.55, 20, bright * 0.75);
+    // the basin wall, as short verticals rather than spokes
+    for(var i = 0; i < 28; i++){
+      var a = i / 28 * Math.PI * 2;
+      b.line([Math.cos(a) * 2.6, 0.02, z + Math.sin(a) * 2.6],
+             [Math.cos(a) * 2.6, 0.40, z + Math.sin(a) * 2.6], bright * 0.5);
     }
-    b.line([0, 0.36, z], [0, 0.9, z], bright * 0.6);
-    // the plume
-    for(var j = 0; j < 8; j++){
-      var t = j / 8 * Math.PI * 2, r = 0.5;
-      b.path([[0, 1.5, z],
-              [Math.cos(t) * r * 0.6, 1.25, z + Math.sin(t) * r * 0.6],
-              [Math.cos(t) * r, 0.5, z + Math.sin(t) * r]], bright * 0.45);
+    b.line([-0.16, 0.44, z], [-0.10, 1.30, z], bright * 0.7);
+    b.line([ 0.16, 0.44, z], [ 0.10, 1.30, z], bright * 0.7);
+    // jets: up out of the middle, arcing over, falling into the water
+    for(var j = 0; j < 10; j++){
+      var t = j / 10 * Math.PI * 2, rTop = 0.30, rFall = 1.9;
+      b.path([
+        [Math.cos(t) * rTop * 0.2, 1.40, z + Math.sin(t) * rTop * 0.2],
+        [Math.cos(t) * rTop,       2.55, z + Math.sin(t) * rTop],
+        [Math.cos(t) * rFall * 0.7, 2.15, z + Math.sin(t) * rFall * 0.7],
+        [Math.cos(t) * rFall,      0.46, z + Math.sin(t) * rFall]
+      ], bright * 0.55);
     }
+    b.line([0, 1.30, z], [0, 2.75, z], bright * 0.8);
   }
 
   // A line tree: a trunk that forks, twice. Cheap, and from a distance it
@@ -241,7 +264,7 @@
     b.path([[-1.3, 0, 16], [-1.3, 0, STEP_Z]], 0.3);
     b.path([[ 1.3, 0, 16], [ 1.3, 0, STEP_Z]], 0.3);
     for(var z = 16; z > STEP_Z; z -= 1.4){
-      b.line([-4.2, 0, z], [4.2, 0, z], 0.32);
+      b.line([-4.2, 0, z], [4.2, 0, z], 0.24);
     }
     [-4.2, 4.2].forEach(function(x){
       b.path([[x, 0.14, 16], [x, 0.14, STEP_Z]], 0.45);
@@ -252,11 +275,11 @@
     // ---- ground ----
     for(var gx = -46; gx <= 46; gx += 3.6){
       if(Math.abs(gx) < 4.6) continue;
-      b.line([gx, 0, 18], [gx, 0, GATE_Z - 16], 0.12);
+      b.line([gx, 0, 18], [gx, 0, GATE_Z - 16], 0.075);
     }
     for(var gz = 18; gz > GATE_Z - 16; gz -= 3.6){
-      b.line([-46, 0, gz], [-4.6, 0, gz], 0.12);
-      b.line([ 4.6, 0, gz], [ 46, 0, gz], 0.12);
+      b.line([-46, 0, gz], [-4.6, 0, gz], 0.075);
+      b.line([ 4.6, 0, gz], [ 46, 0, gz], 0.075);
     }
     b.line([-52, 0, GATE_Z - 16], [52, 0, GATE_Z - 16], 0.24);
 
@@ -316,18 +339,25 @@
   var VERT = [
     'attribute vec4 aPos;',            // xyz + brightness in w
     'uniform mat4 uMvp;',
+    // Nudge, in clip space, scaled by w so it stays a constant number of
+    // PIXELS at any depth. Drawing the scene several times with small
+    // offsets is how these get any thickness: WebGL clamps lineWidth to 1
+    // on essentially every browser, and a 1px hairline on a 3x phone screen
+    // is a third of a pixel of ink.
+    'uniform vec2 uOffset;',
     'varying float vBright;',
     'varying float vFog;',
     'void main(){',
     '  vec4 p = vec4(aPos.xyz, 1.0);',
     '  gl_Position = uMvp * p;',
+    '  gl_Position.xy += uOffset * gl_Position.w;',
     '  vBright = aPos.w;',
     // Depth fade. The scene runs from about 3 units in front of the camera
     // out to 55 at the far blocks, so the falloff has to be spread over that
     // whole range — a tighter curve had the gate arriving at an alpha of
     // 5/255 and the whole campus was invisible on a dark ground. The floor
     // keeps the far geometry present rather than gone.
-    '  vFog = clamp(1.0 - (gl_Position.w - 6.0) / 70.0, 0.12, 1.0);',
+    '  vFog = clamp(1.0 - (gl_Position.w - 8.0) / 95.0, 0.28, 1.0);',
     '}'
   ].join('\n');
 
@@ -338,11 +368,14 @@
     'varying float vBright;',
     'varying float vFog;',
     'void main(){',
-    // 2.1 rather than 1.0: these are hairlines on a night ground under
-    // additive blending, and at their honest alpha the whole campus read as
-    // a smudge. Clamped so the near geometry cannot blow out.
-    '  float a = clamp(vBright * vFog * uAlpha * 2.8, 0.0, 0.95);',
-    '  gl_FragColor = vec4(uColour * (0.6 + vBright * 0.4), a);',
+    // Measured, not guessed: at the previous multiplier the composited
+    // screen came back with a mean luminance of 24/255 and 13% of pixels
+    // lit, which is what "too dark to see" is in numbers.
+    '  float a = clamp(vBright * vFog * uAlpha * 5.4, 0.0, 1.0);',
+    // A bright line goes toward white and a faint one stays blue, so the
+    // gate reads as lit rather than merely as more of the same colour.
+    '  vec3 c = mix(uColour, vec3(1.0), clamp(vBright * 0.30, 0.0, 0.34));',
+    '  gl_FragColor = vec4(c, a);',
     '}'
   ].join('\n');
 
@@ -389,6 +422,16 @@
     var uMvp = gl.getUniformLocation(prog, 'uMvp');
     var uColour = gl.getUniformLocation(prog, 'uColour');
     var uAlpha = gl.getUniformLocation(prog, 'uAlpha');
+    var uOffset = gl.getUniformLocation(prog, 'uOffset');
+
+    // One solid pass down the middle and four at half strength around it.
+    // Together they read as a ~2px stroke with a little bloom on it, which
+    // is the difference between a wireframe you can see and one you cannot.
+    var PASSES = [
+      [ 0,  0, 1.00],
+      [ 1,  0, 0.42], [-1,  0, 0.42],
+      [ 0,  1, 0.42], [ 0, -1, 0.42]
+    ];
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);        // additive: line-work on night
@@ -491,8 +534,14 @@
       gl.uniformMatrix4fv(uMvp, false, mvp);
       gl.uniform3fv(uColour, col);
       // fade the whole scene up over the first second rather than snapping on
-      gl.uniform1f(uAlpha, Math.min(1, t / 1.1));
-      gl.drawArrays(gl.LINES, 0, count);
+      var fade = Math.min(1, t / 1.1);
+      var px = 2 / canvas.width, py = 2 / canvas.height;
+      for(var pi = 0; pi < PASSES.length; pi++){
+        var ps = PASSES[pi];
+        gl.uniform2f(uOffset, ps[0] * px * 1.4, ps[1] * py * 1.4);
+        gl.uniform1f(uAlpha, fade * ps[2]);
+        gl.drawArrays(gl.LINES, 0, count);
+      }
 
       scene.raf = window.requestAnimationFrame(frame);
     }

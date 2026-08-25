@@ -3913,6 +3913,22 @@
    archway. This darkens a band through the middle and leaves the top and the
    bottom of the scene clear, so the drawing still reads at the edges and the
    text has a surface of its own. */
+.wiz-landing-line,
+.wiz-landing-note{
+  /* Legibility bought locally. These two sit over line-work, and the
+     alternative — pushing the scrim darker until they cleared — dimmed the
+     whole campus to rescue two sentences. A halo in the card's own colour
+     does it without touching anything else. */
+  text-shadow:
+    0 0 4px var(--surface-bg),
+    0 0 9px var(--surface-bg),
+    0 0 18px var(--surface-bg),
+    0 0 26px var(--surface-bg);
+}
+/* The closing note sits over the busiest part of the drawing — the fountain
+   and the steps — and it is the dimmest text on the screen. It keeps its
+   halo and gets a little of its contrast back. */
+.wiz-landing-note{color:var(--text-dim); opacity:1;}
 .wiz-landing::after{
   content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
   background:linear-gradient(180deg,
