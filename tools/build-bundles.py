@@ -75,6 +75,7 @@ GROUPS = {
         '74-course-gestures.js', '75-about.js', '76-course-pairs.js', '77-english-level.js',
         '78-you-are-here.js', '79-plan-filter.js', '81-calendar.js', '82-follow.js',
         '84-autobackup.js', '85-carry.js',
+        '86-campus3d.js',
     ],
     'server': [
         '30-sync.js', '31-collect.js', '41-assistant-kb.js', '42-assistant.js',

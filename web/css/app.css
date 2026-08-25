@@ -3886,6 +3886,44 @@
     linear-gradient(to right, transparent 0, #000 7%, #000 93%, transparent 100%);
   mask-composite:intersect;
 }
+/* The campus rebuilt as geometry (js/86-campus3d.js). Sits exactly where the
+   picture sits, and is transparent until WebGL is actually drawing — the
+   .is-live class is set by the module only after the shaders have compiled,
+   linked and produced a frame, so a device that cannot run it simply shows
+   the drawing underneath and nobody sees a blank rectangle. */
+.wiz-campus-3d{
+  position:absolute; inset:0; width:100%; height:100%;
+  z-index:0; opacity:0; pointer-events:none;
+  transition:opacity .9s ease;
+}
+.wiz-campus-3d.is-live{
+  opacity:1;
+  /* It reads the pointer for the lean, so it has to be able to receive the
+     move — but never a tap: the buttons above it are the whole screen. */
+  pointer-events:auto;
+}
+/* Once the live scene is up the still drawing would show through the gaps in
+   the line-work as a doubled campus, so it stands down. */
+.wiz-campus-3d.is-live ~ .wiz-campus,
+.wiz-landing:has(.wiz-campus-3d.is-live) .wiz-campus{opacity:0;}
+
+/* A scrim between the campus and the words. With a still drawing the copy
+   could sit straight on it; with the gate now standing at full height right
+   behind the wordmark, "Every course in your degree" was running across an
+   archway. This darkens a band through the middle and leaves the top and the
+   bottom of the scene clear, so the drawing still reads at the edges and the
+   text has a surface of its own. */
+.wiz-landing::after{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:linear-gradient(180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--surface-bg) 26%, transparent) 30%,
+    color-mix(in srgb, var(--surface-bg) 52%, transparent) 44%,
+    color-mix(in srgb, var(--surface-bg) 52%, transparent) 64%,
+    color-mix(in srgb, var(--surface-bg) 18%, transparent) 78%,
+    transparent 100%);
+}
+
 /* A small language switch, before a plan exists to switch. */
 .wiz-lang{
   position:absolute; top:2px; inset-inline-end:2px; z-index:2;
