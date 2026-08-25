@@ -127,88 +127,166 @@
     }
   }
 
-  // The arched gate with the clock — the centre of the whole view.
-  function gate(b, z, bright, k){
-    k = k || 1;
-    var W = 3.1 * k, H = 5.2 * k, T = 1.5 * k, legTop = 3.0 * k;
-    [-1, 1].forEach(function(s){
-      b.box(s * W / 2, 0, z, 0.9 * k, legTop, T, bright);
-    });
-    // the arch itself, as a半 circle swept between the two legs
-    var seg = 22, arch = [], archBack = [];
+  // THE LANDMARK — ONE OBJECT, NOT TWO.
+  //
+  // This was wrong twice over. First the clock and the fountain were drawn
+  // as two circles with spokes and read as the same thing repeated; then
+  // they were made to look different from each other, which was still
+  // wrong, because at AAUP they are not two things at all. The clock tower
+  // STANDS IN the fountain. It is one landmark on a roundabout — you do not
+  // walk toward it down an avenue, you come round it.
+  //
+  // Built from the photographs, bottom to top: a round tiled pool with jets
+  // around its rim; a stepped stone island in the middle of it; four
+  // clustered columns carrying a pointed arch on each face; a dark
+  // inscription block above the arcade; a pale block above that with a
+  // clock face on each side; and the open book on top.
+
+  // A two-centred pointed arch — the profile of every opening on the tower.
+  // Two arcs struck from centres either side of the axis, meeting in a
+  // point. A single semicircle read as Roman and looked nothing like it.
+  function archProfile(halfW, y0, seg){
+    var d = halfW * 0.55, R = halfW + d;
+    var pts = [];
     for(var i = 0; i <= seg; i++){
-      var a = Math.PI * (i / seg);
-      arch.push([-Math.cos(a) * (W/2 - 0.1 * k), legTop + Math.sin(a) * 1.5 * k, z + T/2]);
-      archBack.push([-Math.cos(a) * (W/2 - 0.1 * k), legTop + Math.sin(a) * 1.5 * k, z - T/2]);
+      var x = -halfW + halfW * (i / seg);
+      var y = y0 + Math.sqrt(Math.max(0, R * R - (x - d) * (x - d)));
+      pts.push([x, y]);
     }
-    b.path(arch, bright); b.path(archBack, bright);
-    for(var j = 0; j <= seg; j += 3){ b.line(arch[j], archBack[j], bright * 0.5); }
-    // the block the clock sits in
-    b.box(0, legTop + 1.5 * k, z, 2.0 * k, H - legTop - 1.5 * k, T * 0.9, bright);
-    // the clock face, on the side you walk toward
-    var cy = legTop + 1.5 * k + (H - legTop - 1.5 * k) / 2, cz = z + T * 0.45 + 0.01;
-    var face = [];
-    // `ci`, not `k`: the scale parameter is also called k, and a loop
-    // variable shadowing it meant the clock's radius was the loop index —
-    // the face was being drawn as an expanding spiral, not a circle.
-    for(var ci = 0; ci < 24; ci++){
-      var t = ci / 24 * Math.PI * 2;
-      face.push([Math.cos(t) * 0.55 * k, cy + Math.sin(t) * 0.55 * k, cz]);
-    }
-    b.loop(face, bright);
-    // A second rim just inside the first. Two close circles read as a dial;
-    // one circle with spokes read as the fountain.
-    var inner = [];
-    for(var ii = 0; ii < 24; ii++){
-      var ti = ii / 24 * Math.PI * 2;
-      inner.push([Math.cos(ti) * 0.47 * k, cy + Math.sin(ti) * 0.47 * k, cz]);
-    }
-    b.loop(inner, bright * 0.8);
-    b.line([0, cy, cz], [0, cy + 0.36 * k, cz], bright);          // the long hand
-    b.line([0, cy, cz], [0.24 * k, cy + 0.10 * k, cz], bright);   // the short one
-    // Four marks, at the quarters only.
-    for(var m = 0; m < 4; m++){
-      var a2 = m / 4 * Math.PI * 2;
-      b.line([Math.cos(a2) * 0.38 * k, cy + Math.sin(a2) * 0.38 * k, cz],
-             [Math.cos(a2) * 0.46 * k, cy + Math.sin(a2) * 0.46 * k, cz], bright * 0.9);
-    }
-    // the spire
-    b.line([0, H, z], [0, H + 0.9 * k, z], bright);
-    b.line([-0.28 * k, H + 0.62 * k, z], [0.28 * k, H + 0.62 * k, z], bright * 0.7);
+    for(var j = seg - 1; j >= 0; j--){ pts.push([-pts[j][0], pts[j][1]]); }
+    return { pts: pts, apexY: y0 + Math.sqrt(R * R - d * d) };
   }
 
-  // THE FOUNTAIN AND THE CLOCK MUST NOT LOOK ALIKE.
-  //
-  // They did. Both were a circle with twelve spokes radiating out of it, so
-  // the screen read as the same object drawn twice, once high and once low.
-  // The spokes are gone from the water: a fountain is stacked basins and
-  // rising jets, and it is the VERTICALS that say so. The clock keeps a
-  // face and hands and nothing radiating round it.
-  function fountain(b, z, bright){
-    b.ring(0, 0.02, z, 2.6, 40, bright);
-    b.ring(0, 0.40, z, 2.6, 40, bright);
-    b.ring(0, 0.44, z, 1.75, 32, bright * 0.85);
-    b.ring(0, 0.92, z, 1.15, 26, bright * 0.8);
-    b.ring(0, 1.30, z, 0.55, 20, bright * 0.75);
-    // the basin wall, as short verticals rather than spokes
-    for(var i = 0; i < 28; i++){
-      var a = i / 28 * Math.PI * 2;
-      b.line([Math.cos(a) * 2.6, 0.02, z + Math.sin(a) * 2.6],
-             [Math.cos(a) * 2.6, 0.40, z + Math.sin(a) * 2.6], bright * 0.5);
+  // One face of the arcade. axis 'z' means the arch faces along z and spans
+  // in x; 'x' is the reverse.
+  function archFace(b, axis, offset, halfW, y0, bright){
+    var a = archProfile(halfW, y0, 12);
+    for(var i = 0; i < a.pts.length - 1; i++){
+      var p0 = a.pts[i], p1 = a.pts[i + 1];
+      if(axis === 'z') b.line([p0[0], p0[1], offset], [p1[0], p1[1], offset], bright);
+      else             b.line([offset, p0[1], p0[0]], [offset, p1[1], p1[0]], bright);
     }
-    b.line([-0.16, 0.44, z], [-0.10, 1.30, z], bright * 0.7);
-    b.line([ 0.16, 0.44, z], [ 0.10, 1.30, z], bright * 0.7);
-    // jets: up out of the middle, arcing over, falling into the water
-    for(var j = 0; j < 10; j++){
-      var t = j / 10 * Math.PI * 2, rTop = 0.30, rFall = 1.9;
+    [-halfW, halfW].forEach(function(e){
+      if(axis === 'z') b.line([e, y0, offset], [e, y0 - 0.5, offset], bright * 0.7);
+      else             b.line([offset, y0, e], [offset, y0 - 0.5, e], bright * 0.7);
+    });
+    return a.apexY;
+  }
+
+  // Three slim shafts bundled together, which is how the piers read.
+  function columnCluster(b, x, z, y0, y1, bright){
+    var r = 0.17;
+    for(var i = 0; i < 3; i++){
+      var a = i / 3 * Math.PI * 2 + 0.4;
+      var cx = x + Math.cos(a) * r * 1.5, cz = z + Math.sin(a) * r * 1.5;
+      b.line([cx, y0, cz], [cx, y1, cz], bright);
+      b.ring(cx, y0 + 0.05, cz, r, 7, bright * 0.7);
+      b.ring(cx, y1 - 0.05, cz, r, 7, bright * 0.7);
+    }
+    b.box(x, y0 - 0.36, z, 1.0, 0.36, 1.0, bright);
+    b.box(x, y1, z, 1.0, 0.32, 1.0, bright);
+  }
+
+  function clockFace(b, axis, offset, cy, r, bright){
+    function put(px, py){ return axis === 'z' ? [px, py, offset] : [offset, py, px]; }
+    var outer = [], inner = [];
+    for(var i = 0; i < 26; i++){
+      var t = i / 26 * Math.PI * 2;
+      outer.push(put(Math.cos(t) * r, cy + Math.sin(t) * r));
+      inner.push(put(Math.cos(t) * r * 0.86, cy + Math.sin(t) * r * 0.86));
+    }
+    b.loop(outer, bright);
+    b.loop(inner, bright * 0.75);
+    for(var m = 0; m < 12; m++){
+      var a = m / 12 * Math.PI * 2;
+      var k = (m % 3 === 0) ? 0.70 : 0.79;
+      b.line(put(Math.cos(a) * r * k, cy + Math.sin(a) * r * k),
+             put(Math.cos(a) * r * 0.86, cy + Math.sin(a) * r * 0.86),
+             bright * (m % 3 === 0 ? 0.95 : 0.6));
+    }
+    b.line(put(0, cy), put(0, cy + r * 0.62), bright);
+    b.line(put(0, cy), put(r * 0.42, cy + r * 0.2), bright);
+  }
+
+  function bookOnTop(b, y0, bright){
+    b.box(0, y0, 0, 1.6, 0.36, 1.6, bright);
+    var w = 1.6, h = 0.75, d = 1.15;
+    [-1, 1].forEach(function(s){
+      b.line([0, y0 + 0.36, 0], [s * w * 0.5, y0 + 0.36 + h, -d * 0.5], bright);
+      b.line([0, y0 + 0.36, 0], [s * w * 0.5, y0 + 0.36 + h,  d * 0.5], bright);
+      b.line([s * w * 0.5, y0 + 0.36 + h, -d * 0.5], [s * w * 0.5, y0 + 0.36 + h, d * 0.5], bright);
+      for(var k = 1; k <= 2; k++){
+        var f = k / 3;
+        b.line([s * w * 0.5 * f, y0 + 0.36 + h * f, -d * 0.5 * f],
+               [s * w * 0.5 * f, y0 + 0.36 + h * f,  d * 0.5 * f], bright * 0.45);
+      }
+    });
+    b.line([0, y0 + 0.36, -d * 0.5], [0, y0 + 0.36, d * 0.5], bright * 0.8);
+  }
+
+  function monument(b, bright){
+    var POOL = 9.0;
+    b.ring(0, 0.00, 0, POOL,       46, bright * 0.8);
+    b.ring(0, 0.55, 0, POOL,       46, bright * 0.9);
+    b.ring(0, 0.55, 0, POOL - 0.7, 44, bright * 0.7);
+    b.ring(0, 0.30, 0, POOL - 1.5, 42, bright * 0.5);
+    for(var i = 0; i < 40; i++){
+      var a = i / 40 * Math.PI * 2;
+      b.line([Math.cos(a) * POOL, 0, Math.sin(a) * POOL],
+             [Math.cos(a) * POOL, 0.55, Math.sin(a) * POOL], bright * 0.4);
+    }
+    for(var j = 0; j < 18; j++){
+      var t = j / 18 * Math.PI * 2, rj = POOL - 1.9;
       b.path([
-        [Math.cos(t) * rTop * 0.2, 1.40, z + Math.sin(t) * rTop * 0.2],
-        [Math.cos(t) * rTop,       2.55, z + Math.sin(t) * rTop],
-        [Math.cos(t) * rFall * 0.7, 2.15, z + Math.sin(t) * rFall * 0.7],
-        [Math.cos(t) * rFall,      0.46, z + Math.sin(t) * rFall]
+        [Math.cos(t) * rj, 0.3, Math.sin(t) * rj],
+        [Math.cos(t) * rj * 0.94, 2.6, Math.sin(t) * rj * 0.94],
+        [Math.cos(t) * rj * 0.82, 3.2, Math.sin(t) * rj * 0.82],
+        [Math.cos(t) * rj * 0.66, 0.3, Math.sin(t) * rj * 0.66]
       ], bright * 0.55);
     }
-    b.line([0, 1.30, z], [0, 2.75, z], bright * 0.8);
+    b.ring(0, 0.30, 0, 4.6, 34, bright * 0.8);
+    b.ring(0, 0.62, 0, 4.2, 32, bright * 0.85);
+    b.ring(0, 0.92, 0, 3.8, 30, bright * 0.9);
+    for(var k = 0; k < 30; k++){
+      var ak = k / 30 * Math.PI * 2;
+      b.line([Math.cos(ak) * 4.6, 0.30, Math.sin(ak) * 4.6],
+             [Math.cos(ak) * 4.2, 0.62, Math.sin(ak) * 4.2], bright * 0.4);
+      b.line([Math.cos(ak) * 4.2, 0.62, Math.sin(ak) * 4.2],
+             [Math.cos(ak) * 3.8, 0.92, Math.sin(ak) * 3.8], bright * 0.4);
+    }
+    b.box(0, 0.92, 0, 5.4, 0.5, 5.4, bright);
+
+    var PIER = 1.85, COL0 = 1.78, COL1 = 5.0;
+    [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(c){
+      columnCluster(b, c[0] * PIER, c[1] * PIER, COL0, COL1, bright);
+    });
+    var spring = COL1 + 0.32;
+    ['z','x'].forEach(function(axis){
+      [-PIER, PIER].forEach(function(off){ archFace(b, axis, off, PIER, spring, bright); });
+    });
+    var arcTop = spring + Math.sqrt(Math.pow(PIER * 1.55, 2) - Math.pow(PIER * 0.55, 2));
+
+    var insY = arcTop + 0.15, insH = 2.4;
+    b.box(0, insY, 0, 5.0, insH, 5.0, bright);
+    b.box(0, insY + insH, 0, 5.5, 0.3, 5.5, bright);
+    for(var L = 1; L <= 4; L++){
+      var ly = insY + 0.4 + insH * (L / 5.4);
+      b.line([-1.9, ly,  2.51], [1.9, ly,  2.51], bright * 0.42);
+      b.line([-1.9, ly, -2.51], [1.9, ly, -2.51], bright * 0.42);
+      b.line([ 2.51, ly, -1.9], [ 2.51, ly, 1.9], bright * 0.42);
+      b.line([-2.51, ly, -1.9], [-2.51, ly, 1.9], bright * 0.42);
+    }
+
+    var clkY = insY + insH + 0.3, clkH = 3.5;
+    b.box(0, clkY, 0, 3.4, clkH, 3.4, bright);
+    b.box(0, clkY + clkH, 0, 3.9, 0.36, 3.9, bright);
+    var cy = clkY + clkH * 0.54;
+    clockFace(b, 'z',  1.71, cy, 1.15, bright);
+    clockFace(b, 'z', -1.71, cy, 1.15, bright);
+    clockFace(b, 'x',  1.71, cy, 1.15, bright);
+    clockFace(b, 'x', -1.71, cy, 1.15, bright);
+
+    bookOnTop(b, clkY + clkH + 0.36, bright);
   }
 
   // A line tree: a trunk that forks, twice. Cheap, and from a distance it
@@ -243,93 +321,77 @@
     b.line([x + 0.9, 7.0, z], [x + 0.85, 6.0, z], bright * 0.4);
   }
 
-  // Steps up to the gate, so the walk arrives somewhere rather than simply
-  // stopping.
-  function steps(b, z, n, bright){
-    for(var i = 0; i < n; i++){
-      var y = i * 0.22, zz = z + i * 0.55, halfW = 5.2 - i * 0.15;
-      b.line([-halfW, y, zz], [halfW, y, zz], bright);
-      b.line([-halfW, y, zz], [-halfW, y + 0.22, zz], bright * 0.5);
-      b.line([ halfW, y, zz], [ halfW, y + 0.22, zz], bright * 0.5);
-    }
-  }
-
   function build(){
     var b = new Builder();
-    var GATE_Z = -30, FOUNTAIN_Z = -15, STEP_Z = -25.5;
 
-    // ---- the walk ----
-    b.path([[-4.2, 0, 16], [-4.2, 0, STEP_Z]], 0.9);
-    b.path([[ 4.2, 0, 16], [ 4.2, 0, STEP_Z]], 0.9);
-    b.path([[-1.3, 0, 16], [-1.3, 0, STEP_Z]], 0.3);
-    b.path([[ 1.3, 0, 16], [ 1.3, 0, STEP_Z]], 0.3);
-    for(var z = 16; z > STEP_Z; z -= 1.4){
-      b.line([-4.2, 0, z], [4.2, 0, z], 0.24);
+    // ---- the roundabout the landmark stands on ----
+    // The photographs settle the layout: the tower is in the middle of a
+    // circular plaza with the road running round it, the faceted glass
+    // faculty on one side and the perforated stone block behind. There is
+    // no long avenue leading up to it, so there is none here.
+    monument(b, 1.0);
+
+    var PLAZA = 15.5, ROAD_IN = 17.5, ROAD_OUT = 23.5;
+    b.ring(0, 0.02, 0, PLAZA, 56, 0.5);
+    b.ring(0, 0.02, 0, ROAD_IN, 60, 0.42);
+    b.ring(0, 0.02, 0, ROAD_OUT, 64, 0.42);
+    // the paving, as radial joints rather than a square grid
+    for(var i = 0; i < 56; i++){
+      var a = i / 56 * Math.PI * 2;
+      b.line([Math.cos(a) * 9.4, 0.02, Math.sin(a) * 9.4],
+             [Math.cos(a) * PLAZA, 0.02, Math.sin(a) * PLAZA], 0.12);
+      b.line([Math.cos(a) * ROAD_IN, 0.02, Math.sin(a) * ROAD_IN],
+             [Math.cos(a) * ROAD_OUT, 0.02, Math.sin(a) * ROAD_OUT], 0.09);
     }
-    [-4.2, 4.2].forEach(function(x){
-      b.path([[x, 0.14, 16], [x, 0.14, STEP_Z]], 0.45);
-      b.path([[x * 1.06, 0, 16], [x * 1.06, 0, STEP_Z]], 0.3);
+    for(var r2 = 11; r2 < PLAZA; r2 += 2.0){ b.ring(0, 0.02, 0, r2, 48, 0.1); }
+
+    // ---- the faceted glass faculty, to the right and behind ----
+    faculty(b,  20.0, -21.0, 15.0, 11.0, 12, 0.5);
+    faculty(b,  30.0, -28.0, 11.0,  8.0, 10, 0.3);
+    // ---- the perforated stone block, left and behind ----
+    faculty(b, -19.0, -20.0, 10.0, 16.0,  9, 0.5);
+    faculty(b, -28.0, -30.0,  9.0,  9.0,  9, 0.28);
+    // ---- something far off on both sides so the horizon is not bare ----
+    faculty(b, -40.0, -44.0, 12.0,  7.0, 10, 0.16);
+    faculty(b,  42.0, -46.0, 12.0,  9.0, 10, 0.16);
+
+    // ---- ground beyond the road ----
+    for(var gx = -60; gx <= 60; gx += 4.4){
+      b.line([gx, 0, 26], [gx, 0, -56], 0.06);
+    }
+    for(var gz = 26; gz > -56; gz -= 4.4){
+      b.line([-60, 0, gz], [60, 0, gz], 0.06);
+    }
+    b.line([-70, 0, -56], [70, 0, -56], 0.2);
+
+    // ---- lamps and planting round the circle ----
+    for(var L = 0; L < 8; L++){
+      var al = L / 8 * Math.PI * 2 + 0.4;
+      var lx = Math.cos(al) * 19.5, lz = Math.sin(al) * 19.5;
+      b.line([lx, 0, lz], [lx, 3.4, lz], 0.4);
+      b.line([lx - 0.34, 3.4, lz], [lx + 0.34, 3.4, lz], 0.4);
+      b.ring(lx, 3.7, lz, 0.3, 8, 0.6);
+      b.line([lx, 3.4, lz], [lx, 3.7, lz], 0.3);
+    }
+    for(var T = 0; T < 10; T++){
+      var at = T / 10 * Math.PI * 2 + 0.15;
+      tree(b, Math.cos(at) * 25.5, Math.sin(at) * 25.5, 3.6 + (T % 3) * 0.4, 0.3);
+    }
+    [0.9, 2.4, 3.9, 5.4].forEach(function(ab){
+      bench(b, Math.cos(ab) * 13.2, Math.sin(ab) * 13.2, 0.26);
     });
-    steps(b, STEP_Z, 7, 0.75);
-
-    // ---- ground ----
-    for(var gx = -46; gx <= 46; gx += 3.6){
-      if(Math.abs(gx) < 4.6) continue;
-      b.line([gx, 0, 18], [gx, 0, GATE_Z - 16], 0.075);
-    }
-    for(var gz = 18; gz > GATE_Z - 16; gz -= 3.6){
-      b.line([-46, 0, gz], [-4.6, 0, gz], 0.075);
-      b.line([ 4.6, 0, gz], [ 46, 0, gz], 0.075);
-    }
-    b.line([-52, 0, GATE_Z - 16], [52, 0, GATE_Z - 16], 0.24);
-
-    // ---- the faculties: four pairs, plus two set well back ----
-    var rows = [
-      { z:   2, x: 10.5, w: 7.0, h:  6.0, d: 7, br: 0.60 },
-      { z:  -9, x: 11.0, w: 6.8, h: 10.5, d: 8, br: 0.55 },
-      { z: -20, x: 12.0, w: 6.4, h:  7.5, d: 7, br: 0.42 },
-      { z: -31, x: 13.5, w: 6.0, h: 12.0, d: 7, br: 0.30 },
-      { z: -42, x: 15.5, w: 7.5, h:  6.0, d: 7, br: 0.20 }
-    ];
-    rows.forEach(function(r){
-      faculty(b, -r.x, r.z, r.w, r.h, r.d, r.br);
-      faculty(b,  r.x, r.z, r.w, r.h, r.d, r.br);
-    });
-    // two towers further out, to give the skyline a silhouette
-    faculty(b, -22, -26, 5.0, 16.0, 5, 0.22);
-    faculty(b,  22, -26, 5.0, 16.0, 5, 0.22);
-
-    fountain(b, FOUNTAIN_Z, 0.9);
-    gate(b, GATE_Z, 1.0, 2.1);
-    mast(b, -7.4, -3, 0.55);
-
-    // ---- lamps, benches and planting down the approach ----
-    for(var lz = 13; lz > STEP_Z + 2; lz -= 4.0){
-      [-5.4, 5.4].forEach(function(lx){
-        b.line([lx, 0, lz], [lx, 3.0, lz], 0.45);
-        b.line([lx - 0.32, 3.0, lz], [lx + 0.32, 3.0, lz], 0.45);
-        b.ring(lx, 3.28, lz, 0.28, 8, 0.65);
-        b.line([lx, 3.0, lz], [lx, 3.28, lz], 0.3);
-      });
-    }
-    for(var tz = 11; tz > -24; tz -= 5.5){
-      tree(b, -7.0, tz, 3.4 + ((tz % 3) + 3) * 0.22, 0.34);
-      tree(b,  7.0, tz + 2.6, 3.4 + ((tz % 4) + 4) * 0.18, 0.34);
-    }
-    [-6.0, 6.0].forEach(function(bx){
-      [6, -2, -10, -18].forEach(function(bz){ bench(b, bx, bz, 0.3); });
-    });
+    mast(b, -12.5, 8.0, 0.45);
 
     // ---- sky ----
     var seed = 7;
     function rnd(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
-    for(var i = 0; i < 60; i++){
-      var sx = (rnd() * 2 - 1) * 44;
-      var sy = 12 + rnd() * 22;
-      var sz = GATE_Z - 6 - rnd() * 34;
-      var r = 0.14 + rnd() * 0.2;
-      b.line([sx - r, sy, sz], [sx + r, sy, sz], 0.55);
-      b.line([sx, sy - r, sz], [sx, sy + r, sz], 0.55);
+    for(var k = 0; k < 70; k++){
+      var sx = (rnd() * 2 - 1) * 52;
+      var sy = 16 + rnd() * 26;
+      var sz = -18 - rnd() * 44;
+      var rr = 0.14 + rnd() * 0.2;
+      b.line([sx - rr, sy, sz], [sx + rr, sy, sz], 0.55);
+      b.line([sx, sy - rr, sz], [sx, sy + rr, sz], 0.55);
     }
     return new Float32Array(b.v);
   }
@@ -492,9 +554,9 @@
       // Three keyframes, eased between with a smoothstep so there is no
       // corner at the joins. Reduced motion skips straight to the last one.
       var KEYS = [
-        { t: 0.0,  eye: [ 30, 34,  34], at: [0,  5, -14] },   // wide, above
-        { t: 0.45, eye: [ 11, 13,  18], at: [0,  7, -24] },   // dropping in
-        { t: 1.0,  eye: [  0, 2.4,  5], at: [0,  8.2, -30] }  // facing the arch
+        { t: 0.0,  eye: [ 40, 34,  40], at: [0,  8,  0] },   // high, off to one side
+        { t: 0.45, eye: [ 24, 16,  27], at: [0,  8,  0] },   // swinging down and round
+        { t: 1.0,  eye: [3.5,  5.0, 23], at: [0, 4.6,  0] }  // across the pool, whole tower in frame
       ];
       var raw = reduced ? 1 : Math.min(1, t / 7.0);
       var eye, at;
