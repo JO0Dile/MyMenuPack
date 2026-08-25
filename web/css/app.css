@@ -4546,19 +4546,6 @@
   .imp-edit-course-btn:hover{background:var(--accent);}
   .imp-structure-actions{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
 
-  /* ---- Edit-mode stat chips (GPA / Credits / Remaining) — shown only
-     while editing, right under the progress bar. Reuses the same numbers
-     the progress bar and Degree Audit already compute; nothing here is
-     invented. ---- */
-  .imp-stat-chips{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;}
-  .imp-stat-chip{
-    flex:1 1 130px;
-    background:var(--panel);border:1px solid var(--line);border-radius:10px;
-    padding:10px 14px;display:flex;flex-direction:column;gap:2px;
-  }
-  .imp-stat-num{font-size:19px;font-weight:800;color:var(--accent);}
-  .imp-stat-label{font-size:10.5px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;}
-
   .course-cr{font-size:10px;opacity:.8;margin-top:2px;}
 
   /* Year, whether it is open to this student, and the hours — the three
