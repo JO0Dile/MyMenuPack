@@ -27,8 +27,8 @@
     { "name": "Khalil Rantisi", "category": "instructor", "courses": ["Introduction to Computer Science"], "email": "khalil.rantisi@aaup.edu" },
     { "name": "Dr. Manar Faraj", "category": "instructor", "courses": ["The Palestinian Prisoners Movement"], "email": "Manar.Faraj@aaup.edu" },
 
-    { "name": "Dr. Hudhaifa", "category": "dean", "role": "AI College Dean", "email": "" },
-    { "name": "Dr. Islam", "category": "dean", "role": "Secretary to Dean Hudhaifa", "email": "" },
+    { "name": "Dr. Huthaifa Ashqar", "category": "dean", "role": "AI College Dean", "email": "Huthaifa.ashqar@aaup.edu" },
+    { "name": "Dr. Islam", "category": "dean", "role": "Secretary to Dean Huthaifa", "email": "" },
     { "name": "Sameh Tawafsheh", "category": "it", "role": "IT", "email": "sameh.tawafsheh@aaup.edu" },
     { "name": "Ahmad Mansour", "category": "student_affairs", "role": "Student Affairs", "email": "ahmad.darmansour@aaup.edu" },
     { "name": "Hidaya", "category": "student_affairs", "role": "Student Affairs", "email": "hidaya.abuzainh@aaup.edu" },
