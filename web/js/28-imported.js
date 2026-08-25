@@ -1729,18 +1729,19 @@
       '<div class="progress-widget"><div class="pw-track"><div class="pw-fill" style="width:' + pct + '%;"></div></div>' +
       '<span class="pw-num"><b>' + doneCr + ' / ' + totalCr + 'H</b></span></div>';
 
-    // Edit mode is where a student is actively rearranging their plan and
-    // most wants a quick read on where they stand — the normal view already
-    // has this via Degree Audit/GPA one tap away, so these chips are kept
-    // out of it rather than shown twice.
-    if(editing){
-      var editGpa = window.AAUP_GPA ? window.AAUP_GPA.gpaFor(id) : { gpa: null };
-      html += '<div class="imp-stat-chips">' +
-        '<div class="imp-stat-chip"><span class="imp-stat-num">' + (editGpa && editGpa.gpa != null ? editGpa.gpa.toFixed(2) : '—') + '</span><span class="imp-stat-label">' + (rtl ? 'المعدل التراكمي' : 'GPA') + '</span></div>' +
-        '<div class="imp-stat-chip"><span class="imp-stat-num">' + doneCr + '</span><span class="imp-stat-label">' + (rtl ? 'ساعات مكتسبة' : 'Credits Earned') + '</span></div>' +
-        '<div class="imp-stat-chip"><span class="imp-stat-num">' + Math.max(0, totalCr - doneCr) + '</span><span class="imp-stat-label">' + (rtl ? 'ساعات متبقية' : 'Remaining') + '</span></div>' +
-        '</div>';
-    }
+    // Three stat chips — GPA, Credits Earned, Remaining — used to sit here,
+    // on the grounds that edit mode is where a student most wants a read on
+    // where they stand. It is not: edit mode is where they are moving
+    // courses, and GPA is the one thing they are not doing.
+    //
+    // What it cost was the whole first screen. Header, legend, search,
+    // About this plan, the progress bar, the filter chips and then three
+    // large chips put the first course card 1,333px down an 844px phone —
+    // a screen and a half of scrolling before anything editable.
+    //
+    // Two of the three were already on the page anyway: the progress widget
+    // directly above says "0 / 132H", which is Credits Earned and Remaining
+    // in one line. The third is a tap away in Degree Audit & GPA.
 
     html += '<div class="years"><svg id="' + id + '-connectorSvg" class="connector-layer" xmlns="http://www.w3.org/2000/svg">' +
       '<defs><marker id="' + id + '-prereqArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z"></path></marker>' +
