@@ -72,9 +72,35 @@
   //
   // alt="" and aria-hidden: it is scenery, and a screen reader announcing a
   // description of it before the sign-in choice would be noise.
+  //
+  // AND THEN IT MOVED. The picture is still here and still the thing that
+  // renders first — but a canvas now sits over it, and js/86-campus3d.js
+  // rebuilds the same walk as real geometry on the GPU: the gate, the two
+  // faculty blocks, the fountain, the lamps, the walkway running out under
+  // the camera. It dollies in once and then drifts, and it leans with the
+  // phone.
+  //
+  // The picture underneath is not a placeholder, it is the floor. The canvas
+  // only hides it once WebGL has actually compiled, linked and started
+  // drawing (.is-live). No WebGL, a lost context, an old phone, anything at
+  // all throwing — the drawing is simply still there, and the screen behaves
+  // exactly as it did before.
   function campusArt(){
     return '<img class="wiz-campus" src="assets/img/landing-campus.webp" ' +
-           'alt="" aria-hidden="true" decoding="async">';
+           'alt="" aria-hidden="true" decoding="async">' +
+           '<canvas class="wiz-campus-3d" id="wizCampus3d" aria-hidden="true"></canvas>';
+  }
+
+  // Started after the markup is in the DOM, and torn down whenever the
+  // landing leaves the screen — a GPU loop running behind a closed overlay
+  // is a battery drain nobody asked for.
+  function mountCampus(){
+    if(!window.AAUP_CAMPUS3D) return;
+    var c = document.getElementById('wizCampus3d');
+    if(c){ window.AAUP_CAMPUS3D.mount(c); }
+  }
+  function unmountCampus(){
+    if(window.AAUP_CAMPUS3D){ window.AAUP_CAMPUS3D.stop(); }
   }
 
   function buildSteps(){
@@ -143,7 +169,9 @@
           '</div>' +
           '<p class="wiz-landing-note">' + window.__escapeHtml(tx.note) + '</p>' +
         '</div>';
+      mountCampus();
     } else {
+      unmountCampus();
       b.innerHTML =
         '<div class="wiz-body">' +
           '<div class="wiz-title">' + s.title + '</div>' +
@@ -228,6 +256,8 @@
 
   function finish(celebrate){
     if(window.AAUP_STUDENT && window.AAUP_STUDENT.markSeen){ window.AAUP_STUDENT.markSeen(); }
+    // The screen is gone; so is the render loop behind it.
+    unmountCampus();
     var ov = overlay();
     if(ov) ov.classList.remove('open');
     if(window.__renderWelcomeMessages) window.__renderWelcomeMessages();
