@@ -30,7 +30,7 @@ import {
 
 const c = hex => new Color().setHex(hex, SRGBColorSpace);
 
-export class LightingSystem {
+export class LightingRig {
   constructor(scene, sky, quality) {
     this.scene = scene;
     this.sky = sky;

@@ -22,7 +22,7 @@ import {
 // the way in because that is the only space lighting is correct in.
 const c = hex => new Color().setHex(hex, SRGBColorSpace);
 
-export class MaterialSystem {
+export class MaterialLibrary {
   constructor(textures, quality) {
     this.tex = textures;
     this.quality = quality;
@@ -88,17 +88,23 @@ export class MaterialSystem {
     // The gem. Dark solar glass over a dark interior: barely transmissive,
     // strongly reflective at grazing angles, and a little rough because a
     // large pane never is not.
+    // Real transmission, not opacity: the pane has thickness, refracts what
+    // is behind it, and tints by depth. That is what makes an edge-on sheet
+    // of glass read as glass instead of as a dark mirror.
     this._add('glass-dark', new MeshPhysicalMaterial({
-      color: c(0x131c26),
-      roughness: 0.075,
-      metalness: 0.0,
-      transmission: 0,
-      transparent: true,
-      opacity: 0.9,
-      reflectivity: 0.62,
+      color: c(0xdfeaf2),
+      roughness: 0.06,
+      metalness: 0,
+      transmission: 0.92,
+      thickness: 0.9,
+      ior: 1.52,
+      attenuationColor: c(0x0e2233),
+      attenuationDistance: 1.1,
+      specularIntensity: 1,
       clearcoat: 1,
-      clearcoatRoughness: 0.045,
-      envMapIntensity: 1.5,
+      clearcoatRoughness: 0.04,
+      envMapIntensity: 1.6,
+      transparent: true,
       side: FrontSide
     }));
 
@@ -109,9 +115,33 @@ export class MaterialSystem {
 
     // Ordinary vision glass on the ordinary buildings.
     this._add('glass-vision', new MeshPhysicalMaterial({
-      color: c(0x2b3a46), roughness: 0.09, metalness: 0,
-      transparent: true, opacity: 0.82, reflectivity: 0.5,
-      clearcoat: 0.9, clearcoatRoughness: 0.06, envMapIntensity: 1.25
+      color: c(0xe8f1f6), roughness: 0.075, metalness: 0,
+      transmission: 0.86, thickness: 0.5, ior: 1.5,
+      attenuationColor: c(0x2b4a5c), attenuationDistance: 2.2,
+      clearcoat: 0.9, clearcoatRoughness: 0.06, envMapIntensity: 1.3,
+      transparent: true
+    }));
+
+    // The authentication panel. Frosted rather than clear — it has to hold
+    // type — with a bright edge that catches the sun, which is what makes a
+    // pane read as a physical object rather than as a rectangle of blur.
+    // Clear enough to see the tower through, with just enough roughness to
+    // soften what is behind the type. Frosting past about 0.14 turns the
+    // pane to milk and the landmark disappears behind the interface, which
+    // is the opposite of what it is for.
+    this._add('glass-ui', new MeshPhysicalMaterial({
+      color: c(0xeaf2fb), roughness: 0.1, metalness: 0,
+      transmission: 1, thickness: 0.16, ior: 1.34,
+      attenuationColor: c(0x25405e), attenuationDistance: 9,
+      clearcoat: 1, clearcoatRoughness: 0.06,
+      specularIntensity: 1,
+      envMapIntensity: 1.5, transparent: true, opacity: 0.62,
+      side: DoubleSide
+    }));
+    this._add('glass-ui-edge', new MeshPhysicalMaterial({
+      color: c(0xbcd4ee), roughness: 0.12, metalness: 0.35,
+      clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 2.0,
+      emissive: c(0x2c4d78), emissiveIntensity: 0.35
     }));
 
     // ---- metal ---------------------------------------------------------

@@ -89,7 +89,7 @@ const PRESET = {
   }
 };
 
-export class SkySystem {
+export class EnvironmentManager {
   constructor(renderer, presetName = 'afternoon') {
     this.renderer = renderer;
     this.preset = { ...PRESET[presetName] };

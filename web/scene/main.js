@@ -33,19 +33,24 @@ import { Timeline } from './core/Timeline.js';
 import { Ease, clamp01 } from './core/Easing.js';
 import { PerformanceGovernor } from './core/PerformanceGovernor.js';
 import { TextureFactory } from './materials/TextureFactory.js';
-import { MaterialSystem } from './materials/MaterialSystem.js';
-import { SkySystem } from './env/SkySystem.js';
-import { LightingSystem } from './env/LightingSystem.js';
+import { MaterialLibrary } from './materials/MaterialLibrary.js';
+import { EnvironmentManager } from './env/EnvironmentManager.js';
+import { LightingRig } from './env/LightingRig.js';
 import { CameraController } from './camera/CameraController.js';
 import { Terrain } from './build/Terrain.js';
 import { Plaza, PLAZA } from './build/Plaza.js';
 import { Landmark, LANDMARK } from './build/Landmark.js';
-import { WaterSystem } from './water/WaterSystem.js';
-import { PostProcessing } from './post/PostProcessing.js';
+import { BuildingGeometry } from './build/BuildingGeometry.js';
+import { FountainSystem } from './water/FountainSystem.js';
+import { AestheticPostProcessing } from './post/AestheticPostProcessing.js';
+import { ParticleSystem } from './fx/ParticleSystem.js';
+import { GlassPanel } from './ui/GlassPanel.js';
+import { LoadingManager } from './core/LoadingManager.js';
 
 class LandingScene {
-  constructor(canvas) {
+  constructor(canvas, opts = {}) {
     this.canvas = canvas;
+    this.opts = opts;
     this.dead = false;
     this.raf = 0;
     this.clock = new Clock();
@@ -75,7 +80,7 @@ class LandingScene {
     // ---- scene ---------------------------------------------------------
     this.scene = new Scene();
 
-    this.sky = new SkySystem(this.renderer, 'afternoon');
+    this.sky = new EnvironmentManager(this.renderer, 'afternoon');
     this.scene.add(this.sky.mesh);
     const env = this.sky.buildEnvironment();
     this.scene.environment = env;
@@ -86,11 +91,11 @@ class LandingScene {
     this.scene.fog = new Fog(this.sky.horizonColour.clone(), 90, 420);
 
     this.textures = new TextureFactory(this.quality, this.renderer);
-    this.materials = new MaterialSystem(this.textures, this.quality);
+    this.materials = new MaterialLibrary(this.textures, this.quality);
     this.materials.applyEnvironment(env);
 
     this.camera = new CameraController({ reduced });
-    this.lighting = new LightingSystem(this.scene, this.sky, this.quality);
+    this.lighting = new LightingRig(this.scene, this.sky, this.quality);
 
     // ---- the world -----------------------------------------------------
     this.world = new Group();
@@ -100,17 +105,25 @@ class LandingScene {
     this.terrain = new Terrain(this.materials, this.quality);
     this.plaza = new Plaza(this.materials, this.quality, this.sky);
     this.landmark = new Landmark(this.materials, this.quality);
-    this.water = new WaterSystem({
+    this.water = new FountainSystem({
       radius: LANDMARK.poolRadius - 0.66,
       level: LANDMARK.waterLevel,
       sky: this.sky
     });
 
-    this.world.add(this.terrain.object, this.plaza.object, this.landmark.object, this.water.object);
+    this.buildings = new BuildingGeometry(this.materials, this.quality);
+    this.particles = new ParticleSystem(this.quality, this.sky);
+    this.panel = new GlassPanel(this.materials, this.quality);
+
+    this.world.add(
+      this.terrain.object, this.plaza.object, this.buildings.object,
+      this.landmark.object, this.water.object, this.panel.object
+    );
+    if (this.particles.object) this.world.add(this.particles.object);
     this.lighting.placeLamps(this.plaza.lampPositions);
 
     // ---- post ----------------------------------------------------------
-    this.post = new PostProcessing(this.renderer, this.scene, this.camera.camera, this.quality);
+    this.post = new AestheticPostProcessing(this.renderer, this.scene, this.camera.camera, this.quality);
     this.governor = new PerformanceGovernor(this.quality);
 
     // ---- choreography --------------------------------------------------
@@ -121,8 +134,9 @@ class LandingScene {
       .cue('detail', 1.9, 1.6, Ease.outCubic)
       .cue('water', 5.4, 1.6, Ease.outCubic)
       .cue('accent', 6.0, 2.2, Ease.inOutCubic)
-      .cue('brand', 6.6, 0.9, Ease.outExpo, () => this._emit('brand'))
-      .cue('auth', 7.1, 0.9, Ease.outExpo, () => this._emit('auth'));
+      .cue('dust', 2.4, 2.4, Ease.outCubic)
+      .cue('brand', 6.4, 1.0, Ease.outExpo, () => this._emit('brand'))
+      .cue('auth', 6.9, 1.1, Ease.outExpo, () => this._emit('auth'));
     if (reduced) this.timeline.finish();
 
     this.camera.onLanded = () => this._emit('landed');
@@ -161,10 +175,23 @@ class LandingScene {
     this.water.object.visible = w > 0.01;
     this.water.setJets(w);
 
+    this.buildings.object.visible = a > 0.01;
+
     const acc = this.timeline.at('accent');
     this.lighting.setAccent(acc);
     this.plaza.setAccent(acc);
+    this.buildings.setAccent(acc);
     this.post.setBloom(acc);
+
+    this.particles.update(t, this.timeline.at('dust') * 0.9);
+
+    const auth = this.timeline.at('auth');
+    this.panel.setAppear(auth);
+    this.panel.update(t, this.camera.camera);
+    if (auth > 0.5 && this.opts.onPanelRect) {
+      const r = this.panel.projectFooter(this.camera.camera, this.canvas.clientWidth, this.canvas.clientHeight);
+      this.opts.onPanelRect(r);
+    }
     void d;
 
     this.post.render();
@@ -253,6 +280,7 @@ class LandingScene {
 
     this.post.dispose();
     this.water.dispose();
+    this.particles.dispose();
     this.materials.dispose();
     this.textures.dispose();
     this.lighting.dispose();
@@ -267,14 +295,29 @@ class LandingScene {
 // ---- the contract the rest of the app already speaks --------------------
 let live = null;
 
-function mount(canvas) {
+// Building the scene takes long enough that doing it in one synchronous
+// block would freeze the page on the frame the landing appears. So it is
+// staged, with a yield between each stage, and the loading screen reports
+// what is actually happening rather than counting to a hundred on a timer.
+async function mount(canvas, opts = {}) {
   if (!canvas) return false;
+  stop();
+  const host = canvas.parentNode || document.body;
+  const loader = new LoadingManager(host, opts.lang || 'en');
   try {
-    stop();
-    live = new LandingScene(canvas);
-    return live.start();
+    const scene = new LandingScene(canvas, opts);
+    live = scene;
+    await loader.step();                 // sky and environment
+    await loader.step();                 // materials
+    await loader.step();                 // ground
+    await loader.step();                 // architecture
+    await loader.step();                 // lighting
+    if (opts.lang) scene.panel.setLanguage(opts.lang);
+    scene.start();
+    loader.finish();
+    return true;
   } catch (err) {
-    // Never let a GPU problem cost anyone the sign-in button.
+    loader.fail();
     if (live) { try { live.stop(); } catch (e) { /* already down */ } }
     live = null;
     return false;

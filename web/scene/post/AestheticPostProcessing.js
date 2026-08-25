@@ -24,8 +24,9 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 
-export class PostProcessing {
+export class AestheticPostProcessing {
   constructor(renderer, scene, camera, quality) {
     this.enabled = true;
     this.quality = quality;
@@ -43,6 +44,15 @@ export class PostProcessing {
     }
 
     this.composer.addPass(new OutputPass());
+
+    // SMAA last, after tone mapping, because it works on the displayed
+    // image. MSAA cannot help here — the composer renders to a target — and
+    // architecture is nothing but long straight edges, which is the exact
+    // case where aliasing is most obvious.
+    if (quality.get('name') !== 'low') {
+      this.smaa = new SMAAPass();
+      this.composer.addPass(this.smaa);
+    }
   }
 
   setSize(w, h, pixelRatio) {

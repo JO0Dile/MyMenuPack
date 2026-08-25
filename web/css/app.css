@@ -3905,6 +3905,60 @@
 /* Once the flight has landed the scene turns: drag anywhere on the campus
    and the camera swings round the fountain. touch-action has to go off or
    the browser claims the swipe as a scroll before we see it. */
+/* ---- the loading sequence ------------------------------------------------
+   Shown before a line of WebGL has run, and it has to hold on its own if
+   WebGL never runs at all. The identity first, then what is happening, then
+   a bar that fills as the real stages complete. */
+.scene-loading{
+  position:absolute; inset:0; z-index:4;
+  display:flex; align-items:center; justify-content:center;
+  background:
+    radial-gradient(120% 90% at 50% 20%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    var(--surface-bg);
+  opacity:1; transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.scene-loading.is-done{opacity:0; transform:scale(1.03); pointer-events:none;}
+.scene-loading-inner{
+  display:flex; flex-direction:column; align-items:center; gap:9px;
+  padding:24px; text-align:center; max-width:320px;
+}
+.scene-loading-mark{display:flex; gap:5px; margin-bottom:10px;}
+.scene-loading-mark span{
+  width:4px; height:22px; border-radius:2px; background:var(--accent);
+  animation:scene-mark 1.25s cubic-bezier(.45,0,.55,1) infinite;
+}
+.scene-loading-mark span:nth-child(2){animation-delay:.14s; opacity:.72;}
+.scene-loading-mark span:nth-child(3){animation-delay:.28s; opacity:.46;}
+@keyframes scene-mark{
+  0%,100%{transform:scaleY(.42);} 50%{transform:scaleY(1);}
+}
+.scene-loading-name{
+  font-size:26px; font-weight:900; letter-spacing:.19em;
+  color:var(--text); line-height:1;
+}
+.scene-loading-ar{font-size:14px; font-weight:800; color:var(--accent);}
+.scene-loading-line{font-size:12.5px; color:var(--text-dim); margin-top:4px; line-height:1.5;}
+.scene-loading-bar{
+  width:180px; height:2px; border-radius:2px; margin-top:12px;
+  background:color-mix(in srgb, var(--text-dim) 24%, transparent); overflow:hidden;
+}
+.scene-loading-bar i{
+  display:block; height:100%; width:0; border-radius:2px; background:var(--accent);
+  transition:width .5s cubic-bezier(.22,1,.36,1);
+}
+.scene-loading-stage{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--text-dim); opacity:.75; min-height:12px;
+}
+@media (prefers-reduced-motion:reduce){
+  .scene-loading-mark span{animation:none; transform:scaleY(.7);}
+  .scene-loading{transition:opacity .2s linear;}
+}
+
+/* While the module is in flight the still drawing carries the screen. */
+.wiz-landing.is-scene-loading .wiz-campus{opacity:.9;}
+
 .wiz-campus-3d.can-turn{cursor:grab; touch-action:none;}
 .wiz-campus-3d.is-turning{cursor:grabbing;}
 /* Once the live scene is up the still drawing would show through the gaps in

@@ -123,13 +123,27 @@
       // The landing may have been left while the module was in flight.
       var still = document.getElementById('wizCampus3d');
       if(!still || !window.AAUP_CAMPUS3D){ sceneState = 'failed'; return; }
-      var ok = window.AAUP_CAMPUS3D.mount(still);
-      sceneState = ok ? 'live' : 'failed';
-      var w = still.closest('.wiz-landing');
-      if(w){
-        w.classList.remove('is-scene-loading');
-        w.classList.add(ok ? 'is-scene-live' : 'is-scene-flat');
-      }
+      return Promise.resolve(window.AAUP_CAMPUS3D.mount(still, {
+        lang: lang(),
+        // The panel is a real object in the scene; the buttons that operate
+        // it are real DOM, placed over where it actually projects. That is
+        // what keeps the whole thing keyboard-operable and reachable by a
+        // screen reader while looking like part of the world.
+        onPanelRect: function(r){
+          var act = document.querySelector('.wiz-landing-actions');
+          if(!act || !r.visible) return;
+          act.style.setProperty('--panel-x', r.x + 'px');
+          act.style.setProperty('--panel-y', r.y + 'px');
+          act.style.setProperty('--panel-w', Math.max(180, r.width) + 'px');
+        }
+      })).then(function(ok){
+        sceneState = ok ? 'live' : 'failed';
+        var w = still.closest('.wiz-landing');
+        if(w){
+          w.classList.remove('is-scene-loading');
+          w.classList.add(ok ? 'is-scene-live' : 'is-scene-flat');
+        }
+      });
     }).catch(function(){
       sceneState = 'failed';
       var w = document.querySelector('.wiz-landing');

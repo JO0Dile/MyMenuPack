@@ -21,9 +21,28 @@ const VERT = /* glsl */`
   varying vec3 vWorld;
   varying vec3 vNormalW;
   varying vec2 vUv;
+  varying float vHeight;
+  uniform float uTime;
+  uniform float uJetWash;
+
+  // Real vertex displacement, not just a normal trick: the surface itself
+  // moves. It matters at the rim, where the silhouette of the water against
+  // the stone visibly rises and falls.
+  float wave(vec2 p, float t) {
+    float a = sin(p.x * 3.1 + t * 0.9) * cos(p.y * 3.5 - t * 0.7);
+    float b = sin(p.x * 7.3 - t * 1.3 + cos(p.y * 6.1)) * 0.45;
+    float r = length(p);
+    float rings = sin(r * 26.0 - t * 2.1) * smoothstep(0.25, 0.95, r) * uJetWash;
+    return (a + b) * 0.5 + rings * 0.8;
+  }
+
   void main() {
     vUv = uv;
-    vec4 w = modelMatrix * vec4(position, 1.0);
+    vec2 p = (uv - 0.5) * 2.0;
+    float h = wave(p, uTime);
+    vHeight = h;
+    vec3 displaced = position + vec3(0.0, h * 0.035, 0.0);
+    vec4 w = modelMatrix * vec4(displaced, 1.0);
     vWorld = w.xyz;
     vNormalW = normalize(mat3(modelMatrix) * normal);
     gl_Position = projectionMatrix * viewMatrix * w;
@@ -35,6 +54,7 @@ const FRAG = /* glsl */`
   varying vec3 vWorld;
   varying vec3 vNormalW;
   varying vec2 vUv;
+  varying float vHeight;
 
   uniform float uTime;
   uniform vec3 uShallow;
@@ -92,7 +112,8 @@ const FRAG = /* glsl */`
     float spec = pow(max(dot(n, h), 0.0), 420.0) * 3.2
                + pow(max(dot(n, h), 0.0), 44.0) * 0.32;
 
-    vec3 col = mix(body, sky, f) + uSunColour * spec;
+    // the crests catch a little more sky than the troughs
+    vec3 col = mix(body, sky, clamp(f + vHeight * 0.05, 0.0, 1.0)) + uSunColour * spec;
 
     // Foam where the jets land, kept to a whisper.
     float foam = smoothstep(0.82, 0.99, length(p)) * uJetWash * 0.20;
@@ -102,7 +123,7 @@ const FRAG = /* glsl */`
   }
 `;
 
-export class WaterSystem {
+export class FountainSystem {
   constructor({ radius, level, sky }) {
     this.uniforms = {
       uTime: { value: 0 },
@@ -114,7 +135,9 @@ export class WaterSystem {
       uCamera: { value: new Vector3() },
       uJetWash: { value: 0.0 }
     };
-    const geo = new CircleGeometry(radius, 96);
+    // Enough rings and segments for the displacement to read as a
+    // surface rather than as a fan of triangles rippling at the centre.
+    const geo = new CircleGeometry(radius, 128, 0, Math.PI * 2);
     geo.rotateX(-Math.PI / 2);
     this.material = new ShaderMaterial({
       uniforms: this.uniforms,

@@ -26,13 +26,13 @@ a returning student who never sees the landing screen never pays for it.
 
     core/        Quality, Timeline, Easing, PerformanceGovernor
     camera/      CameraController  — LOCKED, see the header in that file
-    env/         SkySystem, LightingSystem
+    env/         EnvironmentManager, LightingRig
     materials/   TextureFactory (every map is drawn, none is downloaded),
-                 MaterialSystem
+                 MaterialLibrary
     build/       Architecture (the shared detail primitives), Terrain,
                  Plaza, Landmark
-    water/       WaterSystem
-    post/        PostProcessing
+    water/       FountainSystem
+    post/        AestheticPostProcessing
     main.js      assembly, choreography, and the AAUP_CAMPUS3D contract
 
 ## The contract
