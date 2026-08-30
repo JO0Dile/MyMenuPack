@@ -162,6 +162,38 @@ export class TextureFactory {
     });
   }
 
+  // ---- the blue mosaic in the basin -----------------------------------
+  // Small glazed tiles, no two quite the same blue, on a pale grout. It is
+  // the one strong colour anywhere on the landmark and the thing every
+  // photograph of the fountain is really about.
+  mosaic({ repeat = 10, tiles = 16 } = {}) {
+    return this._memo(`mosaic:${repeat}:${tiles}`, () => {
+      const S = this.size, c = canvas(S), g = c.getContext('2d');
+      const rnd = mulberry32(97);
+      g.fillStyle = '#cfd6d8';                       // the grout
+      g.fillRect(0, 0, S, S);
+      const cell = S / tiles, gap = Math.max(1, S / 260);
+      for (let y = 0; y < tiles; y++) {
+        for (let x = 0; x < tiles; x++) {
+          // three blues in rough proportion, plus the occasional pale tile
+          const r = rnd();
+          let col;
+          if (r > 0.94) col = [206, 224, 232];
+          else if (r > 0.66) col = [30, 118, 176];
+          else if (r > 0.33) col = [22, 92, 150];
+          else col = [46, 146, 198];
+          const j = (rnd() - 0.5) * 22;
+          g.fillStyle = `rgb(${clamp255(col[0] + j)},${clamp255(col[1] + j)},${clamp255(col[2] + j)})`;
+          g.fillRect(x * cell + gap, y * cell + gap, cell - gap * 2, cell - gap * 2);
+          // a glaze highlight along the top-left of each tile
+          g.fillStyle = 'rgba(255,255,255,0.16)';
+          g.fillRect(x * cell + gap, y * cell + gap, cell - gap * 2, (cell - gap * 2) * 0.22);
+        }
+      }
+      return finish(c, { repeat, srgb: true, aniso: this.aniso });
+    });
+  }
+
   // ---- roughness variation -------------------------------------------
   // The most valuable map in the whole set and the least visible one. It is
   // what stops every surface catching the sun in exactly the same way.

@@ -87,13 +87,13 @@ export class Landmark {
     // the internal face, tiled, and the floor of the basin
     const inner = new Mesh(
       new CylinderGeometry(L.poolRadius - 0.62, L.poolRadius - 0.62, L.poolWall, seg, 1, true),
-      M('paving-fine')
+      M('mosaic')
     );
     inner.position.y = L.poolWall / 2;
     inner.material.side = DoubleSide;
     basin.add(inner);
 
-    const floor = new Mesh(new CylinderGeometry(L.poolRadius - 0.62, L.poolRadius - 0.62, 0.08, seg), M('paving-fine'));
+    const floor = new Mesh(new CylinderGeometry(L.poolRadius - 0.62, L.poolRadius - 0.62, 0.08, seg), M('mosaic'));
     floor.position.y = 0.06;
     basin.add(floor);
 

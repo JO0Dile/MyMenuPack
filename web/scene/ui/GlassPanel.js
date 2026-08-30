@@ -18,7 +18,7 @@ import {
   LinearFilter, Vector3, DoubleSide
 } from 'three';
 
-const W = 5.0, H = 3.05, T = 0.16, R = 0.24;
+const W = 4.5, H = 2.7, T = 0.15, R = 0.22;
 
 function roundedPlate(w, h, r, depth) {
   const s = new Shape();
@@ -43,7 +43,7 @@ export class GlassPanel {
     this.q = quality;
     this.group = new Group();
     this.group.name = 'auth-panel';
-    this.group.position.set(0, 8.5, 12.8);
+    this.group.position.set(0, 4.6, 13.6);
     this.group.visible = false;
     this._t = 0;
     this._appear = 0;
@@ -182,7 +182,7 @@ export class GlassPanel {
     this.group.visible = k > 0.005;
     const e = k * k * (3 - 2 * k);
     this.group.scale.setScalar(0.94 + 0.06 * e);
-    this._baseY = 8.5;
+    this._baseY = 4.6;
     this.glass.material.opacity = 1;
     this.edge.material.emissiveIntensity = 0.06 * e;
     this.face.material.opacity = Math.max(0, (k - 0.25) / 0.75);
@@ -193,15 +193,19 @@ export class GlassPanel {
     if (!this.group.visible) return;
     // A slow figure of eight, small enough to be subconscious.
     const k = this._appear;
-    this.group.position.y = (this._baseY || 8.5) - (1 - k) * 0.9
+    this.group.position.y = (this._baseY || 4.6) - (1 - k) * 0.9
       + Math.sin(t * 0.42) * 0.075 * k;
     this.group.position.x = Math.sin(t * 0.27) * 0.05 * k;
     this.group.rotation.z = Math.sin(t * 0.33) * 0.006 * k;
     // It always faces the camera, because it is an interface, but it leans
     // rather than snapping — the lean is what sells it as a physical object
     // hanging in the air.
+    // It turns toward the camera, but only part of the way. Facing the
+    // camera squarely makes a pane at this distance lean hard enough to
+    // swing across the tower behind it; a fraction of the angle keeps the
+    // parallax without the panel ever becoming the subject.
     const target = Math.atan2(camera.position.x - this.group.position.x,
-                              camera.position.z - this.group.position.z);
+                              camera.position.z - this.group.position.z) * 0.38;
     this.group.rotation.y += (target - this.group.rotation.y) * 0.06;
     this.group.rotation.x = Math.sin(t * 0.31) * 0.008 * k;
   }

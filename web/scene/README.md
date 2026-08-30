@@ -24,16 +24,26 @@ a returning student who never sees the landing screen never pays for it.
 
 ## Layout
 
-    core/        Quality, Timeline, Easing, PerformanceGovernor
+    core/        Quality, Timeline, Easing, PerformanceGovernor,
+                 LoadingManager
     camera/      CameraController  — LOCKED, see the header in that file
-    env/         EnvironmentManager, LightingRig
+    env/         CosmicSky (the deep field, the stars, the planets),
+                 LightingRig
     materials/   TextureFactory (every map is drawn, none is downloaded),
                  MaterialLibrary
-    build/       Architecture (the shared detail primitives), Terrain,
-                 Plaza, Landmark
+    build/       Architecture (the shared detail primitives), Plaza,
+                 Landmark
     water/       FountainSystem
+    ui/          GlassPanel — the sign-in surface, as an object in the world
     post/        AestheticPostProcessing
     main.js      assembly, choreography, and the AAUP_CAMPUS3D contract
+
+## What is in the scene
+
+النافورة وطريق — the fountain and a road, on a paved disc, and around it
+the universe. Nothing else: no buildings, no hill, no city. Everything that
+is there is there to be looked at closely, because there is nothing else to
+look at.
 
 ## The contract
 

@@ -24,8 +24,8 @@
 //   7.0  the camera lands and the student takes it
 // ==========================
 import {
-  Scene, WebGLRenderer, Group, Fog, Color, ACESFilmicToneMapping,
-  PCFSoftShadowMap, SRGBColorSpace, Clock
+  Scene, WebGLRenderer, Group, Color, ACESFilmicToneMapping,
+  PCFSoftShadowMap, SRGBColorSpace, Clock, PMREMGenerator
 } from 'three';
 
 import { Quality } from './core/Quality.js';
@@ -34,16 +34,13 @@ import { Ease, clamp01 } from './core/Easing.js';
 import { PerformanceGovernor } from './core/PerformanceGovernor.js';
 import { TextureFactory } from './materials/TextureFactory.js';
 import { MaterialLibrary } from './materials/MaterialLibrary.js';
-import { EnvironmentManager } from './env/EnvironmentManager.js';
+import { CosmicSky } from './env/CosmicSky.js';
 import { LightingRig } from './env/LightingRig.js';
 import { CameraController } from './camera/CameraController.js';
-import { Terrain } from './build/Terrain.js';
 import { Plaza, PLAZA } from './build/Plaza.js';
 import { Landmark, LANDMARK } from './build/Landmark.js';
-import { BuildingGeometry } from './build/BuildingGeometry.js';
 import { FountainSystem } from './water/FountainSystem.js';
 import { AestheticPostProcessing } from './post/AestheticPostProcessing.js';
-import { ParticleSystem } from './fx/ParticleSystem.js';
 import { GlassPanel } from './ui/GlassPanel.js';
 import { LoadingManager } from './core/LoadingManager.js';
 
@@ -70,7 +67,7 @@ class LandingScene {
     // ACES is the single most important line in this file for how the image
     // reads: without it a low sun and a shaded soffit cannot both be right.
     this.renderer.toneMapping = ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 0.82;
+    this.renderer.toneMappingExposure = 1.15;
     this.renderer.outputColorSpace = SRGBColorSpace;
     if (this.quality.get('shadows')) {
       this.renderer.shadowMap.enabled = true;
@@ -80,15 +77,19 @@ class LandingScene {
     // ---- scene ---------------------------------------------------------
     this.scene = new Scene();
 
-    this.sky = new EnvironmentManager(this.renderer, 'afternoon');
-    this.scene.add(this.sky.mesh);
-    const env = this.sky.buildEnvironment();
-    this.scene.environment = env;
+    // النافورة وطريق, and around it the universe. There is no hill, no city
+    // and no horizon: the paved disc simply ends, and past it are stars.
+    this.sky = new CosmicSky(this.renderer, this.quality);
+    this.scene.add(this.sky.object);
 
-    // Aerial perspective. Linear fog tuned so the near campus is untouched
-    // and the far ridge sits in haze — the same depth cue the photographs
-    // have, and the reason the hill reads as kilometres rather than metres.
-    this.scene.fog = new Fog(this.sky.horizonColour.clone(), 150, 460);
+    // The environment every material reflects. In space that is a dim, cool
+    // wash rather than a bright sky — which is exactly why the marble reads
+    // as marble here and the water still catches a highlight.
+    const env = this._spaceEnvironment();
+    this.scene.environment = env;
+    // No fog. Fog is atmosphere and there isn't any; the disc ends at a hard
+    // edge because that is the point of the image.
+    this.scene.fog = null;
 
     this.textures = new TextureFactory(this.quality, this.renderer);
     this.materials = new MaterialLibrary(this.textures, this.quality);
@@ -102,24 +103,17 @@ class LandingScene {
     this.world.name = 'world';
     this.scene.add(this.world);
 
-    this.terrain = new Terrain(this.materials, this.quality);
-    this.plaza = new Plaza(this.materials, this.quality, this.sky);
+    this.plaza = new Plaza(this.materials, this.quality);
     this.landmark = new Landmark(this.materials, this.quality);
     this.water = new FountainSystem({
       radius: LANDMARK.poolRadius - 0.66,
       level: LANDMARK.waterLevel,
       sky: this.sky
     });
-
-    this.buildings = new BuildingGeometry(this.materials, this.quality);
-    this.particles = new ParticleSystem(this.quality, this.sky);
     this.panel = new GlassPanel(this.materials, this.quality);
 
-    this.world.add(
-      this.terrain.object, this.plaza.object, this.buildings.object,
-      this.landmark.object, this.water.object, this.panel.object
-    );
-    if (this.particles.object) this.world.add(this.particles.object);
+    this.world.add(this.plaza.object, this.landmark.object, this.water.object, this.panel.object);
+
     this.lighting.placeLamps(this.plaza.lampPositions);
 
     // ---- post ----------------------------------------------------------
@@ -134,7 +128,6 @@ class LandingScene {
       .cue('detail', 1.9, 1.6, Ease.outCubic)
       .cue('water', 5.4, 1.6, Ease.outCubic)
       .cue('accent', 6.0, 2.2, Ease.inOutCubic)
-      .cue('dust', 2.4, 2.4, Ease.outCubic)
       .cue('brand', 6.4, 1.0, Ease.outExpo, () => this._emit('brand'))
       .cue('auth', 6.9, 1.1, Ease.outExpo, () => this._emit('auth'));
     if (reduced) this.timeline.finish();
@@ -143,6 +136,19 @@ class LandingScene {
 
     this._bindInput();
     this._resize();
+  }
+
+  // A prefiltered environment taken from the deep field itself, so glass and
+  // marble reflect the sky they are actually standing in.
+  _spaceEnvironment() {
+    const pmrem = new PMREMGenerator(this.renderer);
+    pmrem.compileEquirectangularShader();
+    const box = new Scene();
+    box.add(this.sky.dome.clone());
+    const rt = pmrem.fromScene(box, 0.06);
+    pmrem.dispose();
+    this._envTarget = rt;
+    return rt.texture;
   }
 
   _emit(name) {
@@ -168,24 +174,22 @@ class LandingScene {
     const g = this.timeline.at('ground');
     const a = this.timeline.at('architecture');
     const d = this.timeline.at('detail');
-    this.terrain.object.visible = g > 0.01;
     this.landmark.object.visible = a > 0.01;
     this.plaza.object.visible = g > 0.01;
-    this.renderer.toneMappingExposure = 0.30 + 0.52 * this.timeline.at('sky');
+    // the stars are there from the first frame and come up first of all
+    this.sky.update(t, this.timeline.at('sky'));
+    this.renderer.toneMappingExposure = 0.45 + 0.70 * this.timeline.at('sky');
 
     const w = this.timeline.at('water');
     this.water.object.visible = w > 0.01;
     this.water.setJets(w);
 
-    this.buildings.object.visible = a > 0.01;
 
     const acc = this.timeline.at('accent');
     this.lighting.setAccent(acc);
     this.plaza.setAccent(acc);
-    this.buildings.setAccent(acc);
     this.post.setBloom(acc);
 
-    this.particles.update(t, this.timeline.at('dust') * 0.9);
 
     const auth = this.timeline.at('auth');
     this.panel.setAppear(auth);
@@ -282,7 +286,6 @@ class LandingScene {
 
     this.post.dispose();
     this.water.dispose();
-    this.particles.dispose();
     this.materials.dispose();
     this.textures.dispose();
     this.lighting.dispose();

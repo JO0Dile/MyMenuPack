@@ -176,10 +176,20 @@ export class MaterialLibrary {
       color: c(0xeeece7), roughness: 0.5, metalness: 0, envMapIntensity: 0.8
     }));
 
+    // The glazed blue mosaic lining the basin. Glossy, because glazed tile
+    // under water is the shiniest thing in the whole scene.
+    this._add('mosaic', new MeshPhysicalMaterial({
+      color: c(0xffffff),
+      map: T.mosaic({ repeat: 9 }),
+      roughness: 0.14, metalness: 0,
+      clearcoat: 0.8, clearcoatRoughness: 0.08,
+      envMapIntensity: 1.3
+    }));
+
     // ---- ground --------------------------------------------------------
     this._add('paving', new MeshStandardMaterial({
-      color: c(0xbdb6a6), roughness: 0.86, metalness: 0,
-      map: T.paving({ repeat: 9, cols: 4, tint: 0.72 }),
+      color: c(0xd8d2c2), roughness: 0.84, metalness: 0,
+      map: T.paving({ repeat: 9, cols: 4, tint: 0.80 }),
       roughnessMap: T.roughness({ repeat: 9, base: 0.86, spread: 0.14, seed: 61 }),
       normalMap: hq ? T.normal({ repeat: 9, strength: 0.55, seed: 61, scale: 10 }) : null
     }));
@@ -187,8 +197,8 @@ export class MaterialLibrary {
     // The band of finer paving on the island, laid in rings rather than
     // slabs — a different repeat is enough to tell them apart.
     this._add('paving-fine', new MeshStandardMaterial({
-      color: c(0xcac3b3), roughness: 0.8, metalness: 0,
-      map: T.paving({ repeat: 16, cols: 5, tint: 0.78 }),
+      color: c(0xe4dece), roughness: 0.78, metalness: 0,
+      map: T.paving({ repeat: 16, cols: 5, tint: 0.85 }),
       roughnessMap: T.roughness({ repeat: 12, base: 0.8, spread: 0.12, seed: 67 })
     }));
 

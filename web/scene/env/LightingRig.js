@@ -60,8 +60,8 @@ export class LightingRig {
       // further than this is lit but does not cast — which nobody can tell,
       // because at that distance the shadow would be a pixel.
       const cam = key.shadow.camera;
-      cam.left = -46; cam.right = 46; cam.top = 46; cam.bottom = -46;
-      cam.near = 40; cam.far = 250;
+      cam.left = -36; cam.right = 36; cam.top = 36; cam.bottom = -36;
+      cam.near = 60; cam.far = 200;
       cam.updateProjectionMatrix();
       // Bias is the difference between contact shadows and shadow acne on
       // every flat face. Normal bias does the work; the constant bias is
@@ -79,6 +79,7 @@ export class LightingRig {
       1.05 * sunI
     );
     fill.position.set(0, 40, 0);
+    fill.name = 'starlight';
     this.group.add(fill);
     this.fill = fill;
 
