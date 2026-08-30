@@ -43,7 +43,7 @@ export class GlassPanel {
     this.q = quality;
     this.group = new Group();
     this.group.name = 'auth-panel';
-    this.group.position.set(0, 7.6, 11.4);
+    this.group.position.set(0, 8.5, 12.8);
     this.group.visible = false;
     this._t = 0;
     this._appear = 0;
@@ -182,7 +182,7 @@ export class GlassPanel {
     this.group.visible = k > 0.005;
     const e = k * k * (3 - 2 * k);
     this.group.scale.setScalar(0.94 + 0.06 * e);
-    this._baseY = 7.6;
+    this._baseY = 8.5;
     this.glass.material.opacity = 1;
     this.edge.material.emissiveIntensity = 0.06 * e;
     this.face.material.opacity = Math.max(0, (k - 0.25) / 0.75);
@@ -193,7 +193,7 @@ export class GlassPanel {
     if (!this.group.visible) return;
     // A slow figure of eight, small enough to be subconscious.
     const k = this._appear;
-    this.group.position.y = (this._baseY || 7.6) - (1 - k) * 0.9
+    this.group.position.y = (this._baseY || 8.5) - (1 - k) * 0.9
       + Math.sin(t * 0.42) * 0.075 * k;
     this.group.position.x = Math.sin(t * 0.27) * 0.05 * k;
     this.group.rotation.z = Math.sin(t * 0.33) * 0.006 * k;

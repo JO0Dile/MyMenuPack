@@ -1,17 +1,24 @@
 // ==========================
-// BUILDING GEOMETRY
+// THE CAMPUS
 //
-// The complex the landmark stands in front of, as volumetric solids. Every
-// mass here is a Mesh with real thickness; the glazing is transmissive
-// glass in aluminium framing that stands proud of it; the trusses are
-// tubes, not lines.
+// Rebuilt to the photographs, and the thing the previous version got most
+// wrong was scale. The clock tower is small — about thirteen metres — and
+// the complex stands right over it: the glass gem's nose comes almost to
+// the fountain kerb and its ridge is more than twice the tower's height.
+// Modelling them far away and roughly the tower's size is what made the
+// scene read as an empty field with an ornament in it.
+//
+// One unit here is about 0.68 m, set by the tower. Everything below is
+// dimensioned from that.
 // ==========================
 import {
-  Group, Mesh, BoxGeometry, CylinderGeometry, PlaneGeometry, InstancedMesh,
-  Object3D, BufferGeometry, Float32BufferAttribute, Shape, ExtrudeGeometry,
-  DoubleSide, Vector3
+  Group, Mesh, BoxGeometry, CylinderGeometry, InstancedMesh, Object3D,
+  BufferGeometry, Float32BufferAttribute, Shape, ExtrudeGeometry,
+  MeshStandardMaterial, Color, SRGBColorSpace, Vector3, DoubleSide
 } from 'three';
 import { chamferedBox, coping, curtainWall, shadowed } from './Architecture.js';
+
+const U = 1 / 0.68;                    // metres to scene units
 
 function rng(seed) {
   let a = seed >>> 0;
@@ -29,7 +36,7 @@ export class BuildingGeometry {
     this.q = quality;
     this.low = quality.get('name') === 'low';
     this.group = new Group();
-    this.group.name = 'complex';
+    this.group.name = 'campus';
     this.litWindows = [];
     this._build();
   }
@@ -38,304 +45,362 @@ export class BuildingGeometry {
 
   _build() {
     this.group.add(
-      this.gem(16, -38, 1.25),
-      this.cutBlock(-9, -48, 16, 15, 21),
-      this.stairDrum(30, -50, 2.4, 21),
-      this.signBlock(50, -52, 20, 15, 20),
-      this.screenBlock(66, -30, 30, 17, 19),
-      this.highRise(30, -84, 14, 13, 44),
-      this.gatehouse(84, -14)
+      this.gem(),
+      this.stoneBlock(),
+      this.highRise(),
+      this.signBlock(),
+      this.screenBlock(),
+      this.link()
     );
   }
 
-  // ---- the gem -------------------------------------------------------
-  // A closed faceted solid, panelled in transmissive glass, with the
-  // diagonal trusses that actually hold that geometry up expressed on the
-  // outside as tubes running along every arris.
-  gem(cx, cz, k) {
+  // =========================================================
+  // THE GLASS GEM
+  //
+  // A crystal the size of a building: one great triangulated plane facing
+  // the plaza, folded back along a ridge, with the nose coming down to the
+  // red beams over the entrance. Panelled in a triangular lattice with
+  // aluminium capping on every joint, and a scatter of pale opaque panels
+  // among the glass — which on the real building is stone, and is what
+  // stops a glazed slope reading as a mirror.
+  // =========================================================
+  gem() {
     const M = n => this.m.get(n);
     const g = new Group();
     g.name = 'gem';
-    const V = (x, y, z) => new Vector3(cx + x * k, y * k, cz + z * k);
 
-    const N = V(-2, 0.4, 18), A = V(0, 15, 1), R = V(-6, 17, -7), S = V(11, 11, -8);
-    const W1 = V(-17, 0.4, 7), W2 = V(-19, 6, -10);
-    const E1 = V(16, 0.4, 3), E2 = V(18, 4, -11);
-    // the footprint, closing the solid underneath so it is a volume
-    const F = [N, W1, W2, E2, E1];
+    // Metres, then converted. The ridge runs roughly north-east, the great
+    // plane faces the fountain, and the nose lands just past the kerb.
+    const P = (x, y, z) => new Vector3(x * U + 15, y * U, z * U - 20);
+    const N  = P(-6.5, 0.4, 13.5);   // the nose, over the doors
+    const A  = P(-2.0, 15.5, 5.0);   // the head of the leading arris
+    const R  = P(-7.5, 22.5, -6.0);  // the apex, back and west
+    const S  = P(9.5, 15.0, -8.0);   // the eastern shoulder
+    const W1 = P(-15.5, 0.4, 5.5), W2 = P(-17.5, 7.5, -9.5);
+    const E1 = P(14.0, 0.4, 2.5),  E2 = P(16.5, 5.0, -11.0);
+    const B1 = P(-15.5, 0.4, -13.0), B2 = P(14.0, 0.4, -13.5);
 
     const faces = [
-      [N, W1, A], [N, A, E1], [W1, W2, A], [W2, R, A],
-      [A, R, S], [A, S, E1], [E1, S, E2], [W2, S, R], [W2, E2, S]
+      [N, W1, A], [N, A, E1],                 // the two great planes
+      [W1, W2, A], [W2, R, A],
+      [A, R, S], [A, S, E1],
+      [E1, S, E2], [W2, S, R], [W2, E2, S],
+      [W2, B1, E2], [B1, B2, E2]              // the back, closing the solid
     ];
 
-    // The glazed skin: each facet subdivided into a triangular panel grid,
-    // built as one buffer so the whole gem is a single draw call.
-    const pos = [];
-    const sub = this.low ? 2 : 4;
+    const sub = this.low ? 3 : 5;
+    const glassPos = [], stonePos = [];
+    const r = rng(7);
+    const at = (p0, p1, p2, i, j) => new Vector3().copy(p0)
+      .addScaledVector(new Vector3().subVectors(p1, p0), i / sub)
+      .addScaledVector(new Vector3().subVectors(p2, p0), j / sub);
+
     for (const [p0, p1, p2] of faces) {
       for (let i = 0; i < sub; i++) {
         for (let j = 0; i + j < sub; j++) {
-          const at = (a, b) => new Vector3()
-            .copy(p0)
-            .addScaledVector(new Vector3().subVectors(p1, p0), a / sub)
-            .addScaledVector(new Vector3().subVectors(p2, p0), b / sub);
-          const a0 = at(i, j), b0 = at(i + 1, j), c0 = at(i, j + 1);
-          pos.push(a0.x, a0.y, a0.z, b0.x, b0.y, b0.z, c0.x, c0.y, c0.z);
+          const a = at(p0, p1, p2, i, j), b = at(p0, p1, p2, i + 1, j), c = at(p0, p1, p2, i, j + 1);
+          const bin = r() > 0.86 ? stonePos : glassPos;
+          bin.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
           if (i + j < sub - 1) {
-            const d0 = at(i + 1, j + 1);
-            pos.push(b0.x, b0.y, b0.z, d0.x, d0.y, d0.z, c0.x, c0.y, c0.z);
+            const d = at(p0, p1, p2, i + 1, j + 1);
+            const bin2 = r() > 0.86 ? stonePos : glassPos;
+            bin2.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
           }
         }
       }
     }
-    // close the base
-    for (let i = 1; i < F.length - 1; i++) {
-      pos.push(F[0].x, F[0].y, F[0].z, F[i + 1].x, F[i + 1].y, F[i + 1].z, F[i].x, F[i].y, F[i].z);
+    for (const [src, mat, name] of [[glassPos, M('glass-dark'), 'gem-glass'],
+                                    [stonePos, M('paint-white'), 'gem-stone']]) {
+      if (!src.length) continue;
+      const geo = new BufferGeometry();
+      geo.setAttribute('position', new Float32BufferAttribute(src, 3));
+      geo.computeVertexNormals();
+      const m = new Mesh(geo, mat);
+      m.name = name;
+      m.castShadow = true; m.receiveShadow = true;
+      g.add(m);
     }
-    const skin = new BufferGeometry();
-    skin.setAttribute('position', new Float32BufferAttribute(pos, 3));
-    skin.computeVertexNormals();
-    const glass = new Mesh(skin, M('glass-dark'));
-    glass.castShadow = true;
-    glass.receiveShadow = true;
-    g.add(glass);
 
-    // A dark shell just inside the glass, so transmission has something to
-    // find instead of looking straight through the building.
-    const inner = new Mesh(skin.clone().scale(0.965, 0.965, 0.965), M('glass-spandrel'));
-    inner.position.set(cx * 0.035, 0.32, cz * 0.035);
+    // the dark interior behind the glazing
+    const shell = new BufferGeometry();
+    const sp = [];
+    for (const [p0, p1, p2] of faces) sp.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+    shell.setAttribute('position', new Float32BufferAttribute(sp, 3));
+    shell.computeVertexNormals();
+    const inner = new Mesh(shell, M('glass-spandrel'));
+    inner.scale.setScalar(0.955);
+    inner.position.set(15 * 0.045, 0.4, -20 * 0.045);
     g.add(inner);
 
-    // ---- the trusses --------------------------------------------------
-    const arris = [
-      [N, A], [N, W1], [N, E1], [W1, A], [E1, A], [W1, W2], [E1, E2],
-      [W2, E2], [W2, R], [E2, S], [R, A], [A, S], [R, S], [W2, S]
-    ];
-    const tubeR = 0.16 * k;
-    for (const [a, b] of arris) g.add(this._tube(a, b, tubeR, M('aluminium')));
-
-    // and the diagonal bracing across the two great planes
-    for (const [p0, p1, p2] of [[N, W1, A], [N, A, E1]]) {
-      const n = this.low ? 2 : 4;
-      for (let i = 1; i < n; i++) {
-        const f = i / n;
-        const a = new Vector3().lerpVectors(p0, p1, f);
-        const b = new Vector3().lerpVectors(p0, p2, f);
-        g.add(this._tube(a, b, tubeR * 0.62, M('aluminium')));
+    // ---- the lattice ---------------------------------------------------
+    // Aluminium capping on the panel joints of the two plaza-facing planes,
+    // and on every arris. This is the diagonal grid you actually see.
+    const tube = (a, b, rad, mat) => {
+      const d = new Vector3().subVectors(b, a);
+      const len = d.length();
+      if (len < 0.01) return null;
+      const m = new Mesh(new CylinderGeometry(rad, rad, len, this.low ? 4 : 6), mat);
+      m.position.copy(a).addScaledVector(d, 0.5);
+      m.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), d.clone().normalize());
+      m.castShadow = true;
+      return m;
+    };
+    const cap = 0.045 * U;
+    for (const [p0, p1, p2] of [[N, W1, A], [N, A, E1], [A, R, S], [A, S, E1]]) {
+      for (let i = 0; i <= sub; i++) {
+        for (let j = 0; i + j <= sub; j++) {
+          const a = at(p0, p1, p2, i, j);
+          if (i + j < sub) {
+            const b = at(p0, p1, p2, i + 1, j), c = at(p0, p1, p2, i, j + 1);
+            const t1 = tube(a, b, cap, M('aluminium')); if (t1) g.add(t1);
+            const t2 = tube(a, c, cap, M('aluminium')); if (t2) g.add(t2);
+            const t3 = tube(b, c, cap * 0.8, M('aluminium')); if (t3) g.add(t3);
+          }
+        }
       }
     }
-
-    // ---- the red struts and the entrance --------------------------------
-    const doorC = V(-2, 0, 15.4);
-    for (const s of [-1.2, 1.2]) {
-      const foot = V(-2 + s * 1.9, 0.3, 16.7);
-      const head = V(-2, 5.6, 14.6);
-      g.add(this._tube(foot, head, 0.2 * k, M('paint-red')));
+    for (const [a, b] of [[N, A], [N, W1], [N, E1], [W1, A], [E1, A], [W1, W2],
+                          [E1, E2], [W2, R], [E2, S], [R, A], [A, S], [R, S]]) {
+      const t = tube(a, b, cap * 1.5, M('aluminium')); if (t) g.add(t);
     }
-    const doors = new Mesh(new BoxGeometry(7.4 * k, 3.8 * k, 0.24), M('glass-vision'));
-    doors.position.copy(doorC).setY(1.9 * k);
+
+    // ---- the red beams -------------------------------------------------
+    // The V under the nose. Painted steel, and the one saturated thing in
+    // the whole composition.
+    const apex = P(-6.5, 7.0, 11.0);
+    for (const s of [-1, 1]) {
+      const foot = P(-6.5 + s * 3.2, 0.3, 14.6);
+      const t = tube(foot, apex, 0.26 * U, M('paint-red'));
+      if (t) g.add(t);
+      const t2 = tube(foot, P(-6.5 + s * 1.4, 4.0, 12.8), 0.2 * U, M('paint-red'));
+      if (t2) g.add(t2);
+    }
+
+    // ---- the entrance ---------------------------------------------------
+    const doorC = P(-6.5, 0, 12.0);
+    const doors = new Mesh(new BoxGeometry(9 * U, 4.2 * U, 0.3), M('glass-vision'));
+    doors.position.copy(doorC).setY(2.1 * U);
     g.add(doors);
-    const canopy = new Mesh(chamferedBox(9 * k, 0.34, 3 * k, 0.06), M('concrete'));
-    canopy.position.copy(doorC).setY(4.0 * k).setZ(doorC.z + 1.1 * k);
-    g.add(canopy);
+    const soffit = new Mesh(chamferedBox(11 * U, 0.5 * U, 3.4 * U, 0.06), M('concrete'));
+    soffit.position.copy(doorC).setY(4.3 * U).setZ(doorC.z + 1.4 * U);
+    g.add(soffit);
 
     return shadowed(g);
   }
 
-  _tube(a, b, r, mat) {
-    const d = new Vector3().subVectors(b, a);
-    const len = d.length();
-    const geo = new CylinderGeometry(r, r, len, this.low ? 5 : 8, 1);
-    const m = new Mesh(geo, mat);
-    m.position.copy(a).addScaledVector(d, 0.5);
-    m.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), d.normalize());
-    m.castShadow = true;
-    return m;
-  }
-
-  // ---- the white block with the triangular openings -------------------
-  // The triangles are cut through the wall with ExtrudeGeometry holes, so
-  // they are real openings with real reveals — you can see the soffit of
-  // each one, and the sun lands inside them.
-  cutBlock(cx, cz, w, d, h) {
+  // =========================================================
+  // THE WHITE STONE BLOCK
+  //
+  // Tall, stepped, faced in pale stone, cut with triangular openings, and
+  // with the green vertical panels down its western bay that are the thing
+  // you recognise it by.
+  // =========================================================
+  stoneBlock() {
     const M = n => this.m.get(n);
     const g = new Group();
-    g.name = 'cut-block';
-    const r = rng(3);
+    g.name = 'stone-block';
+    const cx = -13, cz = -34;
+    const W = 24, D = 20, H = 50;
+    const r = rng(23);
 
+    // the perforated front skin, with the triangles cut clean through
     const face = new Shape();
-    face.moveTo(-w / 2, 0); face.lineTo(w / 2, 0);
-    face.lineTo(w / 2, h); face.lineTo(-w / 2, h); face.closePath();
+    face.moveTo(-W / 2, 0); face.lineTo(W / 2, 0);
+    face.lineTo(W / 2, H); face.lineTo(-W / 2, H); face.closePath();
 
-    const cols = 4, rows = 6;
+    const cols = 5, rows = 9;
     for (let c = 0; c < cols; c++) {
-      for (let row = 0; row < rows; row++) {
-        if (r() > 0.72) continue;
-        const bw = w / cols;
-        const sz = bw * (0.34 + r() * 0.4);
-        const px = -w / 2 + bw * c + (bw - sz) * (0.2 + r() * 0.6);
-        const py = 1.6 + (h - 4) * (row / rows) + r() * 0.6;
+      for (let row = 1; row < rows; row++) {
+        if (r() > 0.62) continue;
+        const bw = W / cols;
+        const sz = bw * (0.3 + r() * 0.36);
+        const px = -W / 2 + bw * c + (bw - sz) * (0.15 + r() * 0.7);
+        const py = 2.4 + (H - 6) * (row / rows) + r() * 0.8;
         const hole = new Shape();
-        if (r() > 0.42) {
-          hole.moveTo(px, py); hole.lineTo(px + sz, py); hole.lineTo(px + sz / 2, py + sz);
-        } else {
-          hole.moveTo(px, py + sz); hole.lineTo(px + sz, py + sz); hole.lineTo(px + sz / 2, py);
-        }
+        if (r() > 0.45) { hole.moveTo(px, py); hole.lineTo(px + sz, py); hole.lineTo(px + sz / 2, py + sz); }
+        else { hole.moveTo(px, py + sz); hole.lineTo(px + sz, py + sz); hole.lineTo(px + sz / 2, py); }
         hole.closePath();
         face.holes.push(hole);
       }
     }
-    const wallGeo = new ExtrudeGeometry(face, {
-      depth: 0.85, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.04,
+    const skin = new ExtrudeGeometry(face, {
+      depth: 1.1, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.06,
       bevelSegments: 1, curveSegments: 1
     });
-    wallGeo.computeVertexNormals();
-    const front = new Mesh(wallGeo, M('limestone'));
-    front.position.set(cx, 0, cz + d / 2 - 0.85);
+    skin.computeVertexNormals();
+    const front = new Mesh(skin, M('limestone'));
+    front.position.set(cx, 0, cz + D / 2 - 1.1);
     g.add(front);
 
-    // the body behind the perforated skin
-    const body = new Mesh(chamferedBox(w - 0.3, h, d - 1, 0.08), M('limestone'));
-    body.position.set(cx, 0, cz - 0.42);
-    g.add(body);
-    // the dark interior seen through the openings
-    const cavity = new Mesh(new BoxGeometry(w - 0.6, h - 0.4, 0.5), M('glass-spandrel'));
-    cavity.position.set(cx, 0.2, cz + d / 2 - 1.4);
-    g.add(cavity);
+    // the mass behind it, and the dark cavity the openings look into
+    const body = new Mesh(chamferedBox(W - 0.4, H, D - 1.3, 0.1), M('limestone'));
+    body.position.set(cx, 0, cz - 0.6);
+    const cavity = new Mesh(new BoxGeometry(W - 1.2, H - 4, 0.7), M('glass-spandrel'));
+    cavity.position.set(cx, 2, cz + D / 2 - 1.9);
+    g.add(body, cavity);
 
-    // the set-back upper volume and the lower wing
-    const upper = new Mesh(chamferedBox(w * 0.62, h * 0.26, d * 0.72, 0.08), M('limestone'));
-    upper.position.set(cx - w * 0.14, h, cz - d * 0.1);
-    const wing = new Mesh(chamferedBox(w * 0.46, h * 0.52, d * 0.62, 0.08), M('limestone'));
-    wing.position.set(cx + w * 0.34, 0, cz + d * 0.3);
-    g.add(upper, wing);
-
-    const cap = new Mesh(coping(w * 0.62, d * 0.72, 0.34, 0.16), M('limestone-honed'));
-    cap.position.set(cx - w * 0.14, h + h * 0.26, cz - d * 0.1);
-    g.add(cap);
-
-    // the coloured fins down the western bay
-    for (let i = 0; i < 5; i++) {
-      const fin = new Mesh(new BoxGeometry(0.16, h * 0.62, 0.42), M('paint-green'));
-      fin.position.set(cx - w / 2 + 0.55 + i * 0.46, h * 0.18 + h * 0.31, cz + d / 2 + 0.1);
-      g.add(fin);
+    // stepped massing: a set-back tower on the west, a lower wing east
+    const tower = new Mesh(chamferedBox(W * 0.52, H * 0.3, D * 0.7, 0.1), M('limestone'));
+    tower.position.set(cx - W * 0.16, H, cz - D * 0.1);
+    const wing = new Mesh(chamferedBox(W * 0.44, H * 0.46, D * 0.62, 0.1), M('limestone'));
+    wing.position.set(cx + W * 0.36, 0, cz + D * 0.28);
+    g.add(tower, wing);
+    for (const [m, w, d, h] of [[tower, W * 0.52, D * 0.7, H + H * 0.3],
+                                [wing, W * 0.44, D * 0.62, H * 0.46]]) {
+      const c = new Mesh(coping(w, d, 0.42, 0.22), M('limestone-honed'));
+      c.position.set(m.position.x, h, m.position.z);
+      g.add(c);
     }
 
-    // a glazed band down the eastern edge
-    const band = curtainWall({
-      width: 3.6, height: h * 0.6, cols: 3, rows: 8,
-      glassMat: M('glass-vision'), mullionMat: M('aluminium'), spandrelMat: M('glass-spandrel'),
-      spandrelEvery: 3
+    // ---- the green panels -----------------------------------------------
+    const greenMat = M('paint-green');
+    for (let i = 0; i < 4; i++) {
+      const panel = new Mesh(chamferedBox(0.9, H * 0.5, 0.5, 0.03), greenMat);
+      panel.position.set(cx - W / 2 + 1.6 + i * 1.5, H * 0.22, cz + D / 2 + 0.25);
+      g.add(panel);
+    }
+    for (let i = 0; i < 3; i++) {
+      const band = new Mesh(chamferedBox(6.4, 0.7, 0.35, 0.03), greenMat);
+      band.position.set(cx - W / 2 + 3.6, H * 0.2 + i * H * 0.17, cz + D / 2 + 0.22);
+      g.add(band);
+    }
+
+    // ---- glazing --------------------------------------------------------
+    const bay = curtainWall({
+      width: 6.6, height: H * 0.42, cols: 3, rows: 9,
+      glassMat: M('glass-vision'), mullionMat: M('aluminium'),
+      spandrelMat: M('glass-spandrel'), spandrelEvery: 3
     });
-    band.position.set(cx + w / 2 - 2.4, h * 0.22 + h * 0.3, cz + d / 2 + 0.1);
-    g.add(band);
+    bay.position.set(cx + W / 2 - 4.6, H * 0.24 + H * 0.21, cz + D / 2 + 0.2);
+    g.add(bay);
 
     return shadowed(g);
   }
 
-  // ---- the glazed stair drum ------------------------------------------
-  stairDrum(cx, cz, r, h) {
+  // =========================================================
+  // THE HIGH-RISE
+  // =========================================================
+  highRise() {
     const M = n => this.m.get(n);
     const g = new Group();
-    const seg = this.low ? 10 : 20;
-    const skin = new Mesh(new CylinderGeometry(r, r, h, seg, 1, true), M('glass-vision'));
-    skin.position.set(cx, h / 2, cz);
-    g.add(skin);
-    const core = new Mesh(new CylinderGeometry(r * 0.55, r * 0.55, h, seg), M('concrete'));
-    core.position.set(cx, h / 2, cz);
+    g.name = 'high-rise';
+    const cx = 34, cz = -64, W = 17, D = 16, H = 68;
+
+    const core = new Mesh(chamferedBox(W, H, D, 0.16), M('concrete-dark'));
+    core.position.set(cx, 0, cz);
     g.add(core);
-    for (let i = 0; i <= 7; i++) {
-      const ring = new Mesh(new CylinderGeometry(r + 0.06, r + 0.06, 0.12, seg), M('aluminium'));
-      ring.position.set(cx, h * i / 7, cz);
-      g.add(ring);
+
+    // Every floor of glazing on the two visible faces as one InstancedMesh
+    // each — twenty floors of panes is the exact case instancing is for.
+    const floors = this.low ? 12 : 20;
+    const paneW = 2.4, paneH = 2.4;
+    for (const [isSouth, faceZ, faceX] of [[true, cz + D / 2 + 0.08, cx], [false, cz, cx - W / 2 - 0.08]]) {
+      const span = isSouth ? W - 1.6 : D - 1.6;
+      const per = Math.max(1, Math.floor(span / (paneW + 0.3)));
+      const total = floors * per;
+      const panes = new InstancedMesh(new BoxGeometry(paneW, paneH, 0.18), M('glass-vision'), total);
+      const mulls = new InstancedMesh(new BoxGeometry(0.16, paneH + 0.9, 0.34), M('aluminium'), total + floors);
+      const o = new Object3D();
+      let n = 0, mn = 0;
+      for (let f = 0; f < floors; f++) {
+        const y = 3.2 + f * (H - 6) / floors;
+        for (let i = 0; i < per; i++) {
+          const off = -(per - 1) * (paneW + 0.3) / 2 + i * (paneW + 0.3);
+          if (isSouth) { o.position.set(faceX + off, y, faceZ); o.rotation.set(0, 0, 0); }
+          else { o.position.set(faceX, y, cz + off); o.rotation.set(0, Math.PI / 2, 0); }
+          o.updateMatrix(); panes.setMatrixAt(n++, o.matrix);
+          if (isSouth) o.position.set(faceX + off - (paneW + 0.3) / 2, y, faceZ + 0.14);
+          else o.position.set(faceX - 0.14, y, cz + off - (paneW + 0.3) / 2);
+          o.updateMatrix(); mulls.setMatrixAt(mn++, o.matrix);
+        }
+      }
+      panes.count = n; mulls.count = mn;
+      panes.instanceMatrix.needsUpdate = true;
+      mulls.instanceMatrix.needsUpdate = true;
+      panes.castShadow = true;
+      g.add(panes, mulls);
+      this.litWindows.push(panes);
     }
-    for (let i = 0; i < seg; i += 2) {
-      const a = i / seg * Math.PI * 2;
-      const mull = new Mesh(new BoxGeometry(0.09, h, 0.14), M('aluminium'));
-      mull.position.set(cx + Math.cos(a) * (r + 0.04), h / 2, cz + Math.sin(a) * (r + 0.04));
-      mull.rotation.y = -a;
-      g.add(mull);
-    }
-    const cap = new Mesh(new CylinderGeometry(r + 0.25, r + 0.1, 0.4, seg), M('concrete'));
-    cap.position.set(cx, h + 0.2, cz);
-    g.add(cap);
+
+    const crown = new Mesh(chamferedBox(W * 0.76, 3.2, D * 0.76, 0.12), M('concrete'));
+    crown.position.set(cx, H, cz);
+    const mast = new Mesh(new CylinderGeometry(0.12, 0.2, 8, 8), M('steel-dark'));
+    mast.position.set(cx, H + 7, cz);
+    g.add(crown, mast);
     return shadowed(g);
   }
 
-  // ---- the dark block that carries the name ----------------------------
-  signBlock(cx, cz, w, d, h) {
+  // =========================================================
+  // THE DARK BLOCK WITH THE NAME
+  // =========================================================
+  signBlock() {
     const M = n => this.m.get(n);
     const g = new Group();
-    const body = new Mesh(chamferedBox(w, h, d, 0.1), M('concrete-dark'));
+    g.name = 'sign-block';
+    const cx = 48, cz = -44, W = 26, D = 19, H = 30;
+
+    const body = new Mesh(chamferedBox(W, H, D, 0.12), M('concrete-dark'));
     body.position.set(cx, 0, cz);
     g.add(body);
 
-    // ribbon glazing, instanced: six floors of identical panes is exactly
-    // what InstancedMesh is for
-    const floors = 6;
-    const paneW = 1.5, paneH = 1.9;
-    const perFloor = Math.floor((w - 1.6) / (paneW + 0.22));
-    const total = floors * perFloor;
-    const panes = new InstancedMesh(new BoxGeometry(paneW, paneH, 0.16), M('glass-vision'), total);
-    const mulls = new InstancedMesh(new BoxGeometry(0.12, paneH + 0.5, 0.3), M('aluminium'), total + floors);
+    const floors = 6, paneW = 2.1, paneH = 2.6;
+    const per = Math.floor((W - 2.2) / (paneW + 0.28));
+    const panes = new InstancedMesh(new BoxGeometry(paneW, paneH, 0.2), M('glass-vision'), floors * per);
     const o = new Object3D();
-    let n = 0, mn = 0;
+    let n = 0;
     for (let f = 0; f < floors; f++) {
-      const y = 1.7 + f * (h - 2.6) / floors;
-      for (let i = 0; i < perFloor; i++) {
-        const x = cx - (perFloor - 1) * (paneW + 0.22) / 2 + i * (paneW + 0.22);
-        o.position.set(x, y, cz + d / 2 + 0.02); o.rotation.set(0, 0, 0); o.updateMatrix();
+      const y = 2.6 + f * (H - 6) / floors;
+      for (let i = 0; i < per; i++) {
+        o.position.set(cx - (per - 1) * (paneW + 0.28) / 2 + i * (paneW + 0.28), y, cz + D / 2 + 0.06);
+        o.rotation.set(0, 0, 0); o.updateMatrix();
         panes.setMatrixAt(n++, o.matrix);
-        o.position.set(x - (paneW + 0.22) / 2, y, cz + d / 2 + 0.12); o.updateMatrix();
-        mulls.setMatrixAt(mn++, o.matrix);
       }
-      o.position.set(cx + (perFloor - 1) * (paneW + 0.22) / 2 + (paneW + 0.22) / 2, y, cz + d / 2 + 0.12);
-      o.updateMatrix(); mulls.setMatrixAt(mn++, o.matrix);
     }
-    panes.count = n; mulls.count = mn;
+    panes.count = n;
     panes.instanceMatrix.needsUpdate = true;
-    mulls.instanceMatrix.needsUpdate = true;
-    panes.castShadow = true;
-    g.add(panes, mulls);
+    g.add(panes);
     this.litWindows.push(panes);
 
-    const cap = new Mesh(coping(w, d, 0.42, 0.2), M('concrete'));
-    cap.position.set(cx, h, cz);
-    g.add(cap);
-
-    // the sign band and the roundel
-    const sign = new Mesh(chamferedBox(w * 0.52, 1.5, 0.3, 0.04), M('paint-green'));
-    sign.position.set(cx - w * 0.16, h * 0.84, cz + d / 2 + 0.12);
-    const lit = new Mesh(new BoxGeometry(w * 0.5, 1.3, 0.06), M('sign-lit'));
-    lit.position.set(cx - w * 0.16, h * 0.84 + 0.75, cz + d / 2 + 0.3);
-    const roundel = new Mesh(new CylinderGeometry(1.5, 1.5, 0.22, 24), M('paint-green'));
+    const cap = new Mesh(coping(W, D, 0.6, 0.26), M('concrete'));
+    cap.position.set(cx, H, cz);
+    const sign = new Mesh(chamferedBox(W * 0.5, 2.1, 0.4, 0.04), M('paint-green'));
+    sign.position.set(cx - W * 0.14, H * 0.84, cz + D / 2 + 0.16);
+    const lit = new Mesh(new BoxGeometry(W * 0.48, 1.8, 0.08), M('sign-lit'));
+    lit.position.set(cx - W * 0.14, H * 0.84 + 1.05, cz + D / 2 + 0.38);
+    const roundel = new Mesh(new CylinderGeometry(2.1, 2.1, 0.3, 24), M('paint-green'));
     roundel.rotation.x = Math.PI / 2;
-    roundel.position.set(cx + w * 0.28, h * 0.88, cz + d / 2 + 0.16);
-    g.add(sign, lit, roundel);
+    roundel.position.set(cx + W * 0.3, H * 0.86, cz + D / 2 + 0.2);
+    g.add(cap, sign, lit, roundel);
     return shadowed(g);
   }
 
-  // ---- the long white building with the diagonal stair -----------------
-  screenBlock(cx, cz, w, d, h) {
+  // =========================================================
+  // THE LONG BUILDING WITH THE PERFORATED SCREEN
+  // =========================================================
+  screenBlock() {
     const M = n => this.m.get(n);
     const g = new Group();
-    const body = new Mesh(chamferedBox(w, h, d, 0.12), M('limestone'));
+    g.name = 'screen-block';
+    const cx = 74, cz = -22, W = 40, D = 22, H = 27;
+
+    const body = new Mesh(chamferedBox(W, H, D, 0.14), M('limestone'));
     body.position.set(cx, 0, cz);
     g.add(body);
 
-    // the perforated screen: instanced fins standing off the facade, which
-    // self-shade and read as a brise-soleil rather than as a pattern
-    const cols = this.low ? 18 : 34, rows = 6;
-    const finGeo = new BoxGeometry(0.14, (h - 2) / rows - 0.3, 0.34);
-    const fins = new InstancedMesh(finGeo, M('paint-white'), cols * rows);
+    const cols = this.low ? 20 : 40, rows = 7;
+    const cellH = (H - 3) / rows;
+    const fins = new InstancedMesh(
+      new BoxGeometry(0.18, cellH - 0.4, 0.42), M('paint-white'), cols * rows
+    );
     const o = new Object3D();
     let n = 0;
     for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < rows; r++) {
-        const x = cx - w / 2 + 0.8 + c * ((w - 1.6) / (cols - 1));
-        const y = 1.3 + r * (h - 2) / rows;
-        o.position.set(x, y + ((h - 2) / rows) / 2, cz + d / 2 + 0.18);
+      for (let r2 = 0; r2 < rows; r2++) {
+        o.position.set(
+          cx - W / 2 + 1.1 + c * ((W - 2.2) / (cols - 1)),
+          2 + r2 * cellH + cellH / 2,
+          cz + D / 2 + 0.22
+        );
         o.rotation.set(0, 0, 0); o.updateMatrix();
         fins.setMatrixAt(n++, o.matrix);
       }
@@ -345,84 +410,61 @@ export class BuildingGeometry {
     fins.castShadow = true;
     g.add(fins);
 
-    for (let r = 1; r < rows; r++) {
-      const band = new Mesh(new BoxGeometry(w - 1.2, 0.34, 0.4), M('limestone-honed'));
-      band.position.set(cx, 1.3 + r * (h - 2) / rows, cz + d / 2 + 0.16);
+    for (let r2 = 1; r2 < rows; r2++) {
+      const band = new Mesh(new BoxGeometry(W - 1.6, 0.42, 0.5), M('limestone-honed'));
+      band.position.set(cx, 2 + r2 * cellH, cz + D / 2 + 0.2);
       g.add(band);
     }
 
-    // the diagonal stair, as a real box with treads and a red balustrade
-    const x0 = cx - w * 0.34, x1 = cx + w * 0.16, y0 = 1.0, y1 = h * 0.8;
+    // the diagonal stair across the face
+    const x0 = cx - W * 0.3, x1 = cx + W * 0.16, y0 = 1.4, y1 = H * 0.78;
     const len = Math.hypot(x1 - x0, y1 - y0);
     const ang = Math.atan2(y1 - y0, x1 - x0);
-    const slab = new Mesh(new BoxGeometry(len, 0.4, 2.4), M('concrete'));
-    slab.position.set((x0 + x1) / 2, (y0 + y1) / 2, cz + d / 2 + 1.3);
+    const slab = new Mesh(new BoxGeometry(len, 0.55, 3.2), M('concrete'));
+    slab.position.set((x0 + x1) / 2, (y0 + y1) / 2, cz + D / 2 + 1.7);
     slab.rotation.z = ang;
     g.add(slab);
-    for (const side of [-1, 1]) {
-      const rail = new Mesh(new BoxGeometry(len, 0.16, 0.16), M('paint-red'));
-      rail.position.set((x0 + x1) / 2, (y0 + y1) / 2 + 1.05, cz + d / 2 + 1.3 + side * 1.15);
+    for (const s of [-1, 1]) {
+      const rail = new Mesh(new BoxGeometry(len, 0.2, 0.2), M('paint-red'));
+      rail.position.set((x0 + x1) / 2, (y0 + y1) / 2 + 1.4, cz + D / 2 + 1.7 + s * 1.5);
       rail.rotation.z = ang;
       g.add(rail);
     }
 
-    const cap = new Mesh(coping(w, d, 0.5, 0.22), M('limestone-honed'));
-    cap.position.set(cx, h, cz);
+    const cap = new Mesh(coping(W, D, 0.6, 0.26), M('limestone-honed'));
+    cap.position.set(cx, H, cz);
     g.add(cap);
     return shadowed(g);
   }
 
-  // ---- the high-rise ---------------------------------------------------
-  highRise(cx, cz, w, d, h) {
+  // The glazed link between the gem and the stone block, and the drum.
+  link() {
     const M = n => this.m.get(n);
     const g = new Group();
-    const core = new Mesh(chamferedBox(w, h, d, 0.14), M('concrete-dark'));
-    core.position.set(cx, 0, cz);
-    g.add(core);
-
-    // seventeen floors of curtain walling on the two visible faces
-    const floors = this.low ? 10 : 17;
-    for (const [face, rot] of [[cz + d / 2 + 0.06, 0], [cx - w / 2 - 0.06, -Math.PI / 2]]) {
-      const wide = rot === 0 ? w - 0.6 : d - 0.6;
-      const wall = curtainWall({
-        width: wide, height: h - 1.6, cols: rot === 0 ? 5 : 4, rows: floors,
-        glassMat: M('glass-vision'), mullionMat: M('aluminium'),
-        spandrelMat: M('glass-spandrel'), spandrelEvery: 2,
-        mullionWidth: 0.1, mullionDepth: 0.2
-      });
-      if (rot === 0) wall.position.set(cx, (h - 1.6) / 2 + 0.8, face);
-      else { wall.position.set(face, (h - 1.6) / 2 + 0.8, cz); wall.rotation.y = rot; }
-      g.add(wall);
+    const drum = new Mesh(new CylinderGeometry(3.4, 3.4, 44, this.low ? 12 : 24, 1, true), M('glass-vision'));
+    drum.position.set(2, 22, -36);
+    const core = new Mesh(new CylinderGeometry(1.9, 1.9, 44, this.low ? 10 : 18), M('concrete'));
+    core.position.set(2, 22, -36);
+    g.add(drum, core);
+    for (let i = 0; i <= 9; i++) {
+      const ring = new Mesh(new CylinderGeometry(3.5, 3.5, 0.18, this.low ? 12 : 24), M('aluminium'));
+      ring.position.set(2, i * 44 / 9, -36);
+      g.add(ring);
     }
-
-    const crown = new Mesh(chamferedBox(w * 0.72, 2.2, d * 0.72, 0.1), M('concrete'));
-    crown.position.set(cx, h, cz);
-    const mast = new Mesh(new CylinderGeometry(0.1, 0.16, 6, 8), M('steel-dark'));
-    mast.position.set(cx, h + 5.2, cz);
-    g.add(crown, mast);
+    const cap = new Mesh(new CylinderGeometry(3.9, 3.5, 0.7, this.low ? 12 : 24), M('concrete'));
+    cap.position.set(2, 44.3, -36);
+    g.add(cap);
     return shadowed(g);
   }
 
-  gatehouse(cx, cz) {
-    const M = n => this.m.get(n);
-    const g = new Group();
-    const a = new Mesh(chamferedBox(9, 5, 7, 0.1), M('limestone'));
-    a.position.set(cx, 0, cz);
-    const b = new Mesh(chamferedBox(5, 3.4, 4.5, 0.08), M('limestone'));
-    b.position.set(cx - 6, 0, cz + 10);
-    const cap = new Mesh(coping(9, 7, 0.3, 0.2), M('limestone-honed'));
-    cap.position.set(cx, 5, cz);
-    g.add(a, b, cap);
-    return shadowed(g);
-  }
-
-  // The windows warm up with the evening accent lighting.
   setAccent(k) {
     for (const w of this.litWindows) {
       if (w.material.emissive) {
-        w.material.emissive.setHex(0x2a3d52);
-        w.material.emissiveIntensity = 0.55 * k;
+        w.material.emissive.setHex(0x33465c);
+        w.material.emissiveIntensity = 0.5 * k;
       }
     }
   }
 }
+
+export { MeshStandardMaterial, Color, SRGBColorSpace, DoubleSide };
