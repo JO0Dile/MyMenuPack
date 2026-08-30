@@ -57,135 +57,182 @@ export class BuildingGeometry {
   // =========================================================
   // THE GLASS GEM
   //
-  // A crystal the size of a building: one great triangulated plane facing
-  // the plaza, folded back along a ridge, with the nose coming down to the
-  // red beams over the entrance. Panelled in a triangular lattice with
-  // aluminium capping on every joint, and a scatter of pale opaque panels
-  // among the glass — which on the real building is stone, and is what
-  // stops a glazed slope reading as a mirror.
+  // Read off the straight-on photograph rather than invented. It is a
+  // folded wedge, not a crystal and not a pyramid:
+  //
+  //   - one great sloping face of dark blue-green glass, triangulated in a
+  //     diagrid, running from a high ridge down to the plaza
+  //   - solid WHITE fins folding down at the west end and along the foot,
+  //     which are stone, not glazing, and are most of the silhouette
+  //   - opaque white triangular panels scattered among the glass, which is
+  //     the pattern you actually recognise the building by
+  //   - a physical white space frame standing proud of the glazing, built
+  //     as real beams rather than drawn as lines
+  //   - the red V at the entrance, in structural section, not a stick
+  //
+  // Named parts, per the brief: glassStructure, spaceFrame, redSupports.
   // =========================================================
   gem() {
     const M = n => this.m.get(n);
     const g = new Group();
-    g.name = 'gem';
+    g.name = 'gemBuilding';
 
-    // Metres, then converted. The ridge runs roughly north-east, the great
-    // plane faces the fountain, and the nose lands just past the kerb.
+    // Metres, converted. The origin of the building is its front-left foot.
     const P = (x, y, z) => new Vector3(x * U + 15, y * U, z * U - 20);
-    const N  = P(-6.5, 0.4, 13.5);   // the nose, over the doors
-    const A  = P(-2.0, 15.5, 5.0);   // the head of the leading arris
-    const R  = P(-7.5, 22.5, -6.0);  // the apex, back and west
-    const S  = P(9.5, 15.0, -8.0);   // the eastern shoulder
-    const W1 = P(-15.5, 0.4, 5.5), W2 = P(-17.5, 7.5, -9.5);
-    const E1 = P(14.0, 0.4, 2.5),  E2 = P(16.5, 5.0, -11.0);
-    const B1 = P(-15.5, 0.4, -13.0), B2 = P(14.0, 0.4, -13.5);
 
+    // ---- the controlling points -----------------------------------------
+    // The ridge runs west-high to east-low. The great face hangs off it and
+    // meets the plaza along the front edge.
+    const RW = P(-13.0, 24.0, -6.0);   // ridge, west and highest
+    const RE = P(11.0, 17.5, -9.0);    // ridge, east and lower
+    const FW = P(-15.5, 1.0, 11.5);    // front foot, west
+    const FE = P(13.5, 1.0, 8.5);      // front foot, east
+    const NW = P(-6.0, 8.5, 14.5);     // the nose, where the entrance is
+    const BW = P(-15.0, 2.0, -14.0);   // back foot, west
+    const BE = P(13.0, 2.0, -15.5);    // back foot, east
+
+    // ---- glassStructure --------------------------------------------------
+    // The great face, split about the nose so the fold reads.
+    const glass = new Group();
+    glass.name = 'glassStructure';
     const faces = [
-      [N, W1, A], [N, A, E1],                 // the two great planes
-      [W1, W2, A], [W2, R, A],
-      [A, R, S], [A, S, E1],
-      [E1, S, E2], [W2, S, R], [W2, E2, S],
-      [W2, B1, E2], [B1, B2, E2]              // the back, closing the solid
+      { tri: [RW, FW, NW], n: this.low ? 4 : 7 },
+      { tri: [RW, NW, RE], n: this.low ? 4 : 7 },
+      { tri: [RE, NW, FE], n: this.low ? 4 : 6 }
     ];
 
-    const sub = this.low ? 3 : 5;
-    const glassPos = [], stonePos = [];
-    const r = rng(7);
-    const at = (p0, p1, p2, i, j) => new Vector3().copy(p0)
-      .addScaledVector(new Vector3().subVectors(p1, p0), i / sub)
-      .addScaledVector(new Vector3().subVectors(p2, p0), j / sub);
+    const at = (p0, p1, p2, i, j, n) => new Vector3().copy(p0)
+      .addScaledVector(new Vector3().subVectors(p1, p0), i / n)
+      .addScaledVector(new Vector3().subVectors(p2, p0), j / n);
 
-    for (const [p0, p1, p2] of faces) {
-      for (let i = 0; i < sub; i++) {
-        for (let j = 0; i + j < sub; j++) {
-          const a = at(p0, p1, p2, i, j), b = at(p0, p1, p2, i + 1, j), c = at(p0, p1, p2, i, j + 1);
-          const bin = r() > 0.86 ? stonePos : glassPos;
-          bin.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-          if (i + j < sub - 1) {
-            const d = at(p0, p1, p2, i + 1, j + 1);
-            const bin2 = r() > 0.86 ? stonePos : glassPos;
-            bin2.push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
+    const rnd = rng(31);
+    const darkPos = [], palePos = [];
+    const joints = [];
+    for (const f of faces) {
+      const [p0, p1, p2] = f.tri, n = f.n;
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; i + j < n; j++) {
+          const a = at(p0, p1, p2, i, j, n), b = at(p0, p1, p2, i + 1, j, n), c = at(p0, p1, p2, i, j + 1, n);
+          // roughly one panel in six is an opaque white triangle
+          (rnd() > 0.83 ? palePos : darkPos).push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+          joints.push([a, b], [a, c]);
+          if (i + j < n - 1) {
+            const d = at(p0, p1, p2, i + 1, j + 1, n);
+            (rnd() > 0.83 ? palePos : darkPos).push(b.x, b.y, b.z, d.x, d.y, d.z, c.x, c.y, c.z);
+            joints.push([b, c]);
           }
         }
       }
     }
-    for (const [src, mat, name] of [[glassPos, M('glass-dark'), 'gem-glass'],
-                                    [stonePos, M('paint-white'), 'gem-stone']]) {
-      if (!src.length) continue;
+    for (const [src, mat, name] of [[darkPos, M('glass-dark'), 'glazing'],
+                                    [palePos, M('paint-white'), 'stonePanels']]) {
       const geo = new BufferGeometry();
       geo.setAttribute('position', new Float32BufferAttribute(src, 3));
       geo.computeVertexNormals();
       const m = new Mesh(geo, mat);
       m.name = name;
       m.castShadow = true; m.receiveShadow = true;
-      g.add(m);
+      glass.add(m);
     }
+    // the dark interior, so the glazing has something behind it
+    const backPos = [];
+    const T = (a, b, c) => backPos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+    T(RW, RE, BE); T(RW, BE, BW);        // the back slope
+    T(BW, BE, FE); T(BW, FE, FW);        // the underside / floor plate
+    T(RW, BW, FW); T(RE, FE, BE);        // the two ends
+    const back = new BufferGeometry();
+    back.setAttribute('position', new Float32BufferAttribute(backPos, 3));
+    back.computeVertexNormals();
+    const shell = new Mesh(back, M('glass-spandrel'));
+    shell.name = 'shell';
+    shell.castShadow = true; shell.receiveShadow = true;
+    glass.add(shell);
+    g.add(glass);
 
-    // the dark interior behind the glazing
-    const shell = new BufferGeometry();
-    const sp = [];
-    for (const [p0, p1, p2] of faces) sp.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
-    shell.setAttribute('position', new Float32BufferAttribute(sp, 3));
-    shell.computeVertexNormals();
-    const inner = new Mesh(shell, M('glass-spandrel'));
-    inner.scale.setScalar(0.955);
-    inner.position.set(15 * 0.045, 0.4, -20 * 0.045);
-    g.add(inner);
+    // ---- the white folding fins ------------------------------------------
+    // Solid stone planes, not glazing. They fold down at the west end and
+    // along the foot of the great face, and they carry the silhouette.
+    const fins = new Group();
+    fins.name = 'stoneFins';
+    const finPos = [];
+    const F = (a, b, c) => finPos.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
+    const FW2 = P(-19.5, 1.0, 6.0), RW2 = P(-17.0, 20.0, -7.0);
+    F(RW, FW, FW2); F(RW, FW2, RW2);                    // the west fin
+    const FE2 = P(17.0, 1.0, 4.0), RE2 = P(14.5, 14.0, -10.0);
+    F(RE, FE, FE2); F(RE, FE2, RE2);                    // the east fin
+    const finGeo = new BufferGeometry();
+    finGeo.setAttribute('position', new Float32BufferAttribute(finPos, 3));
+    finGeo.computeVertexNormals();
+    const finMesh = new Mesh(finGeo, M('limestone'));
+    finMesh.name = 'fins';
+    finMesh.castShadow = true; finMesh.receiveShadow = true;
+    finMesh.material.side = DoubleSide;
+    fins.add(finMesh);
+    g.add(fins);
 
-    // ---- the lattice ---------------------------------------------------
-    // Aluminium capping on the panel joints of the two plaza-facing planes,
-    // and on every arris. This is the diagonal grid you actually see.
-    const tube = (a, b, rad, mat) => {
-      const d = new Vector3().subVectors(b, a);
-      const len = d.length();
-      if (len < 0.01) return null;
-      const m = new Mesh(new CylinderGeometry(rad, rad, len, this.low ? 4 : 6), mat);
-      m.position.copy(a).addScaledVector(d, 0.5);
-      m.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), d.clone().normalize());
-      m.castShadow = true;
-      return m;
-    };
-    const cap = 0.045 * U;
-    for (const [p0, p1, p2] of [[N, W1, A], [N, A, E1], [A, R, S], [A, S, E1]]) {
-      for (let i = 0; i <= sub; i++) {
-        for (let j = 0; i + j <= sub; j++) {
-          const a = at(p0, p1, p2, i, j);
-          if (i + j < sub) {
-            const b = at(p0, p1, p2, i + 1, j), c = at(p0, p1, p2, i, j + 1);
-            const t1 = tube(a, b, cap, M('aluminium')); if (t1) g.add(t1);
-            const t2 = tube(a, c, cap, M('aluminium')); if (t2) g.add(t2);
-            const t3 = tube(b, c, cap * 0.8, M('aluminium')); if (t3) g.add(t3);
-          }
-        }
+    // ---- spaceFrame ------------------------------------------------------
+    // Real beams standing proud of the glazing on the diagrid joints, and
+    // heavier members on every arris. Instanced: one geometry, one material,
+    // several hundred transforms.
+    const frame = new Group();
+    frame.name = 'spaceFrame';
+    const unit = new CylinderGeometry(1, 1, 1, this.low ? 4 : 6, 1);
+    const dummy = new Object3D();
+    const up = new Vector3(0, 1, 0);
+    const build = (list, radius, mat, name) => {
+      const mesh = new InstancedMesh(unit, mat, list.length);
+      mesh.name = name;
+      let k = 0;
+      for (const [a, b] of list) {
+        const d = new Vector3().subVectors(b, a);
+        const len = d.length();
+        if (len < 0.02) continue;
+        dummy.position.copy(a).addScaledVector(d, 0.5);
+        dummy.quaternion.setFromUnitVectors(up, d.clone().normalize());
+        dummy.scale.set(radius, len, radius);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(k++, dummy.matrix);
       }
-    }
-    for (const [a, b] of [[N, A], [N, W1], [N, E1], [W1, A], [E1, A], [W1, W2],
-                          [E1, E2], [W2, R], [E2, S], [R, A], [A, S], [R, S]]) {
-      const t = tube(a, b, cap * 1.5, M('aluminium')); if (t) g.add(t);
-    }
+      mesh.count = k;
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = true;
+      return mesh;
+    };
+    frame.add(build(joints, 0.038 * U, M('paint-white'), 'diagrid'));
+    frame.add(build([[RW, RE], [RW, FW], [RE, FE], [FW, NW], [NW, FE],
+                     [RW, NW], [RE, NW], [RW, RW2], [RE, RE2],
+                     [FW, FW2], [FE, FE2]], 0.13 * U, M('paint-white'), 'arrises'));
+    g.add(frame);
 
-    // ---- the red beams -------------------------------------------------
-    // The V under the nose. Painted steel, and the one saturated thing in
-    // the whole composition.
-    const apex = P(-6.5, 7.0, 11.0);
+    // ---- redSupports -----------------------------------------------------
+    // A V in structural section: two rectangular members meeting at a point
+    // just above the paving, splaying up to carry the nose. Thick, because
+    // in the photographs they plainly are.
+    const red = new Group();
+    red.name = 'redSupports';
+    const foot = P(-6.0, 0.4, 12.2);
     for (const s of [-1, 1]) {
-      const foot = P(-6.5 + s * 3.2, 0.3, 14.6);
-      const t = tube(foot, apex, 0.26 * U, M('paint-red'));
-      if (t) g.add(t);
-      const t2 = tube(foot, P(-6.5 + s * 1.4, 4.0, 12.8), 0.2 * U, M('paint-red'));
-      if (t2) g.add(t2);
+      const head = P(-6.0 + s * 4.2, 8.2, 13.4);
+      const d = new Vector3().subVectors(head, foot);
+      const len = d.length();
+      const beam = new Mesh(new BoxGeometry(0.62 * U, len, 0.42 * U), M('paint-red'));
+      beam.position.copy(foot).addScaledVector(d, 0.5);
+      beam.quaternion.setFromUnitVectors(up, d.clone().normalize());
+      beam.castShadow = true;
+      red.add(beam);
     }
+    const shoe = new Mesh(new CylinderGeometry(0.5 * U, 0.62 * U, 0.7 * U, 10), M('steel-dark'));
+    shoe.position.copy(foot).setY(0.35 * U);
+    red.add(shoe);
+    g.add(red);
 
-    // ---- the entrance ---------------------------------------------------
-    const doorC = P(-6.5, 0, 12.0);
-    const doors = new Mesh(new BoxGeometry(9 * U, 4.2 * U, 0.3), M('glass-vision'));
-    doors.position.copy(doorC).setY(2.1 * U);
+    // ---- the entrance ----------------------------------------------------
+    const doors = new Mesh(new BoxGeometry(11 * U, 4.4 * U, 0.3), M('glass-vision'));
+    doors.position.set(P(-6, 0, 10.6).x, 2.2 * U, P(-6, 0, 10.6).z);
+    doors.name = 'entrance';
     g.add(doors);
-    const soffit = new Mesh(chamferedBox(11 * U, 0.5 * U, 3.4 * U, 0.06), M('concrete'));
-    soffit.position.copy(doorC).setY(4.3 * U).setZ(doorC.z + 1.4 * U);
-    g.add(soffit);
 
-    return shadowed(g);
+    return g;
   }
 
   // =========================================================

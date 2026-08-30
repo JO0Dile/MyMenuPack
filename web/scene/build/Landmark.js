@@ -1,26 +1,30 @@
 // ==========================
-// THE LANDMARK
+// THE CLOCK FOUNTAIN
 //
-// The clock-tower fountain. One object, as the photographs show it: the
-// tower stands in the middle of the basin.
+// Reconstructed from the photographs, reconciled across views rather than
+// reinterpreted per view. What the earlier model got wrong, and what the
+// references actually show:
 //
-// Every element here is built to the real detail rather than to the
-// silhouette, because the camera lands eighteen metres away and everything
-// is legible at that distance:
+//   ROOF      not a hipped pyramid. A grey pitched gable with a horizontal
+//             ridge running east-west and eaves that overhang on all four
+//             sides, so the head of the clock stage sits in its shadow.
+//   CLOCKS    the stage is a WIDE block, not a square one. TWO dials sit
+//             side by side on each wide face and a single dial on each
+//             narrow end — which is what reconciles every photograph: the
+//             three-quarter views show a pair because that is the wide
+//             face, and the narrow portrait view shows one because that is
+//             the end.
+//   SIGN      the black granite block is WIDE. It oversails the arcade
+//             below it on every side and is the most prominent element on
+//             the whole tower, carrying the verse in Arabic above and
+//             English below.
+//   PIERS     paired round columns, substantial, not a bundle of sticks.
+//   BOOK      on an angled wedge plinth rising off the ridge, not flat on
+//             a box.
 //
-//   - the basin has a coping that oversails its wall, a tiled internal face
-//     and a step down to the water
-//   - the piers are four clusters of three real columns, each with a base,
-//     an entasis and a capital
-//   - the arcade is solid wall with the arch cut out of it, so it has a
-//     soffit and the soffit is in shadow
-//   - the inscription band is polished black granite that oversails the
-//     arcade below and is capped above, and it is the only polished thing
-//     on the tower
-//   - the clock stage carries four faces with real recessed dials, chapter
-//     rings and hands
-//   - the cap is a hipped stone roof, not a pyramid
-//   - the book on top is two curved leaves on a stand
+// Everything is real depth. The arches are cut through solid wall so they
+// have soffits; the dials are sunk into rebates; the sign oversails and
+// therefore casts.
 // ==========================
 import {
   Group, Mesh, BoxGeometry, CylinderGeometry, RingGeometry, CircleGeometry,
@@ -33,11 +37,16 @@ export const LANDMARK = {
   poolWall: 0.74,
   waterLevel: 0.46,
   islandTop: 1.42,
-  pierSpacing: 1.85,
+  pierSpacing: 2.15,     // the piers sit wider apart than they did
   colBase: 1.78,
-  colTop: 5.0,
-  bandHeight: 2.4,
-  clockHeight: 3.5
+  colTop: 5.4,
+  signWidth: 6.6,        // the black block oversails the arcade
+  signHeight: 2.5,
+  clockWidth: 5.2,       // wide: two dials side by side
+  clockDepth: 3.0,
+  clockHeight: 3.2,
+  dialRadius: 1.0,
+  dialGap: 2.24          // centre to centre on the wide face
 };
 
 export class Landmark {
@@ -179,60 +188,138 @@ export class Landmark {
     core.position.y = L.islandTop - 0.3;
     this.group.add(shadowed(core));
 
-    // ---- the inscription band ------------------------------------------
+    // ---- the black granite sign ----------------------------------------
+    // The most prominent element on the tower and the one the previous model
+    // most understated: it is WIDER than the arcade it sits on, oversailing
+    // it on every side, so it throws a hard shadow across the arch heads.
     const bandY = apex + 0.16;
-    const band = new Group();
-    const sill = new Mesh(coping(5.1, 5.1, 0.24, 0.28), M('limestone-honed'));
-    sill.position.y = bandY;
-    band.add(sill);
+    const sign = new Group();
+    sign.name = 'signBlock';
+    const SW = LANDMARK.signWidth, SH = LANDMARK.signHeight;
 
-    const granite = new Mesh(chamferedBox(5.0, L.bandHeight, 5.0, 0.05), M('granite'));
-    granite.position.y = bandY + 0.24;
-    band.add(granite);
+    const corbel = new Mesh(coping(SW - 0.5, SW * 0.66 - 0.4, 0.3, 0.26), M('limestone-honed'));
+    corbel.position.y = bandY;
+    sign.add(corbel);
 
-    const bandCap = new Mesh(coping(5.1, 5.1, 0.3, 0.3), M('limestone-honed'));
-    bandCap.position.y = bandY + 0.24 + L.bandHeight;
-    band.add(bandCap);
-    this.group.add(shadowed(band));
-    this.bandTop = bandY + 0.24 + L.bandHeight + 0.3;
+    const granite = new Mesh(chamferedBox(SW, SH, SW * 0.66, 0.05), M('granite'));
+    granite.position.y = bandY + 0.3;
+    sign.add(granite);
 
-    // ---- the clock stage -----------------------------------------------
+    // the text, as real relief rather than as a texture: a raised Arabic
+    // line above and a smaller English line below, on all four faces
+    for (let f = 0; f < 4; f++) {
+      const face = new Group();
+      const z = SW * 0.33 + 0.012;
+      for (const [ly, len, h] of [[SH * 0.62, SW * 0.76, 0.16], [SH * 0.40, SW * 0.72, 0.12],
+                                  [SH * 0.22, SW * 0.66, 0.085], [SH * 0.11, SW * 0.5, 0.075]]) {
+        const line = new Mesh(new BoxGeometry(len, h, 0.02), M('paint-white'));
+        line.position.set(0, bandY + 0.3 + ly, z);
+        face.add(line);
+      }
+      face.rotation.y = f * Math.PI / 2;
+      sign.add(face);
+    }
+
+    const signCap = new Mesh(coping(SW, SW * 0.66, 0.26, 0.14), M('limestone-honed'));
+    signCap.position.y = bandY + 0.3 + SH;
+    sign.add(signCap);
+    this.group.add(shadowed(sign));
+    this.bandTop = bandY + 0.3 + SH + 0.26;
+
+    // ---- the clock stage ------------------------------------------------
     const stageY = this.bandTop;
     const stage = new Group();
-    const shaft = new Mesh(chamferedBox(3.4, L.clockHeight, 3.4, 0.06), M('limestone'));
+    stage.name = 'clockStage';
+    const CW = LANDMARK.clockWidth, CD = LANDMARK.clockDepth, CH = LANDMARK.clockHeight;
+    const shaft = new Mesh(chamferedBox(CW, CH, CD, 0.06), M('limestone'));
     shaft.position.y = stageY;
     stage.add(shaft);
 
-    const dialY = stageY + L.clockHeight * 0.54;
-    for (let i = 0; i < 4; i++) {
-      const face = this._clockFace(1.16);
-      face.rotation.y = i * Math.PI / 2;
-      const a = i * Math.PI / 2;
-      face.position.set(Math.sin(a) * 1.71, dialY, Math.cos(a) * 1.71);
-      stage.add(face);
+    // Two dials on each wide face, one on each end.
+    const dialY = stageY + CH * 0.56;
+    const R = LANDMARK.dialRadius, G = LANDMARK.dialGap;
+    for (const sz of [1, -1]) {
+      for (const off of [-G / 2, G / 2]) {
+        const f = this._clockFace(R);
+        f.rotation.y = sz > 0 ? 0 : Math.PI;
+        f.position.set(off * sz, dialY, sz * (CD / 2 + 0.01));
+        stage.add(f);
+      }
     }
-
-    const eaves = new Mesh(coping(3.4, 3.4, 0.26, 0.32), M('limestone-honed'));
-    eaves.position.y = stageY + L.clockHeight;
-    stage.add(eaves);
+    for (const sx of [1, -1]) {
+      const f = this._clockFace(R * 0.86);
+      f.rotation.y = sx * Math.PI / 2;
+      f.position.set(sx * (CW / 2 + 0.01), dialY, 0);
+      stage.add(f);
+    }
     this.group.add(shadowed(stage));
 
-    // ---- the cap: a hipped stone roof -----------------------------------
-    const capY = stageY + L.clockHeight + 0.26;
-    const cap = new Mesh(this._hipRoof(2.0, 0.9, 1.16), M('limestone'));
-    cap.position.y = capY;
-    this.group.add(shadowed(cap));
+    // ---- the roof -------------------------------------------------------
+    // A grey pitched gable with a horizontal ridge and eaves that overhang
+    // on every side, not a pyramid — the head of the clock stage sits in
+    // its shadow because of that overhang.
+    const eavesY = stageY + CH;
+    const eaves = new Mesh(coping(CW, CD, 0.22, 0.36), M('limestone-honed'));
+    eaves.position.y = eavesY;
+    this.group.add(shadowed(eaves));
+    const roof = new Mesh(this._gableRoof(CW / 2 + 0.38, CD / 2 + 0.38, 1.15), M('concrete-dark'));
+    roof.position.y = eavesY + 0.2;
+    roof.name = 'roof';
+    this.group.add(shadowed(roof));
 
-    // ---- the book ---------------------------------------------------------
-    const bookY = capY + 1.16;
-    const stand = new Mesh(chamferedBox(1.9, 0.3, 1.9, 0.05), M('limestone'));
-    stand.position.y = bookY;
-    const stand2 = new Mesh(chamferedBox(1.5, 0.26, 1.5, 0.04), M('limestone-honed'));
-    stand2.position.y = bookY + 0.3;
-    this.group.add(shadowed(stand), shadowed(stand2));
-    const book = this._book(bookY + 0.56);
+    // ---- the book, on its angled plinth ----------------------------------
+    const ridgeY = eavesY + 0.2 + 1.15;
+    const wedge = new Mesh(this._wedgePlinth(1.05, 0.95, 1.4), M('limestone'));
+    wedge.position.y = ridgeY - 0.1;
+    this.group.add(shadowed(wedge));
+    const book = this._book(ridgeY + 1.25);
+    book.rotation.z = -0.2;
+    book.name = 'book';
     this.group.add(shadowed(book));
-    this.height = bookY + 1.5;
+    this.height = ridgeY + 2.4;
+  }
+
+  // A gable: two sloping planes to a horizontal ridge, with real gable ends
+  // and an eaves fascia so the roof has thickness where it oversails.
+  _gableRoof(halfX, halfZ, height) {
+    const pos = [];
+    const T = (a, b, c) => pos.push(...a, ...b, ...c);
+    const A = [-halfX, 0, halfZ], B = [halfX, 0, halfZ];
+    const C = [halfX, 0, -halfZ], D = [-halfX, 0, -halfZ];
+    const R1 = [-halfX, height, 0], R2 = [halfX, height, 0];
+    T(A, B, R2); T(A, R2, R1);          // the south slope
+    T(C, D, R1); T(C, R1, R2);          // the north slope
+    T(B, C, R2);                         // the east gable
+    T(D, A, R1);                         // the west gable
+    const f = 0.16;
+    for (const [p0, p1] of [[A, B], [B, C], [C, D], [D, A]]) {
+      const a = [p0[0], -f, p0[2]], b = [p1[0], -f, p1[2]];
+      T(p0, b, p1); T(p0, a, b);
+    }
+    const g = new BufferGeometry();
+    g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+    g.computeVertexNormals();
+    return g;
+  }
+
+  // The plinth the book stands on: a wedge rising off the ridge at an angle,
+  // which is what the photographs show rather than a flat pad.
+  _wedgePlinth(half, lift, depth) {
+    const pos = [];
+    const T = (a, b, c) => pos.push(...a, ...b, ...c);
+    const d = depth / 2;
+    const A = [-half, 0, d], B = [half, 0, d], C = [half, 0, -d], D = [-half, 0, -d];
+    const A2 = [-half, lift * 0.35, d], B2 = [half, lift * 0.35, d];
+    const C2 = [half, lift, -d], D2 = [-half, lift, -d];
+    T(A2, B2, C2); T(A2, C2, D2);
+    T(A, B, B2); T(A, B2, A2);
+    T(C, D, D2); T(C, D2, C2);
+    T(B, C, C2); T(B, C2, B2);
+    T(D, A, A2); T(D, A2, D2);
+    const g = new BufferGeometry();
+    g.setAttribute('position', new Float32BufferAttribute(pos, 3));
+    g.computeVertexNormals();
+    return g;
   }
 
   // A dial recessed into the stone: a sunk rebate, a chapter ring, twelve

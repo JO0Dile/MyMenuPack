@@ -92,19 +92,20 @@ export class MaterialLibrary {
     // is behind it, and tints by depth. That is what makes an edge-on sheet
     // of glass read as glass instead of as a dark mirror.
     this._add('glass-dark', new MeshPhysicalMaterial({
-      color: c(0xdfeaf2),
-      roughness: 0.06,
-      metalness: 0,
-      transmission: 0.92,
-      thickness: 0.9,
+      color: c(0x16232f),
+      roughness: 0.055,
+      metalness: 0.15,
+      transmission: 0.12,        // solar glass over a dark interior
+      thickness: 0.6,
       ior: 1.52,
-      attenuationColor: c(0x0e2233),
-      attenuationDistance: 1.1,
+      attenuationColor: c(0x07141f),
+      attenuationDistance: 0.5,
       specularIntensity: 1,
       clearcoat: 1,
-      clearcoatRoughness: 0.04,
-      envMapIntensity: 1.6,
+      clearcoatRoughness: 0.03,
+      envMapIntensity: 2.1,      // it is a mirror before it is a window
       transparent: true,
+      opacity: 0.97,
       side: FrontSide
     }));
 

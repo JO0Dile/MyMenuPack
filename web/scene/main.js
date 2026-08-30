@@ -88,7 +88,7 @@ class LandingScene {
     // Aerial perspective. Linear fog tuned so the near campus is untouched
     // and the far ridge sits in haze — the same depth cue the photographs
     // have, and the reason the hill reads as kilometres rather than metres.
-    this.scene.fog = new Fog(this.sky.horizonColour.clone(), 90, 420);
+    this.scene.fog = new Fog(this.sky.horizonColour.clone(), 150, 460);
 
     this.textures = new TextureFactory(this.quality, this.renderer);
     this.materials = new MaterialLibrary(this.textures, this.quality);

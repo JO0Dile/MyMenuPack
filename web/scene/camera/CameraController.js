@@ -74,12 +74,30 @@ export class CameraController {
     this.camera.updateProjectionMatrix();
   }
 
+  // Park the camera at one of the reference viewpoints and hold it there.
+  // Pass null to hand control back to the flight and the orbit.
+  setReference(name) {
+    this.reference = name ? REFERENCE_VIEWS[name] || null : null;
+    if (this.reference && this.reference.fov) {
+      this.camera.fov = this.reference.fov;
+      this.camera.updateProjectionMatrix();
+    }
+    return !!this.reference || !name;
+  }
+
   // 0 while the flight runs, 1 once it has landed.
   progress(t) {
     return this.reduced ? 1 : Math.min(1, t / FLIGHT_SECONDS);
   }
 
   update(t, dt) {
+    if (this.reference) {
+      this.eye.fromArray(this.reference.eye);
+      this.at.fromArray(this.reference.at);
+      this.camera.position.copy(this.eye);
+      this.camera.lookAt(this.at);
+      return;
+    }
     const raw = this.progress(t);
     let eye, at;
 
@@ -192,5 +210,27 @@ export class CameraController {
     this.tilt.wantY = clamp(((e.beta || 45) - 45) / 40, -0.6, 0.6);
   }
 }
+
+// ---- validation viewpoints ---------------------------------------------
+// Not part of the experience: these reproduce the viewpoints of the
+// reference photographs so the model can be checked against all of them
+// rather than tuned to look right from the one angle the flight lands at.
+// Geometry that only works from the landing frame is geometry that is
+// wrong. Drive them from the console:
+//
+//    AAUP_CAMPUS3D.scene.camera.setReference('CAMERA_REFERENCE_02')
+//
+export const REFERENCE_VIEWS = {
+  // Straight on to the tower, close, from the plaza — the portrait photo.
+  CAMERA_REFERENCE_01: { eye: [0.5, 6.0, 26], at: [0, 8.5, -2], fov: 46 },
+  // Three-quarter across the plaza with the gem behind — the classic shot.
+  CAMERA_REFERENCE_02: { eye: [-26, 9.5, 30], at: [8, 11, -14], fov: 58 },
+  // Square on to the gem's great face, from the east.
+  CAMERA_REFERENCE_03: { eye: [46, 12, 34], at: [16, 14, -18], fov: 54 },
+  // The white block and the green glass, from the west.
+  CAMERA_REFERENCE_04: { eye: [-44, 16, 22], at: [-10, 20, -30], fov: 52 },
+  // High and back, the whole complex — the drone view.
+  CAMERA_REFERENCE_05: { eye: [-52, 58, 74], at: [16, 12, -34], fov: 50 }
+};
 
 export { KEYS as CAMERA_KEYFRAMES, FLIGHT_SECONDS, PIVOT as CAMERA_PIVOT };
