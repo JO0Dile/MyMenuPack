@@ -2287,6 +2287,22 @@
     transition:background .15s ease, color .15s ease;
   }
 
+  /* One way out, not two. js/60-backbar.js puts a "← Back" bar at the top of
+     every dialog on desktop, because a small ✕ in a corner is something you
+     have to already know to look for. But the ✕ stayed where it was, so
+     every dialog ended up with two controls doing exactly the same thing —
+     and a student asked, reasonably, which one was which.
+     Where a bar exists it is the way out; the ✕ steps aside. It stays in the
+     DOM because the bar's handler clicks it, so whatever the dialog does on
+     close still happens. Dialogs the bar deliberately skips keep their ✕,
+     which is then their only control. */
+  .modal-card:has(> .back-bar) > .modal-close,
+  .modal-card:has(.back-bar) > .modal-close{
+    position:absolute; width:1px; height:1px; padding:0;
+    margin:-1px; overflow:hidden; clip-path:inset(50%);
+    white-space:nowrap; border:0;
+  }
+
   .modal-close:hover{color:var(--text); background:var(--search-bg);}
   .modal-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
@@ -6898,6 +6914,14 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     background:var(--panel); border:0; border-bottom:1px solid var(--line);
     border-radius:0; color:var(--text); font-size:0; z-index:10;
   }
+  /* The button already contains a drawn icon — index.html puts a
+     data-app-icon="close" span in every one of them. font-size:0 above hides
+     a text glyph but has no effect on an SVG that carries its own width and
+     height, so adding a pseudo-element glyph on top rendered BOTH: an ✕ and
+     an arrow in the same control, which read as two buttons doing the same
+     thing. The drawn icon steps aside wherever a pseudo supplies the mark. */
+  .modal-overlay .modal-card .modal-close svg,
+  .modal-overlay .modal-card .modal-close [data-app-icon]{display:none;}
   .modal-overlay .modal-card .modal-close::before{
     content:'\2190'; font-size:26px; line-height:1; font-weight:400;
   }
@@ -6941,6 +6965,8 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     display:flex; align-items:center; justify-content:center;
     font-size:0; z-index:5;
   }
+  #impCourseModalOverlay .modal-card.cd-card .modal-close svg,
+  #impCourseModalOverlay .modal-card.cd-card .modal-close [data-app-icon]{display:none;}
   #impCourseModalOverlay .modal-card.cd-card .modal-close::before{
     content:'\2715'; font-size:14px; font-weight:400;
   }
