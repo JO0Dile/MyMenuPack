@@ -127,9 +127,9 @@ export class Terrain {
     let placed = 0;
     for (let i = 0; i < count * 3 && placed < count; i++) {
       const a = r2() * Math.PI * 2;
-      const rad = 34 + r2() * 150;
+      const rad = 120 + r2() * 90;
       const x = Math.cos(a) * rad, z = Math.sin(a) * rad * 0.82 - 14;
-      if (Math.hypot(x, z + 8) < 33) continue;          // not on the platform
+      if (Math.hypot(x * 0.9, z + 30) < 118) continue;   // not on the paved deck
       const y = heightAt(x, z) - 20 * 0 - 0.02;
       const s = 0.5 + r2() * 1.5;
       d.position.set(x, y + s * 0.22, z - 20);

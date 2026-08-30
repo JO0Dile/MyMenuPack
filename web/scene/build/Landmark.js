@@ -8,12 +8,10 @@
 //   ROOF      not a hipped pyramid. A grey pitched gable with a horizontal
 //             ridge running east-west and eaves that overhang on all four
 //             sides, so the head of the clock stage sits in its shadow.
-//   CLOCKS    the stage is a WIDE block, not a square one. TWO dials sit
-//             side by side on each wide face and a single dial on each
-//             narrow end — which is what reconciles every photograph: the
-//             three-quarter views show a pair because that is the wide
-//             face, and the narrow portrait view shows one because that is
-//             the end.
+//   CLOCK     ONE dial per face. Four faces, four dials. The drone shots
+//             that look like a pair are corner views showing two different
+//             faces of the same block, which I twice mistook for two dials
+//             on one wall.
 //   SIGN      the black granite block is WIDE. It oversails the arcade
 //             below it on every side and is the most prominent element on
 //             the whole tower, carrying the verse in Arabic above and
@@ -42,11 +40,10 @@ export const LANDMARK = {
   colTop: 5.4,
   signWidth: 6.6,        // the black block oversails the arcade
   signHeight: 2.5,
-  clockWidth: 5.2,       // wide: two dials side by side
-  clockDepth: 3.0,
-  clockHeight: 3.2,
-  dialRadius: 1.0,
-  dialGap: 2.24          // centre to centre on the wide face
+  clockWidth: 3.5,
+  clockDepth: 3.5,
+  clockHeight: 3.3,
+  dialRadius: 1.18
 };
 
 export class Landmark {
@@ -235,21 +232,14 @@ export class Landmark {
     shaft.position.y = stageY;
     stage.add(shaft);
 
-    // Two dials on each wide face, one on each end.
-    const dialY = stageY + CH * 0.56;
-    const R = LANDMARK.dialRadius, G = LANDMARK.dialGap;
-    for (const sz of [1, -1]) {
-      for (const off of [-G / 2, G / 2]) {
-        const f = this._clockFace(R);
-        f.rotation.y = sz > 0 ? 0 : Math.PI;
-        f.position.set(off * sz, dialY, sz * (CD / 2 + 0.01));
-        stage.add(f);
-      }
-    }
-    for (const sx of [1, -1]) {
-      const f = this._clockFace(R * 0.86);
-      f.rotation.y = sx * Math.PI / 2;
-      f.position.set(sx * (CW / 2 + 0.01), dialY, 0);
+    // One dial per face.
+    const dialY = stageY + CH * 0.55;
+    const R = LANDMARK.dialRadius;
+    for (let i = 0; i < 4; i++) {
+      const a = i * Math.PI / 2;
+      const f = this._clockFace(R);
+      f.rotation.y = a;
+      f.position.set(Math.sin(a) * (CW / 2 + 0.01), dialY, Math.cos(a) * (CW / 2 + 0.01));
       stage.add(f);
     }
     this.group.add(shadowed(stage));

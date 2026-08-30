@@ -10,7 +10,7 @@
 // kerb to asphalt is a real step and catches a real shadow.
 // ==========================
 import {
-  Group, Mesh, CylinderGeometry, ConeGeometry, BoxGeometry, SphereGeometry,
+  Group, Mesh, CylinderGeometry, ConeGeometry, BoxGeometry, SphereGeometry, PlaneGeometry,
   InstancedMesh, Object3D, MeshStandardMaterial, Color, SRGBColorSpace,
   DoubleSide, TorusGeometry
 } from 'three';
@@ -61,6 +61,39 @@ export class Plaza {
   _build() {
     const M = n => this.m.get(n);
     const seg = this.low ? 56 : 104;
+
+    // ---- the paved deck -------------------------------------------------
+    // The whole site is paved. In the photographs there is not a square
+    // metre of bare ground anywhere near the fountain: concrete and stone
+    // from the retaining wall to the foot of every building, with the
+    // carriageway running through it. The scene had sand up to the basin,
+    // which is why it read as a monument dropped in a desert.
+    const deck = new Mesh(new PlaneGeometry(210, 200), M('concrete'));
+    deck.rotation.x = -Math.PI / 2;
+    deck.position.set(6, 0.005, -46);
+    deck.receiveShadow = true;
+    deck.name = 'deck';
+    this.group.add(deck);
+
+    // the carriageway between the fountain and the buildings, which is what
+    // actually holds them apart
+    const carriage = new Mesh(new PlaneGeometry(150, 15), M('asphalt'));
+    carriage.rotation.x = -Math.PI / 2;
+    carriage.position.set(10, 0.012, -36);
+    carriage.receiveShadow = true;
+    this.group.add(carriage);
+    for (let i = 0; i < 22; i++) {
+      const dash = new Mesh(new BoxGeometry(2.2, 0.014, 0.2), M('paving-fine'));
+      dash.position.set(-56 + i * 6.4, 0.02, -36);
+      this.group.add(dash);
+    }
+    // and the kerb that separates it from the walking surface
+    for (const z of [-28.6, -43.4]) {
+      const k = new Mesh(new BoxGeometry(150, 0.16, 0.5), M('limestone-honed'));
+      k.position.set(10, 0.08, z);
+      k.receiveShadow = true; k.castShadow = true;
+      this.group.add(k);
+    }
 
     // ---- concentric paving ------------------------------------------------
     // Eight bands out from the fountain, alternating between the two stones.

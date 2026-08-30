@@ -78,7 +78,7 @@ export class BuildingGeometry {
     g.name = 'gemBuilding';
 
     // Metres, converted. The origin of the building is its front-left foot.
-    const P = (x, y, z) => new Vector3(x * U + 15, y * U, z * U - 20);
+    const P = (x, y, z) => new Vector3(x * U + 19, y * U, z * U - 46);
 
     // ---- the controlling points -----------------------------------------
     // The ridge runs west-high to east-low. The great face hangs off it and
@@ -246,7 +246,7 @@ export class BuildingGeometry {
     const M = n => this.m.get(n);
     const g = new Group();
     g.name = 'stone-block';
-    const cx = -13, cz = -34;
+    const cx = -22, cz = -62;
     const W = 24, D = 20, H = 50;
     const r = rng(23);
 
@@ -331,7 +331,7 @@ export class BuildingGeometry {
     const M = n => this.m.get(n);
     const g = new Group();
     g.name = 'high-rise';
-    const cx = 34, cz = -64, W = 17, D = 16, H = 68;
+    const cx = 40, cz = -92, W = 17, D = 16, H = 68;
 
     const core = new Mesh(chamferedBox(W, H, D, 0.16), M('concrete-dark'));
     core.position.set(cx, 0, cz);
@@ -384,7 +384,7 @@ export class BuildingGeometry {
     const M = n => this.m.get(n);
     const g = new Group();
     g.name = 'sign-block';
-    const cx = 48, cz = -44, W = 26, D = 19, H = 30;
+    const cx = 56, cz = -70, W = 26, D = 19, H = 30;
 
     const body = new Mesh(chamferedBox(W, H, D, 0.12), M('concrete-dark'));
     body.position.set(cx, 0, cz);
@@ -428,7 +428,7 @@ export class BuildingGeometry {
     const M = n => this.m.get(n);
     const g = new Group();
     g.name = 'screen-block';
-    const cx = 74, cz = -22, W = 40, D = 22, H = 27;
+    const cx = 82, cz = -44, W = 40, D = 22, H = 27;
 
     const body = new Mesh(chamferedBox(W, H, D, 0.14), M('limestone'));
     body.position.set(cx, 0, cz);
@@ -489,17 +489,17 @@ export class BuildingGeometry {
     const M = n => this.m.get(n);
     const g = new Group();
     const drum = new Mesh(new CylinderGeometry(3.4, 3.4, 44, this.low ? 12 : 24, 1, true), M('glass-vision'));
-    drum.position.set(2, 22, -36);
+    drum.position.set(-4, 22, -62);
     const core = new Mesh(new CylinderGeometry(1.9, 1.9, 44, this.low ? 10 : 18), M('concrete'));
-    core.position.set(2, 22, -36);
+    core.position.set(-4, 22, -62);
     g.add(drum, core);
     for (let i = 0; i <= 9; i++) {
       const ring = new Mesh(new CylinderGeometry(3.5, 3.5, 0.18, this.low ? 12 : 24), M('aluminium'));
-      ring.position.set(2, i * 44 / 9, -36);
+      ring.position.set(-4, i * 44 / 9, -62);
       g.add(ring);
     }
     const cap = new Mesh(new CylinderGeometry(3.9, 3.5, 0.7, this.low ? 12 : 24), M('concrete'));
-    cap.position.set(2, 44.3, -36);
+    cap.position.set(-4, 44.3, -62);
     g.add(cap);
     return shadowed(g);
   }
