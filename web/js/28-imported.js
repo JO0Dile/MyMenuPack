@@ -1597,6 +1597,49 @@
   // information.
   var HEAVY_MARGIN = 3;
 
+  // ============================================================
+  // 64 · "WHERE ARE YOU NOW?"
+  //
+  // Setting up means marking two or three years of history one course at a
+  // time — around forty taps before the app is useful to the person doing
+  // them, which is where most people stop. One tap instead: say which
+  // semester you are in, and everything the plan schedules BEFORE that point
+  // is marked done for you to correct.
+  //
+  // It is a starting position, not a claim about the student, so the wording
+  // says so and the correction is the ordinary card tick they would have used
+  // anyway. It only appears on a plan with nothing marked — the moment it
+  // helps — and never again after that.
+  function planTerms(plan){
+    var terms = [];
+    (plan.structure && plan.structure.years ? plan.structure.years : []).forEach(function(y, i){
+      ['s1', 's2'].concat(y.hasSummer ? ['s3'] : []).forEach(function(sem){
+        terms.push({ yearId: y.id, sem: sem, yearNum: i + 1 });
+      });
+    });
+    return terms;
+  }
+
+  function whereAreYouHtml(planId, plan, rtl){
+    if(!hasStructure(plan)) return '';
+    var real = (plan.courses || []).filter(function(c){ return !isPoolElective(c); });
+    if(!real.length || real.some(function(c){ return isDone(planId, c.id); })) return '';
+    var terms = planTerms(plan);
+    if(terms.length < 2) return '';
+    var chips = terms.map(function(t, i){
+      var lab = (rtl ? 'س' + t.yearNum : 'Y' + t.yearNum) + ' · ' +
+        (rtl ? SEMESTER_LABEL_AR[t.sem] : SEMESTER_LABEL[t.sem]).replace(/ Semester$/, '');
+      return '<button type="button" class="way-chip" data-way="' + i +
+        '" data-plan="' + window.__escapeHtml(planId) + '">' + window.__escapeHtml(lab) + '</button>';
+    }).join('');
+    return '<div class="way-card">' +
+      '<div class="way-head">' + window.__escapeHtml(rtl ? 'وين أنت الآن؟' : 'Where are you now?') + '</div>' +
+      '<p class="way-note">' + window.__escapeHtml(rtl
+        ? 'اختر فصلك الحالي وسنحدّد كل ما قبله كمنجز — عدّل أي مساق لم تأخذه.'
+        : 'Pick the semester you are in and everything before it is marked done — fix any you have not taken.') +
+      '</p><div class="way-chips">' + chips + '</div></div>';
+  }
+
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var pairs = pairContinuations(planId);
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
@@ -1637,6 +1680,19 @@
       (semHours > 0 ? '<span class="imp-sem-hours">' + semHours + 'H</span>' : '') +
       (verdict ? '<span class="imp-sem-verdict ' + verdictCls + '">' +
         window.__escapeHtml(verdict) + '</span>' : '') +
+      // 12 · One action instead of six taps. A student setting up two years of
+      // history is marking forty-odd courses one at a time before the app is
+      // useful to them at all, which is where most people give up. The button
+      // says which way it will go, so it is never a guess.
+      (!editing && courses.length
+        ? '<button type="button" class="imp-sem-bulk" data-sem-bulk="' + containerId +
+          '" data-plan="' + window.__escapeHtml(planId) + '">' +
+          window.__escapeHtml(
+            courses.every(function(c){ return isDone(planId, c.id); })
+              ? (rtl ? 'ألغِ تحديد الفصل' : 'Unmark all')
+              : (rtl ? 'حدّد الفصل كمنجز' : 'Mark all done')) +
+          '</button>'
+        : '') +
       '</div>' + loadNote +
       '<div class="course-row" id="' + containerId + '">' +
       courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs, whereTx); }).join('') + addCard +
@@ -1840,6 +1896,7 @@
     // this container's coordinate space, and a card pinned outside it would
     // have its prerequisite arrows drawn to the wrong place.
     html += pinnedHtml(id, p, rtl);
+    html += whereAreYouHtml(id, p, rtl);
 
     // Each year is its own disclosure: a header button that toggles the
     // body under it. The header carries how far through that year the
@@ -1942,7 +1999,12 @@
     if(fill){ fill.style.width = pct + '%'; }
   }
 
-  function toggle(planId, slug){
+  // `opts.silent` skips the re-render and the announcement, for the bulk
+  // action above: forty renders in a row is forty full rebuilds of the plan,
+  // and forty screen-reader announcements is noise rather than information.
+  // The caller renders and announces once at the end instead.
+  function toggle(planId, slug, opts){
+    if(opts && opts.silent){ toggleCourse(planId, slug); return; }
     // What was open to the student before, so the announcement below can name
     // what this tick actually changed rather than just saying "done".
     var before = {};
@@ -2051,6 +2113,60 @@
   // first half and the plan under it says the second, so it was a sentence
   // explaining a search box to people already using one. dismissSearchHint()
   // stays exported: an older cached page can still call it.
+  // 64 · Apply the picked starting position.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-way]');
+    if(!btn) return;
+    e.preventDefault();
+    var planId = btn.getAttribute('data-plan');
+    var plan = loadImportedPlans()[planId];
+    if(!plan) return;
+    var terms = planTerms(plan);
+    var pick = terms[parseInt(btn.getAttribute('data-way'), 10)];
+    if(!pick) return;
+    var cutoff = terms.indexOf(pick);
+    var rank = {};
+    terms.forEach(function(t, i){ rank[t.yearId + '|' + t.sem] = i; });
+    var n = 0;
+    (plan.courses || []).forEach(function(c){
+      // Pool electives are chosen by the student, not scheduled by the plan,
+      // so "everything before this term" cannot include them.
+      if(isPoolElective(c)) return;
+      var r = rank[c.yearId + '|' + c.semester];
+      if(r === undefined || r >= cutoff) return;
+      if(!isDone(planId, c.id)){ toggle(planId, c.id, { silent: true }); n++; }
+    });
+    render(planId);
+    if(window.__showToast){
+      var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+      window.__showToast(rtl
+        ? ('\u2713 حُدّد ' + n + ' مساقًا كمنجز — عدّل أي واحد لم تأخذه.')
+        : ('\u2713 ' + n + ' course' + (n === 1 ? '' : 's') + ' marked done — fix any you have not taken.'));
+    }
+  });
+
+  // 12 · The semester bulk action. Delegated for the same reason as the
+  // language switch below: render() replaces the whole sheet.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-sem-bulk]');
+    if(!btn) return;
+    e.preventDefault();
+    var planId = btn.getAttribute('data-plan');
+    var row = document.getElementById(btn.getAttribute('data-sem-bulk'));
+    if(!planId || !row) return;
+    var slugs = [].slice.call(row.querySelectorAll('.course[id]'))
+      .map(function(el){ return el.id.split('-c-')[1]; })
+      .filter(Boolean);
+    if(!slugs.length) return;
+    // Every course, one way — not a per-course toggle, which on a half-done
+    // semester would flip the finished ones back off.
+    var makeDone = !slugs.every(function(sl){ return isDone(planId, sl); });
+    slugs.forEach(function(sl){
+      if(isDone(planId, sl) !== makeDone){ toggle(planId, sl, { silent: true }); }
+    });
+    render(planId);
+  });
+
   // One delegated listener for the header's language switch, bound at module
   // level so it survives every re-render of the plan (render() replaces the
   // whole sheet, so a listener attached to the buttons themselves would not).

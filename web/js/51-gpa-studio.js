@@ -163,18 +163,33 @@
           (window.AAUP_ICONS ? window.AAUP_ICONS.preview('planpin', 16) : '') + t.goPlan +
         '</button></div>';
     }
-    var optsFor = function(current){
-      return '<option value="">—</option>' + window.AAUP_GPA.GRADE_ORDER.map(function(g){
-        return '<option value="' + g + '"' + (g === current ? ' selected' : '') + '>' +
-          esc(window.AAUP_GPA.gradeLabel(g)) + '</option>';
-      }).join('');
+    // 5 · CHIPS, NOT A NATIVE SELECT.
+    // On Android a <select> throws a full-screen list over the app to choose
+    // one of twelve values, so setting a semester's grades meant twelve
+    // round trips through a modal that covers the table you are working
+    // from. A wrapped row of chips is one tap, keeps the table visible, and
+    // sits where the thumb already is. Still a real radio group, so it is
+    // keyboard- and screen-reader-operable exactly as the select was.
+    var chipsFor = function(pid, current){
+      var one = function(val, label, cls){
+        var on = val === current;
+        return '<button type="button" class="gs-grade-chip' + (cls ? ' ' + cls : '') +
+          (on ? ' is-on' : '') + '" role="radio" aria-checked="' + (on ? 'true' : 'false') +
+          '" data-pid="' + esc(pid) + '" data-grade="' + esc(val) + '">' + esc(label) + '</button>';
+      };
+      return '<div class="gs-grade-chips" role="radiogroup">' +
+        window.AAUP_GPA.GRADE_ORDER.map(function(g){
+          return one(g, window.AAUP_GPA.gradeLabel(g), window.AAUP_GPA.isFailGrade && window.AAUP_GPA.isFailGrade(g) ? 'is-fail' : '');
+        }).join('') +
+        one('', '\u2014', 'gs-grade-none') +
+      '</div>';
     };
     var body = rows.map(function(r){
       var name = rtl && r.nameAr ? r.nameAr : r.name;
       return '<tr class="' + (r.excluded ? 'gs-row-excluded' : '') + '">' +
         '<td><strong>' + name + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
         '<td>' + r.cr + '</td>' +
-        '<td><select class="gs-grade-select" data-pid="' + esc(r.pid) + '">' + optsFor(r.grade) + '</select></td>' +
+        '<td>' + chipsFor(r.pid, r.grade) + '</td>' +
         '<td class="gs-pts">' + pointsCell(r, t) + '</td>' +
         '</tr>';
     }).join('');
@@ -342,11 +357,14 @@
   }
 
   function bindTable(prefix){
-    document.querySelectorAll('.gs-grade-select').forEach(function(sel){
-      sel.addEventListener('change', function(){
-        var pid = sel.getAttribute('data-pid');
+    document.querySelectorAll('.gs-grade-chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        var pid = chip.getAttribute('data-pid');
+        var val = chip.getAttribute('data-grade');
         var grades = window.AAUP_GPA.loadGrades();
-        if(sel.value){ grades[pid] = sel.value; } else { delete grades[pid]; }
+        // Pressing the grade already set clears it, which is what the "—"
+        // option did and is the only way back to ungraded from a chip row.
+        if(val && grades[pid] !== val){ grades[pid] = val; } else { delete grades[pid]; }
         window.AAUP_GPA.saveGrades(grades);
         // Rebuilds the whole modal from the same open() the Dashboard link
         // already calls, so the summary cards, the semester panel, the audit

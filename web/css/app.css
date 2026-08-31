@@ -5727,6 +5727,54 @@
   .offline-note.is-offline{color:var(--text); border-color:var(--accent);}
   .offline-note.is-offline::before{background:var(--accent);}
 
+  /* 64 · "WHERE ARE YOU NOW?" — one tap instead of forty.
+     Only on a plan with nothing marked, which is the one moment it helps. */
+  .way-card{
+    border:1px solid var(--accent); border-radius:14px;
+    padding:14px 15px; margin:0 0 16px;
+    background:var(--card-bg);
+  }
+  .way-head{font-size:14.5px; font-weight:700; margin-bottom:4px;}
+  .way-note{font-size:12px; color:var(--text-dim); margin:0 0 11px; line-height:1.55;}
+  .way-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .way-chip{
+    appearance:none; cursor:pointer; font:inherit;
+    font-size:11.5px; font-weight:700; padding:7px 12px; border-radius:999px;
+    border:1px solid var(--line); background:transparent; color:var(--text);
+    transition:.12s;
+  }
+  .way-chip:hover{border-color:var(--accent); background:var(--search-bg);}
+  .way-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 5 · GRADE CHIPS INSTEAD OF A NATIVE SELECT.
+     On Android a <select> throws a full-screen list over the app to pick one
+     of twelve values — twelve round trips through a modal that covers the very
+     table you are filling in. */
+  .gs-grade-chips{display:flex; flex-wrap:wrap; gap:4px; max-width:210px;}
+  .gs-grade-chip{
+    appearance:none; cursor:pointer; font:inherit;
+    font-size:11px; font-weight:700; line-height:1;
+    min-width:30px; padding:6px 7px; border-radius:7px;
+    border:1px solid var(--line); background:var(--card-bg); color:var(--text-dim);
+    transition:.12s;
+  }
+  .gs-grade-chip:hover{color:var(--text); border-color:var(--text-dim);}
+  .gs-grade-chip.is-on{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+  .gs-grade-chip.is-fail.is-on{background:var(--danger,#e8557c); border-color:var(--danger,#e8557c);}
+  .gs-grade-chip.gs-grade-none{opacity:.65;}
+  .gs-grade-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 12 · MARK A WHOLE SEMESTER AT ONCE. */
+  .imp-sem-bulk{
+    appearance:none; cursor:pointer; font:inherit;
+    font-size:10.5px; font-weight:700; letter-spacing:.02em;
+    padding:3px 9px; border-radius:6px; margin-inline-start:auto;
+    border:1px solid var(--line); background:transparent; color:var(--text-dim);
+    transition:.12s;
+  }
+  .imp-sem-bulk:hover{color:var(--text); border-color:var(--accent);}
+  .imp-sem-bulk:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
   /* 50 · THE INSTALL OFFER, ON THE THIRD VISIT.
      Held back from the first visit on purpose: a stranger says no, and the
      browser then will not offer again for months. */
