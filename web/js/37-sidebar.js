@@ -12,14 +12,24 @@
   function isImportedPlan(prefix){
     return !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
   }
+  // The name at the top of the sidebar, above every menu item. It always
+  // read the English side, so the one heading a student sees on every screen
+  // was in English while the whole menu under it was in Arabic. Falls back
+  // to English for a plan with no Arabic name.
   function planName(prefix){
+    var arabic = ar();
     if(isImportedPlan(prefix)){
       var p = window.AAUP_IMPORTED.loadImportedPlans()[prefix];
-      var en = window.AAUP_IMPORTED.nameParts(p.majorName.en);
-      return en.big;
+      var side = arabic ? (p.majorName.ar || p.majorName.en) : p.majorName.en;
+      var parts = window.AAUP_IMPORTED.nameParts(side);
+      if(!parts.big){ parts = window.AAUP_IMPORTED.nameParts(p.majorName.en); }
+      return parts.big;
     }
     var page = document.getElementById('page-' + prefix);
-    var nameEl = page && page.querySelector('.title-block .en');
+    var nameEl = page && page.querySelector('.title-block ' + (arabic ? '.ar' : '.en'));
+    if(!nameEl || !nameEl.textContent.trim()){
+      nameEl = page && page.querySelector('.title-block .en');
+    }
     return nameEl ? nameEl.textContent : prefix;
   }
 

@@ -100,11 +100,12 @@
     if(only && !state.college){ el.style.display = 'none'; el.innerHTML = ''; return; }
     el.style.display = 'flex';
     var uni = window.APP_UNIVERSITIES[state.university];
+    var A = ar();
     var home = only
       ? '<button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' +
-        window.AAUP_ICONS.preview('home', 15) + ' ' + (uni ? uni.shortName : 'Home') + '</button>'
+        window.AAUP_ICONS.preview('home', 15) + ' ' + (uni ? uni.shortName : (A ? 'الرئيسية' : 'Home')) + '</button>'
       : '<button type="button" onclick="AAUP_HOME.showUniversities()">' +
-        window.AAUP_ICONS.preview('home', 15) + ' Home</button>';
+        window.AAUP_ICONS.preview('home', 15) + ' ' + (A ? 'الرئيسية' : 'Home') + '</button>';
     var html = home;
     if(state.college){
       var college = collegesForUniversity(state.university)[state.college];
@@ -112,9 +113,11 @@
       if(!only){
         html += '<span class="hb-sep">/</span><button type="button" onclick="AAUP_HOME.showColleges(\'' + state.university + '\')">' + (uni ? uni.icon + ' ' + uni.shortName : state.university) + '</button>';
       }
-      html += '<span class="hb-sep">/</span><span class="hb-current">' + name.en + '</span>';
+      html += '<span class="hb-sep">/</span><span class="hb-current">' +
+        (A ? (name.ar || name.en) : name.en) + '</span>';
     } else {
-      html += '<span class="hb-sep">/</span><span class="hb-current">' + (uni ? uni.icon + ' ' + uni.name.en : state.university) + '</span>';
+      html += '<span class="hb-sep">/</span><span class="hb-current">' +
+        (uni ? uni.icon + ' ' + (A ? (uni.name.ar || uni.name.en) : uni.name.en) : state.university) + '</span>';
     }
     el.innerHTML = html;
   }
@@ -143,12 +146,13 @@
     // One short line per step. These used to run to two sentences each, with
     // the advisor disclaimer repeated on two of them — students said the app
     // had "A LOT OF TEXT". The disclaimer now lives once, in the footer.
+    var A = ar();
     if(step === 'universities'){
-      intro.innerHTML = '<strong>Pick your university.</strong>';
+      intro.innerHTML = '<strong>' + (A ? 'اختر جامعتك.' : 'Pick your university.') + '</strong>';
     } else if(step === 'colleges'){
-      intro.innerHTML = '<strong>Pick your faculty.</strong>';
+      intro.innerHTML = '<strong>' + (A ? 'اختر كليتك.' : 'Pick your faculty.') + '</strong>';
     } else {
-      intro.innerHTML = '<strong>Pick your major.</strong>';
+      intro.innerHTML = '<strong>' + (A ? 'اختر تخصصك.' : 'Pick your major.') + '</strong>';
     }
   }
 
@@ -265,13 +269,17 @@
     card.innerHTML =
       '<div class="hr-icon">' + window.AAUP_ICONS.markup(info, { size: 24 }) + '</div>' +
       '<div class="hr-body">' +
-        '<div class="hr-kicker">Continue · تابع</div>' +
+        // One language, not both at once. This card said "Continue · تابع"
+        // and "45% complete · مكتمل" to everyone, which is twice as much
+        // text as anyone needed and half of it in the wrong language.
+        '<div class="hr-kicker">' + (ar() ? 'تابع' : 'Continue') + '</div>' +
         // info.name (from planDisplayInfo) is already HTML-escaped once by
         // the sync sanitizer — esc()'ing it again would show a literal "&amp;".
         '<div class="hr-name">' + (info.name || prefix) + '</div>' +
         (pct !== null
-          ? '<div class="hr-sub">' + pct + '% complete · مكتمل</div><div class="hr-progress"><span style="width:' + pct + '%;"></span></div>'
-          : '<div class="hr-sub">Jump back in · العودة إلى خطتك</div>') +
+          ? '<div class="hr-sub">' + (ar() ? pct + '٪ مكتمل' : pct + '% complete') +
+            '</div><div class="hr-progress"><span style="width:' + pct + '%;"></span></div>'
+          : '<div class="hr-sub">' + (ar() ? 'العودة إلى خطتك' : 'Jump back in') + '</div>') +
       '</div>' +
       '<div class="hr-go">→</div>';
     card.style.display = 'flex';
