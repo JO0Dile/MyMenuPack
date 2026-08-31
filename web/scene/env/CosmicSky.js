@@ -308,9 +308,14 @@ export class CosmicSky {
     this.planetSprites = [];
     const budget = low ? 3 : PLANETS.length;
     PLANETS.slice(0, budget).forEach(p => {
+      // depthTest ON. A sprite is transparent, and the transparent pass runs
+      // after the opaque one — so with depth testing off a planet three
+      // hundred units away paints straight over the tower twenty units
+      // away, whatever its renderOrder says. Testing against the depth
+      // buffer is what actually puts it behind.
       const mat = new SpriteMaterial({
         map: planetTexture(p), transparent: true, depthWrite: false,
-        depthTest: false, blending: NormalBlending, opacity: 0
+        depthTest: true, blending: NormalBlending, opacity: 0
       });
       const sp = new Sprite(mat);
       sp.position.set(p.pos[0], p.pos[1], p.pos[2]);

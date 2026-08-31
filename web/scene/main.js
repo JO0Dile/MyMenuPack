@@ -39,6 +39,7 @@ import { LightingRig } from './env/LightingRig.js';
 import { CameraController } from './camera/CameraController.js';
 import { Plaza, PLAZA } from './build/Plaza.js';
 import { Landmark, LANDMARK } from './build/Landmark.js';
+import { Flag } from './build/Flag.js';
 import { FountainSystem } from './water/FountainSystem.js';
 import { AestheticPostProcessing } from './post/AestheticPostProcessing.js';
 import { GlassPanel } from './ui/GlassPanel.js';
@@ -111,8 +112,14 @@ class LandingScene {
       sky: this.sky
     });
     this.panel = new GlassPanel(this.materials, this.quality);
+    // Off to the west, clear of the sightline, where a flagpole stands on
+    // the real plaza.
+    this.flag = new Flag(this.materials, this.quality, this.sky, { x: -15.5, z: 4.5 });
 
-    this.world.add(this.plaza.object, this.landmark.object, this.water.object, this.panel.object);
+    this.world.add(
+      this.plaza.object, this.landmark.object, this.water.object,
+      this.flag.object, this.panel.object
+    );
 
     this.lighting.placeLamps(this.plaza.lampPositions);
 
@@ -168,6 +175,7 @@ class LandingScene {
 
     this.camera.update(t, dt);
     this.water.update(t, this.camera.camera);
+    this.flag.update(t);
 
     // The reveal: the world does not fade as a whole, it arrives in the
     // order things are built in — ground, then structure, then detail.
@@ -176,6 +184,8 @@ class LandingScene {
     const d = this.timeline.at('detail');
     this.landmark.object.visible = a > 0.01;
     this.plaza.object.visible = g > 0.01;
+    this.flag.object.visible = d > 0.01;
+    this.flag.setWind(0.35 + 0.65 * d);
     // the stars are there from the first frame and come up first of all
     this.sky.update(t, this.timeline.at('sky'));
     this.renderer.toneMappingExposure = 0.45 + 0.70 * this.timeline.at('sky');
@@ -286,6 +296,7 @@ class LandingScene {
 
     this.post.dispose();
     this.water.dispose();
+    this.flag.dispose();
     this.materials.dispose();
     this.textures.dispose();
     this.lighting.dispose();
