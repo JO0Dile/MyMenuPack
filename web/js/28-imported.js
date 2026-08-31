@@ -1081,6 +1081,40 @@
     supportCourses: ['Support', 'مساقات مساندة']
   };
   function bucketOf(c){ return (c && BUCKET_CLASS[c.requirement]) ? c.requirement : ''; }
+
+  // The plan encodes six requirement buckets in colour alone, and roughly one
+  // man in twelve cannot separate the green from the orange — nor can anyone
+  // reading a printed plan in black and white. A three-letter code carries the
+  // same fact without asking the eye to compare hues. Deliberately the same
+  // code in both languages: it is an identifier like a course number, not a
+  // word, and an Arabic abbreviation of "متطلب جامعي" is longer than the tag.
+  var BUCKET_CODE = {
+    univReq: 'UNI', univElec: 'UEL', colgReq: 'COL', specReq: 'SPC',
+    specElec: 'SEL', freeElec: 'FRE', supportCourses: 'SUP'
+  };
+
+  // 32: once a grade is in, the requirement bucket has done its job — you
+  // already know which block the course belongs to. The card switches to
+  // saying how it WENT, which turns the plan into a transcript you can read
+  // at arm's length and makes a bad semester visible as a shape.
+  function gradeTier(g){
+    if(!g) return '';
+    var head = String(g).trim().charAt(0).toUpperCase();
+    if(head === 'A') return 'a';
+    if(head === 'B') return 'b';
+    if(head === 'C') return 'c';
+    if(head === 'D') return 'd';
+    if(head === 'F') return 'f';
+    return '';
+  }
+
+  // 42: a Latin course name inside an Arabic sentence drags trailing numbers
+  // and punctuation to the wrong end of the phrase — "يحتاج Advanced English +1"
+  // put the "+1" on the far side of the line. <bdi> isolates the run so the
+  // surrounding Arabic keeps its own direction.
+  function bidi(text){
+    return '<bdi>' + window.__escapeHtml(text) + '</bdi>';
+  }
   function visualClassFor(c){
     var b = bucketOf(c);
     return b ? BUCKET_CLASS[b] : ((c && c.category) || 'core');
@@ -1111,10 +1145,23 @@
     // cards for one course with no way to tell the live one from the dead
     // one. Both say so now.
     var superseded = !!(window.__isSupersededByRetake && window.__isSupersededByRetake(planId, c.id));
+    var gradeNow = '';
+    try{
+      var gmap = window.AAUP_GPA ? window.AAUP_GPA.loadGrades() : {};
+      gradeNow = gmap[fullId(planId, c.id)] || '';
+    }catch(e){ gradeNow = ''; }
+    var tier = (done && !superseded) ? gradeTier(gradeNow) : '';
     var cls = 'course ' + visualClassFor(c) + (bucket ? ' req-' + bucket : '') +
       (done ? ' completed' : '') + (avail || done ? ' available' : '') +
+      (tier ? ' grade-' + tier : '') +
       (c.isRetake ? ' retake-course' : '') + (superseded ? ' course-superseded' : '');
     var displayName = (rtl && c.ar) ? c.ar : c.name;
+    // 43: the other language, underneath. Lectures, slides and the registrar
+    // all use the English title, so a student reading Arabic still has to be
+    // able to match the card to what the portal calls it — and the reverse is
+    // true for an English reader sitting in an Arabic lecture.
+    var otherName = (rtl && c.ar && c.name && c.name !== c.ar) ? c.name
+      : (!rtl && c.ar && c.ar !== c.name) ? c.ar : '';
     // The old quick "📊 set grade" shortcut for a done course is retired —
     // it shared the same top-right corner as the new checkbox and would
     // visually collide with it. Grade is now set from the full course-
@@ -1146,6 +1193,10 @@
     // said so already. The state worth a word is the closed one, and the
     // useful word is not "closed" but what it is still waiting for.
     var missing = (done || avail) ? [] : missingPrereqNames(planId, c.id, rtl);
+    var lockHtml = !missing.length ? window.__escapeHtml(statusTx)
+      : window.__escapeHtml(rtl ? 'يحتاج ' : 'needs ') + bidi(missing[0]) +
+        (missing.length > 1 ? window.__escapeHtml(' +' + (missing.length - 1)) : '');
+    // The plain-text form, for the screen-reader label where markup cannot go.
     var lockTx = !missing.length ? statusTx
       : (rtl ? 'يحتاج ' : 'needs ') + missing[0] +
         (missing.length > 1 ? ' +' + (missing.length - 1) : '');
@@ -1173,7 +1224,7 @@
     // Hours before the lock line, not after: the lock line carries a course
     // name and is the part that gets ellipsised on a narrow card, so putting
     // it last is what keeps the hours on screen.
-    metaParts.push('<span class="cm-hours">' + window.__escapeHtml(hoursTx) + '</span>');
+    metaParts.push('<span class="cm-hours">' + bidi(hoursTx) + '</span>');
     // The plan document listed this course among the requirements but did not
     // say which term to take it in — the app picked the earliest one its own
     // prerequisites allow. Every other card on the page is showing the
@@ -1184,7 +1235,7 @@
         window.__escapeHtml(rtl ? 'الفصل مقترح' : 'term suggested') + '</span>');
     }
     if(!done && !avail){
-      metaParts.push('<span class="cm-status cm-locked">' + window.__escapeHtml(lockTx) + '</span>');
+      metaParts.push('<span class="cm-status cm-locked">' + lockHtml + '</span>');
     }
     if(superseded || c.isRetake){
       var attemptTx = superseded
@@ -1207,7 +1258,10 @@
       checkboxHtml +
       cardButtons +
       (c.isRetake ? '<span class="retake-badge">\u21bb ' + (rtl ? 'إعادة' : 'Retake') + '</span>' : '') +
+      (bucket && BUCKET_CODE[bucket]
+        ? '<span class="req-code" aria-hidden="true">' + BUCKET_CODE[bucket] + '</span>' : '') +
       '<div class="name">' + displayName + '</div>' +
+      (otherName ? '<div class="name-alt">' + bidi(otherName) + '</div>' : '') +
       '<div class="course-meta">' + meta + '</div>' +
       '</div>';
   }
@@ -1559,6 +1613,17 @@
     }, 0);
     var usual = semester === 's3' ? 0 : typicalLoad(planId, plan);
     var heavy = usual > 0 && semHours >= usual + HEAVY_MARGIN;
+    // "18H" means nothing to a first-year. Light, balanced and heavy mean
+    // something immediately, and the number stays beside them for anyone who
+    // wants it. Measured against this plan's own median term, not a fixed
+    // ceiling — a 163-hour engineering degree and a 33-hour diploma do not
+    // share a definition of heavy.
+    var light = usual > 0 && semHours > 0 && semHours <= usual - HEAVY_MARGIN;
+    var verdict = !usual || !semHours ? ''
+      : heavy ? (rtl ? 'ثقيل' : 'heavy')
+      : light ? (rtl ? 'خفيف' : 'light')
+      : (rtl ? 'متوازن' : 'balanced');
+    var verdictCls = heavy ? 'is-heavy' : light ? 'is-light' : 'is-balanced';
     var loadNote = heavy
       ? '<div class="imp-sem-heavy">' +
         (rtl
@@ -1570,6 +1635,8 @@
     return '<div class="imp-semester-block' + (heavy ? ' is-heavy' : '') + '">' +
       '<div class="imp-semester-title">' + semTx +
       (semHours > 0 ? '<span class="imp-sem-hours">' + semHours + 'H</span>' : '') +
+      (verdict ? '<span class="imp-sem-verdict ' + verdictCls + '">' +
+        window.__escapeHtml(verdict) + '</span>' : '') +
       '</div>' + loadNote +
       '<div class="course-row" id="' + containerId + '">' +
       courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs, whereTx); }).join('') + addCard +

@@ -2296,11 +2296,23 @@
      DOM because the bar's handler clicks it, so whatever the dialog does on
      close still happens. Dialogs the bar deliberately skips keep their ✕,
      which is then their only control. */
-  .modal-card:has(> .back-bar) > .modal-close,
-  .modal-card:has(.back-bar) > .modal-close{
-    position:absolute; width:1px; height:1px; padding:0;
-    margin:-1px; overflow:hidden; clip-path:inset(50%);
-    white-space:nowrap; border:0;
+  /* DESKTOP ONLY. This rule used to carry no media query, and that put an
+     invisible button across the top of every dialog on every phone. The
+     phone turns .modal-close into its own control further down this file
+     (see the max-width:720px block); that later rule wins on width, height
+     and position, but `clip-path` had no competitor, so it survived and
+     clipped the phone's exit to nothing while leaving it full-width and
+     clickable. Students had no visible way out of the Degree Audit,
+     Achievements, Share, Contacts, Change Major, Thoughts, the Course
+     Library or Plan My Next Semester — but tapping the blank strip at the
+     top closed them, for no reason anyone could see. */
+  @media (min-width:721px){
+    .modal-card:has(> .back-bar) > .modal-close,
+    .modal-card:has(.back-bar) > .modal-close{
+      position:absolute; width:1px; height:1px; padding:0;
+      margin:-1px; overflow:hidden; clip-path:inset(50%);
+      white-space:nowrap; border:0;
+    }
   }
 
   .modal-close:hover{color:var(--text); background:var(--search-bg);}
@@ -6473,6 +6485,126 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
    not error-coloured: a heavy term is a thing to notice, not a thing that is
    wrong. */
 .imp-semester-title{display:flex; align-items:baseline; gap:8px;}
+
+/* ============================================================
+   THE PLAN SURFACE — eight changes, all on the course card and
+   the semester it sits in.
+   ============================================================ */
+
+/* 35 · THE SEMESTER HEADER STICKS.
+   Six courses in a two-column grid is three rows, and by the second one the
+   header has scrolled away — taking the running hours total with it, which is
+   the number you are checking WHILE you look at the courses. It rides just
+   under the plan's own sticky progress meter. */
+.imp-semester-title{
+  position:sticky; top:var(--sticky-top, 0px); z-index:3;
+  padding:6px 0 7px; margin-bottom:6px;
+  background:linear-gradient(to bottom,
+    var(--bg) 68%, color-mix(in srgb, var(--bg) 0%, transparent));
+}
+
+/* 1 · THE LOAD IS A VERDICT, NOT A NUMBER.
+   Measured against this plan's own median term (js/28-imported.js), because a
+   163-hour engineering degree and a 33-hour diploma do not share a definition
+   of heavy. The hours stay next to it for anyone who wants them. */
+.imp-sem-verdict{
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  padding:2px 7px; border-radius:5px; line-height:1.5;
+}
+.imp-sem-verdict.is-light{background:var(--sem-light-bg,rgba(90,150,220,.16)); color:var(--sem-light,#7fb3e8);}
+.imp-sem-verdict.is-balanced{background:var(--sem-ok-bg,rgba(70,190,130,.15)); color:var(--sem-ok,#4ecb8b);}
+.imp-sem-verdict.is-heavy{background:var(--sem-heavy-bg,rgba(230,110,140,.16)); color:var(--sem-heavy,#ff7a9c);}
+
+/* 18 · A THREE-LETTER BUCKET CODE.
+   The plan encodes six requirement buckets in colour alone. Roughly one man in
+   twelve cannot separate the green from the orange, and nobody can in a
+   black-and-white printout. The code sits in the corner the checkbox does not
+   use, quiet enough to ignore and legible enough to settle an argument. */
+.course .req-code{
+  position:absolute; top:7px; inset-inline-start:9px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:8.5px; font-weight:700; letter-spacing:.08em;
+  color:var(--text-dim); opacity:.62; pointer-events:none;
+}
+.course{position:relative;}
+.course .name{padding-top:11px;}
+
+/* 43 · THE OTHER LANGUAGE, UNDERNEATH.
+   Lectures, slides and the registrar all use the English title, so a student
+   reading Arabic still has to match the card to what the portal calls it. */
+.course .name-alt{
+  font-size:10.5px; font-weight:500; line-height:1.35;
+  color:var(--text-dim); opacity:.72; margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* 37 · SHAPE, NOT ONLY COLOUR, FOR THE THREE STATES.
+   Solid fill for done, a full outline for open, a dashed outline for locked —
+   readable in sunlight, in greyscale, and without colour vision. */
+.course{border:1px solid transparent;}
+.course.available:not(.completed){border-style:solid;}
+.course:not(.available):not(.completed){
+  border-style:dashed; border-color:var(--line);
+}
+
+/* 32 · THE GRADE COLOURS THE CARD.
+   Once a grade is in, the bucket has done its job — you already know Calculus
+   is a college requirement. What you want to see across a finished year is how
+   it went. The stripe on the leading edge switches to the grade band; the
+   bucket code above still says which block it belonged to. */
+.course.completed.grade-a{--card-grade:#2f9e68; --card-grade-tx:#effaf4;}
+.course.completed.grade-b{--card-grade:#3f6fd8; --card-grade-tx:#eef3ff;}
+.course.completed.grade-c{--card-grade:#c08420; --card-grade-tx:#fff8ea;}
+.course.completed.grade-d{--card-grade:#c4611f; --card-grade-tx:#fff2e8;}
+.course.completed.grade-f{--card-grade:#c8365c; --card-grade-tx:#ffeef3;}
+/* The card is FILLED by its requirement bucket, so an edge stripe would be
+   invisible against it — the fill itself has to carry the grade. The bucket is
+   not lost: the three-letter code added above still says which block the course
+   belongs to, which is the whole reason those two changes ship together. */
+.course.completed[class*=" grade-"]{
+  background:var(--card-grade) !important;
+  color:var(--card-grade-tx) !important;
+}
+.course.completed[class*=" grade-"] .course-meta,
+.course.completed[class*=" grade-"] .name-alt,
+.course.completed[class*=" grade-"] .req-code{
+  color:var(--card-grade-tx); opacity:.82;
+}
+
+/* 36 · DENSITY, FOLDED INTO THE SIZE CONTROL THAT ALREADY EXISTS.
+   Settings already offers Compact / Normal / Large / Extra large, and it only
+   scaled the type. A second "density" control beside it would have been two
+   settings for one decision. So Compact now means a genuinely tighter layout —
+   closer gaps, no second-language line, smaller meta — which is what someone
+   choosing it actually wants: a 163-hour engineering degree, one year at a
+   time, without scrolling. js/17-theme.js writes data-card-size on the root. */
+:root[data-card-size="compact"] .course-row{gap:6px;}
+:root[data-card-size="compact"] .course .name-alt{display:none;}
+:root[data-card-size="compact"] .course-meta{font-size:9.5px;}
+:root[data-card-size="compact"] .imp-semester-block{margin-bottom:10px;}
+:root[data-card-size="compact"] .imp-semester-title{padding:4px 0 5px;}
+/* …and the two large steps go the other way: more air, not just bigger type. */
+:root[data-card-size="large"] .course-row,
+:root[data-card-size="xlarge"] .course-row{gap:12px;}
+:root[data-card-size="xlarge"] .imp-semester-block{margin-bottom:22px;}
+
+/* 31 · THE AUDIT TABLE SAYS IT SCROLLS.
+   It always did — .audit-table-wrap has overflow-x:auto — but nothing on
+   screen suggested it, so a table with two columns past the edge read as
+   broken rather than scrollable. A fade on the trailing edge and a chevron,
+   both of which disappear once you reach the end. */
+.audit-table-wrap{position:relative;}
+.audit-table-wrap::after{
+  content:'\203A'; position:absolute; top:0; bottom:0; inset-inline-end:0;
+  width:34px; display:flex; align-items:center; justify-content:center;
+  font-size:17px; color:var(--accent); pointer-events:none;
+  background:linear-gradient(to var(--fade-to,left),
+    var(--card-bg) 30%, color-mix(in srgb, var(--card-bg) 0%, transparent));
+  opacity:1; transition:opacity .18s;
+}
+.audit-table-wrap[dir="rtl"], [dir="rtl"] .audit-table-wrap{--fade-to:right;}
+.audit-table-wrap.at-end::after{opacity:0;}
+.audit-table-wrap:not(.can-scroll)::after{content:none;}
 .imp-sem-hours{
   margin-inline-start:auto; font-variant-numeric:tabular-nums;
   font-weight:800; color:var(--text-dim); letter-spacing:0;
@@ -6871,15 +7003,20 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
        entirely instead of chasing another dvh recalculation. */
     height:100%; max-height:100%;
     margin:0; border:0; border-radius:0; box-shadow:none;
-    /* 56px clears the fixed back bar below. Cards that carry their own
-       .modal-body keep scrolling inside it; the ones that do not scroll here. */
-    padding:56px 16px 24px;
+    /* The 56px that used to clear a full-width back bar is gone with it —
+       the exit is an edge rail now (see .modal-close below), which hangs off
+       the side and reserves no row. The inline padding leaves the rail its
+       30px plus a little air, so a heading never runs under it. Cards that
+       carry their own .modal-body keep scrolling inside it; the ones that do
+       not scroll here. */
+    padding:16px 16px 24px;
+    padding-inline-start:40px;
     overflow-y:auto; overscroll-behavior:contain;
   }
   /* The few cards that deliberately run edge-to-edge (course detail, the
      onboarding wizard) keep that, minus the space for the bar. */
   .modal-overlay .modal-card.cd-card,
-  .modal-overlay .onboarding-modal-card{padding:56px 0 0;}
+  .modal-overlay .onboarding-modal-card{padding:0;}
 
   /* On a phone the onboarding card is the whole screen, so its footer belongs
      at the bottom of that screen rather than immediately under the last field
@@ -6902,17 +7039,40 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     padding-inline-end:0;
   }
 
-  /* The existing ✕ becomes the page's back control: a full-width bar with a
-     left arrow, pinned to the top of the screen. font-size:0 hides the ✕
-     glyph without every dialog's markup having to change. */
+  /* The existing ✕ becomes an EDGE RAIL: a slim vertical tab on the leading
+     edge, vertically centred, with a back arrow on it.
+     It was a full-width bar across the top. That worked, but it cost 56px of
+     a phone screen on every dialog and sat at the far end of a thumb's reach
+     on a tall phone — you had to shuffle the phone down your hand to close
+     anything. A rail at the vertical middle of the leading edge is where the
+     thumb already rests, is 28px wide instead of a whole row, and never
+     covers content: it hangs off the side rather than sitting over the page.
+     font-size:0 hides the ✕ glyph without every dialog's markup changing;
+     the arrow comes from ::before below. */
   .modal-overlay .modal-card .modal-close,
   .modal-overlay .modal-card.cd-card .modal-close{
-    position:fixed; inset:0 0 auto 0;
-    width:100%; height:56px;
-    display:flex; align-items:center; justify-content:flex-start;
-    gap:10px; padding:0 14px; margin:0;
-    background:var(--panel); border:0; border-bottom:1px solid var(--line);
-    border-radius:0; color:var(--text); font-size:0; z-index:10;
+    position:fixed; inset:50% auto auto 0;
+    transform:translateY(-50%);
+    width:30px; height:82px;
+    display:flex; align-items:center; justify-content:center;
+    gap:0; padding:0; margin:0;
+    background:color-mix(in srgb, var(--panel) 92%, transparent);
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+    border:1px solid var(--line); border-inline-start:0;
+    border-radius:0 15px 15px 0;
+    color:var(--text); font-size:0; z-index:60;
+    box-shadow:4px 0 20px rgba(0,0,0,.34);
+  }
+  /* Mirrored for Arabic — js/60-backbar.js sets dir on the card, so the
+     logical inset and the rounded corners both follow the reading order. */
+  .modal-overlay .modal-card[dir="rtl"] .modal-close{
+    inset:50% 0 auto auto;
+    border-inline-start:1px solid var(--line); border-inline-end:0;
+    border-radius:15px 0 0 15px;
+    box-shadow:-4px 0 20px rgba(0,0,0,.34);
+  }
+  .modal-overlay .modal-card .modal-close:active{
+    background:var(--search-bg);
   }
   /* The button already contains a drawn icon — index.html puts a
      data-app-icon="close" span in every one of them. font-size:0 above hides
@@ -6923,12 +7083,9 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
   .modal-overlay .modal-card .modal-close svg,
   .modal-overlay .modal-card .modal-close [data-app-icon]{display:none;}
   .modal-overlay .modal-card .modal-close::before{
-    content:'\2190'; font-size:26px; line-height:1; font-weight:400;
+    content:'\2190'; font-size:21px; line-height:1; font-weight:400;
   }
   /* In Arabic the page reads right-to-left, so "back" points the other way. */
-  html[dir="rtl"] .modal-overlay .modal-card .modal-close,
-  .modal-overlay .modal-card[dir="rtl"] .modal-close{justify-content:flex-end;}
-  html[dir="rtl"] .modal-overlay .modal-card .modal-close::before,
   .modal-overlay .modal-card[dir="rtl"] .modal-close::before{content:'\2192';}
 
   /* Course detail becomes a bottom sheet instead of a full page — the

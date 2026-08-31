@@ -2,17 +2,23 @@
 // THE SKY, WHICH IS SPACE
 //
 // The fountain does not stand on a hill any more. It stands in the universe,
-// so the sky is a starfield with planets in it.
+// so the sky is a deep field with a starfield over it.
 //
-// Everything here is 2D by design — points and camera-facing sprites drawn
-// into canvases at boot. A sphere with a texture on it would cost far more
-// and look worse at this distance, because what makes a planet read is the
-// crispness of its limb against black and the softness of its terminator,
-// and both are easier to draw than to light.
+// There were planets here. They are gone, and the reason is worth writing
+// down: a camera-facing sprite is easy to draw and very hard to place. The
+// landed camera sits twenty-one units from a tower that fills the middle of
+// the frame, and a portrait phone sees about nineteen degrees either side of
+// the view axis where a laptop sees forty-three — so any placement that
+// framed on one was wrong on the other, and every attempt to fix it in one
+// aspect ratio broke the other. The starfield needs none of that: it is
+// spherical, so it is correct from every angle at every viewport.
+//
+// Everything here is 2D by design — points drawn into a canvas at boot,
+// against a shader dome pinned to the far plane.
 // ==========================
 import {
-  Points, BufferGeometry, Float32BufferAttribute, ShaderMaterial, Sprite,
-  SpriteMaterial, CanvasTexture, AdditiveBlending, NormalBlending, Group,
+  Points, BufferGeometry, Float32BufferAttribute, ShaderMaterial,
+  CanvasTexture, AdditiveBlending, Group,
   Color, Mesh, SphereGeometry, BackSide, SRGBColorSpace, LinearFilter, Vector3
 } from 'three';
 
@@ -130,150 +136,6 @@ const STAR_FRAG = /* glsl */`
   }
 `;
 
-// ---- a planet, drawn into a canvas ---------------------------------------
-// Bands, a terminator, a limb, and optionally a ring. Flat, and from four
-// hundred units away indistinguishable from a lit sphere.
-// How far past the body radius a planet's own decoration reaches: the ring
-// runs out to 1.92x, the atmosphere glow to 1.22x. Everything has to fit
-// inside the canvas, so the body radius is derived from the reach rather than
-// fixed — the previous fixed 0.34 * S put a ringed planet's ring 334 px from
-// a centre only 256 px from the edge, and the canvas sliced it off with a
-// dead-straight vertical cut on both sides. That cut is exactly what a
-// "glitched" planet looked like.
-function reachOf(p) { return p.ring ? 1.92 : 1.24; }
-
-function planetTexture(opts) {
-  const S = 512, c = document.createElement('canvas');
-  c.width = c.height = S;
-  const g = c.getContext('2d');
-  const R = (S * 0.46) / reachOf(opts), cx = S / 2, cy = S / 2;
-  const rnd = mulberry32(opts.seed);
-
-  // the ring goes behind the body
-  if (opts.ring) {
-    g.save();
-    g.translate(cx, cy);
-    g.rotate(opts.ringTilt || -0.42);
-    g.scale(1, 0.24);
-    for (let i = 0; i < 26; i++) {
-      const rr = R * (1.32 + i * 0.024);
-      g.beginPath();
-      g.arc(0, 0, rr, 0, Math.PI * 2);
-      g.strokeStyle = `rgba(${opts.ringColour}, ${0.05 + rnd() * 0.16})`;
-      g.lineWidth = R * 0.022;
-      g.stroke();
-    }
-    g.restore();
-  }
-
-  // the body, with latitude banding
-  g.save();
-  g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.clip();
-  g.fillStyle = opts.base;
-  g.fillRect(0, 0, S, S);
-  for (let i = 0; i < (opts.bands || 12); i++) {
-    const y = cy - R + (2 * R) * (i / (opts.bands || 12));
-    const h = (2 * R) / (opts.bands || 12) * (0.5 + rnd() * 0.8);
-    g.fillStyle = `rgba(${opts.bandColour}, ${0.06 + rnd() * 0.2})`;
-    g.fillRect(cx - R, y, R * 2, h);
-  }
-  // a couple of soft storms
-  for (let i = 0; i < (opts.spots || 0); i++) {
-    const a = rnd() * Math.PI * 2, d = rnd() * R * 0.6;
-    const sx = cx + Math.cos(a) * d, sy = cy + Math.sin(a) * d * 0.7;
-    const sr = R * (0.07 + rnd() * 0.13);
-    const sg = g.createRadialGradient(sx, sy, 0, sx, sy, sr);
-    sg.addColorStop(0, `rgba(${opts.spotColour}, 0.5)`);
-    sg.addColorStop(1, `rgba(${opts.spotColour}, 0)`);
-    g.fillStyle = sg;
-    g.beginPath(); g.arc(sx, sy, sr, 0, Math.PI * 2); g.fill();
-  }
-  // the terminator: the night side, falling away from the light
-  // Deeper than it was. These planets are hundreds of units out with one
-  // distant sun on them, and when only a fifth of the disc fell into shadow
-  // they read as flat bright stickers pasted over the sky rather than as
-  // spheres a long way off.
-  const term = g.createLinearGradient(cx - R * 0.8, cy - R * 0.8, cx + R, cy + R);
-  term.addColorStop(0, 'rgba(0,0,0,0.10)');
-  term.addColorStop(0.34, 'rgba(0,0,0,0.30)');
-  term.addColorStop(0.62, 'rgba(0,0,0,0.68)');
-  term.addColorStop(0.85, 'rgba(0,0,0,0.90)');
-  term.addColorStop(1, 'rgba(0,0,0,0.96)');
-  g.fillStyle = term;
-  g.fillRect(0, 0, S, S);
-  g.restore();
-
-  // the limb: a bright rim on the lit side, which is what sells a sphere
-  g.save();
-  g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2);
-  g.strokeStyle = `rgba(${opts.limb || '255,255,255'}, 0.34)`;
-  g.lineWidth = R * 0.035;
-  g.stroke();
-  g.restore();
-
-  // and a thin atmosphere glowing outside it
-  const atm = g.createRadialGradient(cx, cy, R * 0.97, cx, cy, R * 1.22);
-  atm.addColorStop(0, `rgba(${opts.glow}, 0.30)`);
-  atm.addColorStop(1, `rgba(${opts.glow}, 0)`);
-  g.fillStyle = atm;
-  g.beginPath(); g.arc(cx, cy, R * 1.22, 0, Math.PI * 2); g.fill();
-
-  const t = new CanvasTexture(c);
-  t.colorSpace = SRGBColorSpace;
-  t.minFilter = LinearFilter;
-  return t;
-}
-
-// ---- where a planet goes -------------------------------------------------
-// The landed camera, mirrored from the last key in CameraController. These
-// two vectors must stay in step with it.
-const LANDED_EYE = new Vector3(-3, 4.2, 21.5);
-const LANDED_AT = new Vector3(0, 5.6, 0);
-
-// Placing a planet at a raw world coordinate is a bet on one aspect ratio.
-// A portrait phone sees about 19 degrees either side of the view axis; a
-// laptop sees 43. Every planet used to be pinned in world space for the
-// laptop, so on a phone all five centres sat off the sides of the screen and
-// the only thing that ever reached the frame was a slice of one sprite's
-// edge — a big featureless arc with a hard cut across it, sliding past the
-// tower. Placing by the angle a planet makes with the landed view axis puts
-// it where it was meant to be on both.
-function place(azDeg, elDeg, dist) {
-  const fwd = LANDED_AT.clone().sub(LANDED_EYE).normalize();
-  const right = new Vector3().crossVectors(fwd, new Vector3(0, 1, 0)).normalize();
-  const up = new Vector3().crossVectors(right, fwd).normalize();
-  const az = azDeg * Math.PI / 180, el = elDeg * Math.PI / 180;
-  const dir = fwd.clone().multiplyScalar(Math.cos(az) * Math.cos(el))
-    .addScaledVector(right, Math.sin(az) * Math.cos(el))
-    .addScaledVector(up, Math.sin(el));
-  return LANDED_EYE.clone().addScaledVector(dir, dist);
-}
-
-// `body` is the diameter of the planet's own disc in world units. The sprite
-// is scaled up from it to leave room for the ring and the glow, so a ringed
-// planet's quad is twice the size of the ball you can see in it.
-const PLANETS = [
-  { name: 'ringed', az: 12.5, el: 15, dist: 300, body: 34, seed: 11,
-    base: '#b9a273', bandColour: '150,120,70', spotColour: '245,225,180',
-    glow: '235,210,150', bands: 12, spots: 1, ring: true,
-    ringColour: '226,206,164', ringTilt: -0.5 },
-  { name: 'banded', az: -14, el: 18, dist: 340, body: 42, seed: 3,
-    base: '#a97244', bandColour: '120,70,38', spotColour: '236,180,120',
-    glow: '230,170,110', bands: 16, spots: 3 },
-  // the moon is close and small, catching the same light the fountain does
-  { name: 'moon', az: 15.5, el: 24.5, dist: 150, body: 11, seed: 59,
-    base: '#a3a8b1', bandColour: '110,116,128', spotColour: '160,166,178',
-    glow: '190,205,230', bands: 4, spots: 4 },
-  // these two sit outside a phone's field of view on purpose: they are what
-  // fills the corners of a wide screen, where the two above leave a hole.
-  { name: 'ice', az: -26, el: 10, dist: 260, body: 26, seed: 23,
-    base: '#6693b0', bandColour: '40,80,120', spotColour: '200,235,255',
-    glow: '150,205,245', bands: 8, spots: 1 },
-  { name: 'red', az: 30, el: -1, dist: 220, body: 19, seed: 41,
-    base: '#94452f', bandColour: '90,40,28', spotColour: '230,150,110',
-    glow: '220,120,90', bands: 6, spots: 2 }
-];
-
 export class CosmicSky {
   constructor(renderer, quality) {
     this.quality = quality;
@@ -353,45 +215,10 @@ export class CosmicSky {
     this.stars.name = 'stars';
     this.group.add(this.stars);
 
-    // ---- the planets -----------------------------------------------------
-    this.planets = new Group();
-    this.planets.name = 'planets';
-    this.planetSprites = [];
-    const budget = low ? 3 : PLANETS.length;
-    PLANETS.slice(0, budget).forEach(p => {
-      // depthTest ON. A sprite is transparent, and the transparent pass runs
-      // after the opaque one — so with depth testing off a planet three
-      // hundred units away paints straight over the tower twenty units
-      // away, whatever its renderOrder says. Testing against the depth
-      // buffer is what actually puts it behind.
-      const mat = new SpriteMaterial({
-        map: planetTexture(p), transparent: true, depthWrite: false,
-        depthTest: true, blending: NormalBlending, opacity: 0
-      });
-      const sp = new Sprite(mat);
-      sp.position.copy(place(p.az, p.el, p.dist));
-      // The canvas draws the body at 0.92 / reach of its width, so this is
-      // the scale at which p.body world units of disc actually appear.
-      sp.scale.setScalar(p.body * reachOf(p) / 0.92);
-      sp.name = p.name;
-      sp.renderOrder = -880;
-      // Base height and a fixed rate, so the drift is a slow sway around
-      // where the planet was placed. Adding a sine to position.y every frame
-      // is a random walk, and over a long session it walks the planet out of
-      // the frame it was composed into.
-      sp.userData.baseY = sp.position.y;
-      sp.userData.rate = 0.05 + Math.random() * 0.05;
-      this.planets.add(sp);
-      this.planetSprites.push(sp);
-    });
-    this.group.add(this.planets);
-
     // ---- what the lighting rig and the water read ----------------------
-    // The planets' terminators all fall away to the lower right, so the key
-    // light comes from the upper left. Everything in the scene is lit from
-    // that same direction, which is the only reason a flat sprite planet and
-    // a shaded marble pier can share a frame without one of them looking
-    // wrong.
+    // A single distant sun from the upper left. Everything in the scene is
+    // lit from this one direction; it is what keeps the marble, the water
+    // and the flag agreeing with each other about where the light is.
     this.sunDirection = new Vector3(-0.42, 0.58, 0.70).normalize();
     this.sunColour = new Color().setHex(0xdce6ff, SRGBColorSpace);
     this.horizonColour = new Color().setHex(0x141c38, SRGBColorSpace);
@@ -412,13 +239,6 @@ export class CosmicSky {
     this.skyUniforms.uTime.value = t;
     this.starUniforms.uTime.value = t;
     this.starUniforms.uReveal.value = reveal;
-    // The planets do not orbit — they are hundreds of units away and orbital
-    // motion at that distance would be invisible. They drift, barely, so the
-    // sky is never quite the same twice.
-    this.planetSprites.forEach((s, i) => {
-      s.material.opacity = reveal;
-      s.position.y = s.userData.baseY + Math.sin(t * s.userData.rate + i) * 0.9;
-    });
   }
 
   dispose() {
@@ -427,6 +247,5 @@ export class CosmicSky {
     this.starMat.dispose();
     this.stars.geometry.dispose();
     this.starUniforms.uMap.value.dispose();
-    this.planetSprites.forEach(s => { s.material.map.dispose(); s.material.dispose(); });
   }
 }

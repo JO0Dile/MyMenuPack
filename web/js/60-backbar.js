@@ -86,10 +86,29 @@
     else { overlay.classList.remove('open'); }
   }, true);
 
+  // Every dialog card gets dir set from the app-wide language, so logical
+  // properties (inset-inline-start and friends) resolve to the right edge
+  // and the [dir="rtl"] rules in css/app.css finally match.
+  function markDirection(card){
+    var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+    if(card.getAttribute('dir') !== (rtl ? 'rtl' : 'ltr')){
+      card.setAttribute('dir', rtl ? 'rtl' : 'ltr');
+    }
+  }
+
   function inject(overlay){
     if(!overlay || SKIP.indexOf(overlay.id) !== -1) return;
     var card = overlay.querySelector('.modal-card');
-    if(!card || card.querySelector(':scope > .back-bar')) return;
+    if(!card) return;
+    // Mark the card's own direction. The stylesheet is full of
+    // `.modal-card[dir="rtl"]` rules that were written expecting this and
+    // never matched, because nothing set it — which is why the phone's back
+    // arrow pointed the wrong way in Arabic and every control that should
+    // mirror to the other side stayed put. Set on the card and not on
+    // <html>: a global flip would turn on a large amount of RTL CSS that has
+    // never run, all at once, and this is a dialog problem.
+    markDirection(card);
+    if(card.querySelector(':scope > .back-bar')) return;
     // A dialog that already rendered its own bar inside its body is left
     // alone — two bars would be worse than none.
     if(card.querySelector('.back-bar')) return;

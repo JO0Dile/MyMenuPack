@@ -287,6 +287,13 @@
   function applySize(id){
     var s = sizeById(id) || sizeById(SIZE_DEFAULT);
     document.documentElement.style.setProperty('--card-scale', String(s.scale));
+    // The scale alone only shrinks type. "Compact" should also mean a tighter
+    // layout — closer gaps, no second-language line — and "Extra large" should
+    // mean roomier, so the setting is named for what a student wants ("fit a
+    // whole year" / "I can actually read this") rather than for a font size.
+    // Rather than add a second density control next to this one, this exposes
+    // the choice to CSS and the density rules hang off it.
+    document.documentElement.setAttribute('data-card-size', s.id);
     document.querySelectorAll('[data-size-pick]').forEach(function(el){
       el.classList.toggle('size-pick-active', el.getAttribute('data-size-pick') === s.id);
     });
