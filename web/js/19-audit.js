@@ -355,10 +355,33 @@
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');
     bindModes(prefix);
+    markScrollable(body);
     if(window.AAUP_GPA_STUDIO) window.AAUP_GPA_STUDIO.bind(prefix, rtl);
     if(window.AAUP_GPA_TARGET && document.getElementById('auditGpaTargetBody')){
       window.AAUP_GPA_TARGET.render(prefix, 'auditGpaTargetBody', rtl);
     }
+  }
+
+  // The table has always scrolled sideways — .audit-table-wrap carries
+  // overflow-x:auto — but nothing on screen said so, so on a phone the last
+  // two columns simply sat past the edge and the table read as broken rather
+  // than as scrollable. The CSS draws a fade and a chevron on the trailing
+  // edge; these two classes tell it whether there is anything to scroll to
+  // and whether you have already got there.
+  function markScrollable(body){
+    body.querySelectorAll('.audit-table-wrap').forEach(function(wrap){
+      var sync = function(){
+        // scrollLeft runs negative in an RTL container, so compare distances.
+        var max = wrap.scrollWidth - wrap.clientWidth;
+        var at = Math.abs(wrap.scrollLeft);
+        wrap.classList.toggle('can-scroll', max > 4);
+        wrap.classList.toggle('at-end', max <= 4 || at >= max - 4);
+      };
+      wrap.addEventListener('scroll', sync, { passive: true });
+      // The dialog is mid-open, so the table has no measured width yet.
+      requestAnimationFrame(sync);
+      setTimeout(sync, 220);
+    });
   }
 
   function bindModes(prefix){

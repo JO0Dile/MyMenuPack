@@ -19,6 +19,8 @@ import json
 import pathlib
 import sys
 
+import arabic_fill
+
 REPO = pathlib.Path(__file__).resolve().parent.parent
 DATA = REPO / 'data'
 OUT = REPO / 'web' / 'plans.json'
@@ -228,6 +230,18 @@ def main():
             p['majorName']['en']['big'],
         ))
         plans.extend(shaped)
+
+    # The Arabic side of the catalogue, filled in from data/ before the version
+    # hash is taken so it is part of what a plan's version describes.
+    #
+    # This is a build STEP and not a script anyone runs by hand, and that is
+    # deliberate: it used to be three scripts that edited web/plans.json in
+    # place, and web/plans.json is this file's output. The next rebuild
+    # regenerated it from data/ and silently deleted 3,221 Arabic course names,
+    # 64 programme names and 68 descriptions. Nothing failed — the app just
+    # quietly went back to English. Running it here means a rebuild cannot undo
+    # it.
+    ok = arabic_fill.apply(plans)
 
     # A plan's version must increase when its content changes, or a student who
     # already has the old copy never receives the fix. Content-derived rather

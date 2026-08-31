@@ -6485,6 +6485,126 @@ h2.mh, h3.mh{display:flex; align-items:center; gap:8px;}
    not error-coloured: a heavy term is a thing to notice, not a thing that is
    wrong. */
 .imp-semester-title{display:flex; align-items:baseline; gap:8px;}
+
+/* ============================================================
+   THE PLAN SURFACE — eight changes, all on the course card and
+   the semester it sits in.
+   ============================================================ */
+
+/* 35 · THE SEMESTER HEADER STICKS.
+   Six courses in a two-column grid is three rows, and by the second one the
+   header has scrolled away — taking the running hours total with it, which is
+   the number you are checking WHILE you look at the courses. It rides just
+   under the plan's own sticky progress meter. */
+.imp-semester-title{
+  position:sticky; top:var(--sticky-top, 0px); z-index:3;
+  padding:6px 0 7px; margin-bottom:6px;
+  background:linear-gradient(to bottom,
+    var(--bg) 68%, color-mix(in srgb, var(--bg) 0%, transparent));
+}
+
+/* 1 · THE LOAD IS A VERDICT, NOT A NUMBER.
+   Measured against this plan's own median term (js/28-imported.js), because a
+   163-hour engineering degree and a 33-hour diploma do not share a definition
+   of heavy. The hours stay next to it for anyone who wants them. */
+.imp-sem-verdict{
+  font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  padding:2px 7px; border-radius:5px; line-height:1.5;
+}
+.imp-sem-verdict.is-light{background:var(--sem-light-bg,rgba(90,150,220,.16)); color:var(--sem-light,#7fb3e8);}
+.imp-sem-verdict.is-balanced{background:var(--sem-ok-bg,rgba(70,190,130,.15)); color:var(--sem-ok,#4ecb8b);}
+.imp-sem-verdict.is-heavy{background:var(--sem-heavy-bg,rgba(230,110,140,.16)); color:var(--sem-heavy,#ff7a9c);}
+
+/* 18 · A THREE-LETTER BUCKET CODE.
+   The plan encodes six requirement buckets in colour alone. Roughly one man in
+   twelve cannot separate the green from the orange, and nobody can in a
+   black-and-white printout. The code sits in the corner the checkbox does not
+   use, quiet enough to ignore and legible enough to settle an argument. */
+.course .req-code{
+  position:absolute; top:7px; inset-inline-start:9px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:8.5px; font-weight:700; letter-spacing:.08em;
+  color:var(--text-dim); opacity:.62; pointer-events:none;
+}
+.course{position:relative;}
+.course .name{padding-top:11px;}
+
+/* 43 · THE OTHER LANGUAGE, UNDERNEATH.
+   Lectures, slides and the registrar all use the English title, so a student
+   reading Arabic still has to match the card to what the portal calls it. */
+.course .name-alt{
+  font-size:10.5px; font-weight:500; line-height:1.35;
+  color:var(--text-dim); opacity:.72; margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* 37 · SHAPE, NOT ONLY COLOUR, FOR THE THREE STATES.
+   Solid fill for done, a full outline for open, a dashed outline for locked —
+   readable in sunlight, in greyscale, and without colour vision. */
+.course{border:1px solid transparent;}
+.course.available:not(.completed){border-style:solid;}
+.course:not(.available):not(.completed){
+  border-style:dashed; border-color:var(--line);
+}
+
+/* 32 · THE GRADE COLOURS THE CARD.
+   Once a grade is in, the bucket has done its job — you already know Calculus
+   is a college requirement. What you want to see across a finished year is how
+   it went. The stripe on the leading edge switches to the grade band; the
+   bucket code above still says which block it belonged to. */
+.course.completed.grade-a{--card-grade:#2f9e68; --card-grade-tx:#effaf4;}
+.course.completed.grade-b{--card-grade:#3f6fd8; --card-grade-tx:#eef3ff;}
+.course.completed.grade-c{--card-grade:#c08420; --card-grade-tx:#fff8ea;}
+.course.completed.grade-d{--card-grade:#c4611f; --card-grade-tx:#fff2e8;}
+.course.completed.grade-f{--card-grade:#c8365c; --card-grade-tx:#ffeef3;}
+/* The card is FILLED by its requirement bucket, so an edge stripe would be
+   invisible against it — the fill itself has to carry the grade. The bucket is
+   not lost: the three-letter code added above still says which block the course
+   belongs to, which is the whole reason those two changes ship together. */
+.course.completed[class*=" grade-"]{
+  background:var(--card-grade) !important;
+  color:var(--card-grade-tx) !important;
+}
+.course.completed[class*=" grade-"] .course-meta,
+.course.completed[class*=" grade-"] .name-alt,
+.course.completed[class*=" grade-"] .req-code{
+  color:var(--card-grade-tx); opacity:.82;
+}
+
+/* 36 · DENSITY, FOLDED INTO THE SIZE CONTROL THAT ALREADY EXISTS.
+   Settings already offers Compact / Normal / Large / Extra large, and it only
+   scaled the type. A second "density" control beside it would have been two
+   settings for one decision. So Compact now means a genuinely tighter layout —
+   closer gaps, no second-language line, smaller meta — which is what someone
+   choosing it actually wants: a 163-hour engineering degree, one year at a
+   time, without scrolling. js/17-theme.js writes data-card-size on the root. */
+:root[data-card-size="compact"] .course-row{gap:6px;}
+:root[data-card-size="compact"] .course .name-alt{display:none;}
+:root[data-card-size="compact"] .course-meta{font-size:9.5px;}
+:root[data-card-size="compact"] .imp-semester-block{margin-bottom:10px;}
+:root[data-card-size="compact"] .imp-semester-title{padding:4px 0 5px;}
+/* …and the two large steps go the other way: more air, not just bigger type. */
+:root[data-card-size="large"] .course-row,
+:root[data-card-size="xlarge"] .course-row{gap:12px;}
+:root[data-card-size="xlarge"] .imp-semester-block{margin-bottom:22px;}
+
+/* 31 · THE AUDIT TABLE SAYS IT SCROLLS.
+   It always did — .audit-table-wrap has overflow-x:auto — but nothing on
+   screen suggested it, so a table with two columns past the edge read as
+   broken rather than scrollable. A fade on the trailing edge and a chevron,
+   both of which disappear once you reach the end. */
+.audit-table-wrap{position:relative;}
+.audit-table-wrap::after{
+  content:'\203A'; position:absolute; top:0; bottom:0; inset-inline-end:0;
+  width:34px; display:flex; align-items:center; justify-content:center;
+  font-size:17px; color:var(--accent); pointer-events:none;
+  background:linear-gradient(to var(--fade-to,left),
+    var(--card-bg) 30%, color-mix(in srgb, var(--card-bg) 0%, transparent));
+  opacity:1; transition:opacity .18s;
+}
+.audit-table-wrap[dir="rtl"], [dir="rtl"] .audit-table-wrap{--fade-to:right;}
+.audit-table-wrap.at-end::after{opacity:0;}
+.audit-table-wrap:not(.can-scroll)::after{content:none;}
 .imp-sem-hours{
   margin-inline-start:auto; font-variant-numeric:tabular-nums;
   font-weight:800; color:var(--text-dim); letter-spacing:0;
