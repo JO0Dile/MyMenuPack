@@ -92,7 +92,9 @@
       // info.name (from planDisplayInfo) is already HTML-escaped once by the
       // sync sanitizer — esc()'ing it again would show a literal "&amp;".
       '<div><div class="po-name">' + (info.name || prefix) + '</div>' +
-      '<div class="po-uni">The Arab American University · الجامعة العربية الأمريكية</div></div></div>' +
+      '<div class="po-uni">' + (rtl
+        ? 'الجامعة العربية الأمريكية'
+        : 'The Arab American University') + '</div></div></div>' +
       '<div class="po-meta">' + rows.map(function(r){ return '<span>' + r + '</span>'; }).join('') + '</div>' +
       '</div>';
   }
@@ -137,7 +139,11 @@
       html += '</div>';
     });
     html += '</div>';
-    html += '<p class="po-foot">Unofficial student planning tool — always confirm with your academic advisor. · أداة طلابية غير رسمية — تأكد دائمًا من مرشدك الأكاديمي.</p>';
+    // One language, not both at once. This sheet is printed; a student who
+    // reads Arabic should not hand in a page with the same sentence twice.
+    html += '<p class="po-foot">' + (rtl
+      ? 'أداة طلابية غير رسمية — تأكد دائمًا من مرشدك الأكاديمي.'
+      : 'Unofficial student planning tool — always confirm with your academic advisor.') + '</p>';
     return html;
   }
 

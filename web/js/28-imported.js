@@ -1121,7 +1121,7 @@
       : '';
     var checkboxHtml = editing ? '' :
       '<span class="course-check" role="checkbox" tabindex="0" aria-checked="' + (done ? 'true' : 'false') + '" ' +
-      'aria-label="Mark course as completed" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
+      'aria-label="' + (rtl ? 'ضع علامة إنجاز على المساق' : 'Mark course as completed') + '" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
       'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">' + window.AAUP_ICONS.preview('tick', 11) + '</span>';
     // The line under the name answers the three things a student checks on
     // every card: which year the plan puts it in, whether they can register
