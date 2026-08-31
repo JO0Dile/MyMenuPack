@@ -78,14 +78,23 @@
     return !(p.official && !p.wasEdited);
   }
 
+  // Reads the side the language switch asks for, falling back to English for
+  // a plan with no Arabic name — the same rule the sidebar and the dashboard
+  // use, so one plan is never called two different things on two screens.
   function planNameFor(prefix){
+    var arabic = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     var imported = window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix];
     if(imported && imported.majorName){
-      var parts = window.AAUP_IMPORTED.nameParts(imported.majorName.en || '');
+      var side = arabic ? (imported.majorName.ar || imported.majorName.en) : imported.majorName.en;
+      var parts = window.AAUP_IMPORTED.nameParts(side || '');
+      if(!parts.big){ parts = window.AAUP_IMPORTED.nameParts(imported.majorName.en || ''); }
       return parts.big || imported.majorName.en || prefix;
     }
     var page = document.getElementById('page-' + prefix);
-    var nameEl = page && page.querySelector('.title-block .en');
+    var nameEl = page && page.querySelector('.title-block ' + (arabic ? '.ar' : '.en'));
+    if(!nameEl || !nameEl.textContent.trim()){
+      nameEl = page && page.querySelector('.title-block .en');
+    }
     return nameEl ? nameEl.textContent.trim() : prefix;
   }
 

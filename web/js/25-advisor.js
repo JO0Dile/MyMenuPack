@@ -214,7 +214,8 @@
         '<span class="sb-meter-note">' + t.count + ' ' +
           (rtl ? 'مساق' : (t.count === 1 ? 'course' : 'courses')) + ' · ' + note + '</span>' +
       '</div>' +
-      '<div class="sb-meter-bar" role="img" aria-label="' + t.cr + ' credit hours">' +
+      '<div class="sb-meter-bar" role="img" aria-label="' + t.cr +
+        (rtl ? ' ساعة معتمدة' : ' credit hours') + '">' +
         '<span class="sb-meter-fill" style="width:' + pct.toFixed(1) + '%;"></span>' +
         '<span class="sb-meter-tick" style="inset-inline-start:' + ((FULL_TIME / METER_MAX) * 100).toFixed(1) + '%;"></span>' +
         '<span class="sb-meter-tick" style="inset-inline-start:' + ((TARGET_MAX / METER_MAX) * 100).toFixed(1) + '%;"></span>' +

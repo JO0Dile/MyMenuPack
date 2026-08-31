@@ -108,6 +108,13 @@
 
   // ---------- shell ----------
 
+  // The catalogue editor behind the password is a maintainer tool and stays
+  // in English. The sign-in screen in front of it is not: it is the one part
+  // of this module a student can reach by typing #admin, so it follows the
+  // language switch like the rest of the app.
+  function ar(){ return !!(window.AAUP_LANG && window.AAUP_LANG.isAr()); }
+  function T(en, arabic){ return ar() ? arabic : en; }
+
   function ensureOverlay(){
     if(document.getElementById('adminOverlay')) return;
     var el = document.createElement('div');
@@ -115,15 +122,15 @@
     el.className = 'admin-overlay';
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
-    el.setAttribute('aria-label', 'Admin');
+    el.setAttribute('aria-label', T('Admin', 'لوحة الإدارة'));
     el.innerHTML =
       '<div class="admin-shell">' +
         '<header class="admin-top">' +
-          '<div class="admin-brand">🛡 <strong>Admin</strong><span id="adminWho"></span></div>' +
+          '<div class="admin-brand">🛡 <strong>' + T('Admin', 'لوحة الإدارة') + '</strong><span id="adminWho"></span></div>' +
           '<div class="admin-top-actions">' +
             '<span id="adminSaveState" class="admin-savestate"></span>' +
-            '<button type="button" class="home-btn" id="adminSignOut">Sign out</button>' +
-            '<button type="button" class="home-btn" id="adminClose">✕ Close</button>' +
+            '<button type="button" class="home-btn" id="adminSignOut">' + T('Sign out', 'تسجيل الخروج') + '</button>' +
+            '<button type="button" class="home-btn" id="adminClose">✕ ' + T('Close', 'إغلاق') + '</button>' +
           '</div>' +
         '</header>' +
         '<div class="admin-body">' +
@@ -209,18 +216,20 @@
     if(nav) nav.innerHTML = '';
     main.innerHTML =
       '<div class="admin-login">' +
-        '<h2>Sign in</h2>' +
-        '<p class="admin-hint">Your password is checked on the server. It is never stored in this page, ' +
-        'and nothing here can change published data without it.</p>' +
-        '<div class="form-field"><label for="adminUser">Username</label>' +
+        '<h2>' + T('Sign in', 'تسجيل الدخول') + '</h2>' +
+        '<p class="admin-hint">' + T(
+          'Your password is checked on the server. It is never stored in this page, ' +
+          'and nothing here can change published data without it.',
+          'تُفحص كلمة المرور على الخادم. لا تُخزَّن في هذه الصفحة أبدًا، ولا شيء هنا يستطيع تغيير البيانات المنشورة بدونها.') + '</p>' +
+        '<div class="form-field"><label for="adminUser">' + T('Username', 'اسم المستخدم') + '</label>' +
         '<input type="text" id="adminUser" autocomplete="username" autocapitalize="none" spellcheck="false"></div>' +
-        '<div class="form-field"><label for="adminPass">Password</label>' +
+        '<div class="form-field"><label for="adminPass">' + T('Password', 'كلمة المرور') + '</label>' +
         '<input type="password" id="adminPass" autocomplete="current-password"></div>' +
-        '<div class="form-actions"><button type="button" class="home-btn admin-primary" id="adminLoginBtn">Sign in</button></div>' +
+        '<div class="form-actions"><button type="button" class="home-btn admin-primary" id="adminLoginBtn">' + T('Sign in', 'تسجيل الدخول') + '</button></div>' +
         (err ? '<p class="dev-error-msg">' + esc(err) + '</p>' : '') +
         '<p class="admin-hint" id="adminHealth"></p>' +
         '<details class="admin-endpoint"' + (unreachable ? ' open' : '') + '>' +
-          '<summary>Admin API address</summary>' +
+          '<summary>' + T('Admin API address', 'عنوان واجهة الإدارة') + '</summary>' +
           (unreachable
             ? '<p class="admin-hint">The browser could not reach it at all — that happens before any ' +
               'password is checked, so this is not about your credentials. Usually it means the ' +
@@ -229,12 +238,12 @@
               '<p class="admin-hint">Open <code>' + esc(base()) + '/api/health</code> in a tab. ' +
               'If it shows <code>{"ok":true}</code> the address is right; if nothing loads, it is wrong.</p>'
             : '') +
-          '<div class="form-field"><label for="adminUrl">Worker URL</label>' +
+          '<div class="form-field"><label for="adminUrl">' + T('Worker URL', 'رابط الـ Worker') + '</label>' +
           '<input type="text" id="adminUrl" spellcheck="false" autocapitalize="none" ' +
           'value="' + esc(base()) + '" placeholder="https://your-worker.your-subdomain.workers.dev"></div>' +
           '<div class="form-actions">' +
-          '<button type="button" class="home-btn" id="adminUrlTest">Test</button>' +
-          '<button type="button" class="home-btn" id="adminUrlSave">Use this address</button>' +
+          '<button type="button" class="home-btn" id="adminUrlTest">' + T('Test', 'اختبار') + '</button>' +
+          '<button type="button" class="home-btn" id="adminUrlSave">' + T('Use this address', 'استخدم هذا العنوان') + '</button>' +
           (savedUrl() ? '<button type="button" class="home-btn" id="adminUrlReset">Reset to default</button>' : '') +
           '</div><div id="adminUrlMsg" class="admin-hint"></div>' +
         '</details>' +
@@ -255,7 +264,7 @@
         render();
       }).catch(function(e){
         renderLogin(e.unreachable
-          ? 'Could not reach the admin API.'
+          ? T('Could not reach the admin API.', 'تعذّر الوصول إلى واجهة الإدارة.')
           : e.message, !!e.unreachable);
       });
     };
@@ -286,7 +295,8 @@
               urlMsg('Reached it, but it refuses this site. Set its ALLOWED_ORIGIN to exactly ' +
                      esc(location.origin) + ' and redeploy.', false);
             } else if(h && h.ok){
-              urlMsg('✅ Reached it. Press "Use this address", then sign in.', true);
+              urlMsg(T('✅ Reached it. Press "Use this address", then sign in.',
+                '✅ تم الوصول. اضغط «استخدم هذا العنوان» ثم سجّل الدخول.'), true);
             } else {
               urlMsg('Something answered, but not the admin Worker.', false);
             }
@@ -339,13 +349,14 @@
         }
       }).catch(function(){
         var el = document.getElementById('adminHealth');
-        if(el) el.innerHTML = '⚠️ Could not reach the admin API — see below.';
+        if(el) el.innerHTML = T('⚠️ Could not reach the admin API — see below.',
+          '⚠️ تعذّر الوصول إلى واجهة الإدارة — انظر أدناه.');
         var d = document.querySelector('.admin-endpoint');
         if(d) d.open = true;
       });
     } else {
       var el = document.getElementById('adminHealth');
-      if(el) el.innerHTML = 'No admin API is configured.';
+      if(el) el.innerHTML = T('No admin API is configured.', 'لا توجد واجهة إدارة مُعدّة.');
     }
   }
 

@@ -15,7 +15,11 @@
   function buildModel(prefix){
     var root = document.getElementById('page-' + prefix);
     if(!root) return null;
-    var rtl = root.classList.contains('rtl-mode');
+    // The Overview is opened from Share, which can be reached with the plan
+    // page not rendered — and then the class is absent and the whole sheet
+    // came out in English.
+    var rtl = root.classList.contains('rtl-mode') ||
+      !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     var info = (window.__PLAN_DATA[prefix] || {}).courseInfo || {};
     var grades = (window.AAUP_GPA && window.AAUP_GPA.loadGrades) ? window.AAUP_GPA.loadGrades() : {};
     var progress = window.__getProgress ? window.__getProgress() : {};
@@ -88,7 +92,9 @@
       // info.name (from planDisplayInfo) is already HTML-escaped once by the
       // sync sanitizer — esc()'ing it again would show a literal "&amp;".
       '<div><div class="po-name">' + (info.name || prefix) + '</div>' +
-      '<div class="po-uni">The Arab American University · الجامعة العربية الأمريكية</div></div></div>' +
+      '<div class="po-uni">' + (rtl
+        ? 'الجامعة العربية الأمريكية'
+        : 'The Arab American University') + '</div></div></div>' +
       '<div class="po-meta">' + rows.map(function(r){ return '<span>' + r + '</span>'; }).join('') + '</div>' +
       '</div>';
   }
@@ -101,7 +107,10 @@
 
   function renderOverview(prefix){
     var model = buildModel(prefix);
-    if(!model) return '<p class="ex-note">Open a study plan first.</p>';
+    if(!model){
+      return '<p class="ex-note">' + ((window.AAUP_LANG && window.AAUP_LANG.isAr())
+        ? 'افتح خطة دراسية أولاً.' : 'Open a study plan first.') + '</p>';
+    }
     var rtl = model.rtl;
     var html = planHeader(prefix, rtl);
     html += '<div class="po-years">';
@@ -130,26 +139,36 @@
       html += '</div>';
     });
     html += '</div>';
-    html += '<p class="po-foot">Unofficial student planning tool — always confirm with your academic advisor. · أداة طلابية غير رسمية — تأكد دائمًا من مرشدك الأكاديمي.</p>';
+    // One language, not both at once. This sheet is printed; a student who
+    // reads Arabic should not hand in a page with the same sentence twice.
+    html += '<p class="po-foot">' + (rtl
+      ? 'أداة طلابية غير رسمية — تأكد دائمًا من مرشدك الأكاديمي.'
+      : 'Unofficial student planning tool — always confirm with your academic advisor.') + '</p>';
     return html;
   }
 
   function ensureOverlay(){
     var overlay = document.getElementById('planOverviewOverlay');
     if(overlay) return overlay;
+    // The chrome around the sheet is built once and cached, so it has to be
+    // relabelled on every open (see labelOverlay below) rather than only here
+    // — otherwise the language the student happened to be in the first time
+    // they opened Overview is the language of these buttons for the session.
+    var A = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'planOverviewOverlay';
     overlay.innerHTML =
       '<div class="modal-card po-card">' +
-        '<button class="modal-close" id="planOverviewClose" aria-label="Close">&times;</button>' +
+        '<button class="modal-close" id="planOverviewClose" aria-label="' + (A ? 'إغلاق' : 'Close') + '">&times;</button>' +
         '<div class="po-actions">' +
-          '<div class="po-modes" role="group" aria-label="Detail level">' +
-            '<button type="button" class="po-mode is-on" data-po-mode="compact">Compact</button>' +
-            '<button type="button" class="po-mode" data-po-mode="full">Full plan</button>' +
+          '<div class="po-modes" role="group" aria-label="' + (A ? 'مستوى التفصيل' : 'Detail level') + '">' +
+            '<button type="button" class="po-mode is-on" data-po-mode="compact">' + (A ? 'مختصر' : 'Compact') + '</button>' +
+            '<button type="button" class="po-mode" data-po-mode="full">' + (A ? 'الخطة كاملة' : 'Full plan') + '</button>' +
           '</div>' +
           '<button type="button" class="home-btn po-print" id="planOverviewPrintBtn">' +
-            (window.AAUP_ICONS ? window.AAUP_ICONS.preview('printer', 15) : '') + 'Print / Save PDF</button>' +
+            (window.AAUP_ICONS ? window.AAUP_ICONS.preview('printer', 15) : '') +
+            (A ? 'طباعة / حفظ PDF' : 'Print / Save PDF') + '</button>' +
         '</div>' +
         // .po-sheet is a page, not a panel: white, page-proportioned and with
         // a shadow, so what is on screen is what comes out of the printer.
@@ -180,9 +199,32 @@
   }
 
   var currentPrefix = null;
+  // The overlay chrome is built once and reused. Relabel it on every open so
+  // it follows the language switch instead of the language it was born in.
+  function labelOverlay(overlay){
+    var A = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+    var set = function(sel, text, attr){
+      var el = overlay.querySelector(sel);
+      if(!el) return;
+      if(attr) el.setAttribute(attr, text);
+      else el.textContent = text;
+    };
+    set('#planOverviewClose', A ? 'إغلاق' : 'Close', 'aria-label');
+    set('.po-modes', A ? 'مستوى التفصيل' : 'Detail level', 'aria-label');
+    set('[data-po-mode="compact"]', A ? 'مختصر' : 'Compact');
+    set('[data-po-mode="full"]', A ? 'الخطة كاملة' : 'Full plan');
+    var print = overlay.querySelector('#planOverviewPrintBtn');
+    if(print){
+      print.innerHTML = (window.AAUP_ICONS ? window.AAUP_ICONS.preview('printer', 15) : '') +
+        (A ? 'طباعة / حفظ PDF' : 'Print / Save PDF');
+    }
+    overlay.setAttribute('dir', A ? 'rtl' : 'ltr');
+  }
+
   function open(prefix){
     currentPrefix = prefix;
     var overlay = ensureOverlay();
+    labelOverlay(overlay);
     document.getElementById('planOverviewBody').innerHTML = renderOverview(prefix);
     overlay.classList.add('open');
   }

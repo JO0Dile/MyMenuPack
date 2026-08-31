@@ -38,5 +38,59 @@
   }
   function toggle(){ return set(isAr() ? 'en' : 'ar'); }
 
-  window.AAUP_LANG = { get: get, set: set, isAr: isAr, toggle: toggle };
+  // ---------------------------------------------------------------------
+  // STATIC MARKUP
+  //
+  // Most of the app builds its own HTML in JS and can read isAr() while it
+  // renders. index.html cannot: its labels are written once, in English, and
+  // then never touched — so the assistant panel, the Fix panel and the
+  // course-detail sheet kept their English aria-labels and placeholders in
+  // Arabic no matter what the switch said, which is invisible on screen but
+  // is the entire interface to a student using a screen reader.
+  //
+  // So: put the Arabic next to the English in the markup, as data-ar,
+  // data-ar-label, data-ar-placeholder or data-ar-title, and this swaps it
+  // in. The English is stashed on the node the first time it is swapped so
+  // switching back is exact rather than a second translation.
+  var ATTRS = [
+    ['data-ar', null], ['data-ar-label', 'aria-label'],
+    ['data-ar-placeholder', 'placeholder'], ['data-ar-title', 'title']
+  ];
+
+  function applyStatic(root){
+    var scope = root || document;
+    var arabic = isAr();
+    ATTRS.forEach(function(pair){
+      var src = pair[0], target = pair[1];
+      var nodes = scope.querySelectorAll('[' + src + ']');
+      for(var i = 0; i < nodes.length; i++){
+        var el = nodes[i];
+        // data-ar rewrites textContent, which would delete any child
+        // elements. Only ever use it on a leaf.
+        if(!target && el.children.length) continue;
+        var stash = '__en_' + (target || 'text');
+        if(el[stash] === undefined){
+          el[stash] = target ? (el.getAttribute(target) || '') : el.textContent;
+        }
+        var value = arabic ? el.getAttribute(src) : el[stash];
+        if(target) el.setAttribute(target, value);
+        else el.textContent = value;
+      }
+    });
+  }
+
+  function setAndApply(v){ var r = set(v); applyStatic(); return r; }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ applyStatic(); });
+  } else {
+    applyStatic();
+  }
+
+  window.AAUP_LANG = {
+    get: get, isAr: isAr,
+    set: setAndApply,
+    toggle: function(){ return setAndApply(isAr() ? 'en' : 'ar'); },
+    applyStatic: applyStatic
+  };
 })();

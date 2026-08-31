@@ -24,7 +24,8 @@
     var root = rootFor(prefix);
     if(!root) return;
     var ratings = (window.AAUP_PERSONAL && window.AAUP_PERSONAL.loadRatings) ? window.AAUP_PERSONAL.loadRatings() : {};
-    var rtl = root.classList.contains('rtl-mode');
+    var rtl = root.classList.contains('rtl-mode') ||
+      !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     var LABELS = rtl
       ? { Hard: 'صعب', Medium: 'متوسط', Easy: 'سهل' }
       : { Hard: 'hard', Medium: 'medium', Easy: 'easy' };

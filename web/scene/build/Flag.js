@@ -10,12 +10,11 @@
 // The normal is recomputed from the analytic derivatives of those same
 // waves, so the light actually runs along the folds instead of sitting flat.
 //
-// ON THE MARK: this flies AAUPATH's own flag — the app icon that ships in
-// this repository, on a plain field. It is deliberately not the university's
-// crest: that artwork is not in this repository, and drawing an approximation
-// of a real institution's mark is worse than not drawing it. Drop the real
-// file in web/assets/img/ and pass its URL as `emblemUrl` to replace the
-// whole cloth; nothing else here changes.
+// ON THE MARK: the university's own seal, from web/assets/img/aaup-emblem.png.
+// It is composited onto a white field at load; none of it is drawn here, and
+// there is no invented fallback — if the file does not load the flag is a
+// plain white field. Pass `emblemUrl` instead to replace the entire cloth
+// with a ready-made flag image.
 // ==========================
 import {
   Group, Mesh, PlaneGeometry, CylinderGeometry, SphereGeometry,
@@ -85,18 +84,17 @@ const FRAG = /* glsl */`
   }
 `;
 
-// The cloth. This is AAUPATH's flag, not the university's: the app's own
-// mark, which exists in this repository, on a plain field. The previous
-// version drew an invented institutional roundel — a green ring with a
-// made-up device and the university's name arced around it — and an
-// invented crest for a real institution is worse than no crest at all, so
-// it is gone. If you have the university's actual artwork, drop the file in
-// web/assets/img/ and pass its URL as `emblemUrl`; it replaces this whole
-// texture and nothing else changes.
-const FIELD = '#f6f5f1';
-const BAND = '#e9e7e0';
-const INK = '#1d2a44';
-const BLUE = '#2f5fd0';
+// The cloth. The university's flag: its seal on a white field, which is how
+// an institutional flag is actually made — the mark carries the name, so
+// nothing is set beside it.
+//
+// The artwork in web/assets/img/aaup-emblem.png is the university's own
+// crest, supplied for this purpose and masked to its own circle so the
+// square it arrived in does not show on the cloth. Nothing here draws or
+// approximates it; if the file fails to load the flag stays a plain white
+// field rather than falling back to something invented.
+const FIELD = '#fbfbfa';
+const BAND = '#eceae4';
 
 function drawCloth(g, W, H) {
   g.fillStyle = FIELD;
@@ -105,67 +103,32 @@ function drawCloth(g, W, H) {
   g.fillStyle = BAND;
   g.fillRect(0, 0, W * 0.045, H);
   // and a thin rule down the fly, the way a sewn flag is finished
-  g.fillStyle = 'rgba(29,42,68,0.10)';
+  g.fillStyle = 'rgba(40,44,52,0.10)';
   g.fillRect(W - W * 0.012, 0, W * 0.012, H);
 }
 
-function drawType(g, W, H) {
-  g.save();
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.fillStyle = INK;
-  g.font = `700 ${H * 0.13}px system-ui, sans-serif`;
-  // letter-spaced by hand: canvas has no tracking, and a wordmark set solid
-  // at this size reads as a smudge on a flag two dozen units away
-  const word = 'AAUPATH', track = H * 0.028;
-  const widths = [...word].map(ch => g.measureText(ch).width);
-  const total = widths.reduce((a, b) => a + b, 0) + track * (word.length - 1);
-  let x = W * 0.54 - total / 2;
-  for (let i = 0; i < word.length; i++) {
-    g.fillText(word[i], x + widths[i] / 2, H * 0.755);
-    x += widths[i] + track;
-  }
-  g.fillStyle = BLUE;
-  g.font = `600 ${H * 0.105}px system-ui, sans-serif`;
-  g.fillText('\u0637\u0631\u064a\u0642\u0643', W * 0.54, H * 0.885);
-  g.restore();
-}
-
-// The field is drawn straight away so the flag is never blank; the mark is
-// composited in when the icon has decoded, and the texture is marked for
-// re-upload. `onReady` fires on both paths so the caller does not have to
-// care which one happened.
-function flagTexture(iconUrl, onReady) {
+// The field is drawn straight away so the flag is never blank; the seal is
+// composited in when it has decoded, and the texture marked for re-upload.
+function flagTexture(sealUrl) {
   const W = 512, H = 336;
   const c = document.createElement('canvas');
   c.width = W; c.height = H;
   const g = c.getContext('2d');
   drawCloth(g, W, H);
-  drawType(g, W, H);
 
   const t = new CanvasTexture(c);
   t.colorSpace = SRGBColorSpace;
   t.minFilter = LinearFilter;
 
-  if (iconUrl) {
+  if (sealUrl) {
     const img = new Image();
     img.onload = () => {
-      const s = H * 0.42;
-      g.save();
-      // a soft drop under the badge so it sits on the cloth instead of
-      // floating on it
-      g.shadowColor = 'rgba(29,42,68,0.28)';
-      g.shadowBlur = H * 0.035;
-      g.shadowOffsetY = H * 0.012;
-      g.drawImage(img, W * 0.54 - s / 2, H * 0.34 - s / 2, s, s);
-      g.restore();
+      // 0.74 of the hoist depth, centred in the field the hoist band leaves
+      const d = H * 0.74;
+      g.drawImage(img, W * 0.535 - d / 2, H / 2 - d / 2, d, d);
       t.needsUpdate = true;
-      if (onReady) onReady();
     };
-    img.onerror = () => { if (onReady) onReady(); };
-    img.src = iconUrl;
-  } else if (onReady) {
-    onReady();
+    img.src = sealUrl;
   }
   return t;
 }
@@ -173,7 +136,7 @@ function flagTexture(iconUrl, onReady) {
 export class Flag {
   constructor(materials, quality, sky,
     { x = 0, z = 0, height = 9.5, emblemUrl = null,
-      iconUrl = 'assets/icons/icon-any-512.png' } = {}) {
+      sealUrl = 'assets/img/aaup-emblem.png' } = {}) {
     this.m = materials;
     this.group = new Group();
     this.group.name = 'flag';
@@ -198,7 +161,7 @@ export class Flag {
     // the hoist sits on the pole, so the plane is offset to hang off it
     geo.translate(CW / 2, 0, 0);
 
-    const map = flagTexture(iconUrl);
+    const map = flagTexture(sealUrl);
     this.uniforms = {
       uTime: { value: 0 },
       uWind: { value: 1 },
@@ -221,9 +184,8 @@ export class Flag {
     this.cloth.name = 'cloth';
     this.group.add(this.cloth);
 
-    // If the university's own artwork is dropped in, it replaces the whole
-    // cloth with no other change. On failure the drawn field stays, which is
-    // why the field has to be worth looking at on its own.
+    // `emblemUrl` replaces the whole cloth with a single ready-made image —
+    // a full flag artwork rather than a seal to be composited onto a field.
     if (emblemUrl) {
       new TextureLoader().load(emblemUrl, tex => {
         tex.colorSpace = SRGBColorSpace;

@@ -15,15 +15,26 @@
     return !!(window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans()[prefix]);
   }
 
+  // Every screen that names a plan — the dashboard, Share, Overview & Print —
+  // came through here, and it always read majorName.en. So a student in Arabic
+  // saw the Arabic plan everywhere except in its own title. It reads the side
+  // the switch asks for now, and falls back to English when a plan has no
+  // Arabic name rather than showing an empty heading.
   function planDisplayInfo(prefix){
+    var ar = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     if(isImportedPlan(prefix)){
       var p = window.AAUP_IMPORTED.loadImportedPlans()[prefix];
-      var en = window.AAUP_IMPORTED.nameParts(p.majorName.en);
+      var side = ar ? (p.majorName.ar || p.majorName.en) : p.majorName.en;
+      var parts = window.AAUP_IMPORTED.nameParts(side);
+      if(!parts.big){ parts = window.AAUP_IMPORTED.nameParts(p.majorName.en); }
       return { icon: p.icon || '🎓', iconKey: p.iconKey || '', imageUrl: p.imageUrl || '',
-               name: en.big + (en.small ? ' ' + en.small : '') };
+               name: parts.big + (parts.small ? ' ' + parts.small : '') };
     }
     var page = document.getElementById('page-' + prefix);
-    var nameEl = page && page.querySelector('.title-block .en');
+    var nameEl = page && page.querySelector('.title-block ' + (ar ? '.ar' : '.en'));
+    if(!nameEl || !nameEl.textContent.trim()){
+      nameEl = page && page.querySelector('.title-block .en');
+    }
     return { icon: BUILT_IN_ICONS[prefix] || '🎓', iconKey: BUILT_IN_ICON_KEYS[prefix] || '', name: nameEl ? nameEl.textContent : prefix };
   }
 

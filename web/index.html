@@ -186,11 +186,11 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div class="watermark-layer" aria-hidden="true">@Dile (AL-Hammam_Natsha)</div>
 <div class="update-bar" id="updateBar">
-  <span><span data-app-icon="refresh" data-app-icon-size="15" aria-hidden="true"></span> A new version of the app is ready.</span>
-  <button type="button" onclick="location.reload()">Refresh</button>
+  <span><span data-app-icon="refresh" data-app-icon-size="15" aria-hidden="true"></span> <span data-ar="نسخة جديدة من التطبيق جاهزة.">A new version of the app is ready.</span></span>
+  <button type="button" onclick="location.reload()" data-ar="تحديث">Refresh</button>
 </div>
 
-<button type="button" class="sb-toggle-btn" id="sbToggleBtn" onclick="AAUP_SIDEBAR.toggleMobile()" aria-label="Menu"><span data-app-icon="menu" data-app-icon-size="18" aria-hidden="true"></span></button>
+<button type="button" class="sb-toggle-btn" id="sbToggleBtn" onclick="AAUP_SIDEBAR.toggleMobile()" aria-label="Menu" data-ar-label="القائمة"><span data-app-icon="menu" data-app-icon-size="18" aria-hidden="true"></span></button>
 <div class="sb-overlay" id="sbOverlay" onclick="AAUP_SIDEBAR.closeMobile()"></div>
 <div id="appSidebar" class="app-sidebar" style="display:none;"></div>
 
@@ -201,20 +201,20 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     <img class="home-header-mascot" src="assets/icons/icon-any-384.png" alt="" aria-hidden="true">
     <div class="home-header-body">
       <h1 class="home-wordmark">AAUPATH<span class="home-wordmark-ar">طريقك</span></h1>
-      <p>Your degree, one screen at a time</p>
+      <p data-ar="شهادتك، شاشة واحدة في كل مرة">Your degree, one screen at a time</p>
       <div class="home-header-stats" id="homeHeaderStats"></div>
     </div>
   </div>
 
   <div class="home-resume" id="homeResumeCard" style="display:none;" role="button" tabindex="0"></div>
 
-  <p class="home-intro" id="homeIntroText"><strong>Pick your faculty.</strong></p>
+  <p class="home-intro" id="homeIntroText"><strong data-ar="اختر كليتك.">Pick your faculty.</strong></p>
 
   <div class="search-wrap" id="homeSearchWrap">
     <div class="search-box" id="homeSearchBox">
       <span class="search-ic" data-app-icon="search" aria-hidden="true"></span>
-      <input type="text" id="homeSearchInput" class="search-input" placeholder="Search a major or a course… / ابحث عن تخصص أو مساق…" autocomplete="off">
-      <button type="button" class="search-clear" id="homeSearchClear" aria-label="Clear"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+      <input type="text" id="homeSearchInput" class="search-input" placeholder="Search a major or a course…" data-ar-placeholder="ابحث عن تخصص أو مساق…" autocomplete="off">
+      <button type="button" class="search-clear" id="homeSearchClear" aria-label="Clear" data-ar-label="مسح"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     </div>
     <div class="search-dropdown" id="homeSearchDropdown"></div>
   </div>
@@ -233,19 +233,19 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   <div class="plan-grid">
     <div class="new-plan-card" id="newPlanCard" onclick="AAUP_PLAN_EDITOR.openNewPlanDialog()" role="button" tabindex="0" onkeydown="if(event.key==='Enter')AAUP_PLAN_EDITOR.openNewPlanDialog()">
       <span class="npc-plus">+</span>
-      <p class="npc-label">Don't see your major? Create a new plan.</p>
+      <p class="npc-label" data-ar="لا تجد تخصصك؟ أنشئ خطة جديدة.">Don't see your major? Create a new plan.</p>
     </div>
-    <p class="home-step-empty-note" id="homePlansEmptyNote" style="display:none;">No plans here yet — be the first to add one with "+ New Plan" above.</p>
+    <p class="home-step-empty-note" id="homePlansEmptyNote" style="display:none;" data-ar="لا توجد خطط هنا بعد — كن أول من يضيف واحدة عبر &quot;+ خطة جديدة&quot; بالأعلى.">No plans here yet — be the first to add one with "+ New Plan" above.</p>
   </div>
 
   <div id="importedPlansContainer"></div>
   </div>
 
   <div class="home-footer">
-    <button type="button" class="dev-link" onclick="AAUP_ABOUT.open()"><span data-app-icon="people" data-app-icon-size="14" aria-hidden="true"></span> About us</button>
-    <button type="button" class="dev-link" onclick="AAUP_SIDEBAR.openSettings()"><span data-app-icon="gear" data-app-icon-size="14" aria-hidden="true"></span> Settings</button>
+    <button type="button" class="dev-link" onclick="AAUP_ABOUT.open()"><span data-app-icon="people" data-app-icon-size="14" aria-hidden="true"></span> <span data-ar="من نحن">About us</span></button>
+    <button type="button" class="dev-link" onclick="AAUP_SIDEBAR.openSettings()"><span data-app-icon="gear" data-app-icon-size="14" aria-hidden="true"></span> <span data-ar="الإعدادات">Settings</span></button>
     <span class="dev-link app-version-badge"></span>
-    <button type="button" class="dev-link" onclick="AAUP_DEV.openDialog()">Developer</button>
+    <button type="button" class="dev-link" onclick="AAUP_DEV.openDialog()" data-ar="المطوّر">Developer</button>
   </div>
 </div>
 
@@ -253,32 +253,32 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div class="modal-overlay" id="studentInfoOverlay">
   <div class="modal-card" style="max-width:380px;">
-    <button class="modal-close" id="studentInfoClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="studentInfoClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body">
-      <h2 style="margin-top:0;">Welcome!</h2>
-      <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6;margin-top:-6px;">
+      <h2 style="margin-top:0;" data-ar="أهلاً بك!">Welcome!</h2>
+      <p style="font-size:12.5px;color:var(--text-dim);line-height:1.6;margin-top:-6px;" data-ar="أخبرنا قليلاً عن نفسك حتى تستطيع لوحة تقدّمك أن ترحّب بك. كل ما هنا اختياري ويُحفظ في هذا المتصفح فقط.">
         Tell us a bit about yourself so your progress panel can say hello. Everything here is optional and only saved in this browser.
       </p>
       <div class="form-field">
-        <label for="studentInfoName">Name</label>
-        <input type="text" id="studentInfoName" placeholder="e.g. Lina Ahmad" maxlength="60">
+        <label for="studentInfoName" data-ar="الاسم">Name</label>
+        <input type="text" id="studentInfoName" placeholder="e.g. Lina Ahmad" data-ar-placeholder="مثال: لينا أحمد" maxlength="60">
       </div>
       <div class="form-field">
-        <label for="studentInfoGpa">Current GPA (0.0 – 4.0)</label>
-        <input type="number" id="studentInfoGpa" min="0" max="4" step="0.01" placeholder="e.g. 3.4">
+        <label for="studentInfoGpa" data-ar="المعدل الحالي (0.0 – 4.0)">Current GPA (0.0 – 4.0)</label>
+        <input type="number" id="studentInfoGpa" min="0" max="4" step="0.01" placeholder="e.g. 3.4" data-ar-placeholder="مثال: 3.4">
       </div>
       <div class="form-field">
-        <label>Gender</label>
+        <label data-ar="الجنس">Gender</label>
         <div class="form-radio-group">
-          <label><input type="radio" name="studentInfoGender" value="Male"> Male</label>
-          <label><input type="radio" name="studentInfoGender" value="Female"> Female</label>
+          <label><input type="radio" name="studentInfoGender" value="Male"> <span data-ar="ذكر">Male</span></label>
+          <label><input type="radio" name="studentInfoGender" value="Female"> <span data-ar="أنثى">Female</span></label>
         </div>
       </div>
       <div class="form-actions">
-        <button type="button" class="home-btn" id="studentInfoSkip">Skip for now</button>
-        <button type="button" class="home-btn" id="studentInfoSave" style="border-color:var(--accent);color:var(--text);">Save</button>
+        <button type="button" class="home-btn" id="studentInfoSkip" data-ar="تخطٍّ الآن">Skip for now</button>
+        <button type="button" class="home-btn" id="studentInfoSave" style="border-color:var(--accent);color:var(--text);" data-ar="حفظ">Save</button>
       </div>
-      <p class="form-note">You can change this anytime from the "Edit" link in the My Progress panel.</p>
+      <p class="form-note" data-ar="يمكنك تغيير هذا في أي وقت من رابط &quot;تعديل&quot; في لوحة تقدّمي.">You can change this anytime from the "Edit" link in the My Progress panel.</p>
     </div>
   </div>
 </div>
@@ -324,8 +324,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     <div class="tut-foot">
       <span class="tut-progress" id="tutProgress"></span>
       <div class="tut-actions">
-        <button type="button" class="tut-skip" id="tutSkip">Skip</button>
-        <button type="button" class="tut-next" id="tutNext">Next</button>
+        <button type="button" class="tut-skip" id="tutSkip" data-ar="تخطٍّ">Skip</button>
+        <button type="button" class="tut-next" id="tutNext" data-ar="التالي">Next</button>
       </div>
     </div>
   </div>
@@ -333,28 +333,28 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 
 <div class="modal-overlay" id="aboutOverlay">
   <div class="modal-card" style="max-width:460px;">
-    <button class="modal-close" id="aboutClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="aboutClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="aboutBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="auditModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="auditModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="auditModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="auditModalBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="achievementsModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="achievementsModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="achievementsModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="achievementsModalBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="advisorModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="advisorModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="advisorModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="advisorModalBody"></div>
   </div>
 </div>
@@ -362,7 +362,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- Contacts — instructors and offices, read-only (js/68-contacts.js) -->
 <div class="modal-overlay" id="contactsOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="contactsClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="contactsClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="contactsBody"></div>
   </div>
 </div>
@@ -370,7 +370,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- Share link + QR code for a plan (js/72-share.js) -->
 <div class="modal-overlay" id="shareOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="shareClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="shareClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="shareBody"></div>
   </div>
 </div>
@@ -378,7 +378,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- What-if GPA — retakes and next semester, as a sandbox (js/63-whatif.js) -->
 <div class="modal-overlay" id="whatifOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="whatifClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="whatifClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="whatifBody"></div>
   </div>
 </div>
@@ -386,7 +386,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- Change Major — the transfer comparison before a switch (js/62-change-plan.js) -->
 <div class="modal-overlay" id="changePlanOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="changePlanClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="changePlanClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="changePlanBody"></div>
   </div>
 </div>
@@ -395,14 +395,14 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      js/59-thoughts.js renders the body, including its own back bar. -->
 <div class="modal-overlay" id="thoughtsModalOverlay">
   <div class="modal-card audit-modal-card">
-    <button class="modal-close" id="thoughtsModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="thoughtsModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="thoughtsModalBody"></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="devModalOverlay">
   <div class="modal-card dev-modal-card">
-    <button class="modal-close" id="devModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="devModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="devModalBody"></div>
   </div>
 </div>
@@ -412,7 +412,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      Settings modal above. -->
 <div class="modal-overlay" id="cloudModalOverlay">
   <div class="modal-card dev-modal-card">
-    <button class="modal-close" id="cloudModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="cloudModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="cloudModalBody"></div>
   </div>
 </div>
@@ -422,7 +422,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      own max-width rather than reusing audit-modal-card's 720px cap. -->
 <div class="modal-overlay" id="prereqGraphModalOverlay">
   <div class="modal-card pg-modal-card">
-    <button class="modal-close" id="prereqGraphModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="prereqGraphModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="prereqGraphModalBody"></div>
   </div>
 </div>
@@ -435,7 +435,7 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      have, instead of a bare tap-to-toggle. -->
 <div class="modal-overlay" id="impCourseModalOverlay">
   <div class="modal-card">
-    <button class="modal-close" id="impCourseModalClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <button class="modal-close" id="impCourseModalClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     <div class="modal-body" id="impCourseModalBody"></div>
   </div>
 </div>
@@ -451,22 +451,22 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
      its own tab in the phone tab bar and its own row in the menu, so the
      circle was a third way to reach one screen — two of them visible at
      once on the study plan, which is what a student pointed out. -->
-<div class="asst-panel" id="asstPanel" role="dialog" aria-label="Study Plan assistant">
+<div class="asst-panel" id="asstPanel" role="dialog" aria-label="Study Plan assistant" data-ar-label="مساعد الخطة الدراسية">
   <div class="asst-head">
-    <span class="asst-head-title"><span data-app-icon="cap" data-app-icon-size="16" aria-hidden="true"></span> Study Plan assistant</span>
+    <span class="asst-head-title"><span data-app-icon="cap" data-app-icon-size="16" aria-hidden="true"></span> <span data-ar="مساعد الخطة الدراسية">Study Plan assistant</span></span>
     <div class="asst-head-actions">
       <!-- Hidden until a Worker is configured (window.APP_AI_URL); painted by
            js/43-assistant-ui.js. Bolt = online brain, clock = offline only. -->
       <button type="button" class="asst-mode" id="asstMode" style="display:none;"
-              aria-pressed="false" aria-label="Toggle the smart assistant"><span data-app-icon="clock" data-app-icon-size="15" aria-hidden="true"></span></button>
-      <button type="button" class="asst-close" id="asstClose" aria-label="Close the assistant"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+              aria-pressed="false" aria-label="Toggle the smart assistant" data-ar-label="تشغيل أو إيقاف المساعد الذكي"><span data-app-icon="clock" data-app-icon-size="15" aria-hidden="true"></span></button>
+      <button type="button" class="asst-close" id="asstClose" aria-label="Close the assistant" data-ar-label="إغلاق المساعد"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     </div>
   </div>
   <div class="asst-log" id="asstLog" role="log" aria-live="polite"></div>
   <form class="asst-form" id="asstForm" autocomplete="off">
-    <input type="text" id="asstInput" class="asst-input" aria-label="Ask the assistant"
-           placeholder="Ask about this app… / اسأل عن التطبيق…" maxlength="200">
-    <button type="submit" class="asst-send" aria-label="Send"><span data-app-icon="send" data-app-icon-size="16" aria-hidden="true"></span></button>
+    <input type="text" id="asstInput" class="asst-input" aria-label="Ask the assistant" data-ar-label="اسأل المساعد"
+           placeholder="Ask about this app…" data-ar-placeholder="اسأل عن التطبيق…" maxlength="200">
+    <button type="submit" class="asst-send" aria-label="Send" data-ar-label="إرسال"><span data-app-icon="send" data-app-icon-size="16" aria-hidden="true"></span></button>
   </form>
 </div>
 
@@ -482,8 +482,8 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
     <div class="guide-foot">
       <span class="guide-step" id="guideStep"></span>
       <div class="guide-actions">
-        <button type="button" class="guide-end" id="guideEnd">End</button>
-        <button type="button" class="guide-next" id="guideNext">Next</button>
+        <button type="button" class="guide-end" id="guideEnd" data-ar="إنهاء">End</button>
+        <button type="button" class="guide-next" id="guideNext" data-ar="التالي">Next</button>
       </div>
     </div>
   </div>
@@ -492,22 +492,22 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
 <!-- ===== Fix ===============================================================
      Bottom-left, on every screen, at all times. -->
 <button type="button" class="fix-launcher" id="fixLauncher"
-        aria-label="Fix — check this app for problems" aria-expanded="false"><span data-app-icon="gear" data-app-icon-size="18" aria-hidden="true"></span></button>
+        aria-label="Fix — check this app for problems" data-ar-label="الفحص — ابحث عن مشاكل في التطبيق" aria-expanded="false"><span data-app-icon="gear" data-app-icon-size="18" aria-hidden="true"></span></button>
 
-<div class="fix-panel" id="fixPanel" role="dialog" aria-label="Fix">
+<div class="fix-panel" id="fixPanel" role="dialog" aria-label="Fix" data-ar-label="الفحص">
   <div class="fix-head">
-    <span class="fix-head-title" id="fixTitle"><span data-app-icon="gear" data-app-icon-size="15" aria-hidden="true"></span> Fix</span>
-    <button type="button" class="fix-close" id="fixClose" aria-label="Close the Fix panel"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+    <span class="fix-head-title" id="fixTitle"><span data-app-icon="gear" data-app-icon-size="15" aria-hidden="true"></span> <span data-ar="الفحص">Fix</span></span>
+    <button type="button" class="fix-close" id="fixClose" aria-label="Close the Fix panel" data-ar-label="إغلاق لوحة الفحص"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
   </div>
   <div class="fix-body" id="fixBody"></div>
 </div>
 
-<div class="float-popup" id="floatPopup" style="display:none;" role="dialog" aria-label="Course details">
+<div class="float-popup" id="floatPopup" style="display:none;" role="dialog" aria-label="Course details" data-ar-label="تفاصيل المساق">
   <div class="float-popup-head" id="floatPopupHead">
-    <span class="float-popup-title" id="floatPopupTitle">Course</span>
+    <span class="float-popup-title" id="floatPopupTitle" data-ar="مساق">Course</span>
     <div class="float-popup-head-actions">
-      <button type="button" class="float-popup-min" id="floatPopupMin" aria-label="Minimize"><span class="fp-min-arrow" data-app-icon="chevronUp" data-app-icon-size="13" aria-hidden="true"></span></button>
-      <button type="button" class="float-popup-close" id="floatPopupClose" aria-label="Close"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
+      <button type="button" class="float-popup-min" id="floatPopupMin" aria-label="Minimize" data-ar-label="تصغير"><span class="fp-min-arrow" data-app-icon="chevronUp" data-app-icon-size="13" aria-hidden="true"></span></button>
+      <button type="button" class="float-popup-close" id="floatPopupClose" aria-label="Close" data-ar-label="إغلاق"><span data-app-icon="close" data-app-icon-size="15" aria-hidden="true"></span></button>
     </div>
   </div>
   <div class="float-popup-body" id="floatPopupBody"></div>

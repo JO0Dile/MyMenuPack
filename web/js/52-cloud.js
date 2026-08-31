@@ -504,7 +504,9 @@
   function render(){
     var body = document.getElementById('cloudModalBody');
     if(!body) return;
-    var rtl = document.body.classList.contains('rtl-mode');
+    // rtl-mode lives on the plan page, not on <body>, so this was always
+    // false: every Arabic string below it was written and never reached.
+    var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     body.setAttribute('dir', rtl ? 'rtl' : 'ltr');
     body.innerHTML = detailHtml(rtl);
     bindDetail(body, rtl);

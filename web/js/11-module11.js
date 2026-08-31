@@ -667,7 +667,8 @@
       box.setAttribute('role', 'checkbox');
       box.setAttribute('tabindex', '0');
       box.setAttribute('aria-checked', 'false');
-      box.setAttribute('aria-label', 'Mark course as completed');
+      box.setAttribute('aria-label', isRtl(el.id.split('-c-')[0])
+        ? 'ضع علامة إنجاز على المساق' : 'Mark course as completed');
       box.textContent = '\u2713';
       box.addEventListener('click', function(e){
         e.stopPropagation();

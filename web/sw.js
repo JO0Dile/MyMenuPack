@@ -15,7 +15,7 @@
 // the CDN, correct and verified, and simply not what the browser ran. The
 // fetch handler below does refresh entries one at a time, so it heals after an
 // extra reload, but "reload twice" is not a fix anyone can be told to rely on.
-var CACHE = 'studyplan-shell-v170';
+var CACHE = 'studyplan-shell-v172';
 var CORE = [
   './index.html', './manifest.json', './plans.json', './contacts.json', './css/app.css',
   './js/00-diagnostics.js', './js/01-catalogue.js',
@@ -33,7 +33,8 @@ var CORE = [
   // (No apostrophes in here — check-precache reads this array with a regex
   // over quoted strings, and one inside a comment opens a string it then
   // closes at the next real quote.)
-  './assets/img/landing-campus.webp'
+  './assets/img/landing-campus.webp',
+  './assets/img/aaup-emblem.png'
 ];
 
 // Precached at install rather than opportunistically on first fetch. The

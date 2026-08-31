@@ -163,7 +163,9 @@
         ? (rtl
             ? 'الخطة التفصيلية لم تُضف بعد \u2014 قريبًا.'
             : 'Course list not added yet \u2014 coming soon.')
-        : ((p.bio && p.bio.en) || (courseCount + ' courses \u00b7 community-imported major'));
+        : ((rtl && p.bio && p.bio.ar) || (p.bio && p.bio.en) ||
+           (rtl ? courseCount + ' مساقًا \u00b7 خطة من الطلبة'
+                : courseCount + ' courses \u00b7 community-imported major'));
       var uni = (window.APP_UNIVERSITIES || {})[p.university || 'aaup'];
       // Words, not emoji. The badge sat over a card whose every other glyph
       // is drawn, and "✅ Official" next to "👤 User Made" was two unrelated
@@ -180,9 +182,15 @@
         : 'AAUP_DASHBOARD.selectAndOpen(\'' + jsAttr(id) + '\')';
       return '<div class="plan-card' + (pending ? ' plan-card-pending' : '') + '" data-page="' + txt(id) + '" data-imported="1" data-pending="' + (pending ? '1' : '0') + '" data-university="' + txt(p.university || 'aaup') + '" data-college="' + txt(collegeKeyForPlan(p)) + '" data-search-en="' + window.__escapeHtml(en.big + ' ' + en.small) + '" data-search-ar="' + window.__escapeHtml(ar.big + ' ' + ar.small) + '" onclick="' + openAction + '" role="button" tabindex="0">' +
         '<span class="imp-origin-badge">' + badge + '</span>' +
-        '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">' + window.AAUP_ICONS.preview('trash', 12) + 'Delete</button>' +
+        '<button type="button" class="dev-edit-link" data-dev-edit-btn style="display:none;top:36px;" onclick="event.stopPropagation(); AAUP_IMPORTED.confirmDelete(\'' + id + '\');">' + window.AAUP_ICONS.preview('trash', 12) + (rtl ? 'حذف' : 'Delete') + '</button>' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(p, { size: 30 }) + '</div>' +
-        '<h2>' + txt(en.big) + (en.small ? '<em>' + txt(en.small) + '</em>' : '') + '</h2>' +
+        // The card heading always read the English name, so in Arabic every
+        // plan on the picker was titled in English while everything around
+        // it was not. Fall back to English when a plan has no Arabic name
+        // rather than showing an empty card.
+        '<h2>' + txt((rtl && ar.big) ? ar.big : en.big) +
+          (function(){ var sm = (rtl && ar.big) ? ar.small : en.small;
+            return sm ? '<em>' + txt(sm) + '</em>' : ''; })() + '</h2>' +
         '<p class="pc-bio">' + txt(bio) + '</p>' +
         '<div class="pc-cta">' + (pending
           ? (rtl ? 'قريبًا' : 'Coming soon')
@@ -1121,7 +1129,7 @@
       : '';
     var checkboxHtml = editing ? '' :
       '<span class="course-check" role="checkbox" tabindex="0" aria-checked="' + (done ? 'true' : 'false') + '" ' +
-      'aria-label="Mark course as completed" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
+      'aria-label="' + (rtl ? 'ضع علامة إنجاز على المساق' : 'Mark course as completed') + '" onclick="event.stopPropagation(); AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');" ' +
       'onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();AAUP_IMPORTED.toggle(\'' + planId + '\',\'' + c.id + '\');}">' + window.AAUP_ICONS.preview('tick', 11) + '</span>';
     // The line under the name answers the three things a student checks on
     // every card: which year the plan puts it in, whether they can register
