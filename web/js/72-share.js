@@ -198,6 +198,10 @@
           '<div class="share-qr-plate"><canvas id="' + qrCanvasId + '" class="share-qr-canvas"></canvas></div>' +
           '<p class="share-qr-for">' + esc(res.planName || '') + '</p>' +
           '<p class="share-qr-label">' + t('scan', rtl) + '</p>' +
+          // The app's credit, on one of the two screens whose whole job is to
+          // be seen by someone who is not the student. It used to be a fixed
+          // overlay on every screen in the app instead.
+          '<p class="share-credit">AAUPath \u00b7 @Dile (AL-Hammam_Natsha)</p>' +
         '</div>' +
         // Overview & Print used to be its own menu row. It answers the same
         // question this screen answers — get this plan out of the app — one

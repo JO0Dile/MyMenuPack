@@ -306,8 +306,32 @@
             (A ? faculties + ' كلية' : faculties + ' facult' + (faculties === 1 ? 'y' : 'ies')) + '</span>' : '')
         : '<span>' + window.AAUP_ICONS.preview('cap', 13) +
             (A ? uniCount + ' جامعات' : uniCount + ' universities') + '</span>') +
-      '<span>' + window.AAUP_ICONS.preview('unlock', 13) +
-        (A ? 'مجاني وبدون إنترنت' : 'Free &amp; offline') + '</span>';
+      // 10 · Offline-first is this app's best feature and it was invisible.
+      // This REPLACES the old static "Free & offline" chip rather than sitting
+      // next to it — two chips saying the same thing is worse than one — and
+      // it changes wording the moment the connection actually drops, which is
+      // the one moment the claim is worth reading.
+      '<span class="offline-note" id="homeOfflineNote"></span>';
+    syncOfflineNote();
+  }
+
+  // Reads navigator.onLine, which is only ever a hint — the browser says
+  // "online" for a captive portal that serves nothing. That is fine here: the
+  // claim being made is about this app, and this app genuinely does work
+  // either way, so the worst case is a true statement in the wrong tense.
+  function syncOfflineNote(){
+    var el = document.getElementById('homeOfflineNote');
+    if(!el) return;
+    var A = ar();
+    var off = (typeof navigator !== 'undefined') && navigator.onLine === false;
+    el.classList.toggle('is-offline', off);
+    el.textContent = off
+      ? (A ? 'أنت دون اتصال — كل شيء هنا يعمل' : 'Offline — everything here still works')
+      : (A ? 'مجاني ويعمل بدون إنترنت' : 'Free, and works offline');
+  }
+  if(typeof window !== 'undefined'){
+    window.addEventListener('online', syncOfflineNote);
+    window.addEventListener('offline', syncOfflineNote);
   }
 
   function showUniversities(){

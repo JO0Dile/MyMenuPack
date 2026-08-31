@@ -1767,6 +1767,20 @@
       '<div class="en">' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</div>' +
       '</div></div>' +
       '<div class="ar-block"><div class="ar1">' + ar.big + '</div>' + (ar.small ? '<div class="ar2">' + ar.small + '</div>' : '') + '</div>' +
+      // 45 · The language switch, here rather than four taps away.
+      // It lived at More → Settings → Preferences → Language. Bilingual
+      // students switch constantly — to read a course name the way the
+      // lecturer says it, to send a screenshot to someone who reads the
+      // other one — and four taps each way is enough friction that they
+      // simply stop. Two characters, on the screen where the switching
+      // actually matters.
+      '<div class="plan-lang" role="group" aria-label="' +
+        (rtl ? 'اللغة' : 'Language') + '">' +
+        '<button type="button" class="plan-lang-btn' + (rtl ? '' : ' is-on') +
+          '" data-plan-lang="en" aria-pressed="' + (rtl ? 'false' : 'true') + '">EN</button>' +
+        '<button type="button" class="plan-lang-btn' + (rtl ? ' is-on' : '') +
+          '" data-plan-lang="ar" aria-pressed="' + (rtl ? 'true' : 'false') + '">\u0639</button>' +
+      '</div>' +
       // Home, Edit Mode, Course Library, Export Plan and Contribute all used
       // to sit here as a five-button row above the plan. Every one of them
       // is a destination, and destinations belong in the menu — which is
@@ -2019,8 +2033,13 @@
 
   // Flips the app, not the plan: every other screen reads the same setting,
   // and it is remembered.
-  function toggleLang(planId){
-    if(window.AAUP_LANG){ window.AAUP_LANG.toggle(); }
+  // Called by the two-button switch in the plan header (45) as well as by the
+  // Settings row. `want` is optional: pressing the language you are already in
+  // should do nothing rather than flip you to the other one.
+  function toggleLang(planId, want){
+    var isAr = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+    if(want && ((want === 'ar') === isAr)) return;
+    if(window.AAUP_LANG){ window.AAUP_LANG.set(want || (isAr ? 'en' : 'ar')); }
     render(planId);
     // The menu, the tab bar and anything else already on screen were drawn in
     // the other language.
@@ -2032,6 +2051,19 @@
   // first half and the plan under it says the second, so it was a sentence
   // explaining a search box to people already using one. dismissSearchHint()
   // stays exported: an older cached page can still call it.
+  // One delegated listener for the header's language switch, bound at module
+  // level so it survives every re-render of the plan (render() replaces the
+  // whole sheet, so a listener attached to the buttons themselves would not).
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-plan-lang]');
+    if(!btn) return;
+    var sheet = btn.closest('.sheet-plan');
+    var planId = sheet && sheet.id ? sheet.id.replace(/^page-/, '') : currentOpenPlanId;
+    if(!planId) return;
+    e.preventDefault();
+    toggleLang(planId, btn.getAttribute('data-plan-lang'));
+  });
+
   function dismissSearchHint(){
     document.querySelectorAll('.search-hint').forEach(function(el){ el.remove(); });
   }
