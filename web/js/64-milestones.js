@@ -60,7 +60,8 @@
     var widget = page.querySelector('.progress-widget');
     if(!track || !widget) return;
 
-    var rtl = page.classList.contains('rtl-mode');
+    var rtl = page.classList.contains('rtl-mode') ||
+      !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     var data = gatesFor(prefix);
 
     // Clear any previous pass's ticks/caption before redrawing — refresh()

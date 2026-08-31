@@ -63,6 +63,26 @@
     return out;
   }
 
+  // The picker is the first screen a student sees, and it was entirely in
+  // English no matter what the language switch said: the faculty tiles' own
+  // headings, their screen-reader labels, the plan counts, the header chips
+  // and the "Add a plan" tile. `ar()` is the same question js/09-language.js
+  // answers everywhere else.
+  function ar(){ return !!(window.AAUP_LANG && window.AAUP_LANG.isAr()); }
+
+  // "N plans" in a language where the plural is not "add an s". Arabic
+  // counts one, two, a few (3-10) and many (11+) differently, and getting
+  // that wrong is the difference between a sentence and a label.
+  function planCountLabel(n){
+    n = n || 0;
+    if(!ar()) return n === 1 ? '1 plan' : n + ' plans';
+    if(n === 0) return 'لا توجد خطط';
+    if(n === 1) return 'خطة واحدة';
+    if(n === 2) return 'خطتان';
+    if(n <= 10) return n + ' خطط';
+    return n + ' خطة';
+  }
+
   function collegeDisplayName(college){
     if(college && college.name && (college.name.en || college.name.ar)){
       return { en: college.name.en || college.name.ar, ar: college.name.ar || college.name.en };
@@ -173,13 +193,20 @@
       // A registered faculty with nothing behind it yet still gets a tile —
       // APP_COLLEGES lists it — but its count is dimmed rather than sitting in
       // the accent colour, so "0" doesn't read as something worth tapping.
-      var plans = c.count === 1 ? '1 plan' : (c.count || 0) + ' plans';
+      var plans = planCountLabel(c.count);
       return '<div class="plan-card plan-card-faculty" onclick="AAUP_HOME.showPlans(\'' + uniId + '\',\'' + cid.replace(/'/g, "\\'") + '\')" role="button" tabindex="0"' +
-        ' aria-label="' + esc(name.en) + ', ' + plans + '">' +
+        ' aria-label="' + esc(ar() ? (name.ar || name.en) : name.en) + ', ' + plans + '">' +
         '<div class="pc-icon">' + window.AAUP_ICONS.markup(c, { size: 26, fallback: '🏫' }) + '</div>' +
+        // In Arabic the Arabic name is the heading and the English is the
+        // second line. Both names are always shown — a student who knows the
+        // faculty by its English name should still find it — but the one they
+        // read first is the one in the language they chose.
         '<div class="pc-faculty-body">' +
-          '<h2>' + esc(name.en) + '</h2>' +
-          '<p style="direction:rtl;">' + esc(name.ar) + '</p>' +
+          (ar()
+            ? '<h2 style="direction:rtl;">' + esc(name.ar || name.en) + '</h2>' +
+              (name.ar ? '<p>' + esc(name.en) + '</p>' : '')
+            : '<h2>' + esc(name.en) + '</h2>' +
+              (name.ar ? '<p style="direction:rtl;">' + esc(name.ar) + '</p>' : '')) +
         '</div>' +
         '<span class="pc-faculty-count' + (c.count ? '' : ' pc-faculty-count-none') +
           '" aria-hidden="true" title="' + plans + '">' +
@@ -189,10 +216,12 @@
     var uni = window.APP_UNIVERSITIES[uniId];
     tiles += '<div class="new-plan-card" onclick="AAUP_HOME.startNewPlan(\'' + uniId + '\')" role="button" tabindex="0">' +
       '<span class="npc-plus">+</span>' +
-      '<p class="npc-label">Add a plan</p></div>';
+      '<p class="npc-label">' + (ar() ? 'أضف خطة' : 'Add a plan') + '</p></div>';
     grid.innerHTML = ids.length
       ? tiles
-      : '<p class="home-step-empty-note">No colleges registered for ' + (uni ? uni.name.en : uniId) + ' yet.</p>' + tiles;
+      : '<p class="home-step-empty-note">' + (ar()
+          ? 'لا توجد كليات مسجّلة لـ ' + (uni ? (uni.name.ar || uni.name.en) : uniId) + ' بعد.'
+          : 'No colleges registered for ' + (uni ? uni.name.en : uniId) + ' yet.') + '</p>' + tiles;
   }
 
   function updatePlansEmptyState(){
@@ -257,15 +286,20 @@
     var uniCount = Object.keys(window.APP_UNIVERSITIES || {}).length;
     var planCount = allPlanMeta().length;
     var faculties = Object.keys(collegesForUniversity(soleUniversity() || state.university) || {}).length;
+    var A = ar();
     el.innerHTML =
-      '<span>' + window.AAUP_ICONS.preview('book', 13) + planCount + ' study plan' + (planCount === 1 ? '' : 's') + '</span>' +
+      '<span>' + window.AAUP_ICONS.preview('book', 13) +
+        (A ? planCount + ' خطة دراسية' : planCount + ' study plan' + (planCount === 1 ? '' : 's')) + '</span>' +
       // "1 university" is not a fact worth a chip when there is no university
       // to choose. On one university it reports the faculties instead, which
       // IS what the screen below is about.
       (uniCount === 1
-        ? (faculties ? '<span>' + window.AAUP_ICONS.preview('university', 13) + faculties + ' facult' + (faculties === 1 ? 'y' : 'ies') + '</span>' : '')
-        : '<span>' + window.AAUP_ICONS.preview('cap', 13) + uniCount + ' universities</span>') +
-      '<span>' + window.AAUP_ICONS.preview('unlock', 13) + 'Free &amp; offline</span>';
+        ? (faculties ? '<span>' + window.AAUP_ICONS.preview('university', 13) +
+            (A ? faculties + ' كلية' : faculties + ' facult' + (faculties === 1 ? 'y' : 'ies')) + '</span>' : '')
+        : '<span>' + window.AAUP_ICONS.preview('cap', 13) +
+            (A ? uniCount + ' جامعات' : uniCount + ' universities') + '</span>') +
+      '<span>' + window.AAUP_ICONS.preview('unlock', 13) +
+        (A ? 'مجاني وبدون إنترنت' : 'Free &amp; offline') + '</span>';
   }
 
   function showUniversities(){

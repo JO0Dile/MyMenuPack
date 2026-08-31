@@ -50,7 +50,9 @@
       var label = document.createElement('span');
       label.className = 'cp-pair-label';
       label.setAttribute('aria-hidden', 'true');
-      label.textContent = row.closest('[dir="rtl"], .rtl-mode') ? 'مساق واحد' : 'one course';
+      var pairRtl = row.closest('[dir="rtl"], .rtl-mode') !== null ||
+        !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+      label.textContent = pairRtl ? 'مساق واحد' : 'one course';
       wrap.appendChild(label);
       // Said once, properly, for a screen reader — the visual label is a
       // rotated decoration and the bracket itself is not announced at all.

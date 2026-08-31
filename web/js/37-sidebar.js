@@ -451,10 +451,10 @@
   // icon is a js/04-icons.js ICONS key, same as ITEMS above — reusing
   // 'home'/'planpin' for the same two destinations the sidebar already has.
   var TABS = [
-    { key: 'dashboard', icon: 'home', label: 'Dashboard', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
-    { key: 'studyplan', icon: 'planpin', label: 'Plan', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
-    { key: 'assistant', icon: 'chatdots', label: 'Assistant', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
-    { key: 'more', icon: 'menu', label: 'More', action: function(){ toggleMobile(); } }
+    { key: 'dashboard', icon: 'home', label: 'Dashboard', ar: 'لوحة التحكم', action: function(prefix){ window.AAUP_DASHBOARD.open(prefix); } },
+    { key: 'studyplan', icon: 'planpin', label: 'Plan', ar: 'الخطة', action: function(prefix){ window.AAUP_DASHBOARD.openStudyPlan(prefix); } },
+    { key: 'assistant', icon: 'chatdots', label: 'Assistant', ar: 'المساعد', action: function(){ if(window.AAUP_ASSISTANT_UI) window.AAUP_ASSISTANT_UI.open(); } },
+    { key: 'more', icon: 'menu', label: 'More', ar: 'المزيد', action: function(){ toggleMobile(); } }
   ];
 
   function ensureTabBar(){
@@ -466,7 +466,7 @@
     bar.innerHTML = TABS.map(function(tItem){
       return '<button type="button" class="sb-tab" data-sb-tab="' + tItem.key + '">' +
         '<span class="sb-tab-ic">' + window.AAUP_ICONS.preview(tItem.icon, 20) + (tItem.key === 'dashboard' ? '<span class="sb-tab-badge" id="sbTabProgress" hidden></span>' : '') + '</span>' +
-        '<span class="sb-tab-lbl">' + tItem.label + '</span>' +
+        '<span class="sb-tab-lbl">' + (ar() ? tItem.ar : tItem.label) + '</span>' +
         '</button>';
     }).join('');
     document.body.appendChild(bar);
@@ -499,6 +499,13 @@
     var bar = ensureTabBar();
     bar.querySelectorAll('[data-sb-tab]').forEach(function(el){
       el.classList.toggle('active', el.getAttribute('data-sb-tab') === activeKey);
+      // Relabel on every sync, not only on the build. ensureTabBar() returns
+      // the existing bar untouched, so a tab bar built in English before the
+      // student switched to Arabic would have kept its English labels for the
+      // rest of the session.
+      var tItem = TABS.filter(function(x){ return x.key === el.getAttribute('data-sb-tab'); })[0];
+      var lbl = tItem && el.querySelector('.sb-tab-lbl');
+      if(lbl) lbl.textContent = ar() ? tItem.ar : tItem.label;
     });
     syncTabProgress(prefix);
   }

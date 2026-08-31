@@ -65,7 +65,8 @@
   function root(prefix){ return document.getElementById('page-' + prefix); }
   function rtlFor(prefix){
     var page = root(prefix);
-    return !!(page && page.classList.contains('rtl-mode'));
+    if(page) return page.classList.contains('rtl-mode');
+    return !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
   }
 
   function apply(prefix){

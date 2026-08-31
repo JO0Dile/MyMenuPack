@@ -24,7 +24,11 @@
 
   function isRtl(prefix){
     var page = document.getElementById('page-' + prefix);
-    return !!(page && page.classList.contains('rtl-mode'));
+    // Ask the app-wide setting when there is no plan on screen. The class
+    // only exists on a rendered plan page, so search opened from the picker
+    // used to answer "English" however the switch was set.
+    if(page) return page.classList.contains('rtl-mode');
+    return !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
   }
 
   // ---- typo tolerance: a fallback only, never the primary match. Exact

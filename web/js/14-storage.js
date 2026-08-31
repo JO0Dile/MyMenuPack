@@ -107,12 +107,23 @@
     actionHideTimer = setTimeout(dismiss, 6000);
   }
   window.__showActionToast = showActionToast;
+  // Ten modules ask this question — the assistant, the Fix panel, the export
+  // dialog, achievements, the back bar, the developer panel — and it used to
+  // answer it by looking for a visible `.plan-page` carrying rtl-mode. That
+  // was wrong twice over. An imported plan renders as `.sheet.sheet-plan`,
+  // not `.plan-page`, so it was never seen at all; and with no plan on screen
+  // at all — the picker, Settings, the assistant opened from the tab bar —
+  // there was nothing to look at and the answer was always English, however
+  // the language switch was set.
+  //
+  // The switch is the answer. The DOM is checked first only so that a plan
+  // page still mid-render reports what it is actually showing.
   function anyVisiblePageIsRtl(){
-    var pages = document.querySelectorAll('.plan-page');
+    var pages = document.querySelectorAll('.plan-page, .sheet-plan');
     for(var i = 0; i < pages.length; i++){
       if(pages[i].style.display !== 'none' && pages[i].classList.contains('rtl-mode')) return true;
     }
-    return false;
+    return !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
   }
   window.__showToast = showToast;
   window.__showUnlockToast = showUnlockToast;

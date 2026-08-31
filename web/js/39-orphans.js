@@ -172,7 +172,9 @@
     root.querySelectorAll('.orphan-remove').forEach(function(btn){
       btn.addEventListener('click', function(){
         var pid = btn.getAttribute('data-pid');
-        var rtl = document.body.classList.contains('rtl-mode');
+        // rtl-mode is set on the plan page, never on <body> — so this was
+        // always false and this screen was always English.
+        var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
         var msg = rtl
           ? 'إزالة بياناتك المحفوظة لهذا المساق نهائيًا؟ لا يمكن التراجع عن هذا.'
           : 'Permanently remove your saved data for this course? This can’t be undone.';
@@ -194,7 +196,7 @@
     var n = activeCount();
     if(!n) return;
     announced = true;
-    var rtl = document.body.classList.contains('rtl-mode');
+    var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     var msg = rtl
       ? ('لديك بيانات على ' + n + ' مساق لم تعد موجودة في خطتك المحدّثة — لم نحذف شيئًا.')
       : ('You have saved data on ' + n + ' course' + (n === 1 ? '' : 's') + ' that your updated plan no longer has — nothing was deleted.');

@@ -102,7 +102,8 @@
     closeQuickActions();
     var info = courseInfo(card);
     if(!info) return;
-    var rtl = card.closest('[dir="rtl"], .rtl-mode') !== null;
+    var rtl = card.closest('[dir="rtl"], .rtl-mode') !== null ||
+      !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
     var done = card.classList.contains('completed');
     var nameEl = card.querySelector('.name');
     var codeEl = card.querySelector('.meta');
