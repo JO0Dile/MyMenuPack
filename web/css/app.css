@@ -5727,6 +5727,20 @@
   .offline-note.is-offline{color:var(--text); border-color:var(--accent);}
   .offline-note.is-offline::before{background:var(--accent);}
 
+  /* 50 · THE INSTALL OFFER, ON THE THIRD VISIT.
+     Held back from the first visit on purpose: a stranger says no, and the
+     browser then will not offer again for months. */
+  .install-offer{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:13px 15px; margin:14px 0 0;
+    border:1px solid var(--accent); border-radius:14px;
+    background:var(--surface);
+  }
+  .install-copy{display:flex; flex-direction:column; gap:3px; flex:1 1 200px;}
+  .install-copy b{font-size:13.5px;}
+  .install-copy span{font-size:12px; color:var(--text-dim);}
+  .install-acts{display:flex; gap:8px;}
+
   /* The credit on the share screen, under the QR: content, not chrome. */
   .share-credit{
     margin:14px 0 0; text-align:center;

@@ -112,10 +112,38 @@
     return scenePromise;
   }
 
-  var sceneState = 'idle';   // idle | loading | live | failed
+  // 25 · THE SCENE IS A WELCOME, NOT A DAILY EXPERIENCE.
+  // It is 206 KB of bundle and a few seconds of camera move, and it is the
+  // right thing to show someone the first time they open the app. It is the
+  // wrong thing to show a student who has opened it to check one prerequisite
+  // between classes — which is most openings, for the rest of the degree. So
+  // it plays once and then the still image (already in the DOM, already the
+  // no-WebGL fallback) carries the screen. Nothing is lost: the drawing is
+  // what everyone without WebGL has always seen, and it is good.
+  //
+  // Stored as a flag rather than a count because the question is binary, and
+  // a student who clears their storage gets the welcome again, which is
+  // exactly right — as far as the app knows they are new.
+  var SEEN_KEY = 'aaup_landingSceneSeen';
+  function sceneAlreadySeen(){
+    try{ return localStorage.getItem(SEEN_KEY) === '1'; }catch(e){ return false; }
+  }
+  function markSceneSeen(){
+    try{ localStorage.setItem(SEEN_KEY, '1'); }catch(e){}
+  }
+
+  var sceneState = 'idle';   // idle | loading | live | failed | skipped
   function mountCampus(){
     var c = document.getElementById('wizCampus3d');
     if(!c) return;
+    if(sceneAlreadySeen()){
+      // Deliberately identical to the no-WebGL path, so there is exactly one
+      // "no moving scene" appearance to design and to test.
+      sceneState = 'skipped';
+      var flat = c.closest('.wiz-landing');
+      if(flat){ flat.classList.add('is-scene-flat'); }
+      return;
+    }
     var wrap = c.closest('.wiz-landing');
     if(wrap) wrap.classList.add('is-scene-loading');
     sceneState = 'loading';
@@ -138,6 +166,10 @@
         }
       })).then(function(ok){
         sceneState = ok ? 'live' : 'failed';
+        // Only a scene that actually rendered counts as seen. A student whose
+        // first visit failed on a slow phone should get the welcome on their
+        // second, not be told they have already had it.
+        if(ok){ markSceneSeen(); }
         var w = still.closest('.wiz-landing');
         if(w){
           w.classList.remove('is-scene-loading');

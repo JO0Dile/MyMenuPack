@@ -123,6 +123,78 @@
     card.insertBefore(bar, card.firstChild);
   }
 
+  // ============================================================
+  // 46 · THE SYSTEM BACK GESTURE CLOSES THE DIALOG
+  //
+  // Every dialog in this app is a `.open` class on an overlay, not a history
+  // entry. So on Android — where back is the first thing anyone reaches for,
+  // and on most phones it is a swipe from the edge rather than a button you
+  // have to aim at — pressing back inside the Degree Audit left AAUPath
+  // entirely and lost where the student was. On iOS the same gesture went
+  // back a page in the browser.
+  //
+  // One history entry per open dialog fixes it. The entry is tagged so a
+  // popstate that is NOT ours (the student really did want to go back a page)
+  // falls through untouched, and closing a dialog by its own control pops the
+  // entry back off so the history does not silently grow one step for every
+  // screen ever opened.
+  var pushed = [];          // overlay ids we have pushed an entry for
+  var popping = false;      // true while we are the ones closing it
+
+  function openIds(){
+    return [].slice.call(document.querySelectorAll('.modal-overlay.open'))
+      .map(function(o){ return o.id; }).filter(Boolean);
+  }
+
+  function pushEntry(id){
+    if(!id || pushed.indexOf(id) !== -1) return;
+    pushed.push(id);
+    try{
+      history.pushState({ aaupDialog: id }, '');
+    }catch(e){ pushed.pop(); }
+  }
+
+  function closeOverlay(id){
+    var ov = document.getElementById(id);
+    if(!ov) return;
+    // Go through the dialog's own control wherever there is one, so whatever
+    // it does on close — saving a draft, redrawing the plan — still happens.
+    var own = ov.querySelector('.modal-close');
+    if(own){ own.click(); } else { ov.classList.remove('open'); }
+  }
+
+  window.addEventListener('popstate', function(e){
+    var st = e.state;
+    // Not one of ours: let the browser do what it was going to do.
+    if(!pushed.length) return;
+    var id = pushed.pop();
+    popping = true;
+    closeOverlay(id);
+    setTimeout(function(){ popping = false; }, 0);
+    void st;
+  });
+
+  // When a dialog closes by its own button, drop the entry we pushed for it —
+  // otherwise the student has to press back once per dialog they ever opened
+  // before the browser will actually leave the page.
+  function syncHistory(){
+    var open = openIds();
+    // Opened something new.
+    open.forEach(function(id){
+      if(SKIP.indexOf(id) === -1) pushEntry(id);
+    });
+    // Closed something without going through popstate.
+    if(!popping){
+      for(var i = pushed.length - 1; i >= 0; i--){
+        if(open.indexOf(pushed[i]) === -1){
+          pushed.splice(i, 1);
+          try{ history.back(); }catch(e){}
+          break;   // one per tick; the next mutation will catch the rest
+        }
+      }
+    }
+  }
+
   function watch(){
     document.querySelectorAll('.modal-overlay').forEach(function(ov){
       if(ov.classList.contains('open')) inject(ov);
@@ -130,8 +202,9 @@
     var obs = new MutationObserver(function(muts){
       muts.forEach(function(m){
         var el = m.target;
-        if(el.classList && el.classList.contains('modal-overlay') && el.classList.contains('open')){
-          inject(el);
+        if(el.classList && el.classList.contains('modal-overlay')){
+          if(el.classList.contains('open')){ inject(el); }
+          syncHistory();
         }
       });
     });
