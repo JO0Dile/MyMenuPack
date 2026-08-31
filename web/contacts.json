@@ -174,16 +174,22 @@
       "email": "Manar.Faraj@aaup.edu"
     },
     {
-      "name": "Dr. Hudhaifa",
+      "name": "Dr. Huthaifa Ashqar",
       "category": "dean",
       "role": "AI College Dean",
-      "email": ""
+      "email": "Huthaifa.ashqar@aaup.edu"
     },
     {
       "name": "Dr. Islam",
       "category": "dean",
-      "role": "Secretary to Dean Hudhaifa",
+      "role": "Secretary to Dean Huthaifa",
       "email": ""
+    },
+    {
+      "name": "Dr. Ghassan Sirhan",
+      "category": "dean",
+      "role": "Head of the Educational Sciences Department",
+      "email": "Ghassan.Sirhan@aaup.edu"
     },
     {
       "name": "Sameh Tawafsheh",

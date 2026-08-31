@@ -2287,6 +2287,22 @@
     transition:background .15s ease, color .15s ease;
   }
 
+  /* One way out, not two. js/60-backbar.js puts a "← Back" bar at the top of
+     every dialog on desktop, because a small ✕ in a corner is something you
+     have to already know to look for. But the ✕ stayed where it was, so
+     every dialog ended up with two controls doing exactly the same thing —
+     and a student asked, reasonably, which one was which.
+     Where a bar exists it is the way out; the ✕ steps aside. It stays in the
+     DOM because the bar's handler clicks it, so whatever the dialog does on
+     close still happens. Dialogs the bar deliberately skips keep their ✕,
+     which is then their only control. */
+  .modal-card:has(> .back-bar) > .modal-close,
+  .modal-card:has(.back-bar) > .modal-close{
+    position:absolute; width:1px; height:1px; padding:0;
+    margin:-1px; overflow:hidden; clip-path:inset(50%);
+    white-space:nowrap; border:0;
+  }
+
   .modal-close:hover{color:var(--text); background:var(--search-bg);}
   .modal-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 
@@ -3902,6 +3918,65 @@
      move — but never a tap: the buttons above it are the whole screen. */
   pointer-events:auto;
 }
+/* Once the flight has landed the scene turns: drag anywhere on the campus
+   and the camera swings round the fountain. touch-action has to go off or
+   the browser claims the swipe as a scroll before we see it. */
+/* ---- the loading sequence ------------------------------------------------
+   Shown before a line of WebGL has run, and it has to hold on its own if
+   WebGL never runs at all. The identity first, then what is happening, then
+   a bar that fills as the real stages complete. */
+.scene-loading{
+  position:absolute; inset:0; z-index:4;
+  display:flex; align-items:center; justify-content:center;
+  background:
+    radial-gradient(120% 90% at 50% 20%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    var(--surface-bg);
+  opacity:1; transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.scene-loading.is-done{opacity:0; transform:scale(1.03); pointer-events:none;}
+.scene-loading-inner{
+  display:flex; flex-direction:column; align-items:center; gap:9px;
+  padding:24px; text-align:center; max-width:320px;
+}
+.scene-loading-mark{display:flex; gap:5px; margin-bottom:10px;}
+.scene-loading-mark span{
+  width:4px; height:22px; border-radius:2px; background:var(--accent);
+  animation:scene-mark 1.25s cubic-bezier(.45,0,.55,1) infinite;
+}
+.scene-loading-mark span:nth-child(2){animation-delay:.14s; opacity:.72;}
+.scene-loading-mark span:nth-child(3){animation-delay:.28s; opacity:.46;}
+@keyframes scene-mark{
+  0%,100%{transform:scaleY(.42);} 50%{transform:scaleY(1);}
+}
+.scene-loading-name{
+  font-size:26px; font-weight:900; letter-spacing:.19em;
+  color:var(--text); line-height:1;
+}
+.scene-loading-ar{font-size:14px; font-weight:800; color:var(--accent);}
+.scene-loading-line{font-size:12.5px; color:var(--text-dim); margin-top:4px; line-height:1.5;}
+.scene-loading-bar{
+  width:180px; height:2px; border-radius:2px; margin-top:12px;
+  background:color-mix(in srgb, var(--text-dim) 24%, transparent); overflow:hidden;
+}
+.scene-loading-bar i{
+  display:block; height:100%; width:0; border-radius:2px; background:var(--accent);
+  transition:width .5s cubic-bezier(.22,1,.36,1);
+}
+.scene-loading-stage{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--text-dim); opacity:.75; min-height:12px;
+}
+@media (prefers-reduced-motion:reduce){
+  .scene-loading-mark span{animation:none; transform:scaleY(.7);}
+  .scene-loading{transition:opacity .2s linear;}
+}
+
+/* While the module is in flight the still drawing carries the screen. */
+.wiz-landing.is-scene-loading .wiz-campus{opacity:.9;}
+
+.wiz-campus-3d.can-turn{cursor:grab; touch-action:none;}
+.wiz-campus-3d.is-turning{cursor:grabbing;}
 /* Once the live scene is up the still drawing would show through the gaps in
    the line-work as a doubled campus, so it stands down. */
 .wiz-campus-3d.is-live ~ .wiz-campus,
@@ -3913,6 +3988,22 @@
    archway. This darkens a band through the middle and leaves the top and the
    bottom of the scene clear, so the drawing still reads at the edges and the
    text has a surface of its own. */
+.wiz-landing-line,
+.wiz-landing-note{
+  /* Legibility bought locally. These two sit over line-work, and the
+     alternative — pushing the scrim darker until they cleared — dimmed the
+     whole campus to rescue two sentences. A halo in the card's own colour
+     does it without touching anything else. */
+  text-shadow:
+    0 0 4px var(--surface-bg),
+    0 0 9px var(--surface-bg),
+    0 0 18px var(--surface-bg),
+    0 0 26px var(--surface-bg);
+}
+/* The closing note sits over the busiest part of the drawing — the fountain
+   and the steps — and it is the dimmest text on the screen. It keeps its
+   halo and gets a little of its contrast back. */
+.wiz-landing-note{color:var(--text-dim); opacity:1;}
 .wiz-landing::after{
   content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
   background:linear-gradient(180deg,
@@ -6823,6 +6914,14 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     background:var(--panel); border:0; border-bottom:1px solid var(--line);
     border-radius:0; color:var(--text); font-size:0; z-index:10;
   }
+  /* The button already contains a drawn icon — index.html puts a
+     data-app-icon="close" span in every one of them. font-size:0 above hides
+     a text glyph but has no effect on an SVG that carries its own width and
+     height, so adding a pseudo-element glyph on top rendered BOTH: an ✕ and
+     an arrow in the same control, which read as two buttons doing the same
+     thing. The drawn icon steps aside wherever a pseudo supplies the mark. */
+  .modal-overlay .modal-card .modal-close svg,
+  .modal-overlay .modal-card .modal-close [data-app-icon]{display:none;}
   .modal-overlay .modal-card .modal-close::before{
     content:'\2190'; font-size:26px; line-height:1; font-weight:400;
   }
@@ -6866,6 +6965,8 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
     display:flex; align-items:center; justify-content:center;
     font-size:0; z-index:5;
   }
+  #impCourseModalOverlay .modal-card.cd-card .modal-close svg,
+  #impCourseModalOverlay .modal-card.cd-card .modal-close [data-app-icon]{display:none;}
   #impCourseModalOverlay .modal-card.cd-card .modal-close::before{
     content:'\2715'; font-size:14px; font-weight:400;
   }

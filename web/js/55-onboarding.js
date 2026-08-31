@@ -91,15 +91,67 @@
            '<canvas class="wiz-campus-3d" id="wizCampus3d" aria-hidden="true"></canvas>';
   }
 
-  // Started after the markup is in the DOM, and torn down whenever the
-  // landing leaves the screen — a GPU loop running behind a closed overlay
-  // is a battery drain nobody asked for.
+  // ---- the 3D campus -----------------------------------------------------
+  // The scene is a module of its own (web/scene/, built to
+  // bundles/landing-scene.js) and is fetched only when this screen is
+  // actually shown. That is deliberate: it is by far the largest single
+  // thing in the app, and it has no business being in the app shell that a
+  // returning student downloads to look at their timetable. The service
+  // worker caches it on first fetch, so it is offline from the second visit
+  // like everything else.
+  //
+  // Every failure path lands in the same place — the drawing that is already
+  // in the DOM stays visible and the student signs in exactly as before. No
+  // WebGL, a slow network, a lost context, a thrown error: same outcome.
+  var scenePromise = null;
+  function loadScene(){
+    if(scenePromise) return scenePromise;
+    if(!window.WebGLRenderingContext) return Promise.reject(new Error('no webgl'));
+    var url = new URL('bundles/landing-scene.js', document.baseURI).href;
+    scenePromise = import(/* webpackIgnore: true */ url);
+    return scenePromise;
+  }
+
+  var sceneState = 'idle';   // idle | loading | live | failed
   function mountCampus(){
-    if(!window.AAUP_CAMPUS3D) return;
     var c = document.getElementById('wizCampus3d');
-    if(c){ window.AAUP_CAMPUS3D.mount(c); }
+    if(!c) return;
+    var wrap = c.closest('.wiz-landing');
+    if(wrap) wrap.classList.add('is-scene-loading');
+    sceneState = 'loading';
+    loadScene().then(function(){
+      // The landing may have been left while the module was in flight.
+      var still = document.getElementById('wizCampus3d');
+      if(!still || !window.AAUP_CAMPUS3D){ sceneState = 'failed'; return; }
+      return Promise.resolve(window.AAUP_CAMPUS3D.mount(still, {
+        lang: lang(),
+        // The panel is a real object in the scene; the buttons that operate
+        // it are real DOM, placed over where it actually projects. That is
+        // what keeps the whole thing keyboard-operable and reachable by a
+        // screen reader while looking like part of the world.
+        onPanelRect: function(r){
+          var act = document.querySelector('.wiz-landing-actions');
+          if(!act || !r.visible) return;
+          act.style.setProperty('--panel-x', r.x + 'px');
+          act.style.setProperty('--panel-y', r.y + 'px');
+          act.style.setProperty('--panel-w', Math.max(180, r.width) + 'px');
+        }
+      })).then(function(ok){
+        sceneState = ok ? 'live' : 'failed';
+        var w = still.closest('.wiz-landing');
+        if(w){
+          w.classList.remove('is-scene-loading');
+          w.classList.add(ok ? 'is-scene-live' : 'is-scene-flat');
+        }
+      });
+    }).catch(function(){
+      sceneState = 'failed';
+      var w = document.querySelector('.wiz-landing');
+      if(w){ w.classList.remove('is-scene-loading'); w.classList.add('is-scene-flat'); }
+    });
   }
   function unmountCampus(){
+    sceneState = 'idle';
     if(window.AAUP_CAMPUS3D){ window.AAUP_CAMPUS3D.stop(); }
   }
 
