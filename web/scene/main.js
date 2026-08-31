@@ -114,7 +114,16 @@ class LandingScene {
     this.panel = new GlassPanel(this.materials, this.quality);
     // Off to the west, clear of the sightline, where a flagpole stands on
     // the real plaza.
-    this.flag = new Flag(this.materials, this.quality, this.sky, { x: -15.5, z: 4.5 });
+    // The pole stood at (-15.5, 4.5), which is 16 units out to the side of a
+    // camera only 21 units back — so it was off the left edge of the frame at
+    // every viewport, phone and desktop alike, and the flag was only ever
+    // glimpsed during the fly-in. This spot is on the paved deck 19 units out
+    // and behind the fountain, at about 13 degrees left of the landed view
+    // axis, which is inside even a portrait phone's 19-degree half-field. The
+    // pole is taller than it was so the cloth flies clear of the kerb line
+    // and above the copy.
+    this.flag = new Flag(this.materials, this.quality, this.sky,
+      { x: -6.5, z: -17.9, height: 13.2 });
 
     this.world.add(
       this.plaza.object, this.landmark.object, this.water.object,
