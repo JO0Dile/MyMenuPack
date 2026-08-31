@@ -10,13 +10,12 @@
 // The normal is recomputed from the analytic derivatives of those same
 // waves, so the light actually runs along the folds instead of sitting flat.
 //
-// ON THE EMBLEM: the roundel below is drawn here as a stand-in — an
-// institutional seal of the right shape, weight and colour for a flag seen
-// at this size. It is NOT a reproduction of the university's crest, because
-// inventing the details of a real institution's mark would be worse than
-// leaving it plain. If you have the real artwork, drop it in
-// web/assets/img/ and pass its URL as `emblemUrl`; everything else here
-// stays as it is.
+// ON THE MARK: this flies AAUPATH's own flag — the app icon that ships in
+// this repository, on a plain field. It is deliberately not the university's
+// crest: that artwork is not in this repository, and drawing an approximation
+// of a real institution's mark is worse than not drawing it. Drop the real
+// file in web/assets/img/ and pass its URL as `emblemUrl` to replace the
+// whole cloth; nothing else here changes.
 // ==========================
 import {
   Group, Mesh, PlaneGeometry, CylinderGeometry, SphereGeometry,
@@ -86,80 +85,95 @@ const FRAG = /* glsl */`
   }
 `;
 
-// The seal. Shape, weight and colour of an institutional roundel at flag
-// size — deliberately not a copy of anyone's actual crest.
-function flagTexture() {
+// The cloth. This is AAUPATH's flag, not the university's: the app's own
+// mark, which exists in this repository, on a plain field. The previous
+// version drew an invented institutional roundel — a green ring with a
+// made-up device and the university's name arced around it — and an
+// invented crest for a real institution is worse than no crest at all, so
+// it is gone. If you have the university's actual artwork, drop the file in
+// web/assets/img/ and pass its URL as `emblemUrl`; it replaces this whole
+// texture and nothing else changes.
+const FIELD = '#f6f5f1';
+const BAND = '#e9e7e0';
+const INK = '#1d2a44';
+const BLUE = '#2f5fd0';
+
+function drawCloth(g, W, H) {
+  g.fillStyle = FIELD;
+  g.fillRect(0, 0, W, H);
+  // a hoist band, so the flag has a construction
+  g.fillStyle = BAND;
+  g.fillRect(0, 0, W * 0.045, H);
+  // and a thin rule down the fly, the way a sewn flag is finished
+  g.fillStyle = 'rgba(29,42,68,0.10)';
+  g.fillRect(W - W * 0.012, 0, W * 0.012, H);
+}
+
+function drawType(g, W, H) {
+  g.save();
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillStyle = INK;
+  g.font = `700 ${H * 0.13}px system-ui, sans-serif`;
+  // letter-spaced by hand: canvas has no tracking, and a wordmark set solid
+  // at this size reads as a smudge on a flag two dozen units away
+  const word = 'AAUPATH', track = H * 0.028;
+  const widths = [...word].map(ch => g.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0) + track * (word.length - 1);
+  let x = W * 0.54 - total / 2;
+  for (let i = 0; i < word.length; i++) {
+    g.fillText(word[i], x + widths[i] / 2, H * 0.755);
+    x += widths[i] + track;
+  }
+  g.fillStyle = BLUE;
+  g.font = `600 ${H * 0.105}px system-ui, sans-serif`;
+  g.fillText('\u0637\u0631\u064a\u0642\u0643', W * 0.54, H * 0.885);
+  g.restore();
+}
+
+// The field is drawn straight away so the flag is never blank; the mark is
+// composited in when the icon has decoded, and the texture is marked for
+// re-upload. `onReady` fires on both paths so the caller does not have to
+// care which one happened.
+function flagTexture(iconUrl, onReady) {
   const W = 512, H = 336;
   const c = document.createElement('canvas');
   c.width = W; c.height = H;
   const g = c.getContext('2d');
-
-  g.fillStyle = '#f4f3ef';                       // the cloth
-  g.fillRect(0, 0, W, H);
-  // a hoist band, so the flag has a construction
-  g.fillStyle = '#e8e6df';
-  g.fillRect(0, 0, W * 0.045, H);
-
-  const cx = W * 0.54, cy = H / 2, R = H * 0.34;
-  const GREEN = '#1c7a3e', DARK = '#232a30';
-
-  g.save();
-  g.translate(cx, cy);
-
-  // the outer ring and the inner rule
-  g.strokeStyle = GREEN; g.lineWidth = R * 0.1;
-  g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.stroke();
-  g.strokeStyle = DARK; g.lineWidth = R * 0.028;
-  g.beginPath(); g.arc(0, 0, R * 0.83, 0, Math.PI * 2); g.stroke();
-
-  // the mark: an open book over a rising path, which is what this app is
-  g.fillStyle = DARK;
-  g.beginPath();
-  g.moveTo(-R * 0.42, R * 0.10);
-  g.quadraticCurveTo(-R * 0.20, -R * 0.06, 0, R * 0.02);
-  g.quadraticCurveTo(R * 0.20, -R * 0.06, R * 0.42, R * 0.10);
-  g.lineTo(R * 0.42, R * 0.22);
-  g.quadraticCurveTo(R * 0.20, R * 0.06, 0, R * 0.14);
-  g.quadraticCurveTo(-R * 0.20, R * 0.06, -R * 0.42, R * 0.22);
-  g.closePath(); g.fill();
-  g.strokeStyle = GREEN; g.lineWidth = R * 0.075;
-  g.lineCap = 'round'; g.lineJoin = 'round';
-  g.beginPath();
-  g.moveTo(-R * 0.34, -R * 0.16);
-  g.lineTo(-R * 0.02, -R * 0.46);
-  g.lineTo(R * 0.34, -R * 0.16);
-  g.stroke();
-
-  // arc text, top and bottom, set on the ring
-  const arc = (text, radius, start, sweep, size, colour, flip) => {
-    g.save();
-    g.fillStyle = colour;
-    g.font = `700 ${size}px system-ui, sans-serif`;
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    const step = sweep / Math.max(1, text.length - 1);
-    for (let i = 0; i < text.length; i++) {
-      const a = start + step * i;
-      g.save();
-      g.rotate(a);
-      g.translate(0, flip ? radius : -radius);
-      if (flip) g.rotate(Math.PI);
-      g.fillText(text[i], 0, 0);
-      g.restore();
-    }
-    g.restore();
-  };
-  arc('ARAB AMERICAN UNIVERSITY', R * 0.72, -0.92, 1.84, R * 0.115, DARK, false);
-  arc('الجامعة العربية الأمريكية', R * 0.72, -0.62, 1.24, R * 0.125, GREEN, true);
-  g.restore();
+  drawCloth(g, W, H);
+  drawType(g, W, H);
 
   const t = new CanvasTexture(c);
   t.colorSpace = SRGBColorSpace;
   t.minFilter = LinearFilter;
+
+  if (iconUrl) {
+    const img = new Image();
+    img.onload = () => {
+      const s = H * 0.42;
+      g.save();
+      // a soft drop under the badge so it sits on the cloth instead of
+      // floating on it
+      g.shadowColor = 'rgba(29,42,68,0.28)';
+      g.shadowBlur = H * 0.035;
+      g.shadowOffsetY = H * 0.012;
+      g.drawImage(img, W * 0.54 - s / 2, H * 0.34 - s / 2, s, s);
+      g.restore();
+      t.needsUpdate = true;
+      if (onReady) onReady();
+    };
+    img.onerror = () => { if (onReady) onReady(); };
+    img.src = iconUrl;
+  } else if (onReady) {
+    onReady();
+  }
   return t;
 }
 
 export class Flag {
-  constructor(materials, quality, sky, { x = 0, z = 0, height = 9.5, emblemUrl = null } = {}) {
+  constructor(materials, quality, sky,
+    { x = 0, z = 0, height = 9.5, emblemUrl = null,
+      iconUrl = 'assets/icons/icon-any-512.png' } = {}) {
     this.m = materials;
     this.group = new Group();
     this.group.name = 'flag';
@@ -171,7 +185,7 @@ export class Flag {
     base.position.y = 0.25;
     const collar = new Mesh(new CylinderGeometry(0.15, 0.2, 0.3, low ? 8 : 14), M('steel-dark'));
     collar.position.y = 0.62;
-    const pole = new Mesh(new CylinderGeometry(0.055, 0.08, height, low ? 7 : 12), M('aluminium'));
+    const pole = new Mesh(new CylinderGeometry(0.065, 0.095, height, low ? 7 : 12), M('aluminium'));
     pole.position.y = height / 2 + 0.6;
     const finial = new Mesh(new SphereGeometry(0.13, low ? 6 : 12, low ? 5 : 8), M('aluminium'));
     finial.position.y = height + 0.68;
@@ -179,19 +193,22 @@ export class Flag {
     this.group.add(base, collar, pole, finial);
 
     // ---- the cloth -------------------------------------------------------
-    const CW = 3.4, CH = 2.25;
+    const CW = 4.3, CH = 2.85;
     const geo = new PlaneGeometry(CW, CH, low ? 22 : 44, low ? 14 : 28);
     // the hoist sits on the pole, so the plane is offset to hang off it
     geo.translate(CW / 2, 0, 0);
 
-    const map = flagTexture();
+    const map = flagTexture(iconUrl);
     this.uniforms = {
       uTime: { value: 0 },
       uWind: { value: 1 },
       uMap: { value: map },
       uLightDir: { value: sky.sunDirection.clone() },
       uLightColour: { value: sky.sunColour.clone() },
-      uAmbient: { value: new Color(0.24, 0.27, 0.36) }
+      // Brighter than the rest of the scene's ambient on purpose: a flag is a
+      // thin sheet with sky on both sides of it, so it never sits in the deep
+      // shade a solid wall does, and at this size the mark on it has to read.
+      uAmbient: { value: new Color(0.42, 0.46, 0.56) }
     };
     this.material = new ShaderMaterial({
       uniforms: this.uniforms, vertexShader: VERT, fragmentShader: FRAG,
@@ -204,13 +221,14 @@ export class Flag {
     this.cloth.name = 'cloth';
     this.group.add(this.cloth);
 
-    // If the real artwork is dropped in, it replaces the stand-in with no
-    // other change.
+    // If the university's own artwork is dropped in, it replaces the whole
+    // cloth with no other change. On failure the drawn field stays, which is
+    // why the field has to be worth looking at on its own.
     if (emblemUrl) {
       new TextureLoader().load(emblemUrl, tex => {
         tex.colorSpace = SRGBColorSpace;
         this.uniforms.uMap.value = tex;
-      }, undefined, () => { /* keep the drawn seal */ });
+      }, undefined, () => { /* keep the drawn cloth */ });
     }
 
     this.group.position.set(x, 0.05, z);

@@ -397,17 +397,22 @@ export class Landmark {
   _book(y) {
     const M = n => this.m.get(n);
     const g = new Group();
-    const W = 0.9, H = 0.82, D = 0.66, SEG = 10;
+    const W = 1.15, D = 1.0, SEG = 12;
 
     for (const side of [-1, 1]) {
       const pos = [];
-      // A leaf is a ruled surface: it lifts away from the spine and curls
-      // back down at the outer edge, the way a heavy open book does.
+      // A leaf is a ruled surface: it lifts away from the spine and comes
+      // back down at the outer edge, the way a heavy open book does. The
+      // profile has to be non-monotonic for that. The old one was a plain
+      // sine that only ever climbed, so each leaf rose 0.76 over 0.9 of
+      // lateral run — a 40-degree wedge — and the two of them together read
+      // as a pair of raised wings rather than as a book. This rises to about
+      // 0.21 near the middle of the leaf and returns almost flat at the
+      // margin, which is roughly 25 degrees at its steepest.
       const pt = (u, v) => {
         const x = side * u * W;
-        const lift = Math.sin(u * Math.PI * 0.62) * H;
-        const sag = Math.pow(u, 2.2) * 0.16;
-        return [x, y + lift - sag, v * D];
+        const lift = 0.34 * Math.pow(u, 0.55) - 0.30 * Math.pow(u, 3);
+        return [x, y + lift, v * D];
       };
       for (let i = 0; i < SEG; i++) {
         const u0 = i / SEG, u1 = (i + 1) / SEG;
@@ -420,7 +425,7 @@ export class Landmark {
       // the page edge: a thin skirt down the outer margin so the leaf is
       // not infinitely thin where the light grazes it
       const eA = pt(1, -0.5), eB = pt(1, 0.5);
-      const tA = [eA[0], eA[1] - 0.05, eA[2]], tB = [eB[0], eB[1] - 0.05, eB[2]];
+      const tA = [eA[0], eA[1] - 0.07, eA[2]], tB = [eB[0], eB[1] - 0.07, eB[2]];
       pos.push(...eA, ...eB, ...tB, ...eA, ...tB, ...tA);
 
       const geo = new BufferGeometry();
@@ -431,7 +436,7 @@ export class Landmark {
       g.add(leaf);
     }
 
-    const spine = new Mesh(new BoxGeometry(0.1, 0.09, D), M('limestone-honed'));
+    const spine = new Mesh(new BoxGeometry(0.12, 0.1, D), M('limestone-honed'));
     spine.position.set(0, y + 0.02, 0);
     g.add(spine);
     return g;

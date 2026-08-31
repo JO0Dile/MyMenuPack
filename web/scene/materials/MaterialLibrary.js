@@ -137,7 +137,15 @@ export class MaterialLibrary {
       clearcoat: 1, clearcoatRoughness: 0.06,
       specularIntensity: 1,
       envMapIntensity: 1.5, transparent: true, opacity: 0.62,
-      side: DoubleSide
+      side: DoubleSide,
+      // A transmissive material renders in its own pass, between the opaque
+      // and the transparent ones, and by default it writes depth. That put a
+      // rounded-rectangle hole in the depth buffer in front of everything,
+      // and the planets — transparent, drawn afterwards, depth-tested —
+      // were cut to the shape of the panel wherever they crossed it. The
+      // pane is a floating sheet of interface; nothing needs to sort against
+      // it, so it has no business writing depth at all.
+      depthWrite: false
     }));
     this._add('glass-ui-edge', new MeshPhysicalMaterial({
       color: c(0xbcd4ee), roughness: 0.12, metalness: 0.35,
