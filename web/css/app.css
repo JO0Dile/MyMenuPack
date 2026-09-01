@@ -5824,24 +5824,17 @@
   }
   .tut-tooltip h4{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--text);}
   .tut-tooltip p{margin:0 0 12px;font-size:12.5px;line-height:1.55;color:var(--text-dim);}
-  .tut-tooltip .tut-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .tut-tooltip .tut-progress{font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:.03em;white-space:nowrap;}
+  /* One button, at the end. The step counter and the Skip that used to share
+     this row went with the guided tours (js/32-tutorial.js) — a coach mark
+     has no step to count and nothing to skip past. */
+  .tut-tooltip .tut-foot{display:flex;align-items:center;justify-content:flex-end;}
   .tut-tooltip .tut-actions{display:flex;align-items:center;gap:14px;}
-  .tut-skip{background:none;border:none;color:var(--text-dim);font-size:12px;font-family:inherit;cursor:pointer;padding:0;}
-  .tut-skip:hover{color:var(--text);}
   .tut-next{
     background:var(--accent);border:none;color:var(--on-accent);
     font-size:12.5px;font-weight:800;font-family:inherit;
     padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .tut-next:hover{filter:brightness(1.08);}
-  /* A step waiting on the student to actually perform a gesture. Quieter
-     than the solid button, so the invitation to try it reads before the
-     invitation to move past it — this used to be done by relabelling the
-     button "Skip", which put two buttons reading Skip side by side. */
-  .tut-next.tut-next-waiting{
-    background:none; color:var(--accent); border:1px solid var(--accent);
-  }
   @media (prefers-reduced-motion: reduce){
     .tut-spotlight, .tut-tooltip{transition:none;}
   }

@@ -317,16 +317,18 @@ if (('serviceWorker' in navigator) && (location.protocol === 'https:' || locatio
   </span>
 </div>
 
+<!-- One coach mark at a time (js/32-tutorial.js). This used to carry a step
+     counter and a Skip/Next pair, because it used to run multi-step guided
+     tours; a mark is one sentence with one button, so the counter and the
+     second button are gone with them. -->
 <div class="tut-layer" id="tutLayer">
   <div class="tut-spotlight" id="tutSpotlight"></div>
   <div class="tut-tooltip" id="tutTooltip">
     <h4 id="tutTitle"></h4>
     <p id="tutText"></p>
     <div class="tut-foot">
-      <span class="tut-progress" id="tutProgress"></span>
       <div class="tut-actions">
-        <button type="button" class="tut-skip" id="tutSkip" data-ar="تخطٍّ">Skip</button>
-        <button type="button" class="tut-next" id="tutNext" data-ar="التالي">Next</button>
+        <button type="button" class="tut-next" id="tutNext" data-ar="فهمت">Got it</button>
       </div>
     </div>
   </div>

@@ -1457,6 +1457,11 @@
       var extrasEl = body.querySelector('.modal-extras');
       window.__bindCourseModalExtras(planId, slug, extrasEl);
     }
+    // 53 · Hold-to-trace is taught the first time someone opens a course, not
+    // in a tour thirty seconds before they open one (js/32-tutorial.js).
+    if(window.AAUP_TUTORIAL && window.AAUP_TUTORIAL.moment){
+      window.AAUP_TUTORIAL.moment('courseOpen');
+    }
     if(window.AAUP_COURSE_DETAIL && window.AAUP_COURSE_DETAIL.bind){
       window.AAUP_COURSE_DETAIL.bind(planId, slug, body);
     }
