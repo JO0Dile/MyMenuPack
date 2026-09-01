@@ -2613,6 +2613,57 @@
   .tr-why summary:hover{color:var(--text);}
   .tr-why p{margin:6px 0 0; font-size:11.5px; line-height:1.6; color:var(--text-dim);}
 
+  /* Idea 58 — your load against the advisory plan (js/19-audit.js). Two bars
+     per term: what the plan schedules there, and what you have finished of
+     it. The plan bar is the outline you are measured against, so it is a
+     hollow accent-edged column; the finished bar is solid and sits in front
+     of it, which is the same figure/ground reading as a target and a
+     result. The chart scrolls sideways rather than squeezing: eleven terms
+     at 26px still overflow a 390px phone, and squeezed bars stop being
+     comparable to each other, which is the entire point of the widget. */
+  .adv-block{margin-bottom:16px;}
+  .adv-chart{
+    display:flex; align-items:flex-end; gap:10px;
+    height:112px; padding:0 2px 0; overflow-x:auto; overflow-y:hidden;
+  }
+  .adv-term{
+    flex:0 0 auto; display:flex; flex-direction:column; align-items:center;
+    gap:5px; height:100%;
+  }
+  .adv-pair{
+    position:relative; flex:1 1 auto; width:26px;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .adv-plan{
+    width:100%; min-height:2px; border-radius:4px 4px 0 0;
+    border:1.5px solid var(--accent); border-bottom:none;
+    background:color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  /* In front of the plan outline, not beside it — a term is one quantity
+     measured against another, and two adjacent columns read as two terms. */
+  .adv-mine{
+    position:absolute; inset-inline:5px; bottom:0;
+    min-height:2px; border-radius:3px 3px 0 0; background:var(--accent);
+  }
+  .adv-lab{
+    font-size:10px; font-weight:700; color:var(--text-dim);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .adv-key{
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    margin:0 0 8px; font-size:11px; color:var(--text-dim);
+  }
+  .adv-swatch{
+    width:11px; height:11px; border-radius:3px; flex:0 0 auto;
+    margin-inline-start:4px;
+  }
+  .adv-key .adv-swatch:first-child{margin-inline-start:0;}
+  .adv-swatch-mine{background:var(--accent);}
+  .adv-swatch-plan{
+    border:1.5px solid var(--accent);
+    background:color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
   /* The three automatic restore points in Settings (js/84-autobackup.js).
      A date, how long ago, how big, and the two things you can do with it. */
   .ab-list{display:flex; flex-direction:column; gap:8px; margin-bottom:6px;}
@@ -4161,10 +4212,14 @@
     position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
     padding:26px 24px 18px;gap:8px;min-height:170px;justify-content:center;touch-action:pan-y;
   }
+  /* Holds an inline SVG from js/04-icons.js. font-size is kept for the one
+     remaining caller that still passes a character. */
   .story-ic{
     width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.06);
     display:flex;align-items:center;justify-content:center;font-size:30px;line-height:1;
+    color:var(--accent);
   }
+  .story-ic svg{width:34px;height:34px;}
   .story-title{font-size:17px;font-weight:800;color:var(--text);}
   .story-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
   .story-content{width:100%;margin-top:8px;}
@@ -4204,6 +4259,26 @@
     border-radius:999px;padding:5px 12px;
   }
   .story-gpa-big{font-size:40px;font-weight:800;color:var(--accent);line-height:1;margin-top:4px;}
+  .story-cap{
+    font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);margin-top:6px;
+  }
+
+  /* 59 · The cumulative before and after the semester that just closed. The
+     "was" is deliberately quieter than the "now" — the point of the card is
+     where you have arrived, and showing both at equal weight makes the
+     reader do the comparison the card exists to have already made. */
+  .story-move{
+    display:flex;align-items:baseline;justify-content:center;gap:12px;
+    font-variant-numeric:tabular-nums;margin-top:4px;
+  }
+  .story-move-was{font-size:24px;font-weight:700;color:var(--text-dim);}
+  .story-move-arrow{font-size:20px;color:var(--text-dim);}
+  .story-move-now{font-size:40px;font-weight:800;line-height:1;}
+  .story-move-up .story-move-now{color:var(--skills);}
+  .story-move-down .story-move-now{color:var(--warn);}
+  .story-move-flat .story-move-now{color:var(--accent);}
+  [dir="rtl"] .story-move{flex-direction:row-reverse;}
 
   /* Prerequisite "why is this locked?" card content — one chip per direct
      prerequisite of the course the current card is about, so a branch (two
@@ -4532,6 +4607,15 @@
      note: something to know, not something wrong. */
   .course-meta .cm-suggested{
     color:var(--warn);font-style:italic;flex:0 0 auto;
+  }
+
+  /* 52 · "which level?" on the three English cards, until the placement is
+     answered (js/77-english-level.js). It is the one chip on a card that
+     asks for something rather than reporting something, so it is the accent
+     rather than the dim or the warn — and it disappears the moment it is
+     answered, which is why it can afford to be loud. */
+  .course-meta .cm-eng-ask{
+    color:var(--accent);font-weight:800;flex:0 0 auto;
   }
 
   /* Following a friend's snapshot (js/82-follow.js). Two bars, same scale,
@@ -5550,6 +5634,101 @@
   .dash-card h3{margin:0 0 10px;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.03em;}
   .dash-card .dash-big{font-size:28px;font-weight:800;color:var(--text);}
   .dash-card .dash-sub{font-size:12px;color:var(--text-dim);margin-top:4px;}
+
+  /* 29 · The plan-health grade, above the numbers that produced it. The
+     letter is the largest thing on the dashboard because it is the one thing
+     the screen is now for; everything under it exists so the letter can be
+     disagreed with rather than taken on faith. */
+  .ph-card{margin-bottom:16px;}
+  .ph-head{display:flex; align-items:center; gap:14px;}
+  .ph-grade{
+    font-size:38px; font-weight:800; line-height:1; color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  .ph-head-text{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .ph-lbl{
+    font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .ph-verdict{font-size:14px; font-weight:800;}
+  .ph-why{margin:10px 0 0; font-size:12px; color:var(--text-dim); line-height:1.6;}
+  .ph-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:11px;}
+  .ph-chip{
+    font-size:10.5px; font-weight:800; letter-spacing:.02em;
+    border-radius:999px; padding:4px 11px; border:1px solid transparent;
+  }
+  .ph-good{background:color-mix(in srgb, var(--skills) 16%, transparent); color:var(--skills); border-color:var(--skills);}
+  .ph-watch{background:color-mix(in srgb, var(--warn) 16%, transparent); color:var(--warn); border-color:var(--warn);}
+  .ph-bad{background:color-mix(in srgb, var(--free) 18%, transparent); color:var(--free); border-color:var(--free);}
+  .ph-note{margin:11px 0 0; font-size:10.5px; color:var(--text-dim); line-height:1.55;}
+
+  /* 28 · The badges as a strip on the dashboard, instead of a count in a
+     tile pointing at a screen visited once. Scrolls sideways rather than
+     wrapping: a wrapped second row of badges is the wall this replaced. */
+  .ach-strip{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:13px 15px; margin-bottom:20px;
+  }
+  .ach-strip-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    margin-bottom:9px;
+  }
+  .ach-strip-lbl{
+    font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .ach-strip-count{
+    font-size:12px; font-weight:800; color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
+  .ach-strip-row{
+    display:flex; gap:7px; overflow-x:auto; padding-bottom:2px;
+  }
+  .ach-pill{
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:700; white-space:nowrap;
+    background:rgba(255,255,255,.05); border:1px solid var(--line);
+    border-radius:999px; padding:6px 12px; color:var(--text);
+  }
+  .ach-pill svg{width:15px; height:15px; flex:0 0 auto;}
+  .ach-pill-next{border-style:dashed; color:var(--text-dim);}
+  .ach-pill-pct{font-weight:800; color:var(--accent); font-variant-numeric:tabular-nums;}
+  .ach-pill-more{
+    cursor:pointer; font-family:inherit; color:var(--accent);
+    border-color:color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .ach-pill-more:hover{border-color:var(--accent); background:var(--panel);}
+  .ach-pill-more:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 9 · Every empty state, everywhere (js/88-empty.js). What is missing,
+     what appears once it is not, and the one button that fills it. */
+  .empty-card{
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:8px; padding:22px 20px;
+    background:var(--panel); border:1px dashed var(--line); border-radius:12px;
+  }
+  .empty-ic{
+    width:48px; height:48px; border-radius:14px; display:flex;
+    align-items:center; justify-content:center;
+    background:rgba(255,255,255,.05); color:var(--accent);
+  }
+  .empty-title{font-size:14px; font-weight:800;}
+  .empty-body{
+    font-size:12px; color:var(--text-dim); line-height:1.65; max-width:36ch;
+  }
+  .empty-btn{
+    margin-top:4px; font-family:inherit; font-size:12.5px; font-weight:800;
+    background:var(--accent); color:var(--on-accent); border:none;
+    border-radius:999px; padding:9px 20px; cursor:pointer;
+  }
+  .empty-btn:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+  .empty-line{
+    margin:0; font-size:12px; color:var(--text-dim); line-height:1.6;
+  }
+  .empty-link{
+    font-family:inherit; font-size:12px; font-weight:800; color:var(--accent);
+    background:none; border:none; padding:0; cursor:pointer; text-decoration:underline;
+  }
   .dash-quicklinks{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
   .dash-quicklink{
     background:var(--panel);border:1px solid var(--line);border-radius:10px;
@@ -5645,41 +5824,148 @@
   }
   .tut-tooltip h4{margin:0 0 6px;font-size:14px;font-weight:800;color:var(--text);}
   .tut-tooltip p{margin:0 0 12px;font-size:12.5px;line-height:1.55;color:var(--text-dim);}
-  .tut-tooltip .tut-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .tut-tooltip .tut-progress{font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:.03em;white-space:nowrap;}
+  /* One button, at the end. The step counter and the Skip that used to share
+     this row went with the guided tours (js/32-tutorial.js) — a coach mark
+     has no step to count and nothing to skip past. */
+  .tut-tooltip .tut-foot{display:flex;align-items:center;justify-content:flex-end;}
   .tut-tooltip .tut-actions{display:flex;align-items:center;gap:14px;}
-  .tut-skip{background:none;border:none;color:var(--text-dim);font-size:12px;font-family:inherit;cursor:pointer;padding:0;}
-  .tut-skip:hover{color:var(--text);}
   .tut-next{
     background:var(--accent);border:none;color:var(--on-accent);
     font-size:12.5px;font-weight:800;font-family:inherit;
     padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;
   }
   .tut-next:hover{filter:brightness(1.08);}
-  /* A step waiting on the student to actually perform a gesture. Quieter
-     than the solid button, so the invitation to try it reads before the
-     invitation to move past it — this used to be done by relabelling the
-     button "Skip", which put two buttons reading Skip side by side. */
-  .tut-next.tut-next-waiting{
-    background:none; color:var(--accent); border:1px solid var(--accent);
-  }
   @media (prefers-reduced-motion: reduce){
     .tut-spotlight, .tut-tooltip{transition:none;}
   }
 
 
-  .watermark-layer{
-    position:fixed;
-    right:14px;
-    bottom:10px;
-    z-index:9999;
-    pointer-events:none;
-    color:rgba(255,255,255,.35);
-    font-size:11px;
-    font-weight:600;
-    letter-spacing:.02em;
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    white-space:nowrap;
+  /* 11 · THE WATERMARK IS FOR THINGS THAT LEAVE THE APP.
+     It sat fixed over every screen at z-index 9999 — on top of table rows, on
+     top of the plan, on top of a student's own grades, permanently. The name
+     belongs on the artefacts other people see: the printed plan and the share
+     screen, both of which now carry it as real content rather than as an
+     overlay. On screen it is gone; in print it comes back once, on the page. */
+  .watermark-layer{display:none;}
+  @media print{
+    .watermark-layer{
+      display:block;
+      position:fixed;
+      right:14px;
+      bottom:10px;
+      z-index:9999;
+      pointer-events:none;
+      color:rgba(0,0,0,.45);
+      font-size:9px;
+      font-weight:600;
+      letter-spacing:.02em;
+      font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      white-space:nowrap;
+    }
+  }
+  /* 45 · THE LANGUAGE SWITCH, ON THE PLAN.
+     Two characters in the plan header. It used to be More → Settings →
+     Preferences → Language, four taps each way, which is enough friction that
+     a bilingual student simply stops switching. */
+  .plan-lang{
+    display:inline-flex; gap:0; border:1px solid var(--line);
+    border-radius:999px; overflow:hidden; margin-top:6px;
+  }
+  .plan-lang-btn{
+    appearance:none; border:0; cursor:pointer; font:inherit;
+    font-size:11.5px; font-weight:700; letter-spacing:.02em;
+    padding:5px 13px; min-width:40px;
+    background:transparent; color:var(--text-dim); transition:.14s;
+  }
+  .plan-lang-btn:hover{color:var(--text);}
+  .plan-lang-btn.is-on{background:var(--accent); color:var(--on-accent);}
+  .plan-lang-btn:focus-visible{outline:2px solid var(--accent); outline-offset:-2px;}
+
+  /* 10 · SAY THAT IT WORKS OFFLINE.
+     Offline-first is the app's best feature and it was completely invisible.
+     A student on campus wifi that drops needs to know BEFORE it drops. One
+     line on the home screen, and it changes rather than disappearing when the
+     connection actually goes — which is the moment it is worth reading. */
+  .offline-note{
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:11.5px; font-weight:600; color:var(--text-dim);
+    padding:5px 11px; border-radius:999px;
+    border:1px solid var(--line); background:var(--surface);
+  }
+  .offline-note::before{
+    content:''; width:7px; height:7px; border-radius:50%;
+    background:var(--ok, #3fbf7f); flex:none;
+  }
+  .offline-note.is-offline{color:var(--text); border-color:var(--accent);}
+  .offline-note.is-offline::before{background:var(--accent);}
+
+  /* 64 · "WHERE ARE YOU NOW?" — one tap instead of forty.
+     Only on a plan with nothing marked, which is the one moment it helps. */
+  .way-card{
+    border:1px solid var(--accent); border-radius:14px;
+    padding:14px 15px; margin:0 0 16px;
+    background:var(--card-bg);
+  }
+  .way-head{font-size:14.5px; font-weight:700; margin-bottom:4px;}
+  .way-note{font-size:12px; color:var(--text-dim); margin:0 0 11px; line-height:1.55;}
+  .way-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .way-chip{
+    appearance:none; cursor:pointer; font:inherit;
+    font-size:11.5px; font-weight:700; padding:7px 12px; border-radius:999px;
+    border:1px solid var(--line); background:transparent; color:var(--text);
+    transition:.12s;
+  }
+  .way-chip:hover{border-color:var(--accent); background:var(--search-bg);}
+  .way-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 5 · GRADE CHIPS INSTEAD OF A NATIVE SELECT.
+     On Android a <select> throws a full-screen list over the app to pick one
+     of twelve values — twelve round trips through a modal that covers the very
+     table you are filling in. */
+  .gs-grade-chips{display:flex; flex-wrap:wrap; gap:4px; max-width:210px;}
+  .gs-grade-chip{
+    appearance:none; cursor:pointer; font:inherit;
+    font-size:11px; font-weight:700; line-height:1;
+    min-width:30px; padding:6px 7px; border-radius:7px;
+    border:1px solid var(--line); background:var(--card-bg); color:var(--text-dim);
+    transition:.12s;
+  }
+  .gs-grade-chip:hover{color:var(--text); border-color:var(--text-dim);}
+  .gs-grade-chip.is-on{background:var(--accent); border-color:var(--accent); color:var(--on-accent);}
+  .gs-grade-chip.is-fail.is-on{background:var(--danger,#e8557c); border-color:var(--danger,#e8557c);}
+  .gs-grade-chip.gs-grade-none{opacity:.65;}
+  .gs-grade-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 12 · MARK A WHOLE SEMESTER AT ONCE. */
+  .imp-sem-bulk{
+    appearance:none; cursor:pointer; font:inherit;
+    font-size:10.5px; font-weight:700; letter-spacing:.02em;
+    padding:3px 9px; border-radius:6px; margin-inline-start:auto;
+    border:1px solid var(--line); background:transparent; color:var(--text-dim);
+    transition:.12s;
+  }
+  .imp-sem-bulk:hover{color:var(--text); border-color:var(--accent);}
+  .imp-sem-bulk:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 50 · THE INSTALL OFFER, ON THE THIRD VISIT.
+     Held back from the first visit on purpose: a stranger says no, and the
+     browser then will not offer again for months. */
+  .install-offer{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:13px 15px; margin:14px 0 0;
+    border:1px solid var(--accent); border-radius:14px;
+    background:var(--surface);
+  }
+  .install-copy{display:flex; flex-direction:column; gap:3px; flex:1 1 200px;}
+  .install-copy b{font-size:13.5px;}
+  .install-copy span{font-size:12px; color:var(--text-dim);}
+  .install-acts{display:flex; gap:8px;}
+
+  /* The credit on the share screen, under the QR: content, not chrome. */
+  .share-credit{
+    margin:14px 0 0; text-align:center;
+    font-size:10.5px; font-weight:600; letter-spacing:.02em;
+    color:var(--text-dim); opacity:.7;
   }
   .update-bar{
     position:fixed; top:0; left:0; right:0; z-index:2000;
@@ -6824,6 +7110,16 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
 .cd-side .cd-note{font-size:11px; color:var(--warn); margin:4px 0 0; line-height:1.5;}
 .cd-note strong{font-weight:700;}
 
+/* Idea 57 — the cost of dropping a course you have already passed
+   (js/49-course-detail.js). It answers a question the plan never asked out
+   loud, so it is set apart from the neighbouring sections by a warning rail
+   rather than another uppercase label competing with them. */
+.cd-drop{
+  border-inline-start:3px solid var(--warn);
+  padding-inline-start:10px;
+}
+.cd-drop .cd-note{margin-bottom:0;}
+
 /* Each prerequisite carries its own state, so "why is this locked" is answered
    by looking rather than by reading. */
 .cd-chain{display:flex; align-items:center; gap:7px; flex-wrap:wrap;}
@@ -7672,6 +7968,68 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
   .eng-opt{transition:none;}
   .eng-opt:active{transform:none;}
 }
+
+/* 52 · The same four options, inside the course popup instead of a dialog
+   in front of the app. Tighter, because they are sharing a card with the
+   course's own details rather than owning the screen. */
+.eng-inline .eng-opts-inline{gap:6px;margin-top:8px;}
+.eng-inline .eng-opts-inline .eng-opt{padding:9px 11px;}
+.eng-inline .eng-opts-inline .eng-opt-name{font-size:12.5px;}
+.eng-inline .eng-opts-inline .eng-opt-sub{font-size:10.5px;}
+
+/* 41 · Reporting a wrong prerequisite from the course itself
+   (js/86-prereq-report.js). A quiet row under the reasoning — it must be
+   findable by someone who has just read an arrow they know is wrong, and
+   invisible to everyone else, so it reads as a footnote rather than an
+   action the course is asking for. */
+.cd-report{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; flex-wrap:wrap;
+  margin-top:14px; padding-top:11px; border-top:1px solid var(--line);
+}
+.cd-report-lbl{font-size:11.5px; color:var(--text-dim);}
+.cd-report-btn{
+  border:1px solid var(--line); background:transparent; color:var(--accent);
+  font:inherit; font-size:11.5px; font-weight:700; cursor:pointer;
+  padding:5px 11px; border-radius:999px;
+}
+.cd-report-btn:hover{border-color:var(--accent); background:var(--panel);}
+.cd-report-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.cd-report-done{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11.5px; font-weight:700; color:var(--skills);
+}
+
+/* The report form itself. One radio per listed prerequisite — a list short
+   enough (rarely more than three) that radios beat a dropdown. */
+.pr-course{
+  margin:0 0 10px; font-size:13.5px; font-weight:800;
+}
+.pr-opts{display:flex; flex-direction:column; gap:7px; margin-bottom:14px;}
+.pr-opt{
+  display:flex; align-items:center; gap:9px;
+  padding:9px 11px; border:1px solid var(--line); border-radius:10px;
+  cursor:pointer; font-size:12.5px;
+}
+.pr-opt:hover{border-color:var(--accent);}
+.pr-opt input{flex:0 0 auto; accent-color:var(--accent);}
+.pr-opt-name{flex:1 1 auto; min-width:0; font-weight:700;}
+.pr-opt-num{
+  flex:0 0 auto; font-size:11px; color:var(--text-dim);
+  font-variant-numeric:tabular-nums;
+}
+.pr-note-lbl{
+  display:block; margin-bottom:6px;
+  font-size:10.5px; font-weight:800; letter-spacing:1.1px;
+  text-transform:uppercase; color:var(--text-dim);
+}
+/* Send is the one thing this dialog exists to do, so it is the filled one —
+   same treatment .fix-btn-primary gives the equivalent button elsewhere. */
+.pr-send{
+  background:var(--accent); color:var(--on-accent); border-color:transparent;
+  font-weight:800;
+}
+.pr-send:hover{background:var(--accent); color:var(--on-accent); filter:brightness(1.08);}
 
 /* ==========================================================================
    YOU ARE HERE (js/78-you-are-here.js)

@@ -138,6 +138,8 @@
     if(window.AAUP_SIDEBAR){ window.AAUP_SIDEBAR.hide(); }
   }
 
+  function tx9(rtl, en, ar){ return rtl ? ar : en; }
+
   function render(prefix){
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     var info = planDisplayInfo(prefix);
@@ -158,7 +160,6 @@
       standingLabel = standing ? (rtl ? standing.ar : standing.label) : null;
     }
 
-    var achv = window.AAUP_ACHIEVEMENTS ? window.AAUP_ACHIEVEMENTS.getUnlockedCount(prefix) : { unlocked: 0, total: 0 };
 
     // js/50-whats-next.js owns this card's content when it has loaded — it
     // is the same ranked-with-reasons module used in the study-plan
@@ -197,6 +198,22 @@
       '</div></div>' +
     '</div>';
 
+    // 29 + 9. A plan with nothing marked cannot be graded, and the honest
+    // thing on an empty screen is to name the ONE action that fills it.
+    var healthHtml = (window.AAUP_PLAN_HEALTH ? window.AAUP_PLAN_HEALTH.cardHtml(prefix, rtl) : '');
+    if(!healthHtml && window.AAUP_EMPTY){
+      healthHtml = window.AAUP_EMPTY.card({
+        rtl: rtl,
+        icon: 'planpin',
+        title: tx9(rtl, 'Nothing marked yet', 'ما في إشي مُعلّم بعد'),
+        body: tx9(rtl,
+          'Tick one course you have already passed and this fills in — pace, load balance, and whether what is left still fits in the terms you have.',
+          'علّم مساق واحد خلّصته ومنعبيلك هاي — السرعة والتوازن، وإذا اللي باقي بضل بضبط بالفصول المتبقية.'),
+        action: tx9(rtl, 'Open my plan', 'افتح خطتي'),
+        onclick: 'AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')'
+      });
+    }
+
     var host = document.getElementById('dashboard');
     var html = '<div class="dash-header">' +
       '<div class="dash-title"><span class="dash-icon">' + window.AAUP_ICONS.markup(info, { size: 24 }) + '</span><div><h1>' + info.name + '</h1><p>' + (rtl ? 'لوحة التحكم' : 'Dashboard') + '</p></div></div>' +
@@ -208,12 +225,19 @@
         '<button type="button" class="home-btn" onclick="AAUP_DASHBOARD.openStudyPlan(\'' + prefix + '\')">' + window.AAUP_ICONS.preview('planpin', 14) + '<span>' + (rtl ? 'خطتي الدراسية' : 'My Study Plan') + '</span></button>' +
       '</div></div>' +
       phoneHeroHtml +
-      '<div class="dash-swipe-dots" id="' + prefix + '-dashDots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>' +
+      // 29 · The judgement, before the numbers that produced it. Empty until
+      // there is something marked to judge — the empty state below asks for
+      // exactly that, rather than grading a blank plan an A.
+      healthHtml +
+      '<div class="dash-swipe-dots" id="' + prefix + '-dashDots" aria-hidden="true"><span class="active"></span><span></span></div>' +
       '<div class="dash-grid" id="' + prefix + '-dashGrid">' +
         '<div class="dash-card"><h3>' + (rtl ? 'التقدم' : 'Progress') + '</h3><div class="dash-big">' + pct + '%</div><div class="dash-sub">' + doneCr + ' / ' + totalCr + 'H</div></div>' +
         '<div class="dash-card"><h3>GPA</h3><div class="dash-big">' + (gpaResult.gpa != null ? gpaResult.gpa.toFixed(2) : '\u2014') + '</div><div class="dash-sub">' + (standingLabel || (rtl ? 'لم تُدخل علامات بعد' : 'No grades entered yet')) + '</div></div>' +
-        '<div class="dash-card"><h3>' + (rtl ? 'الإنجازات' : 'Achievements') + '</h3><div class="dash-big">' + achv.unlocked + ' / ' + achv.total + '</div><div class="dash-sub">' + (rtl ? 'مُنجَز' : 'unlocked') + '</div></div>' +
       '</div>' +
+      // 28 · The badges, as a strip that is seen every time, instead of a
+      // count in a tile pointing at a screen visited once.
+      (window.AAUP_ACHIEVEMENTS && window.AAUP_ACHIEVEMENTS.stripHtml
+        ? window.AAUP_ACHIEVEMENTS.stripHtml(prefix, rtl) : '') +
       (window.AAUP_GRADUATION
         ? '<div class="dash-card grad-card" style="margin-bottom:20px;"><h3 class="mh">' + window.AAUP_ICONS.preview('cap', 18) + window.AAUP_GRADUATION.title(rtl) +
           '</h3><div id="' + prefix + '-dashGradBody"></div></div>'
@@ -254,7 +278,8 @@
     try{ lastBackup = parseInt(localStorage.getItem('aaup_lastBackup') || '0', 10) || 0; }catch(e){}
     var hasProgress = doneCr > 0;
     if(hasProgress && (Date.now() - lastBackup) > 30 * 24 * 60 * 60 * 1000){
-      html += '<p class="form-note" style="text-align:center;margin-top:18px;">💾 ' +
+      html += '<p class="form-note" style="text-align:center;margin-top:18px;">' +
+        window.AAUP_ICONS.preview('save', 13) + ' ' +
         (rtl ? 'نصيحة: صدّر نسخة احتياطية من تقدمك من الإعدادات — بيانات المتصفح قد تُمسح.' :
                'Tip: export a backup of your progress from Settings \u2014 browser data can be wiped.') + '</p>';
     }

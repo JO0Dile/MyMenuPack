@@ -288,7 +288,9 @@
     card.onkeydown = function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } };
   }
 
+  var visitCounted = false;
   function renderHeaderStats(){
+    if(!visitCounted){ visitCounted = true; bumpVisits(); maybeOfferInstall(); }
     var el = document.getElementById('homeHeaderStats');
     if(!el) return;
     var uniCount = Object.keys(window.APP_UNIVERSITIES || {}).length;
@@ -306,8 +308,105 @@
             (A ? faculties + ' كلية' : faculties + ' facult' + (faculties === 1 ? 'y' : 'ies')) + '</span>' : '')
         : '<span>' + window.AAUP_ICONS.preview('cap', 13) +
             (A ? uniCount + ' جامعات' : uniCount + ' universities') + '</span>') +
-      '<span>' + window.AAUP_ICONS.preview('unlock', 13) +
-        (A ? 'مجاني وبدون إنترنت' : 'Free &amp; offline') + '</span>';
+      // 10 · Offline-first is this app's best feature and it was invisible.
+      // This REPLACES the old static "Free & offline" chip rather than sitting
+      // next to it — two chips saying the same thing is worse than one — and
+      // it changes wording the moment the connection actually drops, which is
+      // the one moment the claim is worth reading.
+      '<span class="offline-note" id="homeOfflineNote"></span>';
+    syncOfflineNote();
+  }
+
+  // Reads navigator.onLine, which is only ever a hint — the browser says
+  // "online" for a captive portal that serves nothing. That is fine here: the
+  // claim being made is about this app, and this app genuinely does work
+  // either way, so the worst case is a true statement in the wrong tense.
+  // ============================================================
+  // 50 · ASK TO BE INSTALLED, AT THE RIGHT MOMENT
+  //
+  // It is a proper offline PWA and almost nobody discovers that, because the
+  // browser only offers installation through a menu most students never open.
+  // The event that lets an app ask directly fires on the FIRST visit, which is
+  // the worst possible moment: a stranger who has not seen the app yet says
+  // no, and Chrome will not offer again for months.
+  //
+  // So the event is caught and held, and the offer is made on the third
+  // visit — by which point the student has come back twice of their own
+  // accord, which is the only evidence that matters. Declining hides it for
+  // good; this asks once.
+  var VISITS_KEY = 'aaup_visits';
+  var INSTALL_KEY = 'aaup_installAsked';
+  var heldPrompt = null;
+
+  function bumpVisits(){
+    try{
+      var n = (parseInt(localStorage.getItem(VISITS_KEY), 10) || 0) + 1;
+      localStorage.setItem(VISITS_KEY, String(n));
+      return n;
+    }catch(e){ return 0; }
+  }
+  function installAsked(){
+    try{ return localStorage.getItem(INSTALL_KEY) === '1'; }catch(e){ return true; }
+  }
+  function markInstallAsked(){
+    try{ localStorage.setItem(INSTALL_KEY, '1'); }catch(e){}
+  }
+
+  if(typeof window !== 'undefined'){
+    window.addEventListener('beforeinstallprompt', function(e){
+      e.preventDefault();        // hold it rather than let the browser decide
+      heldPrompt = e;
+      maybeOfferInstall();
+    });
+    window.addEventListener('appinstalled', markInstallAsked);
+  }
+
+  function maybeOfferInstall(){
+    if(!heldPrompt || installAsked()) return;
+    var visits = 0;
+    try{ visits = parseInt(localStorage.getItem(VISITS_KEY), 10) || 0; }catch(e){}
+    if(visits < 3) return;
+    var host = document.getElementById('homeInstallRow');
+    if(!host) return;
+    var A = ar();
+    host.innerHTML =
+      '<div class="install-offer">' +
+        '<div class="install-copy">' +
+          '<b>' + (A ? 'أضف AAUPath إلى شاشتك الرئيسية؟' : 'Add AAUPath to your home screen?') + '</b>' +
+          '<span>' + (A ? 'يفتح فورًا ويعمل بدون إنترنت.' : 'It opens instantly and works with no signal.') + '</span>' +
+        '</div>' +
+        '<div class="install-acts">' +
+          '<button type="button" class="home-btn" data-install="yes">' + (A ? 'أضف' : 'Add') + '</button>' +
+          '<button type="button" class="home-btn" data-install="no">' + (A ? 'لا' : 'No thanks') + '</button>' +
+        '</div>' +
+      '</div>';
+    host.hidden = false;
+    host.addEventListener('click', function(e){
+      var b = e.target.closest('[data-install]');
+      if(!b) return;
+      markInstallAsked();
+      host.hidden = true;
+      host.innerHTML = '';
+      if(b.getAttribute('data-install') === 'yes' && heldPrompt){
+        try{ heldPrompt.prompt(); }catch(err){}
+      }
+      heldPrompt = null;
+    }, { once: true });
+  }
+
+  function syncOfflineNote(){
+    var el = document.getElementById('homeOfflineNote');
+    if(!el) return;
+    var A = ar();
+    var off = (typeof navigator !== 'undefined') && navigator.onLine === false;
+    el.classList.toggle('is-offline', off);
+    el.textContent = off
+      ? (A ? 'أنت دون اتصال — كل شيء هنا يعمل' : 'Offline — everything here still works')
+      : (A ? 'مجاني ويعمل بدون إنترنت' : 'Free, and works offline');
+  }
+  if(typeof window !== 'undefined'){
+    window.addEventListener('online', syncOfflineNote);
+    window.addEventListener('offline', syncOfflineNote);
   }
 
   function showUniversities(){

@@ -9,13 +9,17 @@
 // the one fact in the whole plan that is about them rather than about the
 // programme.
 //
-// So it is asked, once, and it is not skippable. Everything else in this
-// app can be left blank and filled in later; this cannot, because a wrong
-// answer here silently changes the hours owed and what is available to take
-// next. There are four buttons and no fourth wall — no ✕, no backdrop
-// dismiss, no Escape — but the answer is changeable afterwards from
-// Settings, because a one-shot question with no way to correct a mis-tap is
-// its own kind of trap.
+// It used to be asked as an unskippable modal the moment a plan opened —
+// the first thing a stranger saw, before they had seen a single course, with
+// no way past it. That is a gate in front of the app for a fact that only
+// affects three courses, and it was answered by whoever could be bothered.
+//
+// It is now asked on those three courses instead: the English cards carry a
+// "which level?" chip, and opening any of them puts the four options in
+// front of you, at the one moment the question explains itself. Until it is
+// answered the plan simply shows all three levels, which is what the
+// published document says and is therefore not a lie — just not yet narrowed
+// to this student. The answer is still changeable from Settings.
 //
 // What the answer does: the levels BELOW the placement are marked removed
 // through js/12-removed.js — the mechanism whose own header names this
@@ -47,7 +51,7 @@
   var TX = {
     en: {
       title: 'Where were you placed in English?',
-      lead: 'Your plan lists Beginning, Intermediate and Advanced English. The placement test decides which of them you actually take, and the levels below yours are never taken at all — so the app has to ask before it can tell you what is left.',
+      lead: 'Your plan lists Beginning, Intermediate and Advanced English. The placement test decides which of them you actually take, and the levels below yours are never taken at all \u2014 so your answer takes them out of the grid and out of the hours you still owe.',
       beginning: 'Beginning English',
       beginningSub: 'I start from the first level',
       intermediate: 'Intermediate English',
@@ -58,6 +62,8 @@
       passedSub: 'All levels done, or exempt',
       settings: 'English level',
       change: 'Change',
+      chip: 'which level?',
+      askHere: 'Your plan lists three English levels. You only take one — which did you place into?',
       current: { beginning: 'Beginning', intermediate: 'Intermediate', advanced: 'Advanced', passed: 'Finished' },
       saved: function(n){
         return n === 0 ? 'Saved — your plan keeps all its English levels.'
@@ -74,7 +80,7 @@
     },
     ar: {
       title: 'وين تحدّد مستواك بالإنجليزي؟',
-      lead: 'خطتك فيها إنجليزي مبتدئ ومتوسط ومتقدّم. امتحان تحديد المستوى بقرر أي واحد منهم فعليًا بتاخده، والمستويات اللي تحتك ما بتاخدها أبدًا — فالتطبيق لازم يسأل قبل ما يقلك شو ضلّ عليك.',
+      lead: 'خطتك فيها إنجليزي مبتدئ ومتوسط ومتقدّم. امتحان تحديد المستوى بقرر أي واحد منهم فعليًا بتاخده، والمستويات اللي تحتك ما بتاخدها أبدًا — فجوابك بشيلهم من الخطة ومن الساعات المتبقية.',
       beginning: 'إنجليزي مبتدئ',
       beginningSub: 'ببلّش من أول مستوى',
       intermediate: 'إنجليزي متوسط',
@@ -85,6 +91,8 @@
       passedSub: 'كل المستويات منجزة، أو معفى',
       settings: 'مستوى الإنجليزي',
       change: 'تغيير',
+      chip: 'أي مستوى؟',
+      askHere: 'خطتك فيها ثلاث مستويات إنجليزي. بتاخد واحد بس — على أي واحد تحدّد مستواك؟',
       current: { beginning: 'مبتدئ', intermediate: 'متوسط', advanced: 'متقدّم', passed: 'منتهٍ' },
       saved: function(n){
         return n === 0 ? 'انحفظ — خطتك محتفظة بكل مستويات الإنجليزي.'
@@ -203,18 +211,63 @@
     });
   }
 
-  // Ask on opening a plan that actually has English levels in it, and only
-  // when there is no answer yet. A plan with no English courses is never
-  // asked — the question would have nothing to act on.
+  // Apply the stored answer on opening a plan. It no longer ASKS here — see
+  // this file's header. A plan opened for the first time on a second device
+  // still picks the answer up, which is all this call was ever needed for.
   function ensure(prefix){
-    if(level()){ apply(prefix); return; }
-    var found = englishIn(prefix);
-    var total = found.beginning.length + found.intermediate.length + found.advanced.length;
-    if(total === 0) return;
-    var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
-    ask(prefix, rtl, function(){
-      if(window.__refreshPlanUI){ window.__refreshPlanUI(prefix); }
-    });
+    apply(prefix);
+  }
+
+  // ---------------------------------------------------------------------
+  // Asking on the courses themselves.
+  //
+  // needsAnswer() is the one predicate both surfaces read: is this course one
+  // of the three English levels, in a plan that has them, with no answer
+  // stored? The plan grid uses it to put a chip on the card; the course
+  // modal uses it to put the four options in front of someone who tapped it.
+  // Cached per plan because the grid asks it once per card on every render.
+  var engCache = Object.create(null);
+  function englishSlugs(prefix){
+    if(!engCache[prefix]){
+      var f = englishIn(prefix);
+      engCache[prefix] = f.beginning.concat(f.intermediate, f.advanced);
+    }
+    return engCache[prefix];
+  }
+  // __PLAN_DATA for a plan is rebuilt when its courses change, so the cache
+  // has to be droppable. Cheap, and only ever called on a real edit.
+  function forget(prefix){
+    if(prefix) delete engCache[prefix]; else engCache = Object.create(null);
+  }
+  function needsAnswer(prefix, slug){
+    if(level()) return false;
+    return englishSlugs(prefix).indexOf(slug) !== -1;
+  }
+  function chipLabel(rtl){ return t(rtl).chip; }
+
+  // The block that goes inside the course modal. Same four options as the
+  // dialog, same handler — bound by the caller through answerFromClick so
+  // there is exactly one place that writes the answer.
+  function askHereHtml(prefix, slug, rtl){
+    if(!needsAnswer(prefix, slug)) return '';
+    var tx = t(rtl);
+    return '<div class="cd-sec eng-inline"><div class="cd-lbl">' + esc(tx.settings) + '</div>' +
+      '<p class="cd-note">' + esc(tx.askHere) + '</p>' +
+      '<div class="eng-opts eng-opts-inline">' +
+        optionHTML('beginning', tx) + optionHTML('intermediate', tx) +
+        optionHTML('advanced', tx) + optionHTML('passed', tx) +
+      '</div></div>';
+  }
+
+  // Handles a click anywhere inside an askHereHtml block. Returns true if it
+  // was one of the options, so the caller knows whether to close and redraw.
+  function answerFromClick(prefix, target, rtl){
+    var btn = target && target.closest ? target.closest('.eng-opts-inline [data-eng]') : null;
+    if(!btn) return false;
+    setLevel(btn.getAttribute('data-eng'));
+    var n = apply(prefix);
+    if(window.__showToast){ window.__showToast(t(rtl).saved(n)); }
+    return true;
   }
 
   // Changing the answer later. Re-asks, then re-applies — which can add
@@ -228,7 +281,9 @@
   }
 
   window.AAUP_ENGLISH = {
-    ensure: ensure, apply: apply, change: change,
+    ensure: ensure, apply: apply, change: change, forget: forget,
+    needsAnswer: needsAnswer, chipLabel: chipLabel,
+    askHereHtml: askHereHtml, answerFromClick: answerFromClick,
     level: level, label: function(rtl){
       var lv = level();
       return lv ? t(rtl).current[lv] : '';

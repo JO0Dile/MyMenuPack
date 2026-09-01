@@ -143,7 +143,11 @@
     // reads Arabic should not hand in a page with the same sentence twice.
     html += '<p class="po-foot">' + (rtl
       ? 'أداة طلابية غير رسمية — تأكد دائمًا من مرشدك الأكاديمي.'
-      : 'Unofficial student planning tool — always confirm with your academic advisor.') + '</p>';
+      : 'Unofficial student planning tool — always confirm with your academic advisor.') +
+      // This sheet gets printed and handed to someone, which is exactly where
+      // the app's credit belongs — rather than fixed over every screen inside
+      // the app, which is where it used to live.
+      '<span class="po-credit"> \u00b7 AAUPath \u00b7 @Dile (AL-Hammam_Natsha)</span></p>';
     return html;
   }
 

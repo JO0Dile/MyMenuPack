@@ -141,6 +141,42 @@
       }).join('') + '</div>';
   }
 
+  // 57 · WHAT CLOSES IF YOU DROP THIS
+  //
+  // Only on a course the student has actually passed, because that is the only
+  // time the question is live. Transitive, because the second-order effects
+  // are the ones that catch people out: dropping Statistics does not just
+  // close Machine Learning, it closes what sits behind Machine Learning too.
+  // Nothing is shown when nothing closes — silence is the honest answer, and
+  // a line saying "0 courses" is noise on most of the plan.
+  // Arabic counts a noun three different ways: dual for two, plural genitive
+  // for three to ten, singular accusative from eleven up. "8 مساقًا" is the
+  // eleven-and-up form on a count of eight, which reads as a mistake to any
+  // Arabic speaker, so the count picks the form.
+  function arCloses(n){
+    if(n === 1) return 'يُغلق مساقًا واحدًا بعده: ';
+    if(n === 2) return 'يُغلق مساقين بعده: ';
+    if(n <= 10) return 'يُغلق ' + n + ' مساقات بعده: ';
+    return 'يُغلق ' + n + ' مساقًا بعده: ';
+  }
+
+  function dropsHTML(prefix, slug, rtl){
+    var done = window.__getProgress && window.__getProgress()[prefix + '-c-' + slug];
+    if(!done) return '';
+    var closes = (window.AAUP_IMPORTED && window.AAUP_IMPORTED.closesIfDropped)
+      ? window.AAUP_IMPORTED.closesIfDropped(prefix, slug) : [];
+    if(!closes.length) return '';
+    var names = closes.slice(0, 4).map(function(u){ return courseName(prefix, u, rtl); });
+    var more = closes.length - names.length;
+    return '<div class="cd-sec cd-drop"><div class="cd-lbl">' +
+      (rtl ? 'لو تركت هذا المساق' : 'If you drop this') + '</div>' +
+      '<p class="cd-note">' + (rtl ? arCloses(closes.length)
+        : (closes.length + ' later course' + (closes.length === 1 ? '' : 's') + ' close' +
+           (closes.length === 1 ? 's' : '') + ': ')) +
+      names.join(rtl ? '\u060c ' : ', ') + (more > 0 ? ' +' + more : '') +
+      '</p></div>';
+  }
+
   function row(k, v){
     if(v == null || v === '' || v === '-') return '';
     return '<div class="cd-row"><span>' + k + '</span><b>' + esc(v) + '</b></div>';
@@ -221,6 +257,16 @@
               opensHTML(prefix, slug, rtl, t) + '</div></div>' +
           '</div>' +
           '<div class="cd-swipe-dots" id="cdSlideDots"><span class="on"></span><span></span></div>' +
+          dropsHTML(prefix, slug, rtl) +
+          // 52 · The English placement question, asked on the three courses
+          // it decides rather than as a gate in front of the whole app.
+          // Empty for every other course, and once it has been answered.
+          (window.AAUP_ENGLISH && window.AAUP_ENGLISH.askHereHtml
+            ? window.AAUP_ENGLISH.askHereHtml(prefix, slug, rtl) : '') +
+          // 41 · One tap to say an arrow is wrong. Empty on a course with no
+          // prerequisites — there is nothing there to be wrong about.
+          (window.AAUP_PREREQ_REPORT
+            ? window.AAUP_PREREQ_REPORT.lineHtml(prefix, slug, rtl) : '') +
           '<div class="cd-extras"></div>' +
         '</div>' +
         '<div class="cd-side">' +
@@ -249,6 +295,20 @@
   // just never fires.
   function bind(prefix, slug, container){
     if(!container) return;
+    // 52 · Answering the English placement from inside the course popup. The
+    // answer removes courses from the plan, so the popup closes and the plan
+    // redraws — leaving the popup open on a course that may have just left
+    // the grid is the one outcome that must not happen.
+    var engBlock = container.querySelector('.eng-opts-inline');
+    if(engBlock && window.AAUP_ENGLISH && window.AAUP_ENGLISH.answerFromClick){
+      engBlock.addEventListener('click', function(e){
+        var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+        if(!window.AAUP_ENGLISH.answerFromClick(prefix, e.target, rtl)) return;
+        var ov = container.closest('.modal-overlay');
+        if(ov) ov.classList.remove('open');
+        if(window.__refreshPlanUI) window.__refreshPlanUI(prefix);
+      });
+    }
     var slides = container.querySelector('#cdSlides');
     var dots = container.querySelector('#cdSlideDots');
     if(slides && dots){

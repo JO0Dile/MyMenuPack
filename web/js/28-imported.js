@@ -1134,6 +1134,65 @@
       });
   }
 
+  // ============================================================
+  // 2 · HOW FAR AWAY A LOCKED COURSE ACTUALLY IS
+  //
+  // Every locked course looks equally out of reach today, so a student cannot
+  // tell the one that opens as soon as they pass a single course from the one
+  // that is three deep behind courses they have not started. Depth is the
+  // longest chain of NOT-YET-DONE prerequisites standing in front of it —
+  // exactly the number of courses that still have to happen first.
+  //
+  // Capped, and cycle-guarded: a hand-transcribed plan can contain a pair of
+  // courses that each list the other, and this walk must not follow that
+  // forever.
+  var DEPTH_CAP = 9;
+  function chainDepth(planId, slug, seen){
+    var data = window.__PLAN_DATA[planId] || {};
+    var needs = (data.needsMap && data.needsMap[slug]) || [];
+    seen = seen || Object.create(null);
+    if(seen[slug]) return 0;
+    seen[slug] = true;
+    var deepest = 0;
+    for(var i = 0; i < needs.length; i++){
+      var r = needs[i];
+      if(isDone(planId, r)) continue;
+      var d = 1 + chainDepth(planId, r, seen);
+      if(d > deepest) deepest = d;
+      if(deepest >= DEPTH_CAP) break;
+    }
+    seen[slug] = false;
+    return Math.min(deepest, DEPTH_CAP);
+  }
+
+  // 57 · WHAT CLOSES IF YOU DROP THIS
+  //
+  // The inverse of "what does this open", and the more urgent one: dropping a
+  // course is a decision made under pressure in week three with no information
+  // at all. Transitive, because the second-order effects are the ones that
+  // catch people out — dropping Statistics does not just close Machine
+  // Learning, it closes everything behind Machine Learning too.
+  // A prerequisite list in this catalogue is an AND, not a choice of routes:
+  // needsMap holds every course that must be passed first, so there is no
+  // "other way round" to check for. What closes is therefore the whole
+  // downstream cone — everything whose path to being taken runs through this
+  // course — minus anything already passed, which cannot close retroactively.
+  function closesIfDropped(planId, slug){
+    var data = window.__PLAN_DATA[planId] || {};
+    var unlocks = data.unlocksMap || {};
+    var out = [], seen = Object.create(null), queue = (unlocks[slug] || []).slice();
+    seen[slug] = true;
+    while(queue.length){
+      var cur = queue.shift();
+      if(seen[cur]) continue;
+      seen[cur] = true;
+      if(isDone(planId, cur)) continue;
+      out.push(cur);
+      (unlocks[cur] || []).forEach(function(n){ queue.push(n); });
+    }
+    return out;
+  }
+
   function courseCardHtml(planId, c, rtl, yearNum, continuations, whereTx){
     var done = isDone(planId, c.id);
     var avail = isAvailable(planId, c.id);
@@ -1193,9 +1252,18 @@
     // said so already. The state worth a word is the closed one, and the
     // useful word is not "closed" but what it is still waiting for.
     var missing = (done || avail) ? [] : missingPrereqNames(planId, c.id, rtl);
+    var depth = (done || avail) ? 0 : chainDepth(planId, c.id);
+    // Two is a dual in Arabic, not a plural — "2 مساقات" reads as a mistake.
+    // Depth is capped at DEPTH_CAP (9), so the three-to-ten plural covers the
+    // whole of the rest of the range.
+    var awayTx = depth > 1
+      ? (rtl ? ' \u00b7 ' + (depth === 2 ? 'على بُعد مساقين' : 'على بُعد ' + depth + ' مساقات')
+             : ' \u00b7 ' + depth + ' away')
+      : '';
     var lockHtml = !missing.length ? window.__escapeHtml(statusTx)
       : window.__escapeHtml(rtl ? 'يحتاج ' : 'needs ') + bidi(missing[0]) +
-        (missing.length > 1 ? window.__escapeHtml(' +' + (missing.length - 1)) : '');
+        (missing.length > 1 ? window.__escapeHtml(' +' + (missing.length - 1)) : '') +
+        window.__escapeHtml(awayTx);
     // The plain-text form, for the screen-reader label where markup cannot go.
     var lockTx = !missing.length ? statusTx
       : (rtl ? 'يحتاج ' : 'needs ') + missing[0] +
@@ -1236,6 +1304,15 @@
     }
     if(!done && !avail){
       metaParts.push('<span class="cm-status cm-locked">' + lockHtml + '</span>');
+    }
+    // 52 · The English placement is no longer a gate in front of the app; it
+    // is asked on the three courses it actually decides. This chip is what
+    // makes the question findable — without it the only prompt would be
+    // inside a popup nobody has a reason to open.
+    if(window.AAUP_ENGLISH && window.AAUP_ENGLISH.needsAnswer &&
+       window.AAUP_ENGLISH.needsAnswer(planId, c.id)){
+      metaParts.push('<span class="cm-status cm-eng-ask">' +
+        window.__escapeHtml(window.AAUP_ENGLISH.chipLabel(rtl)) + '</span>');
     }
     if(superseded || c.isRetake){
       var attemptTx = superseded
@@ -1380,6 +1457,11 @@
       var extrasEl = body.querySelector('.modal-extras');
       window.__bindCourseModalExtras(planId, slug, extrasEl);
     }
+    // 53 · Hold-to-trace is taught the first time someone opens a course, not
+    // in a tour thirty seconds before they open one (js/32-tutorial.js).
+    if(window.AAUP_TUTORIAL && window.AAUP_TUTORIAL.moment){
+      window.AAUP_TUTORIAL.moment('courseOpen');
+    }
     if(window.AAUP_COURSE_DETAIL && window.AAUP_COURSE_DETAIL.bind){
       window.AAUP_COURSE_DETAIL.bind(planId, slug, body);
     }
@@ -1405,11 +1487,16 @@
     var overlay = document.getElementById('impCourseModalOverlay');
     if(!overlay || overlay.getAttribute('data-bound')) return;
     overlay.setAttribute('data-bound', '1');
-    var card = overlay.querySelector('.modal-card');
     var closeBtn = document.getElementById('impCourseModalClose');
     if(closeBtn){ closeBtn.addEventListener('click', closeCourseModal); }
     overlay.addEventListener('click', function(e){ if(e.target === overlay){ closeCourseModal(); } });
-    if(card){ card.addEventListener('click', function(e){ e.stopPropagation(); }); }
+    // The card used to stopPropagation() on every click, to stop a click
+    // inside it reaching the backdrop. It never could: the backdrop handler
+    // above closes only when the click's target IS the overlay, which a click
+    // inside the card is not. What the guard did instead was swallow every
+    // click before it left the card, so any handler delegated from document —
+    // js/86-prereq-report.js was the first to need one — silently never
+    // fired inside this modal. Removed rather than worked around.
     document.addEventListener('keydown', function(e){
       if(e.key === 'Escape' && overlay.classList.contains('open')){ closeCourseModal(); }
     });
@@ -1597,6 +1684,49 @@
   // information.
   var HEAVY_MARGIN = 3;
 
+  // ============================================================
+  // 64 · "WHERE ARE YOU NOW?"
+  //
+  // Setting up means marking two or three years of history one course at a
+  // time — around forty taps before the app is useful to the person doing
+  // them, which is where most people stop. One tap instead: say which
+  // semester you are in, and everything the plan schedules BEFORE that point
+  // is marked done for you to correct.
+  //
+  // It is a starting position, not a claim about the student, so the wording
+  // says so and the correction is the ordinary card tick they would have used
+  // anyway. It only appears on a plan with nothing marked — the moment it
+  // helps — and never again after that.
+  function planTerms(plan){
+    var terms = [];
+    (plan.structure && plan.structure.years ? plan.structure.years : []).forEach(function(y, i){
+      ['s1', 's2'].concat(y.hasSummer ? ['s3'] : []).forEach(function(sem){
+        terms.push({ yearId: y.id, sem: sem, yearNum: i + 1 });
+      });
+    });
+    return terms;
+  }
+
+  function whereAreYouHtml(planId, plan, rtl){
+    if(!hasStructure(plan)) return '';
+    var real = (plan.courses || []).filter(function(c){ return !isPoolElective(c); });
+    if(!real.length || real.some(function(c){ return isDone(planId, c.id); })) return '';
+    var terms = planTerms(plan);
+    if(terms.length < 2) return '';
+    var chips = terms.map(function(t, i){
+      var lab = (rtl ? 'س' + t.yearNum : 'Y' + t.yearNum) + ' · ' +
+        (rtl ? SEMESTER_LABEL_AR[t.sem] : SEMESTER_LABEL[t.sem]).replace(/ Semester$/, '');
+      return '<button type="button" class="way-chip" data-way="' + i +
+        '" data-plan="' + window.__escapeHtml(planId) + '">' + window.__escapeHtml(lab) + '</button>';
+    }).join('');
+    return '<div class="way-card">' +
+      '<div class="way-head">' + window.__escapeHtml(rtl ? 'وين أنت الآن؟' : 'Where are you now?') + '</div>' +
+      '<p class="way-note">' + window.__escapeHtml(rtl
+        ? 'اختر فصلك الحالي وسنحدّد كل ما قبله كمنجز — عدّل أي مساق لم تأخذه.'
+        : 'Pick the semester you are in and everything before it is marked done — fix any you have not taken.') +
+      '</p><div class="way-chips">' + chips + '</div></div>';
+  }
+
   function semesterHtml(planId, plan, yearId, semester, editing, rtl, yearNum){
     var pairs = pairContinuations(planId);
     var containerId = planId + '-y' + yearId.replace('y','') + '-s' + semester.replace('s','');
@@ -1637,6 +1767,19 @@
       (semHours > 0 ? '<span class="imp-sem-hours">' + semHours + 'H</span>' : '') +
       (verdict ? '<span class="imp-sem-verdict ' + verdictCls + '">' +
         window.__escapeHtml(verdict) + '</span>' : '') +
+      // 12 · One action instead of six taps. A student setting up two years of
+      // history is marking forty-odd courses one at a time before the app is
+      // useful to them at all, which is where most people give up. The button
+      // says which way it will go, so it is never a guess.
+      (!editing && courses.length
+        ? '<button type="button" class="imp-sem-bulk" data-sem-bulk="' + containerId +
+          '" data-plan="' + window.__escapeHtml(planId) + '">' +
+          window.__escapeHtml(
+            courses.every(function(c){ return isDone(planId, c.id); })
+              ? (rtl ? 'ألغِ تحديد الفصل' : 'Unmark all')
+              : (rtl ? 'حدّد الفصل كمنجز' : 'Mark all done')) +
+          '</button>'
+        : '') +
       '</div>' + loadNote +
       '<div class="course-row" id="' + containerId + '">' +
       courses.map(function(c){ return courseCardHtml(planId, c, rtl, yearNum, pairs, whereTx); }).join('') + addCard +
@@ -1767,6 +1910,20 @@
       '<div class="en">' + en.big + (en.small ? '<em>' + en.small + '</em>' : '') + '</div>' +
       '</div></div>' +
       '<div class="ar-block"><div class="ar1">' + ar.big + '</div>' + (ar.small ? '<div class="ar2">' + ar.small + '</div>' : '') + '</div>' +
+      // 45 · The language switch, here rather than four taps away.
+      // It lived at More → Settings → Preferences → Language. Bilingual
+      // students switch constantly — to read a course name the way the
+      // lecturer says it, to send a screenshot to someone who reads the
+      // other one — and four taps each way is enough friction that they
+      // simply stop. Two characters, on the screen where the switching
+      // actually matters.
+      '<div class="plan-lang" role="group" aria-label="' +
+        (rtl ? 'اللغة' : 'Language') + '">' +
+        '<button type="button" class="plan-lang-btn' + (rtl ? '' : ' is-on') +
+          '" data-plan-lang="en" aria-pressed="' + (rtl ? 'false' : 'true') + '">EN</button>' +
+        '<button type="button" class="plan-lang-btn' + (rtl ? ' is-on' : '') +
+          '" data-plan-lang="ar" aria-pressed="' + (rtl ? 'true' : 'false') + '">\u0639</button>' +
+      '</div>' +
       // Home, Edit Mode, Course Library, Export Plan and Contribute all used
       // to sit here as a five-button row above the plan. Every one of them
       // is a destination, and destinations belong in the menu — which is
@@ -1826,6 +1983,7 @@
     // this container's coordinate space, and a card pinned outside it would
     // have its prerequisite arrows drawn to the wrong place.
     html += pinnedHtml(id, p, rtl);
+    html += whereAreYouHtml(id, p, rtl);
 
     // Each year is its own disclosure: a header button that toggles the
     // body under it. The header carries how far through that year the
@@ -1928,7 +2086,12 @@
     if(fill){ fill.style.width = pct + '%'; }
   }
 
-  function toggle(planId, slug){
+  // `opts.silent` skips the re-render and the announcement, for the bulk
+  // action above: forty renders in a row is forty full rebuilds of the plan,
+  // and forty screen-reader announcements is noise rather than information.
+  // The caller renders and announces once at the end instead.
+  function toggle(planId, slug, opts){
+    if(opts && opts.silent){ toggleCourse(planId, slug); return; }
     // What was open to the student before, so the announcement below can name
     // what this tick actually changed rather than just saying "done".
     var before = {};
@@ -2019,8 +2182,13 @@
 
   // Flips the app, not the plan: every other screen reads the same setting,
   // and it is remembered.
-  function toggleLang(planId){
-    if(window.AAUP_LANG){ window.AAUP_LANG.toggle(); }
+  // Called by the two-button switch in the plan header (45) as well as by the
+  // Settings row. `want` is optional: pressing the language you are already in
+  // should do nothing rather than flip you to the other one.
+  function toggleLang(planId, want){
+    var isAr = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+    if(want && ((want === 'ar') === isAr)) return;
+    if(window.AAUP_LANG){ window.AAUP_LANG.set(want || (isAr ? 'en' : 'ar')); }
     render(planId);
     // The menu, the tab bar and anything else already on screen were drawn in
     // the other language.
@@ -2032,6 +2200,73 @@
   // first half and the plan under it says the second, so it was a sentence
   // explaining a search box to people already using one. dismissSearchHint()
   // stays exported: an older cached page can still call it.
+  // 64 · Apply the picked starting position.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-way]');
+    if(!btn) return;
+    e.preventDefault();
+    var planId = btn.getAttribute('data-plan');
+    var plan = loadImportedPlans()[planId];
+    if(!plan) return;
+    var terms = planTerms(plan);
+    var pick = terms[parseInt(btn.getAttribute('data-way'), 10)];
+    if(!pick) return;
+    var cutoff = terms.indexOf(pick);
+    var rank = {};
+    terms.forEach(function(t, i){ rank[t.yearId + '|' + t.sem] = i; });
+    var n = 0;
+    (plan.courses || []).forEach(function(c){
+      // Pool electives are chosen by the student, not scheduled by the plan,
+      // so "everything before this term" cannot include them.
+      if(isPoolElective(c)) return;
+      var r = rank[c.yearId + '|' + c.semester];
+      if(r === undefined || r >= cutoff) return;
+      if(!isDone(planId, c.id)){ toggle(planId, c.id, { silent: true }); n++; }
+    });
+    render(planId);
+    if(window.__showToast){
+      var rtl = !!(window.AAUP_LANG && window.AAUP_LANG.isAr());
+      window.__showToast(rtl
+        ? ('\u2713 حُدّد ' + n + ' مساقًا كمنجز — عدّل أي واحد لم تأخذه.')
+        : ('\u2713 ' + n + ' course' + (n === 1 ? '' : 's') + ' marked done — fix any you have not taken.'));
+    }
+  });
+
+  // 12 · The semester bulk action. Delegated for the same reason as the
+  // language switch below: render() replaces the whole sheet.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-sem-bulk]');
+    if(!btn) return;
+    e.preventDefault();
+    var planId = btn.getAttribute('data-plan');
+    var row = document.getElementById(btn.getAttribute('data-sem-bulk'));
+    if(!planId || !row) return;
+    var slugs = [].slice.call(row.querySelectorAll('.course[id]'))
+      .map(function(el){ return el.id.split('-c-')[1]; })
+      .filter(Boolean);
+    if(!slugs.length) return;
+    // Every course, one way — not a per-course toggle, which on a half-done
+    // semester would flip the finished ones back off.
+    var makeDone = !slugs.every(function(sl){ return isDone(planId, sl); });
+    slugs.forEach(function(sl){
+      if(isDone(planId, sl) !== makeDone){ toggle(planId, sl, { silent: true }); }
+    });
+    render(planId);
+  });
+
+  // One delegated listener for the header's language switch, bound at module
+  // level so it survives every re-render of the plan (render() replaces the
+  // whole sheet, so a listener attached to the buttons themselves would not).
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-plan-lang]');
+    if(!btn) return;
+    var sheet = btn.closest('.sheet-plan');
+    var planId = sheet && sheet.id ? sheet.id.replace(/^page-/, '') : currentOpenPlanId;
+    if(!planId) return;
+    e.preventDefault();
+    toggleLang(planId, btn.getAttribute('data-plan-lang'));
+  });
+
   function dismissSearchHint(){
     document.querySelectorAll('.search-hint').forEach(function(el){ el.remove(); });
   }
@@ -2544,6 +2779,9 @@
     // Exposed for js/74-course-gestures.js, which shows the same trace under
     // its action sheet rather than re-implementing the walk over the edges.
     traceCourse: handleCourseHoverEnter, untraceCourse: handleCourseHoverLeave,
+    // Exposed for js/49-course-detail.js (57) and anything else that wants to
+    // ask what a course is holding open.
+    closesIfDropped: closesIfDropped, chainDepth: chainDepth,
     toggleLang: toggleLang, openLibrary: openLibrary, bucketsInPlan: bucketsInPlan,
     dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,

@@ -1064,13 +1064,29 @@
     return '<h2>📮 Contributions</h2>' +
       '<div class="form-actions"><button type="button" class="home-btn" id="contribReload">🔄 Refresh</button></div>' +
       state.contribItems.map(function(c){
+        // Two kinds arrive on this endpoint. A plan contribution is a course
+        // list to merge; a prerequisite report (js/86-prereq-report.js) is a
+        // single claim to check against the published document. They need
+        // different summaries — counting "0 course(s)" on a report told you
+        // nothing about what it said.
+        var isReport = c.kind === 'prereq-report';
+        var r = c.report || {};
+        var summary = isReport
+          ? '<strong>Wrong prerequisite</strong> on ' + esc(courseRefTx(r.course)) +
+            ' — reported: ' + esc(r.wrongPrereq ? courseRefTx(r.wrongPrereq) : 'not one of the listed ones')
+          : '<strong>' + esc(c.majorName || c.prefix) + '</strong> (' + esc(c.prefix) + ') — ' +
+            esc((c.courses || []).length) + ' course(s), ' +
+            esc((c.prerequisites || []).length) + ' prerequisite line(s)';
+        var detail = isReport
+          ? { plan: c.prefix, majorName: c.majorName, course: r.course,
+              reportedWrong: r.wrongPrereq, appListsAsPrereqs: r.listedPrereqs, note: r.note }
+          : { courses: c.courses, prerequisites: c.prerequisites, structure: c.structure };
         return '<div class="admin-note" data-contrib-id="' + esc(c.id) + '">' +
-          '<strong>' + esc(c.majorName || c.prefix) + '</strong> (' + esc(c.prefix) + ') — ' +
-          esc((c.courses || []).length) + ' course(s), ' + esc((c.prerequisites || []).length) + ' prerequisite line(s)' +
+          summary +
           (c.contributorName ? ' — from ' + esc(c.contributorName) : '') +
           '<br><span style="opacity:.7;">' + esc(new Date(c.submittedAt).toLocaleString()) + ' · status: ' + esc(c.status) + '</span>' +
           (c.adminReply ? '<div class="admin-note" style="margin-top:8px;"><strong>Your reply:</strong> ' + esc(c.adminReply) + '</div>' : '') +
-          '<pre class="admin-contrib-json">' + esc(JSON.stringify({ courses: c.courses, prerequisites: c.prerequisites, structure: c.structure }, null, 2)) + '</pre>' +
+          '<pre class="admin-contrib-json">' + esc(JSON.stringify(detail, null, 2)) + '</pre>' +
           '<div class="form-field"><label>Reply' + (c.adminReply ? ' (replacing the one above)' : '') + '</label>' +
           '<textarea data-contrib-reply rows="2" placeholder="Thanks — added! or: can you double check X\'s credit hours?"></textarea></div>' +
           '<div class="form-actions">' +
@@ -1078,6 +1094,13 @@
           '<button type="button" class="home-btn admin-danger" data-contrib-dismiss="' + esc(c.id) + '">🗑 Delete</button>' +
           '</div></div>';
       }).join('');
+  }
+
+  // "Machine Learning [0303221]" — one line for a course reference inside a
+  // prerequisite report, so the summary reads without opening the JSON.
+  function courseRefTx(c){
+    if(!c) return '(missing)';
+    return (c.name || c.id || '?') + (c.num ? ' [' + c.num + ']' : '');
   }
 
   function bindContributions(main){
