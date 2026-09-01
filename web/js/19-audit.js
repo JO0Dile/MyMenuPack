@@ -308,6 +308,76 @@
     }).join('') + '</div>';
   }
 
+  // ============================================================
+  // 58 · YOUR LOAD AGAINST THE ADVISORY PLAN
+  //
+  // The university publishes its own semester-by-semester sequence for most of
+  // these plans and the app has never once compared against it. Two bars per
+  // term — what the plan scheduled, and what the student has actually
+  // finished in that term — show at a glance whether someone is front-loading,
+  // coasting, or about to walk into a 21-hour wall. It needs no data that is
+  // not already here.
+  //
+  // "Your" hours are the courses marked done that the plan places in that
+  // term. A course taken out of sequence therefore shows up against the term
+  // the plan expected it in, not the term it was really taken — the app does
+  // not record the latter, and inventing it would be worse than the honest
+  // approximation. The caption says as much.
+  function advisoryHtml(prefix, rtl){
+    var plans = window.AAUP_IMPORTED && window.AAUP_IMPORTED.loadImportedPlans();
+    var plan = plans && plans[prefix];
+    if(!plan || !plan.structure || !Array.isArray(plan.structure.years)) return '';
+    var progress = window.__getProgress ? window.__getProgress() : {};
+    var terms = [];
+    plan.structure.years.forEach(function(y, i){
+      ['s1', 's2'].concat(y.hasSummer ? ['s3'] : []).forEach(function(sem){
+        var here = (plan.courses || []).filter(function(c){
+          return c.yearId === y.id && c.semester === sem;
+        });
+        if(!here.length) return;
+        var planned = 0, mine = 0;
+        here.forEach(function(c){
+          var h = parseFloat(c.creditHours) || 0;
+          planned += h;
+          if(progress[prefix + '-c-' + c.id]) mine += h;
+        });
+        // "Y1a" needs decoding; "1.1" does not, and it reads the same in
+        // both languages, which matters because the bars are only ~26px wide
+        // on a phone. The full wording lives in the tooltip.
+        var mark = sem === 's3' ? '\u2600' : sem === 's1' ? '1' : '2';
+        var full = rtl
+          ? 'السنة ' + (i + 1) + ' · ' + (sem === 's3' ? 'صيفي' : sem === 's1' ? 'الفصل الأول' : 'الفصل الثاني')
+          : 'Year ' + (i + 1) + ' · ' + (sem === 's3' ? 'Summer' : sem === 's1' ? 'first semester' : 'second semester');
+        terms.push({ label: (i + 1) + '.' + mark, full: full, planned: planned, mine: mine });
+      });
+    });
+    if(terms.length < 2) return '';
+    var peak = terms.reduce(function(m, t){ return Math.max(m, t.planned, t.mine); }, 1);
+    var bars = terms.map(function(t){
+      var pct = function(v){ return Math.round((v / peak) * 100); };
+      var tip = t.full + ' — ' + (rtl
+        ? 'أنجزت ' + t.mine + ' من ' + t.planned + ' ساعة'
+        : 'you finished ' + t.mine + ' of the ' + t.planned + ' hours scheduled');
+      return '<div class="adv-term" title="' + window.__escapeHtml(tip) + '">' +
+        '<div class="adv-pair">' +
+          '<span class="adv-mine" style="height:' + pct(t.mine) + '%"></span>' +
+          '<span class="adv-plan" style="height:' + pct(t.planned) + '%"></span>' +
+        '</div><span class="adv-lab">' + window.__escapeHtml(t.label) + '</span></div>';
+    }).join('');
+    return '<div class="adv-block">' +
+      '<h3 style="margin-bottom:6px;">' +
+        (rtl ? 'حِملك مقابل الخطة الإرشادية' : 'Your load against the advisory plan') + '</h3>' +
+      '<p class="adv-key">' +
+        '<span class="adv-swatch adv-swatch-mine"></span>' + (rtl ? 'أنجزت' : 'you finished') +
+        '<span class="adv-swatch adv-swatch-plan"></span>' + (rtl ? 'الخطة' : 'the plan schedules') +
+      '</p>' +
+      '<div class="adv-chart">' + bars + '</div>' +
+      '<p class="form-note">' + (rtl
+        ? 'المساق المُنجز يُحتسب على الفصل الذي تضعه فيه الخطة، لا الفصل الذي أخذته فيه فعلًا.'
+        : 'A finished course counts against the term the plan puts it in, not the term you actually took it.') +
+      '</p></div>';
+  }
+
   function open(prefix, startMode){
     var body = document.getElementById('auditModalBody');
     var overlay = document.getElementById('auditModalOverlay');
@@ -352,6 +422,7 @@
           '<div id="auditGpaTargetBody"></div></div>'
         : '') +
       renderSemesterGpas(prefix, rtl) +
+      advisoryHtml(prefix, rtl) +
       renderAuditTable(prefix, rtl);
     overlay.classList.add('open');
     bindModes(prefix);

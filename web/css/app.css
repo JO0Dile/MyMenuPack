@@ -2613,6 +2613,57 @@
   .tr-why summary:hover{color:var(--text);}
   .tr-why p{margin:6px 0 0; font-size:11.5px; line-height:1.6; color:var(--text-dim);}
 
+  /* Idea 58 — your load against the advisory plan (js/19-audit.js). Two bars
+     per term: what the plan schedules there, and what you have finished of
+     it. The plan bar is the outline you are measured against, so it is a
+     hollow accent-edged column; the finished bar is solid and sits in front
+     of it, which is the same figure/ground reading as a target and a
+     result. The chart scrolls sideways rather than squeezing: eleven terms
+     at 26px still overflow a 390px phone, and squeezed bars stop being
+     comparable to each other, which is the entire point of the widget. */
+  .adv-block{margin-bottom:16px;}
+  .adv-chart{
+    display:flex; align-items:flex-end; gap:10px;
+    height:112px; padding:0 2px 0; overflow-x:auto; overflow-y:hidden;
+  }
+  .adv-term{
+    flex:0 0 auto; display:flex; flex-direction:column; align-items:center;
+    gap:5px; height:100%;
+  }
+  .adv-pair{
+    position:relative; flex:1 1 auto; width:26px;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .adv-plan{
+    width:100%; min-height:2px; border-radius:4px 4px 0 0;
+    border:1.5px solid var(--accent); border-bottom:none;
+    background:color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  /* In front of the plan outline, not beside it — a term is one quantity
+     measured against another, and two adjacent columns read as two terms. */
+  .adv-mine{
+    position:absolute; inset-inline:5px; bottom:0;
+    min-height:2px; border-radius:3px 3px 0 0; background:var(--accent);
+  }
+  .adv-lab{
+    font-size:10px; font-weight:700; color:var(--text-dim);
+    font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .adv-key{
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+    margin:0 0 8px; font-size:11px; color:var(--text-dim);
+  }
+  .adv-swatch{
+    width:11px; height:11px; border-radius:3px; flex:0 0 auto;
+    margin-inline-start:4px;
+  }
+  .adv-key .adv-swatch:first-child{margin-inline-start:0;}
+  .adv-swatch-mine{background:var(--accent);}
+  .adv-swatch-plan{
+    border:1.5px solid var(--accent);
+    background:color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
   /* The three automatic restore points in Settings (js/84-autobackup.js).
      A date, how long ago, how big, and the two things you can do with it. */
   .ab-list{display:flex; flex-direction:column; gap:8px; margin-bottom:6px;}
@@ -6937,6 +6988,16 @@ html[dir="rtl"] .cd-head, .cd[dir="rtl"] .cd-head{padding:20px 22px 16px 46px;}
    paragraph of its own weight. */
 .cd-side .cd-note{font-size:11px; color:var(--warn); margin:4px 0 0; line-height:1.5;}
 .cd-note strong{font-weight:700;}
+
+/* Idea 57 — the cost of dropping a course you have already passed
+   (js/49-course-detail.js). It answers a question the plan never asked out
+   loud, so it is set apart from the neighbouring sections by a warning rail
+   rather than another uppercase label competing with them. */
+.cd-drop{
+  border-inline-start:3px solid var(--warn);
+  padding-inline-start:10px;
+}
+.cd-drop .cd-note{margin-bottom:0;}
 
 /* Each prerequisite carries its own state, so "why is this locked" is answered
    by looking rather than by reading. */

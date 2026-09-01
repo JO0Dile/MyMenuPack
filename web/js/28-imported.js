@@ -1134,6 +1134,65 @@
       });
   }
 
+  // ============================================================
+  // 2 · HOW FAR AWAY A LOCKED COURSE ACTUALLY IS
+  //
+  // Every locked course looks equally out of reach today, so a student cannot
+  // tell the one that opens as soon as they pass a single course from the one
+  // that is three deep behind courses they have not started. Depth is the
+  // longest chain of NOT-YET-DONE prerequisites standing in front of it —
+  // exactly the number of courses that still have to happen first.
+  //
+  // Capped, and cycle-guarded: a hand-transcribed plan can contain a pair of
+  // courses that each list the other, and this walk must not follow that
+  // forever.
+  var DEPTH_CAP = 9;
+  function chainDepth(planId, slug, seen){
+    var data = window.__PLAN_DATA[planId] || {};
+    var needs = (data.needsMap && data.needsMap[slug]) || [];
+    seen = seen || Object.create(null);
+    if(seen[slug]) return 0;
+    seen[slug] = true;
+    var deepest = 0;
+    for(var i = 0; i < needs.length; i++){
+      var r = needs[i];
+      if(isDone(planId, r)) continue;
+      var d = 1 + chainDepth(planId, r, seen);
+      if(d > deepest) deepest = d;
+      if(deepest >= DEPTH_CAP) break;
+    }
+    seen[slug] = false;
+    return Math.min(deepest, DEPTH_CAP);
+  }
+
+  // 57 · WHAT CLOSES IF YOU DROP THIS
+  //
+  // The inverse of "what does this open", and the more urgent one: dropping a
+  // course is a decision made under pressure in week three with no information
+  // at all. Transitive, because the second-order effects are the ones that
+  // catch people out — dropping Statistics does not just close Machine
+  // Learning, it closes everything behind Machine Learning too.
+  // A prerequisite list in this catalogue is an AND, not a choice of routes:
+  // needsMap holds every course that must be passed first, so there is no
+  // "other way round" to check for. What closes is therefore the whole
+  // downstream cone — everything whose path to being taken runs through this
+  // course — minus anything already passed, which cannot close retroactively.
+  function closesIfDropped(planId, slug){
+    var data = window.__PLAN_DATA[planId] || {};
+    var unlocks = data.unlocksMap || {};
+    var out = [], seen = Object.create(null), queue = (unlocks[slug] || []).slice();
+    seen[slug] = true;
+    while(queue.length){
+      var cur = queue.shift();
+      if(seen[cur]) continue;
+      seen[cur] = true;
+      if(isDone(planId, cur)) continue;
+      out.push(cur);
+      (unlocks[cur] || []).forEach(function(n){ queue.push(n); });
+    }
+    return out;
+  }
+
   function courseCardHtml(planId, c, rtl, yearNum, continuations, whereTx){
     var done = isDone(planId, c.id);
     var avail = isAvailable(planId, c.id);
@@ -1193,9 +1252,18 @@
     // said so already. The state worth a word is the closed one, and the
     // useful word is not "closed" but what it is still waiting for.
     var missing = (done || avail) ? [] : missingPrereqNames(planId, c.id, rtl);
+    var depth = (done || avail) ? 0 : chainDepth(planId, c.id);
+    // Two is a dual in Arabic, not a plural — "2 مساقات" reads as a mistake.
+    // Depth is capped at DEPTH_CAP (9), so the three-to-ten plural covers the
+    // whole of the rest of the range.
+    var awayTx = depth > 1
+      ? (rtl ? ' \u00b7 ' + (depth === 2 ? 'على بُعد مساقين' : 'على بُعد ' + depth + ' مساقات')
+             : ' \u00b7 ' + depth + ' away')
+      : '';
     var lockHtml = !missing.length ? window.__escapeHtml(statusTx)
       : window.__escapeHtml(rtl ? 'يحتاج ' : 'needs ') + bidi(missing[0]) +
-        (missing.length > 1 ? window.__escapeHtml(' +' + (missing.length - 1)) : '');
+        (missing.length > 1 ? window.__escapeHtml(' +' + (missing.length - 1)) : '') +
+        window.__escapeHtml(awayTx);
     // The plain-text form, for the screen-reader label where markup cannot go.
     var lockTx = !missing.length ? statusTx
       : (rtl ? 'يحتاج ' : 'needs ') + missing[0] +
@@ -2692,6 +2760,9 @@
     // Exposed for js/74-course-gestures.js, which shows the same trace under
     // its action sheet rather than re-implementing the walk over the edges.
     traceCourse: handleCourseHoverEnter, untraceCourse: handleCourseHoverLeave,
+    // Exposed for js/49-course-detail.js (57) and anything else that wants to
+    // ask what a course is holding open.
+    closesIfDropped: closesIfDropped, chainDepth: chainDepth,
     toggleLang: toggleLang, openLibrary: openLibrary, bucketsInPlan: bucketsInPlan,
     dismissSearchHint: dismissSearchHint,
     persistCourseMove: persistCourseMove, confirmRemoveCourse: confirmRemoveCourse, removeCourse: removeCourse,
