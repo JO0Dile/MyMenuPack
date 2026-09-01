@@ -322,21 +322,15 @@
   // claim being made is about this app, and this app genuinely does work
   // either way, so the worst case is a true statement in the wrong tense.
   // ============================================================
-  // 50 · ASK TO BE INSTALLED, AT THE RIGHT MOMENT
+  // 50 · ASK TO BE INSTALLED
   //
-  // It is a proper offline PWA and almost nobody discovers that, because the
-  // browser only offers installation through a menu most students never open.
-  // The event that lets an app ask directly fires on the FIRST visit, which is
-  // the worst possible moment: a stranger who has not seen the app yet says
-  // no, and Chrome will not offer again for months.
-  //
-  // So the event is caught and held, and the offer is made on the third
-  // visit — by which point the student has come back twice of their own
-  // accord, which is the only evidence that matters. Declining hides it for
-  // good; this asks once.
+  // This used to hold the beforeinstallprompt event and pop a yes/no offer on
+  // the third visit, then never ask again. All of that now lives in
+  // js/89-install.js, because the offer is made in three places rather than
+  // one and the state behind it — held / installed / iOS-manual / impossible —
+  // is the same state in all three. What is left here is the visit counter,
+  // which nothing else owns.
   var VISITS_KEY = 'aaup_visits';
-  var INSTALL_KEY = 'aaup_installAsked';
-  var heldPrompt = null;
 
   function bumpVisits(){
     try{
@@ -345,53 +339,8 @@
       return n;
     }catch(e){ return 0; }
   }
-  function installAsked(){
-    try{ return localStorage.getItem(INSTALL_KEY) === '1'; }catch(e){ return true; }
-  }
-  function markInstallAsked(){
-    try{ localStorage.setItem(INSTALL_KEY, '1'); }catch(e){}
-  }
-
-  if(typeof window !== 'undefined'){
-    window.addEventListener('beforeinstallprompt', function(e){
-      e.preventDefault();        // hold it rather than let the browser decide
-      heldPrompt = e;
-      maybeOfferInstall();
-    });
-    window.addEventListener('appinstalled', markInstallAsked);
-  }
-
   function maybeOfferInstall(){
-    if(!heldPrompt || installAsked()) return;
-    var visits = 0;
-    try{ visits = parseInt(localStorage.getItem(VISITS_KEY), 10) || 0; }catch(e){}
-    if(visits < 3) return;
-    var host = document.getElementById('homeInstallRow');
-    if(!host) return;
-    var A = ar();
-    host.innerHTML =
-      '<div class="install-offer">' +
-        '<div class="install-copy">' +
-          '<b>' + (A ? 'أضف AAUPath إلى شاشتك الرئيسية؟' : 'Add AAUPath to your home screen?') + '</b>' +
-          '<span>' + (A ? 'يفتح فورًا ويعمل بدون إنترنت.' : 'It opens instantly and works with no signal.') + '</span>' +
-        '</div>' +
-        '<div class="install-acts">' +
-          '<button type="button" class="home-btn" data-install="yes">' + (A ? 'أضف' : 'Add') + '</button>' +
-          '<button type="button" class="home-btn" data-install="no">' + (A ? 'لا' : 'No thanks') + '</button>' +
-        '</div>' +
-      '</div>';
-    host.hidden = false;
-    host.addEventListener('click', function(e){
-      var b = e.target.closest('[data-install]');
-      if(!b) return;
-      markInstallAsked();
-      host.hidden = true;
-      host.innerHTML = '';
-      if(b.getAttribute('data-install') === 'yes' && heldPrompt){
-        try{ heldPrompt.prompt(); }catch(err){}
-      }
-      heldPrompt = null;
-    }, { once: true });
+    if(window.AAUP_INSTALL) window.AAUP_INSTALL.refresh();
   }
 
   function syncOfflineNote(){

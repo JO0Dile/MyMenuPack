@@ -5556,6 +5556,21 @@
     .app-sidebar .sb-mrow.active .sb-mrow-label{color:var(--accent); font-weight:800;}
     .app-sidebar .sb-mrow.active .sb-mrow-icon{background:var(--accent); color:var(--on-accent);}
 
+    /* The install row (js/89-install.js) sits above every group and carries a
+       second line the other rows do not, because it is an offer rather than a
+       destination and has to say what accepting it does. */
+    .app-sidebar .sb-group-install{margin-bottom:8px;}
+    .app-sidebar .sb-mrow-install .sb-mrow-icon{
+      background:var(--accent); color:var(--on-accent);
+    }
+    .app-sidebar .sb-mrow-install .sb-mrow-label{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .app-sidebar .sb-mrow-install .sb-mrow-label b{font-weight:700;}
+    .app-sidebar .sb-mrow-install .sb-mrow-label small{
+      font-size:11px; font-weight:600; color:var(--text-dim);
+    }
+
     /* On the phone sheet the toggle is a section header that can be pressed,
        so it takes the .sb-group-label's shape rather than the desktop row's —
        otherwise it would look like a destination sitting outside any card. */
@@ -5990,19 +6005,69 @@
   .imp-sem-bulk:hover{color:var(--text); border-color:var(--accent);}
   .imp-sem-bulk:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 
-  /* 50 · THE INSTALL OFFER, ON THE THIRD VISIT.
-     Held back from the first visit on purpose: a stranger says no, and the
-     browser then will not offer again for months. */
-  .install-offer{
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-    padding:13px 15px; margin:14px 0 0;
+  /* 50 · THE INSTALL OFFER (js/89-install.js).
+     Three placements, one state. This one is the bar under the hero on Home —
+     the one a stranger sees. Filled rather than outlined: it is the only
+     thing on that screen asking for something rather than reporting
+     something, and it disappears entirely once the app is installed. */
+  /* An accent-EDGED panel, not an accent-filled one. Filling it meant
+     reversing the button out in --on-accent, and --on-accent is near-black in
+     the dark themes and white in the light ones — so the "white pill" became
+     a black pill with blue text on half the themes. The accent/--on-accent
+     pairing is already tuned per theme for exactly one thing, a filled
+     button, so that is what the button is and the bar carries the edge. */
+  .install-bar{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 13px; margin:14px 0 0;
     border:1px solid var(--accent); border-radius:14px;
-    background:var(--surface);
+    background:color-mix(in srgb, var(--accent) 8%, var(--panel));
   }
-  .install-copy{display:flex; flex-direction:column; gap:3px; flex:1 1 200px;}
-  .install-copy b{font-size:13.5px;}
-  .install-copy span{font-size:12px; color:var(--text-dim);}
-  .install-acts{display:flex; gap:8px;}
+  .install-ic{
+    width:34px; height:34px; flex:none; border-radius:11px;
+    background:color-mix(in srgb, var(--accent) 16%, transparent);
+    color:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .install-copy{display:flex; flex-direction:column; gap:3px; flex:1; min-width:0;}
+  .install-copy b{font-size:13px; font-weight:700; line-height:1.35; color:var(--text);}
+  .install-copy span{font-size:11px; line-height:1.45; color:var(--text-dim);}
+  .install-go{
+    flex:none; appearance:none; cursor:pointer; font-family:inherit;
+    font-size:12px; font-weight:800; padding:8px 16px; border-radius:999px;
+    border:none; background:var(--accent); color:var(--on-accent);
+    align-self:center;
+  }
+  .install-go:hover{filter:brightness(1.08);}
+  .install-go:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* iOS Safari has no install API at all, so the button opens these two
+     steps instead of doing nothing. */
+  .ios-steps{
+    margin:4px 0 0; padding-inline-start:22px;
+    font-size:13.5px; line-height:1.75; color:var(--text);
+  }
+  .ios-steps li{margin-bottom:6px;}
+
+  /* Settings → Help. The permanent one: it is here in every state, including
+     "already installed", because someone who deleted the app needs a way
+     back and the browser will not re-offer on its own. */
+  .install-help{
+    border:1px solid var(--line); border-radius:12px;
+    padding:13px 14px; margin-bottom:16px; background:var(--panel);
+  }
+  .install-help-head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+  }
+  .install-help-t{font-size:13.5px; font-weight:700;}
+  .install-help-btn{flex:none; font-size:12px;}
+  .install-help-done{
+    display:inline-flex; align-items:center; gap:5px; flex:none;
+    font-size:11.5px; font-weight:800; color:var(--skills);
+  }
+  .settings-rule{
+    border:0; border-top:1px solid var(--line); margin:0 0 16px;
+  }
 
   /* The credit on the share screen, under the QR: content, not chrome. */
   .share-credit{

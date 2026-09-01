@@ -275,7 +275,12 @@
         '<div class="sb-group sb-adv-panel" id="sbAdvancedPanel-more"' + (expanded ? '' : ' hidden') + '>' +
           adv.map(rowHtml).join('') + '</div>'
       : '';
-    return (soloItems.length ? '<div class="sb-group sb-group-solo">' + soloItems.map(rowHtml).join('') + '</div>' : '') +
+    // The install offer sits above every group — it is an offer about the app
+    // itself, not one of the places you can go in it. Its own host id so
+    // js/89-install.js can empty it the moment the app is installed, without
+    // this sheet having to be rebuilt.
+    return '<div id="sbInstallRow">' + (window.AAUP_INSTALL ? window.AAUP_INSTALL.rowHtml() : '') + '</div>' +
+      (soloItems.length ? '<div class="sb-group sb-group-solo">' + soloItems.map(rowHtml).join('') + '</div>' : '') +
       groupHtml('plan') + groupHtml('community') + advHtml + groupHtml('account');
   }
 
@@ -673,7 +678,13 @@
   // appears where it applies. So there is one button, it clears every tip's
   // seen-flag, and they come back on their own as you reach each screen.
   function helpTabHtml(r){
-    return '<p class="form-note" style="margin-top:0;">' + (r
+    // The install row is FIRST and is always here, in every state. The offers
+    // on Home and in the More sheet vanish once the app is installed; someone
+    // who later removes it from their home screen needs a way back that does
+    // not depend on a browser event which will not fire a second time.
+    return (window.AAUP_INSTALL ? window.AAUP_INSTALL.settingsHtml() : '') +
+      '<hr class="settings-rule">' +
+      '<p class="form-note" style="margin-top:0;">' + (r
       ? 'التلميحات بتطلع مرة وحدة بس عند أول مرة توصل كل شاشة. فيك ترجّعهم كلهم من هون.'
       : 'Tips appear once, the first time you reach each screen. This brings all of them back.') + '</p>' +
       '<div class="form-actions" style="justify-content:flex-start;">' +
