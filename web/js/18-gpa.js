@@ -146,11 +146,18 @@
   function isFailGrade(g){ return own(FAIL_GRADES, g); }
   // Dropdown label: the two special grades get a short descriptor so students
   // know what they mean; ordinary letter grades show as-is.
+  // The long form, for a <select> option where a row of text is the whole
+  // control and there is room to explain.
   function gradeLabel(g){
     if(g === 'W') return 'W — Withdrawn (not counted)';
     if(g === 'FA') return 'FA — Absence fail (counts as F)';
     return g;
   }
+  // The short form, for anywhere the grade is a CHIP. gradeLabel's sentence
+  // inside a 30px chip wrapped one character per line and made the row a
+  // thousand pixels tall (js/51-gpa-studio.js) — the explanation belongs in a
+  // footnote under the grid, not inside the button.
+  function gradeShort(g){ return g; }
 
   function loadMap(key){
     return window.AAUP_STORAGE.getJSON(key, {});
@@ -351,7 +358,8 @@
 
   window.AAUP_GPA = {
     GRADE_POINTS: GRADE_POINTS, GRADE_ORDER: GRADE_ORDER,
-    isNonPassing: isNonPassing, isFailGrade: isFailGrade, gradeLabel: gradeLabel,
+    isNonPassing: isNonPassing, isFailGrade: isFailGrade,
+    gradeLabel: gradeLabel, gradeShort: gradeShort,
     // Exported so no caller has to write `g in GRADE_POINTS` again — that
     // check is prototype-chain unsafe for grades that came from storage.
     isRealGrade: isRealGrade,

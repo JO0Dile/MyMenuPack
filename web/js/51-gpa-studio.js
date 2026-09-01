@@ -49,7 +49,9 @@
       done: 'Nothing left — this plan’s credit hours are already accounted for.',
       cumulative: 'Cumulative', outOf: 'OUT OF 4.00', thisSemester: 'This semester',
       majorGpa: 'Major GPA', gradedHours: 'Graded hours', qualityPoints: 'Quality points',
-      standing: 'Class standing', noGrades: 'No grades yet'
+      standing: 'Class standing', noGrades: 'No grades yet',
+      clearGrade: 'No grade — clear this one',
+      faNote: 'FA is an absence fail and counts as an F. W is a withdrawal and is not counted at all.'
     },
     ar: {
       title: 'علاماتك', hint: 'أدخل أو غيّر أي علامة أدناه وستتحدث الدائرة فوراً.',
@@ -65,7 +67,9 @@
       done: 'لم يتبق شيء — ساعات هذه الخطة مكتملة العدد بالفعل.',
       cumulative: 'التراكمي', outOf: 'من أصل 4.00', thisSemester: 'هذا الفصل',
       majorGpa: 'معدل التخصص', gradedHours: 'الساعات المُقيَّمة', qualityPoints: 'نقاط الجودة',
-      standing: 'الوضع الأكاديمي', noGrades: 'لا توجد علامات بعد'
+      standing: 'الوضع الأكاديمي', noGrades: 'لا توجد علامات بعد',
+      clearGrade: 'بلا علامة — امسح هاي',
+      faNote: 'FA رسوب بسبب الغياب وبتحتسب زي F. أما W فهي انسحاب وما بتتحسب أبدًا.'
     }
   };
 
@@ -170,27 +174,41 @@
     // from. A wrapped row of chips is one tap, keeps the table visible, and
     // sits where the thumb already is. Still a real radio group, so it is
     // keyboard- and screen-reader-operable exactly as the select was.
+    //
+    // A chip shows the grade and NOTHING else. The first version of this
+    // reused gradeLabel(), which returns "FA — Absence fail (counts as F)"
+    // for the select — a sentence inside a 30px chip, wrapped one character
+    // per line, in a 64px table column that was sized for the select it
+    // replaced. Every course row came out about a thousand pixels tall. The
+    // sentence is a footnote under the grid now, and it is said once instead
+    // of once per course.
     var chipsFor = function(pid, current){
-      var one = function(val, label, cls){
+      var one = function(val, label, title, cls){
         var on = val === current;
         return '<button type="button" class="gs-grade-chip' + (cls ? ' ' + cls : '') +
           (on ? ' is-on' : '') + '" role="radio" aria-checked="' + (on ? 'true' : 'false') +
-          '" data-pid="' + esc(pid) + '" data-grade="' + esc(val) + '">' + esc(label) + '</button>';
+          '" title="' + esc(title) + '" aria-label="' + esc(title) + '"' +
+          ' data-pid="' + esc(pid) + '" data-grade="' + esc(val) + '">' + esc(label) + '</button>';
       };
       return '<div class="gs-grade-chips" role="radiogroup">' +
         window.AAUP_GPA.GRADE_ORDER.map(function(g){
-          return one(g, window.AAUP_GPA.gradeLabel(g), window.AAUP_GPA.isFailGrade && window.AAUP_GPA.isFailGrade(g) ? 'is-fail' : '');
+          return one(g, window.AAUP_GPA.gradeShort(g), window.AAUP_GPA.gradeLabel(g),
+                     window.AAUP_GPA.isFailGrade && window.AAUP_GPA.isFailGrade(g) ? 'is-fail' : '');
         }).join('') +
-        one('', '\u2014', 'gs-grade-none') +
+        one('', '\u2014', t.clearGrade, 'gs-grade-none') +
       '</div>';
     };
+    // On a phone this table stops being a table (see .gs-table in app.css):
+    // four columns cannot hold a course name, a chip grid and two numbers in
+    // 390px. Each row becomes a card, and the two number cells carry their
+    // own label, because the header row they were reading is not there.
     var body = rows.map(function(r){
       var name = rtl && r.nameAr ? r.nameAr : r.name;
       return '<tr class="' + (r.excluded ? 'gs-row-excluded' : '') + '">' +
-        '<td><strong>' + name + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
-        '<td>' + r.cr + '</td>' +
-        '<td>' + chipsFor(r.pid, r.grade) + '</td>' +
-        '<td class="gs-pts">' + pointsCell(r, t) + '</td>' +
+        '<td class="gs-c-name"><strong>' + name + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
+        '<td class="gs-c-ch" data-lbl="' + esc(t.ch) + '">' + r.cr + '</td>' +
+        '<td class="gs-c-grade">' + chipsFor(r.pid, r.grade) + '</td>' +
+        '<td class="gs-pts gs-c-pts" data-lbl="' + esc(t.pts) + '">' + pointsCell(r, t) + '</td>' +
         '</tr>';
     }).join('');
     return '<div class="gs-block">' +
@@ -200,7 +218,10 @@
         '<colgroup><col class="gs-col-course"><col class="gs-col-ch"><col class="gs-col-grade"><col class="gs-col-pts"></colgroup>' +
         '<thead><tr>' +
         '<th>' + t.course + '</th><th>' + t.ch + '</th><th>' + t.grade + '</th><th>' + t.pts + '</th>' +
-      '</tr></thead><tbody>' + body + '</tbody></table></div></div>';
+      '</tr></thead><tbody>' + body + '</tbody></table></div>' +
+      // Said once, under the grid, instead of inside every FA and W chip on
+      // every row.
+      '<p class="gs-foot">' + t.faNote + '</p></div>';
   }
 
   // The one forward-looking figure this offers: real algebra over real
