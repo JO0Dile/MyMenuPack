@@ -185,6 +185,14 @@
   // something.
   var lastSyncAt = {};
   var SYNC_COOLDOWN_MS = 5 * 60 * 1000;
+  // Pooled ratings are the one feature here that needs a server, and the app
+  // is designed to work without one. When the endpoint answers with an error
+  // there is no point asking it again: a Worker deployed without its KV
+  // namespace bound answers 500 to every request, forever, and a plan with
+  // 200 courses asks in four batches — so one misconfiguration produced four
+  // failed requests on every plan open, which is what the diagnostics screen
+  // was reporting. One failure now stands the feature down for the session.
+  var liveDown = false;
 
   function mergeLiveAggregate(courseId, agg, community){
     if(!agg) return;
@@ -207,7 +215,7 @@
   function syncLive(prefix){
     var url = ratingsUrl();
     var ids = Object.keys((window.__PLAN_DATA[prefix] || {}).courseInfo || {});
-    if(!url || !ids.length) return Promise.resolve();
+    if(!url || !ids.length || liveDown) return Promise.resolve();
     var now = Date.now();
     if(lastSyncAt[prefix] && now - lastSyncAt[prefix] < SYNC_COOLDOWN_MS) return Promise.resolve();
     lastSyncAt[prefix] = now;
@@ -216,13 +224,16 @@
     for(var i = 0; i < ids.length; i += CHUNK){ chunks.push(ids.slice(i, i + CHUNK)); }
     return chunks.reduce(function(chain, chunk){
       return chain.then(function(){
+        // Every batch after a failed one fails the same way — the endpoint
+        // does not become reachable three requests later. Stop asking.
+        if(liveDown) return null;
         return fetch(url + '/ratings?courses=' + encodeURIComponent(chunk.join(',')))
           .then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
           .then(function(data){
             var community = loadCommunity();
             Object.keys(data.ratings || {}).forEach(function(id){ mergeLiveAggregate(id, data.ratings[id], community); });
             saveCommunity(community);
-          }).catch(function(){});
+          }).catch(function(){ liveDown = true; });
       });
     }, Promise.resolve()).then(function(){ refreshAllCommunityBadges(); });
   }
@@ -233,7 +244,7 @@
   // just changed would silently erase the other two from the pooled count.
   function pingRating(prefix, courseId){
     var url = ratingsUrl();
-    if(!url || !courseId) return;
+    if(!url || !courseId || liveDown) return;
     var pid = window.AAUP_GPA ? window.AAUP_GPA.primaryId(prefix, courseId) : courseId;
     var ratings = (window.AAUP_PERSONAL ? window.AAUP_PERSONAL.loadRatings() : {})[pid] || {};
     var statuses = window.AAUP_GPA ? window.AAUP_GPA.loadStatuses() : {};
@@ -245,7 +256,8 @@
         workload: ratings.workload || null,
         status: statuses[pid] || null
       })
-    }).catch(function(){});
+    }).then(function(r){ if(!r.ok) liveDown = true; })
+      .catch(function(){ liveDown = true; });
   }
 
   window.AAUP_COMMUNITY = {

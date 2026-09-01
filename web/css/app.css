@@ -2682,7 +2682,11 @@
   .gs-table{width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed;}
   .gs-table col.gs-col-course{width:auto;}
   .gs-table col.gs-col-ch{width:34px;}
-  .gs-table col.gs-col-grade{width:64px;}
+  /* 64px here was the width of the <select> the chips replaced. Fourteen
+     chips in 64px stack one per line and make every course row about a
+     thousand pixels tall — wide enough for four or five per row is the
+     minimum this control can live in. */
+  .gs-table col.gs-col-grade{width:220px;}
   .gs-table col.gs-col-pts{width:54px;}
 
   .gs-table th{
@@ -5922,7 +5926,7 @@
      On Android a <select> throws a full-screen list over the app to pick one
      of twelve values — twelve round trips through a modal that covers the very
      table you are filling in. */
-  .gs-grade-chips{display:flex; flex-wrap:wrap; gap:4px; max-width:210px;}
+  .gs-grade-chips{display:flex; flex-wrap:wrap; gap:4px;}
   .gs-grade-chip{
     appearance:none; cursor:pointer; font:inherit;
     font-size:11px; font-weight:700; line-height:1;
@@ -5935,6 +5939,45 @@
   .gs-grade-chip.is-fail.is-on{background:var(--danger,#e8557c); border-color:var(--danger,#e8557c);}
   .gs-grade-chip.gs-grade-none{opacity:.65;}
   .gs-grade-chip:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  /* What FA and W mean, once, under the grid — instead of inside every FA
+     and W chip on every row, which is what made them unreadable. */
+  .gs-foot{
+    margin:9px 2px 0; font-size:10.5px; line-height:1.55; color:var(--text-dim);
+  }
+
+  /* On a phone the four-column table cannot hold a course name, a fourteen-
+     chip grid and two numbers in 390px, so it stops being a table: each row
+     becomes a card, and the two number cells carry the label the header row
+     used to give them. */
+  @media (max-width:720px){
+    .gs-table, .gs-table tbody, .gs-table tr, .gs-table td{display:block; width:auto;}
+    .gs-table thead{display:none;}
+    .gs-table-wrap{overflow-x:visible;}
+    .gs-table tr{
+      padding:12px 13px; border-bottom:1px solid var(--line);
+    }
+    .gs-table tr:last-child{border-bottom:0;}
+    .gs-table td{border-bottom:0; padding:0;}
+    .gs-c-name{margin-bottom:8px;}
+    /* CH and Points read as one meta line above the chips, each prefixed by
+       its own label since there is no header row to read up to. */
+    .gs-c-ch, .gs-c-pts{
+      display:inline-block; font-size:11px; color:var(--text-dim); text-align:start;
+    }
+    .gs-c-ch::before, .gs-c-pts::before{
+      content:attr(data-lbl) " "; font-weight:800; letter-spacing:.04em;
+      text-transform:uppercase; font-size:9.5px;
+    }
+    /* CH sits above the chips as context; POINTS sits below them as the
+       result of the chip you just pressed. They are not adjacent, so neither
+       needs separating from the other. */
+    .gs-c-pts{margin-top:8px;}
+    html[dir="rtl"] .gs-c-pts, .plan-page.rtl-mode .gs-c-pts{text-align:start;}
+    .gs-c-grade{margin-top:9px;}
+    /* Full width now, so the chips lay out five or six to a row instead of
+       one. Slightly bigger than desktop because they are thumb targets. */
+    .gs-c-grade .gs-grade-chip{min-width:38px; padding:8px 8px; font-size:11.5px;}
+  }
 
   /* 12 · MARK A WHOLE SEMESTER AT ONCE. */
   .imp-sem-bulk{
