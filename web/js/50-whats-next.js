@@ -37,6 +37,15 @@
   var T = {
     en: {
       empty: 'Nothing new is unlocked yet — complete a few prerequisites first.',
+      // 9 · Two different empty screens were sharing one sentence. A student
+      // with nothing marked has not "completed a few prerequisites first" —
+      // they have not started, and the thing to do about it is different.
+      emptyNewTitle: 'Nothing to recommend yet',
+      emptyNewBody: 'Tick the courses you have already passed and this fills with what they open, ranked by how much each one unlocks.',
+      emptyNewAction: 'Open my plan',
+      emptyStuckTitle: 'Nothing new is open to you',
+      emptyStuckBody: 'Everything still ahead of you is waiting on a course you have not finished. The plan shows which one each is waiting for.',
+      emptyStuckAction: 'Open my plan',
       ready: 'Ready now', opensN: function(n){ return 'Opens ' + n; },
       reasonMany: function(names, extra){
         return 'Unlocks ' + names + (extra ? ' and ' + extra + ' more' : '') + '.';
@@ -62,6 +71,12 @@
     },
     ar: {
       empty: 'لا توجد مساقات جديدة متاحة الآن — أكمل بعض المتطلبات السابقة أولاً.',
+      emptyNewTitle: 'ما في توصيات بعد',
+      emptyNewBody: 'علّم المساقات اللي خلّصتها ومنعبيلك هون اللي بتفتحه، مرتّبة حسب شو بتفتح كل وحدة.',
+      emptyNewAction: 'افتح خطتي',
+      emptyStuckTitle: 'ما في إشي جديد متاح إلك',
+      emptyStuckBody: 'كل اللي قدامك مستني مساق ما خلّصته. الخطة بتوريك كل واحد مستني شو.',
+      emptyStuckAction: 'افتح خطتي',
       ready: 'متاح الآن', opensN: function(n){ return 'يفتح ' + n; },
       reasonMany: function(names, extra){
         return 'يفتح المجال أمام ' + names + (extra ? ' و' + extra + ' أخرى' : '') + '.';
@@ -299,7 +314,22 @@
     var list = all.slice(0, TOTAL_CAP);
 
     if(!list.length){
-      body.innerHTML = '<p class="ncp-empty">' + t.empty + '</p>';
+      // Has this student marked anything at all? That is what separates
+      // "you have not started" from "you are blocked", and they need
+      // different sentences and the same button.
+      var progress = window.__getProgress ? window.__getProgress() : {};
+      var started = Object.keys(progress).some(function(k){
+        return progress[k] && k.indexOf(prefix + '-c-') === 0;
+      });
+      body.innerHTML = window.AAUP_EMPTY
+        ? window.AAUP_EMPTY.card({
+            rtl: rtl, icon: started ? 'lock' : 'planpin',
+            title: started ? t.emptyStuckTitle : t.emptyNewTitle,
+            body: started ? t.emptyStuckBody : t.emptyNewBody,
+            action: started ? t.emptyStuckAction : t.emptyNewAction,
+            onclick: "AAUP_DASHBOARD.openStudyPlan('" + prefix + "')"
+          })
+        : '<p class="ncp-empty">' + t.empty + '</p>';
       return;
     }
 

@@ -793,5 +793,76 @@
   if(document.readyState === 'complete'){ bind(); }
   else { window.addEventListener('load', bind); }
 
-  window.AAUP_ACHIEVEMENTS = { open: open, refreshUnlocks: refreshUnlocks, getUnlockedCount: getUnlockedCount };
+  // 28 · THE BADGES, ON THE DASHBOARD
+  //
+  // A screen you visit once is a screen worth demoting. The badges are worth
+  // having; they were not worth a destination of their own, sitting behind a
+  // menu row that a student opened once out of curiosity and never again.
+  // Everything the wall showed you at a glance — how many you have, the most
+  // recent ones, the one you are closest to — fits in a strip, and a strip on
+  // the dashboard is seen EVERY time, which is the entire point of a badge.
+  //
+  // The full wall stays as the overflow behind the last chip, because that is
+  // where the descriptions, the filters and the shareable card live. What is
+  // gone is the pretence that it is somewhere you were meant to go.
+  function stripHtml(prefix, rtl){
+    var unlocked = refreshUnlocks(prefix);
+    var gender = studentGender();
+    var earned = [];
+    var applicable = 0;
+    ACHIEVEMENTS.forEach(function(a){
+      var applies = !a.appliesTo || a.appliesTo(prefix);
+      if(!applies) return;
+      applicable++;
+      var key = a.global ? a.id : (prefix + ':' + a.id);
+      var rec = unlocked[key];
+      if(rec) earned.push({ a: a, at: rec.at || 0 });
+    });
+    // Newest first: a badge earned this week is the one worth showing, and
+    // the declaration order in ACHIEVEMENTS is by theme, not by time.
+    earned.sort(function(x, y){ return (y.at || 0) - (x.at || 0); });
+
+    var SHOW = 3;
+    var pills = earned.slice(0, SHOW).map(function(e){
+      var ti = resolveTitle(e.a, gender);
+      return '<span class="ach-pill">' + badgeIconHtml(e.a) +
+        '<span>' + window.__escapeHtml(rtl ? ti.ar : ti.en) + '</span></span>';
+    });
+
+    if(!earned.length){
+      // Not an empty row: the badge you are closest to, which is the one
+      // thing that makes an unearned badge worth looking at.
+      var next = findNextUp(prefix, unlocked);
+      if(next){
+        var nt = resolveTitle(next.a, gender);
+        pills.push('<span class="ach-pill ach-pill-next">' + badgeIconHtml(next.a) +
+          '<span>' + window.__escapeHtml(rtl ? nt.ar : nt.en) + '</span>' +
+          '<span class="ach-pill-pct">' + Math.round(next.pct * 100) + '%</span></span>');
+      }
+    }
+
+    var more = applicable - Math.min(earned.length, SHOW);
+    return '<div class="ach-strip">' +
+      '<div class="ach-strip-head">' +
+        '<span class="ach-strip-lbl">' + (rtl ? 'الإنجازات' : 'Achievements') + '</span>' +
+        '<span class="ach-strip-count">' + earned.length + ' / ' + applicable + '</span>' +
+      '</div>' +
+      '<div class="ach-strip-row">' + pills.join('') +
+        (more > 0
+          ? '<button type="button" class="ach-pill ach-pill-more" data-ach-open="' +
+            window.__escapeHtml(prefix) + '">' + more + (rtl ? ' كمان \u2190' : ' more \u2192') + '</button>'
+          : '') +
+      '</div></div>';
+  }
+
+  // Delegated, because the dashboard replaces its own markup on every render.
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-ach-open]');
+    if(btn) open(btn.getAttribute('data-ach-open'));
+  });
+
+  window.AAUP_ACHIEVEMENTS = {
+    open: open, refreshUnlocks: refreshUnlocks, getUnlockedCount: getUnlockedCount,
+    stripHtml: stripHtml
+  };
 })();

@@ -4212,10 +4212,14 @@
     position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
     padding:26px 24px 18px;gap:8px;min-height:170px;justify-content:center;touch-action:pan-y;
   }
+  /* Holds an inline SVG from js/04-icons.js. font-size is kept for the one
+     remaining caller that still passes a character. */
   .story-ic{
     width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.06);
     display:flex;align-items:center;justify-content:center;font-size:30px;line-height:1;
+    color:var(--accent);
   }
+  .story-ic svg{width:34px;height:34px;}
   .story-title{font-size:17px;font-weight:800;color:var(--text);}
   .story-sub{font-size:12px;color:var(--text-dim);line-height:1.6;max-width:320px;}
   .story-content{width:100%;margin-top:8px;}
@@ -4255,6 +4259,26 @@
     border-radius:999px;padding:5px 12px;
   }
   .story-gpa-big{font-size:40px;font-weight:800;color:var(--accent);line-height:1;margin-top:4px;}
+  .story-cap{
+    font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);margin-top:6px;
+  }
+
+  /* 59 · The cumulative before and after the semester that just closed. The
+     "was" is deliberately quieter than the "now" — the point of the card is
+     where you have arrived, and showing both at equal weight makes the
+     reader do the comparison the card exists to have already made. */
+  .story-move{
+    display:flex;align-items:baseline;justify-content:center;gap:12px;
+    font-variant-numeric:tabular-nums;margin-top:4px;
+  }
+  .story-move-was{font-size:24px;font-weight:700;color:var(--text-dim);}
+  .story-move-arrow{font-size:20px;color:var(--text-dim);}
+  .story-move-now{font-size:40px;font-weight:800;line-height:1;}
+  .story-move-up .story-move-now{color:var(--skills);}
+  .story-move-down .story-move-now{color:var(--warn);}
+  .story-move-flat .story-move-now{color:var(--accent);}
+  [dir="rtl"] .story-move{flex-direction:row-reverse;}
 
   /* Prerequisite "why is this locked?" card content — one chip per direct
      prerequisite of the course the current card is about, so a branch (two
@@ -5610,6 +5634,101 @@
   .dash-card h3{margin:0 0 10px;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.03em;}
   .dash-card .dash-big{font-size:28px;font-weight:800;color:var(--text);}
   .dash-card .dash-sub{font-size:12px;color:var(--text-dim);margin-top:4px;}
+
+  /* 29 · The plan-health grade, above the numbers that produced it. The
+     letter is the largest thing on the dashboard because it is the one thing
+     the screen is now for; everything under it exists so the letter can be
+     disagreed with rather than taken on faith. */
+  .ph-card{margin-bottom:16px;}
+  .ph-head{display:flex; align-items:center; gap:14px;}
+  .ph-grade{
+    font-size:38px; font-weight:800; line-height:1; color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  .ph-head-text{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .ph-lbl{
+    font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .ph-verdict{font-size:14px; font-weight:800;}
+  .ph-why{margin:10px 0 0; font-size:12px; color:var(--text-dim); line-height:1.6;}
+  .ph-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:11px;}
+  .ph-chip{
+    font-size:10.5px; font-weight:800; letter-spacing:.02em;
+    border-radius:999px; padding:4px 11px; border:1px solid transparent;
+  }
+  .ph-good{background:color-mix(in srgb, var(--skills) 16%, transparent); color:var(--skills); border-color:var(--skills);}
+  .ph-watch{background:color-mix(in srgb, var(--warn) 16%, transparent); color:var(--warn); border-color:var(--warn);}
+  .ph-bad{background:color-mix(in srgb, var(--free) 18%, transparent); color:var(--free); border-color:var(--free);}
+  .ph-note{margin:11px 0 0; font-size:10.5px; color:var(--text-dim); line-height:1.55;}
+
+  /* 28 · The badges as a strip on the dashboard, instead of a count in a
+     tile pointing at a screen visited once. Scrolls sideways rather than
+     wrapping: a wrapped second row of badges is the wall this replaced. */
+  .ach-strip{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:13px 15px; margin-bottom:20px;
+  }
+  .ach-strip-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    margin-bottom:9px;
+  }
+  .ach-strip-lbl{
+    font-size:10px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--text-dim);
+  }
+  .ach-strip-count{
+    font-size:12px; font-weight:800; color:var(--text-dim);
+    font-variant-numeric:tabular-nums;
+  }
+  .ach-strip-row{
+    display:flex; gap:7px; overflow-x:auto; padding-bottom:2px;
+  }
+  .ach-pill{
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:700; white-space:nowrap;
+    background:rgba(255,255,255,.05); border:1px solid var(--line);
+    border-radius:999px; padding:6px 12px; color:var(--text);
+  }
+  .ach-pill svg{width:15px; height:15px; flex:0 0 auto;}
+  .ach-pill-next{border-style:dashed; color:var(--text-dim);}
+  .ach-pill-pct{font-weight:800; color:var(--accent); font-variant-numeric:tabular-nums;}
+  .ach-pill-more{
+    cursor:pointer; font-family:inherit; color:var(--accent);
+    border-color:color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+  .ach-pill-more:hover{border-color:var(--accent); background:var(--panel);}
+  .ach-pill-more:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* 9 · Every empty state, everywhere (js/88-empty.js). What is missing,
+     what appears once it is not, and the one button that fills it. */
+  .empty-card{
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:8px; padding:22px 20px;
+    background:var(--panel); border:1px dashed var(--line); border-radius:12px;
+  }
+  .empty-ic{
+    width:48px; height:48px; border-radius:14px; display:flex;
+    align-items:center; justify-content:center;
+    background:rgba(255,255,255,.05); color:var(--accent);
+  }
+  .empty-title{font-size:14px; font-weight:800;}
+  .empty-body{
+    font-size:12px; color:var(--text-dim); line-height:1.65; max-width:36ch;
+  }
+  .empty-btn{
+    margin-top:4px; font-family:inherit; font-size:12.5px; font-weight:800;
+    background:var(--accent); color:var(--on-accent); border:none;
+    border-radius:999px; padding:9px 20px; cursor:pointer;
+  }
+  .empty-btn:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+  .empty-line{
+    margin:0; font-size:12px; color:var(--text-dim); line-height:1.6;
+  }
+  .empty-link{
+    font-family:inherit; font-size:12px; font-weight:800; color:var(--accent);
+    background:none; border:none; padding:0; cursor:pointer; text-decoration:underline;
+  }
   .dash-quicklinks{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
   .dash-quicklink{
     background:var(--panel);border:1px solid var(--line);border-radius:10px;
