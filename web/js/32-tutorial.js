@@ -156,11 +156,21 @@
       text: { en: 'Press and hold a year title and everything you cannot take yet fades. What stays lit is what is open to you today.',
               ar: 'اضغط مطوّل على عنوان السنة وكل اللي ما بتقدر تاخده بيبهت. اللي بيضل واضح هو المتاح إلك اليوم.' }
     },
-    courseOpen: {
-      target: function(){ return document.querySelector('#impCourseModalOverlay.open .cd-pill'); },
+    // Fired when the course popup CLOSES, not when it opens, and pointing at
+    // the plan rather than into the popup. Pointing inside a dialog could
+    // never work: checkHealth() pauses any mark while another modal is open,
+    // so this one showed, paused itself in the same frame, was never read and
+    // was therefore never recorded as read — firing again on every single
+    // course a student opened, forever. Its own words say "back on the plan"
+    // anyway, so the plan is where it belongs.
+    courseClose: {
+      target: function(){
+        var r = visiblePlanRoot();
+        return r.querySelector('.imp-year-body .course[id]') || r.querySelector('.course[id]');
+      },
       title: { en: 'Hold a card, too', ar: 'والبطاقة كمان' },
-      text: { en: 'Back on the plan, press and hold a course: what it needs first lights up in one colour, what it opens in another.',
-              ar: 'ارجع ع الخطة واضغط مطوّل على مساق: اللي بدّه إياه أولًا بيضوّي بلون، واللي بيفتحه بلون تاني.' }
+      text: { en: 'Press and hold a course: what it needs first lights up in one colour, what it opens in another.',
+              ar: 'اضغط مطوّل على مساق: اللي بدّه إياه أولًا بيضوّي بلون، واللي بيفتحه بلون تاني.' }
     }
   };
 
@@ -195,7 +205,18 @@
     document.getElementById('tutTitle').textContent = side(mark.title);
     document.getElementById('tutText').textContent = side(mark.text);
 
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    // ONLY when the mark first appears. render() also runs on every reflow —
+    // window resize, and every scroll event in the capture phase, which means
+    // every scroll of every scrollable element on the page. Scrolling there
+    // put the target back in the centre the instant the student scrolled away
+    // from it: a course popup with a paused mark behind it could not be
+    // scrolled at all, because each gesture was undone before it finished.
+    // Reflow exists to move the spotlight to where the target now IS, not to
+    // move the target back to where the spotlight was.
+    if(!active._scrolled){
+      active._scrolled = true;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
     // Two animation frames used to be the whole wait. That is fine for a
     // target already on screen and wrong for one that is not: a smooth
     // scroll takes a few hundred milliseconds, so the rect was read while
@@ -254,7 +275,11 @@
     });
   }
 
-  function reflow(){ if(active) render(); }
+  var paused = false;
+  // A paused mark is one hidden behind a real dialog. It must not reposition
+  // itself against a page it cannot see, and above all it must not run
+  // render() for every scroll event that dialog produces.
+  function reflow(){ if(active && !paused) render(); }
 
   // Closing a mark. `seen` is false only when the mark gave up because its
   // own target was not on screen — in that case it has not been read, so it
@@ -279,7 +304,6 @@
   // that modal stays open, then treat closing it as "step done" and move
   // on, same reward-the-interaction logic the hold-to-trace step already
   // uses.
-  var paused = false;
   function anyOtherModalOpen(){
     return !!document.querySelector('.modal-overlay.open:not(#tutLayer)');
   }

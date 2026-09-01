@@ -1457,11 +1457,6 @@
       var extrasEl = body.querySelector('.modal-extras');
       window.__bindCourseModalExtras(planId, slug, extrasEl);
     }
-    // 53 · Hold-to-trace is taught the first time someone opens a course, not
-    // in a tour thirty seconds before they open one (js/32-tutorial.js).
-    if(window.AAUP_TUTORIAL && window.AAUP_TUTORIAL.moment){
-      window.AAUP_TUTORIAL.moment('courseOpen');
-    }
     if(window.AAUP_COURSE_DETAIL && window.AAUP_COURSE_DETAIL.bind){
       window.AAUP_COURSE_DETAIL.bind(planId, slug, body);
     }
@@ -1479,6 +1474,12 @@
   function closeCourseModal(){
     var overlay = document.getElementById('impCourseModalOverlay');
     if(overlay){ overlay.classList.remove('open'); }
+    // 53 · Hold-to-trace is taught once someone has looked at a course and
+    // come back out — the tip is about the plan, and a coach mark cannot be
+    // read while a dialog is covering it anyway (js/32-tutorial.js).
+    if(window.AAUP_TUTORIAL && window.AAUP_TUTORIAL.moment){
+      window.AAUP_TUTORIAL.moment('courseClose');
+    }
   }
 
   // One-time wiring for the single shared overlay — backdrop click, Escape,
