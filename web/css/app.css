@@ -4585,6 +4585,15 @@
     color:var(--warn);font-style:italic;flex:0 0 auto;
   }
 
+  /* 52 · "which level?" on the three English cards, until the placement is
+     answered (js/77-english-level.js). It is the one chip on a card that
+     asks for something rather than reporting something, so it is the accent
+     rather than the dim or the warn — and it disappears the moment it is
+     answered, which is why it can afford to be loud. */
+  .course-meta .cm-eng-ask{
+    color:var(--accent);font-weight:800;flex:0 0 auto;
+  }
+
   /* Following a friend's snapshot (js/82-follow.js). Two bars, same scale,
      and what each of you has that the other does not. */
   .fl-row{margin:0 0 10px;}
@@ -7847,6 +7856,68 @@ body:has(.course-qa-backdrop) .fix-launcher{display:none;}
   .eng-opt{transition:none;}
   .eng-opt:active{transform:none;}
 }
+
+/* 52 · The same four options, inside the course popup instead of a dialog
+   in front of the app. Tighter, because they are sharing a card with the
+   course's own details rather than owning the screen. */
+.eng-inline .eng-opts-inline{gap:6px;margin-top:8px;}
+.eng-inline .eng-opts-inline .eng-opt{padding:9px 11px;}
+.eng-inline .eng-opts-inline .eng-opt-name{font-size:12.5px;}
+.eng-inline .eng-opts-inline .eng-opt-sub{font-size:10.5px;}
+
+/* 41 · Reporting a wrong prerequisite from the course itself
+   (js/86-prereq-report.js). A quiet row under the reasoning — it must be
+   findable by someone who has just read an arrow they know is wrong, and
+   invisible to everyone else, so it reads as a footnote rather than an
+   action the course is asking for. */
+.cd-report{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; flex-wrap:wrap;
+  margin-top:14px; padding-top:11px; border-top:1px solid var(--line);
+}
+.cd-report-lbl{font-size:11.5px; color:var(--text-dim);}
+.cd-report-btn{
+  border:1px solid var(--line); background:transparent; color:var(--accent);
+  font:inherit; font-size:11.5px; font-weight:700; cursor:pointer;
+  padding:5px 11px; border-radius:999px;
+}
+.cd-report-btn:hover{border-color:var(--accent); background:var(--panel);}
+.cd-report-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+.cd-report-done{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11.5px; font-weight:700; color:var(--skills);
+}
+
+/* The report form itself. One radio per listed prerequisite — a list short
+   enough (rarely more than three) that radios beat a dropdown. */
+.pr-course{
+  margin:0 0 10px; font-size:13.5px; font-weight:800;
+}
+.pr-opts{display:flex; flex-direction:column; gap:7px; margin-bottom:14px;}
+.pr-opt{
+  display:flex; align-items:center; gap:9px;
+  padding:9px 11px; border:1px solid var(--line); border-radius:10px;
+  cursor:pointer; font-size:12.5px;
+}
+.pr-opt:hover{border-color:var(--accent);}
+.pr-opt input{flex:0 0 auto; accent-color:var(--accent);}
+.pr-opt-name{flex:1 1 auto; min-width:0; font-weight:700;}
+.pr-opt-num{
+  flex:0 0 auto; font-size:11px; color:var(--text-dim);
+  font-variant-numeric:tabular-nums;
+}
+.pr-note-lbl{
+  display:block; margin-bottom:6px;
+  font-size:10.5px; font-weight:800; letter-spacing:1.1px;
+  text-transform:uppercase; color:var(--text-dim);
+}
+/* Send is the one thing this dialog exists to do, so it is the filled one —
+   same treatment .fix-btn-primary gives the equivalent button elsewhere. */
+.pr-send{
+  background:var(--accent); color:var(--on-accent); border-color:transparent;
+  font-weight:800;
+}
+.pr-send:hover{background:var(--accent); color:var(--on-accent); filter:brightness(1.08);}
 
 /* ==========================================================================
    YOU ARE HERE (js/78-you-are-here.js)

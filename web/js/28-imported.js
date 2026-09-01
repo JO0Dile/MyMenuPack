@@ -1305,6 +1305,15 @@
     if(!done && !avail){
       metaParts.push('<span class="cm-status cm-locked">' + lockHtml + '</span>');
     }
+    // 52 · The English placement is no longer a gate in front of the app; it
+    // is asked on the three courses it actually decides. This chip is what
+    // makes the question findable — without it the only prompt would be
+    // inside a popup nobody has a reason to open.
+    if(window.AAUP_ENGLISH && window.AAUP_ENGLISH.needsAnswer &&
+       window.AAUP_ENGLISH.needsAnswer(planId, c.id)){
+      metaParts.push('<span class="cm-status cm-eng-ask">' +
+        window.__escapeHtml(window.AAUP_ENGLISH.chipLabel(rtl)) + '</span>');
+    }
     if(superseded || c.isRetake){
       var attemptTx = superseded
         ? (gr ? gr + ' · ' : '') + (rtl ? 'مستبدَل' : 'replaced')
@@ -1473,11 +1482,16 @@
     var overlay = document.getElementById('impCourseModalOverlay');
     if(!overlay || overlay.getAttribute('data-bound')) return;
     overlay.setAttribute('data-bound', '1');
-    var card = overlay.querySelector('.modal-card');
     var closeBtn = document.getElementById('impCourseModalClose');
     if(closeBtn){ closeBtn.addEventListener('click', closeCourseModal); }
     overlay.addEventListener('click', function(e){ if(e.target === overlay){ closeCourseModal(); } });
-    if(card){ card.addEventListener('click', function(e){ e.stopPropagation(); }); }
+    // The card used to stopPropagation() on every click, to stop a click
+    // inside it reaching the backdrop. It never could: the backdrop handler
+    // above closes only when the click's target IS the overlay, which a click
+    // inside the card is not. What the guard did instead was swallow every
+    // click before it left the card, so any handler delegated from document —
+    // js/86-prereq-report.js was the first to need one — silently never
+    // fired inside this modal. Removed rather than worked around.
     document.addEventListener('keydown', function(e){
       if(e.key === 'Escape' && overlay.classList.contains('open')){ closeCourseModal(); }
     });

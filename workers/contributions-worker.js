@@ -100,8 +100,18 @@ async function addContribution(env, body, cors) {
   const deviceId = safeId(body.deviceId || '');
   if (!prefix) return json({ error: 'prefix is required' }, 400, cors);
   if (!deviceId) return json({ error: 'deviceId is required' }, 400, cors);
+  // Two kinds of submission share this endpoint. A plan contribution carries
+  // a course list; a prerequisite report (web/js/86-prereq-report.js) carries
+  // one course and the arrow the student says is wrong, and has no course
+  // list at all — so the non-empty check applies only to the first kind.
+  const kind = body.kind === 'prereq-report' ? 'prereq-report' : 'plan';
   const courses = Array.isArray(body.courses) ? body.courses.slice(0, MAX_COURSES) : [];
-  if (!courses.length) return json({ error: 'courses must be a non-empty array' }, 400, cors);
+  if (kind === 'plan' && !courses.length) {
+    return json({ error: 'courses must be a non-empty array' }, 400, cors);
+  }
+  if (kind === 'prereq-report' && !body.course) {
+    return json({ error: 'course is required for a prereq-report' }, 400, cors);
+  }
 
   const rateKey = `rate:${deviceId}`;
   const last = await env.CONTRIB.get(rateKey);
@@ -116,9 +126,19 @@ async function addContribution(env, body, cors) {
     majorName: clean(String(body.majorName || '')).slice(0, MAX_STR),
     deviceId,
     contributorName: clean(String(body.contributorName || '')).slice(0, MAX_STR),
+    kind,
     courses,
     prerequisites: Array.isArray(body.prerequisites) ? body.prerequisites.slice(0, 2000) : [],
     structure: body.structure && typeof body.structure === 'object' ? body.structure : null,
+    // Report-only fields. Trimmed to the same limits as everything else here,
+    // and absent entirely on a plan contribution.
+    report: kind === 'prereq-report' ? {
+      course: courseRef(body.course),
+      wrongPrereq: body.wrongPrereq ? courseRef(body.wrongPrereq) : null,
+      listedPrereqs: (Array.isArray(body.listedPrereqs) ? body.listedPrereqs : [])
+        .slice(0, 40).map(courseRef),
+      note: clean(String(body.note || '')).slice(0, 500),
+    } : null,
     status: 'pending',
     adminReply: '',
     submittedAt: Date.now(),
@@ -149,6 +169,14 @@ function json(obj, status, cors) {
 }
 function safeId(s) {
   return String(s).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 80);
+}
+function courseRef(c) {
+  const o = c && typeof c === 'object' ? c : {};
+  return {
+    id: safeId(o.id || ''),
+    num: clean(String(o.num || '')).slice(0, 40),
+    name: clean(String(o.name || '')).slice(0, MAX_STR),
+  };
 }
 function clean(s) {
   return s.replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();

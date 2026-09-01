@@ -258,6 +258,15 @@
           '</div>' +
           '<div class="cd-swipe-dots" id="cdSlideDots"><span class="on"></span><span></span></div>' +
           dropsHTML(prefix, slug, rtl) +
+          // 52 · The English placement question, asked on the three courses
+          // it decides rather than as a gate in front of the whole app.
+          // Empty for every other course, and once it has been answered.
+          (window.AAUP_ENGLISH && window.AAUP_ENGLISH.askHereHtml
+            ? window.AAUP_ENGLISH.askHereHtml(prefix, slug, rtl) : '') +
+          // 41 · One tap to say an arrow is wrong. Empty on a course with no
+          // prerequisites — there is nothing there to be wrong about.
+          (window.AAUP_PREREQ_REPORT
+            ? window.AAUP_PREREQ_REPORT.lineHtml(prefix, slug, rtl) : '') +
           '<div class="cd-extras"></div>' +
         '</div>' +
         '<div class="cd-side">' +
@@ -286,6 +295,20 @@
   // just never fires.
   function bind(prefix, slug, container){
     if(!container) return;
+    // 52 · Answering the English placement from inside the course popup. The
+    // answer removes courses from the plan, so the popup closes and the plan
+    // redraws — leaving the popup open on a course that may have just left
+    // the grid is the one outcome that must not happen.
+    var engBlock = container.querySelector('.eng-opts-inline');
+    if(engBlock && window.AAUP_ENGLISH && window.AAUP_ENGLISH.answerFromClick){
+      engBlock.addEventListener('click', function(e){
+        var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
+        if(!window.AAUP_ENGLISH.answerFromClick(prefix, e.target, rtl)) return;
+        var ov = container.closest('.modal-overlay');
+        if(ov) ov.classList.remove('open');
+        if(window.__refreshPlanUI) window.__refreshPlanUI(prefix);
+      });
+    }
     var slides = container.querySelector('#cdSlides');
     var dots = container.querySelector('#cdSlideDots');
     if(slides && dots){
