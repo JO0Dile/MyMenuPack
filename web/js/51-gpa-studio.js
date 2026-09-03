@@ -51,6 +51,8 @@
       majorGpa: 'Major GPA', gradedHours: 'Graded hours', qualityPoints: 'Quality points',
       standing: 'Class standing', noGrades: 'No grades yet',
       clearGrade: 'No grade — clear this one',
+      pick: 'Set grade', change: 'Change', changed: 'changed',
+      noGrade: 'no grade yet',
       faNote: 'FA is an absence fail and counts as an F. W is a withdrawal and is not counted at all.'
     },
     ar: {
@@ -69,6 +71,8 @@
       majorGpa: 'معدل التخصص', gradedHours: 'الساعات المُقيَّمة', qualityPoints: 'نقاط الجودة',
       standing: 'الوضع الأكاديمي', noGrades: 'لا توجد علامات بعد',
       clearGrade: 'بلا علامة — امسح هاي',
+      pick: 'ضع العلامة', change: 'غيّر', changed: 'تغيّرت',
+      noGrade: 'بلا علامة بعد',
       faNote: 'FA رسوب بسبب الغياب وبتحتسب زي F. أما W فهي انسحاب وما بتتحسب أبدًا.'
     }
   };
@@ -143,6 +147,14 @@
     return rows;
   }
 
+  // Which courses this student has touched since the screen opened. Setting a
+  // grade rebuilds the whole modal, so a row cannot remember anything itself —
+  // and after four or five edits "which ones did I just do?" is a real
+  // question with no way to answer it. Module-level, and cleared only when
+  // the screen is opened fresh rather than re-rendered by an edit.
+  var changed = Object.create(null);
+  function clearChanged(){ changed = Object.create(null); }
+
   function pointsCell(row, t){
     if(row.excluded) return '<span class="gs-excluded">' + t.excluded + '</span>';
     // No grade yet is not the same as a grade that earns nothing, and
@@ -198,29 +210,53 @@
         one('', '\u2014', t.clearGrade, 'gs-grade-none') +
       '</div>';
     };
-    // On a phone this table stops being a table (see .gs-table in app.css):
-    // four columns cannot hold a course name, a chip grid and two numbers in
-    // 390px. Each row becomes a card, and the two number cells carry their
-    // own label, because the header row they were reading is not there.
+    // ONE COURSE OPEN AT A TIME.
+    //
+    // Every course used to carry its own permanently-expanded grid of
+    // fourteen chips. Correct per row, unusable as a list: forty courses came
+    // to roughly eight thousand pixels of scrolling to reach the one grade a
+    // student actually came here to change, and thirteen of every fourteen
+    // chips on screen were for courses they were not editing.
+    //
+    // A row is now a summary — the course, its hours, the grade it already
+    // has, the points that grade earns. Tapping it opens the chips underneath
+    // it, and opening one closes whichever was open before. Picking a grade
+    // closes the row, because the next thing a student does is the next
+    // course, not a second look at this one.
+    //
+    // The grade stays readable in the closed row, so the whole record can
+    // still be scanned without opening anything — which is what a screen
+    // called "Your grades" is mostly for.
     var body = rows.map(function(r){
       var name = rtl && r.nameAr ? r.nameAr : r.name;
-      return '<tr class="' + (r.excluded ? 'gs-row-excluded' : '') + '">' +
-        '<td class="gs-c-name"><strong>' + name + '</strong><br><span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + '</span></td>' +
-        '<td class="gs-c-ch" data-lbl="' + esc(t.ch) + '">' + r.cr + '</td>' +
-        '<td class="gs-c-grade">' + chipsFor(r.pid, r.grade) + '</td>' +
-        '<td class="gs-pts gs-c-pts" data-lbl="' + esc(t.pts) + '">' + pointsCell(r, t) + '</td>' +
-        '</tr>';
+      var has = r.grade != null && r.grade !== '';
+      return '<div class="gs-row' + (r.excluded ? ' gs-row-excluded' : '') + '" data-gs-row="' + esc(r.pid) + '">' +
+        '<button type="button" class="gs-head" data-gs-toggle="' + esc(r.pid) + '"' +
+          ' aria-expanded="false" aria-controls="gsp-' + esc(r.pid) + '">' +
+          '<span class="gs-head-main">' +
+            '<span class="gs-head-name">' + name + '</span>' +
+            '<span class="gs-code">' + esc(r.code) + ' · ' + esc(r.term) + ' · ' + r.cr + esc(t.ch) + '</span>' +
+          '</span>' +
+          '<span class="gs-head-right">' +
+            // What you changed on this visit, so a run of edits can be
+            // checked afterwards instead of remembered.
+            (changed[r.pid] ? '<span class="gs-head-changed">' + esc(t.changed) + '</span>' : '') +
+            (has
+              ? '<span class="gs-head-grade' + (window.AAUP_GPA.isFailGrade && window.AAUP_GPA.isFailGrade(r.grade) ? ' is-fail' : '') + '">' +
+                  esc(window.AAUP_GPA.gradeShort(r.grade)) + '</span>'
+              : '<span class="gs-head-set">' + esc(t.pick) + '</span>') +
+            '<span class="gs-head-pts">' + pointsCell(r, t) + '</span>' +
+          '</span>' +
+        '</button>' +
+        '<div class="gs-panel" id="gsp-' + esc(r.pid) + '" hidden>' + chipsFor(r.pid, r.grade) + '</div>' +
+      '</div>';
     }).join('');
     return '<div class="gs-block">' +
       '<div class="gs-lbl">' + t.title + '</div>' +
       '<p class="gs-hint">' + t.hint + '</p>' +
-      '<div class="gs-table-wrap"><table class="gs-table">' +
-        '<colgroup><col class="gs-col-course"><col class="gs-col-ch"><col class="gs-col-grade"><col class="gs-col-pts"></colgroup>' +
-        '<thead><tr>' +
-        '<th>' + t.course + '</th><th>' + t.ch + '</th><th>' + t.grade + '</th><th>' + t.pts + '</th>' +
-      '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-      // Said once, under the grid, instead of inside every FA and W chip on
-      // every row.
+      '<div class="gs-list">' + body + '</div>' +
+      // Said once, under the list, instead of inside every FA and W chip on
+      // every course.
       '<p class="gs-foot">' + t.faNote + '</p></div>';
   }
 
@@ -378,6 +414,29 @@
   }
 
   function bindTable(prefix){
+    // One open at a time. Opening a row closes whichever was open, so the
+    // list never grows past one course's worth of chips.
+    document.querySelectorAll('[data-gs-toggle]').forEach(function(head){
+      head.addEventListener('click', function(){
+        var pid = head.getAttribute('data-gs-toggle');
+        var panel = document.getElementById('gsp-' + pid);
+        var opening = panel && panel.hidden;
+        document.querySelectorAll('.gs-panel').forEach(function(p2){ p2.hidden = true; });
+        document.querySelectorAll('[data-gs-toggle]').forEach(function(h2){
+          h2.setAttribute('aria-expanded', 'false');
+          h2.closest('.gs-row').classList.remove('is-open');
+        });
+        if(opening){
+          panel.hidden = false;
+          head.setAttribute('aria-expanded', 'true');
+          head.closest('.gs-row').classList.add('is-open');
+          // Bring the whole row into view — the chips open BELOW the header,
+          // so a row tapped near the bottom of the screen would otherwise
+          // expand entirely off it.
+          panel.scrollIntoView({ block: 'nearest' });
+        }
+      });
+    });
     document.querySelectorAll('.gs-grade-chip').forEach(function(chip){
       chip.addEventListener('click', function(){
         var pid = chip.getAttribute('data-pid');
@@ -387,6 +446,7 @@
         // option did and is the only way back to ungraded from a chip row.
         if(val && grades[pid] !== val){ grades[pid] = val; } else { delete grades[pid]; }
         window.AAUP_GPA.saveGrades(grades);
+        changed[pid] = true;
         // Rebuilds the whole modal from the same open() the Dashboard link
         // already calls, so the summary cards, the semester panel, the audit
         // table and this table all recompute from the one save — there is no
@@ -407,6 +467,9 @@
   window.AAUP_GPA_STUDIO = {
     layout: layoutHTML,
     hasGrades: hasGrades,
+    // Called by js/19-audit.js when the screen is opened from outside, so the
+    // "changed" marks belong to one sitting rather than accumulating forever.
+    resetChanged: clearChanged,
     bind: function(prefix, rtl){ bindTable(prefix); bindProjection(rtl); bindSwipeDots(); }
   };
 })();
