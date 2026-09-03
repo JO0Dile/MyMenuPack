@@ -1,0 +1,62 @@
+name: Trades Work Manager
+
+# The Android app lives in tradesmanager/ and is unrelated to the StudyPlan
+# site in web/ — different product, different toolchain. Scoping this workflow
+# to its own paths keeps a change to one from running the other's checks.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tradesmanager/**'
+      - '.github/workflows/tradesmanager.yml'
+  pull_request:
+    paths:
+      - 'tradesmanager/**'
+      - '.github/workflows/tradesmanager.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # The generated Android and iOS resource files must match the shared
+      # catalogue. This fails if someone hand-edited a strings.xml, or added a
+      # string in one language and forgot the other two.
+      - name: Translations are complete and generated files are current
+        run: python3 tradesmanager/tools/gen-strings.py --check
+
+      # Parses every catalogue file through the app's own model types with
+      # unknown keys rejected, and runs the locale, format and time-of-day
+      # tests. Needs no emulator.
+      - name: Unit tests
+        working-directory: tradesmanager/android
+        run: ./gradlew --no-daemon :app:testDebugUnitTest
+
+      - name: Lint
+        working-directory: tradesmanager/android
+        run: ./gradlew --no-daemon :app:lintDebug
+
+      - name: Assemble debug APK
+        working-directory: tradesmanager/android
+        run: ./gradlew --no-daemon :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tradesmanager-debug-apk
+          path: tradesmanager/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
