@@ -382,6 +382,15 @@
     var body = document.getElementById('auditModalBody');
     var overlay = document.getElementById('auditModalOverlay');
     if(!body || !overlay) return;
+    // This same open() is what a grade chip calls to rebuild the screen after
+    // a save, so "was the overlay already open?" is the only thing that
+    // separates a fresh visit from a redraw. The GPA list's "changed" marks
+    // belong to one sitting; resetting them on every redraw would clear them
+    // the instant they were earned.
+    if(!overlay.classList.contains('open') &&
+       window.AAUP_GPA_STUDIO && window.AAUP_GPA_STUDIO.resetChanged){
+      window.AAUP_GPA_STUDIO.resetChanged();
+    }
     if(startMode === 'now' || startMode === 'whatif'){ mode = startMode; }
     var rtl = window.__isRtl ? window.__isRtl(prefix) : false;
     // The sentence that used to sit here explained which screen set a grade
