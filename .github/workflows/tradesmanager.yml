@@ -5,8 +5,10 @@ name: Trades Work Manager
 # to its own paths keeps a change to one from running the other's checks.
 
 on:
+  # Every branch, not just main: the debug APK this produces is how the app is
+  # actually tested on a phone before there is a Play listing, so it has to be
+  # built on the branch the work is happening on.
   push:
-    branches: [main]
     paths:
       - 'tradesmanager/**'
       - '.github/workflows/tradesmanager.yml'
@@ -60,3 +62,5 @@ jobs:
           name: tradesmanager-debug-apk
           path: tradesmanager/android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          # Long enough to install and try it, short enough not to hoard builds.
+          retention-days: 30
